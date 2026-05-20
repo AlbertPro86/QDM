@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "XAMPP Apache",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "C:\\xampp\\apache_start.bat"],
+      "port": 80
+    },
+    {
+      "name": "XAMPP MySQL",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "C:\\xampp\\mysql_start.bat"],
+      "port": 3306
+    },
+    {
+      "name": "PHP Built-in Server",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["-S", "localhost:8080", "-t", "C:\\xampp\\htdocs\\CRM-QUANTUN-Digital"],
+      "port": 8080
+    }
+  ]
+}

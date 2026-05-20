@@ -1,0 +1,32 @@
+# =============================================
+# CRM Operativo QUANTUN Digital
+# Seguridad Apache
+# =============================================
+
+# Proteger archivos sensibles
+<FilesMatch "^\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(sql|md|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Proteger directorios internos
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Bloquear acceso directo a config/ e includes/
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^services/ - [F,L]
+    RewriteRule ^includes/ - [F,L]
+</IfModule>
+
+# Prevenir listado de directorios
+Options -Indexes
+
+# Charset
+AddDefaultCharset UTF-8
