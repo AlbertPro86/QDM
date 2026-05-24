@@ -314,9 +314,17 @@ include __DIR__ . '/includes/header.php';
         <div class="card animate-fade-up stagger-1">
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
                 <h3 class="card-title">Servicios Activos y Renovaciones</h3>
-                <div style="display:flex;gap:12px">
-                    <button class="btn btn-secondary sm" onclick="openAddSvcModal()">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn btn-outline sm" onclick="generateSelectedOrder()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #e2e8f0;color:#0f172a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0'">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Facturar Seleccionados
+                    </button>
+                    <button class="btn btn-outline sm" onclick="openRenovarModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #e2e8f0;color:#3F5E9E;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#E1E7F2';this.style.borderColor='#3F5E9E'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0'">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Renovar
+                    </button>
+                    <button class="btn btn-secondary sm" onclick="openAddSvcModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                         Nuevo Servicio
                     </button>
                 </div>
@@ -1297,8 +1305,8 @@ function generateSelectedOrder() {
 function openOrdenModalMultiple(csIds) {
     document.getElementById('currentCsId').value  = '';
     document.getElementById('currentCsIds').value = csIds;
-    const map = window._ordenSvcMap || {};
-    const svcs = csIds.split(',').map(id => map[id]).filter(Boolean);
+    var map = window._ordenSvcMap || {};
+    var svcs = csIds.split(',').map(function(id) { return map[id]; }).filter(Boolean);
     if (svcs.length > 0) {
         _loadOrdenEditor(svcs);
     } else {
@@ -1308,8 +1316,8 @@ function openOrdenModalMultiple(csIds) {
     document.getElementById('ordenNotas').value        = '';
     document.getElementById('ordenFechaUltPago').value = '';
     document.getElementById('ordenModal').classList.add('show');
-    _loadOrdenDraftIfExists();
-    refreshOrdenPreview();
+    try { _loadOrdenDraftIfExists(); } catch(e) { console.warn('Draft load skipped:', e); }
+    try { refreshOrdenPreview(); } catch(e) { console.error('Preview error:', e); }
 }
 
 function calculateNet() {
@@ -1780,7 +1788,7 @@ function openOrdenModal(csId) {
     _toggleOrdenRenovacionFields(false);
     document.getElementById('currentCsId').value  = csId;
     document.getElementById('currentCsIds').value = '';
-    const svc = (window._ordenSvcMap || {})[csId];
+    var svc = (window._ordenSvcMap || {})[csId];
     if (svc) {
         _loadOrdenEditor([svc]);
     } else {
@@ -1790,8 +1798,8 @@ function openOrdenModal(csId) {
     document.getElementById('ordenNotas').value        = '';
     document.getElementById('ordenFechaUltPago').value = '';
     document.getElementById('ordenModal').classList.add('show');
-    _loadOrdenDraftIfExists();
-    refreshOrdenPreview();
+    try { _loadOrdenDraftIfExists(); } catch(e) { console.warn('Draft load skipped:', e); }
+    try { refreshOrdenPreview(); } catch(e) { console.error('Preview error:', e); }
 }
 
 function closeOrdenModal() {
