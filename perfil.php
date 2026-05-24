@@ -87,7 +87,10 @@ $stmt->execute([$user['id']]);
 $actividades = $stmt->fetchAll();
 
 $pageTitle = 'Configuración';
-$pageSubtitle = 'Perfil y preferencias';
+$pageSubtitle = '';
+$pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
+    . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
+    . '<span style="font-weight:600;color:var(--color-text)">Perfil</span>';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -163,7 +166,7 @@ include __DIR__ . '/includes/header.php';
             <?php else: ?>
             <?php foreach ($actividades as $a): ?>
             <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-light)">
-                <div style="width:8px;height:8px;border-radius:50%;background:var(--color-secondary);margin-top:6px;flex-shrink:0"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--q-lima);margin-top:6px;flex-shrink:0"></div>
                 <div>
                     <div style="font-size:13px;font-weight:600;color:var(--color-text)"><?= sanitize($a['accion']) ?> — <?= sanitize($a['entidad']) ?></div>
                     <div style="font-size:12px;color:var(--color-text-muted)"><?= $a['detalles'] ? sanitize($a['detalles']) : '' ?></div>

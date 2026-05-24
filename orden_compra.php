@@ -88,9 +88,18 @@ if ($plantillaIdOverride > 0) {
     $stmt->execute([$plantillaIdOverride]);
     $template = $stmt->fetch();
 } else {
-    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
-    $stmt->execute();
+    // Intentar buscar plantilla predeterminada de la categoría correspondiente
+    $categoria = ($docTipo === 'orden_renovacion') ? 'orden_renovacion' : 'cotizacion';
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE categoria = ? AND es_default = 1 AND activo = 1 LIMIT 1");
+    $stmt->execute([$categoria]);
     $template = $stmt->fetch();
+    
+    // Si no se encuentra, buscar cualquier predeterminada activa
+    if (!$template) {
+        $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
+        $stmt->execute();
+        $template = $stmt->fetch();
+    }
 }
 
 if (!$template) {
@@ -135,7 +144,7 @@ function generarTablaServicios($servicios, $fmtCOP) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $docTipoLabel ?> - <?= sanitize($cliente['nombre_comercial']) ?></title>
+    <title><?= $docTipoLabel ?> - <?= sanitize($cliente['nombre_comercial'] ?? '') ?></title>
     <style>
         body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #0E0E0C; line-height: 1.5; margin: 0; padding: 40px; background: #FAFAF7; }
         .invoice { background: white; max-width: 900px; margin: auto; }
@@ -185,11 +194,11 @@ function generarTablaServicios($servicios, $fmtCOP) {
                 <div class="logo-section">
                     <img src="<?= ($template['logo_url'] && trim($template['logo_url']) !== '') ? $template['logo_url'] : 'Assets/logo_quantun_digital_negro.png' ?>" alt="Logo" style="max-height:48px;object-fit:contain;filter:brightness(0) invert(1)">
                     <div class="company-details">
-                        <?php if($template['empresa_nit']): ?>
-                            NIT: <?= htmlspecialchars($template['empresa_nit']) ?> &nbsp;·&nbsp;
+                        <?php if(!empty($template['empresa_nit'])): ?>
+                            NIT: <?= htmlspecialchars($template['empresa_nit'] ?? '') ?> &nbsp;·&nbsp;
                         <?php endif; ?>
-                        <?= htmlspecialchars($template['empresa_email']) ?><br>
-                        <?= htmlspecialchars($template['empresa_tel']) ?> &nbsp;·&nbsp; <?= htmlspecialchars($template['empresa_dir']) ?>
+                        <?= htmlspecialchars($template['empresa_email'] ?? '') ?><br>
+                        <?= htmlspecialchars($template['empresa_tel'] ?? '') ?> &nbsp;·&nbsp; <?= htmlspecialchars($template['empresa_dir'] ?? '') ?>
                     </div>
                 </div>
                 <div class="order-info">
@@ -204,7 +213,7 @@ function generarTablaServicios($servicios, $fmtCOP) {
         <div class="client-section">
             <div class="client-info">
                 <div class="label-small">Facturado a</div>
-                <h3><?= htmlspecialchars($cliente['nombre_comercial']) ?></h3>
+                <h3><?= htmlspecialchars($cliente['nombre_comercial'] ?? '') ?></h3>
                 <?php if(!empty($cliente['nit_cedula'])): ?>
                 <p style="font-size:12px;font-weight:700;color:#0E0E0C;margin:2px 0">NIT / Cédula: <?= htmlspecialchars($cliente['nit_cedula'] ?? '') ?></p>
                 <?php endif; ?>
@@ -243,10 +252,10 @@ function generarTablaServicios($servicios, $fmtCOP) {
                     <?php foreach($servicios as $svc):
                         $qty      = $svc['_qty'] ?? 1;
                         $precioU  = $svc['_precio_unit'] ?? $svc['monto_renovacion'];
-                        $subtotal = $svc['monto_renovacion'] - ($svc['descuento'] ?? 0);
+                        $subtotal = ($svc['monto_renovacion'] ?? 0) - ($svc['descuento'] ?? 0);
                     ?>
                     <tr>
-                        <td><?= htmlspecialchars($svc['servicio_nombre']) ?></td>
+                        <td><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></td>
                         <td style="text-align:center"><?= $qty ?></td>
                         <td style="text-align:right">$ <?= number_format($precioU, 0, ',', '.') ?></td>
                         <td class="amount">$ <?= number_format($subtotal, 0, ',', '.') ?></td>
@@ -305,7 +314,7 @@ function generarTablaServicios($servicios, $fmtCOP) {
                     ?>
                     <div style="padding:10px 16px;background:<?= $bg ?>;display:flex;flex-direction:column;gap:2px">
                         <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F"><?= $label ?></span>
-                        <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($bancarios[$key]) ?></span>
+                        <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($bancarios[$key] ?? '') ?></span>
                     </div>
                     <?php $idx++; endforeach; ?>
                 </div>
@@ -316,10 +325,10 @@ function generarTablaServicios($servicios, $fmtCOP) {
         <!-- Enlace de Pago -->
         <?php if ($linkPago): ?>
         <div style="padding:0 36px 24px;text-align:center">
-            <a href="<?= htmlspecialchars($linkPago) ?>" target="_blank" style="display:inline-block;padding:14px 36px;background:<?= $template['color_primario'] ?>;color:<?= $template['color_secundario'] ?>;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">
+            <a href="<?= htmlspecialchars($linkPago ?? '') ?>" target="_blank" style="display:inline-block;padding:14px 36px;background:<?= $template['color_primario'] ?>;color:<?= $template['color_secundario'] ?>;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">
                 💳 Pagar Ahora
             </a>
-            <p style="font-size:11px;color:#8A867C;margin:8px 0 0"><?= htmlspecialchars($linkPago) ?></p>
+            <p style="font-size:11px;color:#8A867C;margin:8px 0 0"><?= htmlspecialchars($linkPago ?? '') ?></p>
         </div>
         <?php endif; ?>
 

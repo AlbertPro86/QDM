@@ -174,7 +174,22 @@
       "PowerShell(Get-ScheduledTask -TaskName \"CRM_QUANTUN_Notif_Renovaciones\")",
       "PowerShell(& \"C:\\\\xampp\\\\php\\\\php.exe\" \"C:\\\\xampp\\\\htdocs\\\\CRM-QUANTUN-Digital\\\\api\\\\notificacion_resumen.php\" 2>&1)",
       "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root --password=\"\" crm_quantun -e \"UPDATE crm_configuraciones SET valor='07:00' WHERE clave='notif_hora';\" 2>&1)",
-      "Bash(grep \"\\\\.php$\")"
+      "Bash(grep \"\\\\.php$\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root --password=\"\" --default-character-set=utf8mb4 crm_quantun -e \"SHOW TABLES;\")",
+      "Bash(findstr /n \"modalPlantilla\\\\|enviarWhatsApp\\\\|waStep\\\\|tabWA\\\\|tabEmail\\\\|emailStep2\\\\|modalEditar\\\\|editarCotizacion\\\\|cerrarModalEditar\\\\|guardarEdicion\\\\|listadoPlantillas\\\\|abrirModalPlantillas\\\\|modalGestion\\\\|clonarPlantilla\\\\|confirmarEnvioWA\\\\|confirmarEnvioEmail\\\\|seleccionarPlantilla\\\\|volverStep1\" cotizaciones.php)",
+      "Bash(Get-Content \"C:\\\\xampp\\\\htdocs\\\\CRM-QUANTUN-Digital\\\\js\\\\finanzas.js\")",
+      "Bash(Measure-Object -Line)",
+      "Bash(findstr /V \"backups\")",
+      "Bash(findstr /s /r \"costo_servicio\" *.php api/*.php)",
+      "Bash(findstr /v \"backup\")",
+      "Bash(php -l orden_compra.php)",
+      "Bash(php -l api/cotizaciones.php)",
+      "Bash(php -l api/plantillas_factura.php)",
+      "Bash(php -l cotizaciones.php)",
+      "Bash(php -l cotizador.php)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost/CRM-QUANTUN-Digital/orden_compra.php\" -UseBasicParsing -MaximumRedirection 0 -ErrorAction Stop; $r.StatusCode } catch { $_.Exception.Response.StatusCode.value__ ; if \\(-not $_.Exception.Response\\) { $_.Exception.Message } })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost/CRM-QUANTUN-Digital/orden_compra.php\" -UseBasicParsing -MaximumRedirection 5; \"Status: $\\($r.StatusCode\\)`nContent length: $\\($r.Content.Length\\)`nFirst 500 chars: $\\($r.Content.Substring\\(0, [Math]::Min\\(500, $r.Content.Length\\)\\)\\)\" } catch { \"Error: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(Select-String -Path \"C:\\\\xampp\\\\php\\\\php.ini\" -Pattern \"display_errors\" | ForEach-Object { \"$\\($_.LineNumber\\): $\\($_.Line\\)\" } | Select-Object -First 5)"
     ]
   }
 }

@@ -78,7 +78,7 @@
                 <div style="width:56px;height:56px;border-radius:50%;background:${c.icon_bg};display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
                     <svg width="28" height="28" fill="none" stroke="${c.icon_color}" viewBox="0 0 24 24" stroke-width="2">${c.svg}</svg>
                 </div>
-                <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px;letter-spacing:-.01em">${c.title}</div>
+                <div style="font-size:15px;font-weight:700;color:#0E0E0C;margin-bottom:8px;letter-spacing:-.01em">${c.title}</div>
                 <div style="font-size:13px;color:#475569;line-height:1.6">${cleanMsg}</div>
                 <div style="margin-top:20px;height:3px;border-radius:99px;background:rgba(0,0,0,0.07);overflow:hidden">
                     <div id="alertBar" style="height:100%;width:100%;border-radius:99px;background:${c.border};transform-origin:left;transition:none"></div>
@@ -137,19 +137,19 @@
         overlay.id = 'confirmModal';
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s;backdrop-filter:blur(2px)';
         overlay.innerHTML = `
-            <div id="confirmBox" style="background:#fff;border-radius:18px;padding:32px 32px 24px;max-width:400px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.18);transform:translateY(12px) scale(.97);transition:transform .18s,opacity .18s;opacity:0;text-align:center">
-                <div id="confirmIcon" style="width:52px;height:52px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-                    <svg width="24" height="24" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <div id="confirmBox" style="background:#FFFFFF;border-radius:6px;padding:32px 32px 24px;max-width:400px;width:90%;box-shadow:0 1px 2px rgba(14,14,12,.06);transform:translateY(12px) scale(.97);transition:transform .18s,opacity .18s;opacity:0;text-align:center">
+                <div id="confirmIcon" style="width:52px;height:52px;border-radius:50%;background:#F4DEDB;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+                    <svg width="24" height="24" fill="none" stroke="#B0382F" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </div>
-                <h3 id="confirmTitle" style="font-size:17px;font-weight:800;color:#0f172a;margin:0 0 8px"></h3>
-                <p id="confirmMsg" style="font-size:13px;color:#64748b;margin:0 0 24px;line-height:1.6"></p>
+                <h3 id="confirmTitle" style="font-size:17px;font-weight:700;color:#0E0E0C;margin:0 0 8px"></h3>
+                <p id="confirmMsg" style="font-size:13px;color:#57544D;margin:0 0 24px;line-height:1.6"></p>
                 <div style="display:flex;gap:10px;justify-content:center">
-                    <button id="confirmCancel" style="flex:1;padding:10px 16px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s"
-                        onmouseenter="this.style.borderColor='#94a3b8';this.style.color='#475569'"
-                        onmouseleave="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">Cancelar</button>
-                    <button id="confirmOk" style="flex:1;padding:10px 16px;border-radius:10px;border:none;background:#dc2626;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:background .15s"
-                        onmouseenter="this.style.background='#b91c1c'"
-                        onmouseleave="this.style.background='#dc2626'">Eliminar</button>
+                    <button id="confirmCancel" style="flex:1;padding:10px 16px;border-radius:4px;border:1.5px solid #E8E5DD;background:#FFFFFF;font-size:13px;font-weight:700;color:#57544D;cursor:pointer;transition:all .15s"
+                        onmouseenter="this.style.borderColor='#D6D2C7';this.style.color='#0E0E0C'"
+                        onmouseleave="this.style.borderColor='#E8E5DD';this.style.color='#57544D'">Cancelar</button>
+                    <button id="confirmOk" style="flex:1;padding:10px 16px;border-radius:4px;border:none;background:#B0382F;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:background .15s"
+                        onmouseenter="this.style.background='#8f2d24'"
+                        onmouseleave="this.style.background='#B0382F'">Eliminar</button>
                 </div>
             </div>`;
         document.body.appendChild(overlay);
@@ -172,7 +172,7 @@
         overlay.addEventListener('click', function(e) { if (e.target === overlay) closeConfirm(); });
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && overlay.style.visibility === 'visible') closeConfirm(); });
 
-        window.confirmAction = function(message, { title = '¿Eliminar?', okText = 'Eliminar', okColor = '#dc2626', okHover = '#b91c1c' } = {}) {
+        window.confirmAction = function(message, { title = '¿Eliminar?', okText = 'Eliminar', okColor = '#B0382F', okHover = '#8f2d24' } = {}) {
             return new Promise((resolve) => {
                 document.getElementById('confirmTitle').textContent = title;
                 document.getElementById('confirmMsg').textContent = message;

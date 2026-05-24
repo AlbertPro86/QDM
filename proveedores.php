@@ -14,32 +14,43 @@ include __DIR__ . '/includes/header.php';
 
 
 <div class="page-header" style="margin-top:5px">
-    <div class="page-header-left"></div>
-    <div class="page-header-right" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;width:100%">
+    <div class="page-header-left" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1">
+        <div style="position:relative">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"
+                style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--color-text-light);pointer-events:none">
+                <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="filtroNombre" placeholder="Buscar proveedor…"
+                oninput="aplicarFiltroCategoria()"
+                style="width:220px;padding:8px 12px 8px 33px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;background:#fff;color:var(--color-text);outline:none"
+                onfocus="this.style.borderColor='var(--color-text)'" onblur="this.style.borderColor='var(--color-border)'">
+        </div>
         <select id="filtroCategoria" onchange="aplicarFiltroCategoria()"
-            style="padding:9px 13px;border:1.5px solid var(--color-border);border-radius:8px;font-size:13px;font-weight:500;font-family:inherit;background:var(--color-surface);color:var(--color-text);outline:none;cursor:pointer;transition:all .15s"
-            onmouseenter="this.style.borderColor='var(--color-secondary)'" onmouseleave="this.style.borderColor='var(--color-border)'">
+            style="padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:#fff;color:var(--color-text);outline:none;cursor:pointer">
             <option value="">Todas las categorías</option>
         </select>
-        <button class="btn btn-secondary" onclick="openProvModal()" style="padding:9px 16px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        <span id="filtroConteo" style="font-size:12px;color:var(--color-text-muted);white-space:nowrap"></span>
+    </div>
+    <div class="page-header-right">
+        <button class="btn btn-accent" onclick="openProvModal()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
             Nuevo Proveedor
         </button>
     </div>
 </div>
 
-<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-top:10px">
+<div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;overflow:hidden;box-shadow:0 1px 2px rgba(14,14,12,.06);margin-top:10px">
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:13px" id="proveedoresTable">
             <thead>
-                <tr style="background:#0f172a;border-bottom:1px solid var(--color-border)">
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Nombre</th>
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Categoría</th>
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Email</th>
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Teléfono</th>
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">NIT</th>
-                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Ciudad</th>
-                    <th style="padding:11px 14px;text-align:center;font-size:12px;font-weight:900;color:#ffffff;text-transform:uppercase;letter-spacing:.06em">Acciones</th>
+                <tr style="background:var(--color-surface);border-bottom:1.5px solid var(--color-border)">
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Nombre</th>
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Categoría</th>
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Email</th>
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Teléfono</th>
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">NIT</th>
+                    <th style="padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Ciudad</th>
+                    <th style="padding:11px 14px;text-align:center;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em">Acciones</th>
                 </tr>
             </thead>
             <tbody id="proveedoresTbody">
@@ -61,41 +72,41 @@ include __DIR__ . '/includes/header.php';
                 <input type="hidden" id="provId">
                 <div class="form-group">
                     <label class="form-label">Nombre de la empresa *</label>
-                    <input type="text" class="form-input" id="provNombre" required placeholder="Ej: Hostinger, GoDaddy, AWS..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                    <input type="text" class="form-input" id="provNombre" required placeholder="Ej: Hostinger, GoDaddy, AWS..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-input" id="provEmail" placeholder="contacto@proveedor.com" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                        <input type="email" class="form-input" id="provEmail" placeholder="contacto@proveedor.com" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                     </div>
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Teléfono</label>
-                        <input type="tel" class="form-input" id="provTelefono" placeholder="+57 300 123 4567" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                        <input type="tel" class="form-input" id="provTelefono" placeholder="+57 300 123 4567" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                     <div class="form-group" style="margin:0">
                         <label class="form-label">NIT / RUT</label>
-                        <input type="text" class="form-input" id="provNit" placeholder="Ej: 900.123.456-7" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                        <input type="text" class="form-input" id="provNit" placeholder="Ej: 900.123.456-7" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                     </div>
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Categoría</label>
-                        <select class="form-select" id="provCategoria" onchange="onProvCatChange()" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px;background:var(--color-surface)">
+                        <select class="form-select" id="provCategoria" onchange="onProvCatChange()" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px;background:var(--color-surface)">
                             <!-- Se llena dinámicamente por JS -->
                         </select>
                         <div id="provNuevaCatWrap" style="display:none;margin-top:8px">
                             <div style="display:flex;gap:8px">
                                 <input type="text" id="provNuevaCatInput" placeholder="Nueva categoría"
-                                    style="flex:1;padding:9px 11px;border:1.5px solid var(--color-border);border-radius:7px;font-size:13px;font-family:inherit;outline:none;transition:all .15s"
+                                    style="flex:1;padding:9px 11px;border:1.5px solid var(--color-border);border-radius:3px;font-size:13px;font-family:inherit;outline:none;transition:all .15s"
                                     onfocus="this.style.borderColor='var(--color-secondary)'" onblur="this.style.borderColor='var(--color-border)'"
                                     onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarNuevaCat()}">
                                 <button type="button" onclick="confirmarNuevaCat()"
-                                    style="padding:9px 14px;background:var(--color-secondary);color:#0f172a;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .12s"
+                                    style="padding:9px 14px;background:var(--q-lima);color:var(--color-text);border:none;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .12s"
                                     onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
                                     + Agregar
                                 </button>
                                 <button type="button" onclick="cancelarNuevaCat()"
-                                    style="padding:9px 11px;background:none;border:1.5px solid var(--color-border);border-radius:7px;font-size:13px;color:var(--color-text-muted);cursor:pointer;transition:all .12s"
+                                    style="padding:9px 11px;background:none;border:1.5px solid var(--color-border);border-radius:3px;font-size:13px;color:var(--color-text-muted);cursor:pointer;transition:all .12s"
                                     onmouseenter="this.style.borderColor='var(--color-text-muted)'" onmouseleave="this.style.borderColor='var(--color-border)'">
                                     ✕
                                 </button>
@@ -106,20 +117,20 @@ include __DIR__ . '/includes/header.php';
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Ciudad</label>
-                        <input type="text" class="form-input" id="provCiudad" placeholder="Ej: Bogotá, Medellín..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                        <input type="text" class="form-input" id="provCiudad" placeholder="Ej: Bogotá, Medellín..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                     </div>
                     <div class="form-group" style="margin:0">
                         <label class="form-label">Dirección</label>
-                        <input type="text" class="form-input" id="provDireccion" placeholder="Ej: Cra 7 # 32-45" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px">
+                        <input type="text" class="form-input" id="provDireccion" placeholder="Ej: Cra 7 # 32-45" style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Notas</label>
-                    <textarea class="form-textarea" id="provNotas" rows="3" placeholder="Condiciones de pago, contacto clave, etc..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:8px;font-family:inherit"></textarea>
+                    <textarea class="form-textarea" id="provNotas" rows="3" placeholder="Condiciones de pago, contacto clave, etc..." style="border:1.5px solid var(--color-border);padding:10px 12px;font-size:13px;border-radius:3px;font-family:inherit"></textarea>
                 </div>
                 <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:28px">
                     <button type="button" class="btn btn-outline" onclick="closeProvModal()" style="padding:10px 16px;font-size:13px">Cancelar</button>
-                    <button type="submit" class="btn btn-secondary" style="padding:10px 18px;font-size:13px;font-weight:700">Guardar Proveedor</button>
+                    <button type="submit" class="btn btn-primary" style="padding:10px 18px;font-size:13px;font-weight:700">Guardar Proveedor</button>
                 </div>
             </form>
         </div>
@@ -219,7 +230,22 @@ let _allProveedores = [];
 
 function aplicarFiltroCategoria() {
     const cat = document.getElementById('filtroCategoria').value;
-    renderProveedores(_allProveedores.filter(p => !cat || p.categoria === cat));
+    const q   = (document.getElementById('filtroNombre')?.value || '').toLowerCase().trim();
+
+    const filtrados = _allProveedores.filter(p => {
+        const matchCat    = !cat || p.categoria === cat;
+        const matchNombre = !q
+            || (p.nombre   || '').toLowerCase().includes(q)
+            || (p.email    || '').toLowerCase().includes(q)
+            || (p.nit      || '').toLowerCase().includes(q)
+            || (p.ciudad   || '').toLowerCase().includes(q);
+        return matchCat && matchNombre;
+    });
+
+    const conteo = document.getElementById('filtroConteo');
+    if (conteo) conteo.textContent = filtrados.length + ' de ' + _allProveedores.length + ' proveedores';
+
+    renderProveedores(filtrados);
 }
 
 /* ── Modal Crear / Editar ─────────────────────────────────────────────────── */
@@ -288,7 +314,7 @@ async function verProv(id) {
 
         document.getElementById('provDetalleBody').innerHTML = `
             <div style="padding-bottom:8px">
-                ${p.categoria ? `<span style="background:#e2e8f0;color:#1e293b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${sanitizeHtml(p.categoria)}</span>` : ''}
+                ${p.categoria ? `<span style="background:#EFECE5;color:#0E0E0C;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${sanitizeHtml(p.categoria)}</span>` : ''}
             </div>
             ${row('NIT / RUT',  p.nit)}
             ${row('Email',      p.email)}
@@ -375,14 +401,14 @@ function renderProveedores(data) {
             <td style="padding:11px 14px;font-weight:800;color:var(--color-primary);font-size:14px">${sanitizeHtml(p.nombre)}</td>
             <td style="padding:11px 14px">
                 ${p.categoria
-                    ? `<span style="background:#e2e8f0;color:#1e293b;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:700">${sanitizeHtml(p.categoria)}</span>`
+                    ? `<span style="background:#EFECE5;color:#0E0E0C;padding:5px 11px;border-radius:3px;font-size:12px;font-weight:700">${sanitizeHtml(p.categoria)}</span>`
                     : '<span style="color:var(--color-text-muted);font-size:13px">—</span>'}
             </td>
             <td style="padding:11px 14px;font-size:13px;font-weight:500">
-                ${p.email ? `<a href="mailto:${sanitizeHtml(p.email)}" style="color:#2563eb;text-decoration:none;font-weight:600;transition:all .15s" onmouseenter="this.style.color='#1d4ed8;text-decoration:underline'" onmouseleave="this.style.color='#2563eb;text-decoration:none'">${sanitizeHtml(p.email)}</a>` : '<span style="color:var(--color-text-muted)">—</span>'}
+                ${p.email ? `<a href="mailto:${sanitizeHtml(p.email)}" style="color:#3F5E9E;text-decoration:none;font-weight:600;transition:all .15s" onmouseenter="this.style.color='#2d4d80;text-decoration:underline'" onmouseleave="this.style.color='#3F5E9E;text-decoration:none'">${sanitizeHtml(p.email)}</a>` : '<span style="color:var(--color-text-muted)">—</span>'}
             </td>
             <td style="padding:11px 14px;font-size:13px;font-weight:500">
-                ${p.telefono ? `<a href="tel:${sanitizeHtml(p.telefono)}" style="color:#2563eb;text-decoration:none;font-weight:600;transition:all .15s" onmouseenter="this.style.color='#1d4ed8;text-decoration:underline'" onmouseleave="this.style.color='#2563eb;text-decoration:none'">${sanitizeHtml(p.telefono)}</a>` : '<span style="color:var(--color-text-muted)">—</span>'}
+                ${p.telefono ? `<a href="tel:${sanitizeHtml(p.telefono)}" style="color:#3F5E9E;text-decoration:none;font-weight:600;transition:all .15s" onmouseenter="this.style.color='#2d4d80;text-decoration:underline'" onmouseleave="this.style.color='#3F5E9E;text-decoration:none'">${sanitizeHtml(p.telefono)}</a>` : '<span style="color:var(--color-text-muted)">—</span>'}
             </td>
             <td style="padding:11px 14px;color:var(--color-text);font-size:13px;font-weight:600;font-family:monospace">
                 ${p.nit ? sanitizeHtml(p.nit) : '<span style="color:var(--color-text-muted)">—</span>'}
@@ -393,18 +419,18 @@ function renderProveedores(data) {
             <td style="padding:10px 16px;text-align:center">
                 <div style="display:flex;gap:6px;justify-content:center">
                     <button onclick="verProv(${p.id})" title="Ver detalle"
-                        style="background:none;border:none;padding:7px 8px;border-radius:6px;color:#475569;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
-                        onmouseenter="this.style.background='#eff6ff';this.style.color='#2563eb'"
-                        onmouseleave="this.style.background='transparent';this.style.color='#475569'">
+                        style="background:none;border:none;padding:7px 8px;border-radius:3px;color:#475569;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
+                        onmouseenter="this.style.background='#E1E7F2';this.style.color='#3F5E9E'"
+                        onmouseleave="this.style.background='transparent';this.style.color='#57544D'">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </button>
                     <button onclick="openProvModal(${p.id})" title="Editar"
-                        style="background:none;border:none;padding:7px 8px;border-radius:6px;color:#ca8a04;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
+                        style="background:none;border:none;padding:7px 8px;border-radius:3px;color:#ca8a04;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
                         onmouseenter="this.style.background='#fef3c7'" onmouseleave="this.style.background='transparent'">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </button>
                     <button onclick="deleteProv(${p.id})" title="Eliminar"
-                        style="background:none;border:none;padding:7px 8px;border-radius:6px;color:#ef4444;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
+                        style="background:none;border:none;padding:7px 8px;border-radius:3px;color:#ef4444;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center"
                         onmouseenter="this.style.background='#fee2e2'" onmouseleave="this.style.background='transparent'">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>

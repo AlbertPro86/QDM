@@ -15,20 +15,12 @@ function switchVista(v) {
 
     const btnLista  = document.getElementById('btnVista-lista');
     const btnKanban = document.getElementById('btnVista-kanban');
-    const actStyle  = 'background:#0f172a;color:#c9f31d;';
-    const inactStyle= 'background:transparent;color:#64748b;';
 
-    if (v === 'lista') {
-        btnLista.style.cssText  += actStyle;
-        btnKanban.style.cssText += inactStyle;
-        document.getElementById('vistaLista').style.display  = 'block';
-        document.getElementById('vistaKanban').style.display = 'none';
-    } else {
-        btnKanban.style.cssText += actStyle;
-        btnLista.style.cssText  += inactStyle;
-        document.getElementById('vistaLista').style.display  = 'none';
-        document.getElementById('vistaKanban').style.display = 'block';
-    }
+    btnLista.classList.toggle('active',  v === 'lista');
+    btnKanban.classList.toggle('active', v === 'kanban');
+
+    document.getElementById('vistaLista').style.display  = v === 'lista'  ? 'block' : 'none';
+    document.getElementById('vistaKanban').style.display = v === 'kanban' ? 'block' : 'none';
 
     cargarTareas();
 }
@@ -115,9 +107,9 @@ function renderLista(rows) {
         }
 
         const vinculo = t.cliente_nombre
-            ? `<div style="font-size:11px;color:#6366f1;margin-top:3px">${t.cliente_nombre}</div>`
+            ? `<div style="font-size:11px;color:#57544D;margin-top:3px">${t.cliente_nombre}</div>`
             : t.lead_nombre
-            ? `<div style="font-size:11px;color:#8b5cf6;margin-top:3px">${t.lead_nombre}</div>`
+            ? `<div style="font-size:11px;color:#57544D;margin-top:3px">${t.lead_nombre}</div>`
             : '';
 
         return `
@@ -133,7 +125,7 @@ function renderLista(rows) {
             </td>
 
             <td style="padding:12px;max-width:260px">
-                <div style="font-weight:700;font-size:13px;color:#0f172a;line-height:1.3">${escapeHtml(t.titulo)}</div>
+                <div style="font-weight:700;font-size:13px;color:#0E0E0C;line-height:1.3">${escapeHtml(t.titulo)}</div>
                 ${t.descripcion ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(t.descripcion)}</div>` : ''}
                 ${vinculo}
             </td>
@@ -158,7 +150,7 @@ function renderLista(rows) {
                 <div style="display:flex;align-items:center;justify-content:center;gap:4px">
                     <button onclick="verDetallesTarea(${t.id}); event.stopPropagation();" title="Ver detalles"
                         style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8"
-                        onmouseenter="this.style.background='#eef2ff';this.style.color='#4f46e5'"
+                        onmouseenter="this.style.background='#FAFAF7';this.style.color='#0E0E0C'"
                         onmouseleave="this.style.background='none';this.style.color='#94a3b8'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -224,7 +216,7 @@ function renderKanban(rows, resumen) {
                  onclick="editarTarea(${t.id})">
                 <!-- Cabecera: prioridad dot + titulo -->
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
-                    <div style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.35;flex:1">${escapeHtml(t.titulo)}</div>
+                    <div style="font-size:13px;font-weight:700;color:#0E0E0C;line-height:1.35;flex:1">${escapeHtml(t.titulo)}</div>
                     <span style="width:8px;height:8px;border-radius:50%;background:${prioDot[t.prioridad]};flex-shrink:0;margin-top:4px" title="${prioLabel[t.prioridad]}"></span>
                 </div>
                 <!-- Descripción -->
@@ -427,9 +419,9 @@ function verDetallesTarea(id) {
             // Vinculo cliente/lead
             let vinculo = '—';
             if (t.cliente_nombre) {
-                vinculo = `<span style="color:#6366f1;font-weight:600">📌 Cliente: ${escapeHtml(t.cliente_nombre)}</span>`;
+                vinculo = `<span style="color:#57544D;font-weight:600">📌 Cliente: ${escapeHtml(t.cliente_nombre)}</span>`;
             } else if (t.lead_nombre) {
-                vinculo = `<span style="color:#8b5cf6;font-weight:600">📌 Lead: ${escapeHtml(t.lead_nombre)}</span>`;
+                vinculo = `<span style="color:#57544D;font-weight:600">📌 Lead: ${escapeHtml(t.lead_nombre)}</span>`;
             }
             document.getElementById('detalleVinculo').innerHTML = vinculo;
 

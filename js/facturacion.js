@@ -74,7 +74,7 @@ function cargarFacturas() {
 
 /* ── KPIs ─────────────────────────────────────────────────────────────── */
 function renderKpisFac(resumen, total) {
-    const fmt = v => (typeof formatMoney === 'function') ? formatMoney(parseFloat(v || 0)) : '$ ' + parseFloat(v || 0).toLocaleString('es-CO');
+    const fmt = v => (typeof moneyNum === 'function') ? moneyNum(parseFloat(v || 0)) : '$ ' + parseFloat(v || 0).toLocaleString('es-CO');
 
     document.getElementById('kpiIngresos').textContent = fmt(resumen.total_ingresos);
     document.getElementById('kpiEgresos').textContent  = fmt(resumen.total_egresos);
@@ -83,14 +83,17 @@ function renderKpisFac(resumen, total) {
     document.getElementById('kpiBalance').textContent = fmt(Math.abs(balance));
 
     const pill = document.getElementById('kpiBalancePill');
+    const card = document.getElementById('kpiBalanceCard');
     if (balance >= 0) {
-        pill.textContent = 'Positivo';
-        pill.style.background = '';
-        pill.style.color = '';
+        pill.textContent        = 'Positivo';
+        pill.style.background   = 'rgba(0,0,0,0.12)';
+        pill.style.color        = '#0E0E0C';
+        if (card) { card.style.background = '#C6F24E'; card.style.borderColor = '#A8D87A'; }
     } else {
-        pill.textContent = 'Negativo';
-        pill.style.background = '#fee2e2';
-        pill.style.color = '#ef4444';
+        pill.textContent        = 'Negativo';
+        pill.style.background   = '#E8BCB8';
+        pill.style.color        = '#6E211B';
+        if (card) { card.style.background = '#F4DEDB'; card.style.borderColor = '#E8BCB8'; }
     }
 
     document.getElementById('kpiPendientes').textContent = `${resumen.total_pendientes || 0} pendientes · ${resumen.total_vencidos || 0} vencidos`;
@@ -274,10 +277,10 @@ function renderFacPaginacion(total) {
         const ellipsis = i === page - 2 || i === page + 2;
         if (show) {
             btns += `<button onclick="facGoPage(${i})"
-                style="padding:4px 10px;border:1.5px solid ${i === page ? '#0f172a' : '#e2e8f0'};
-                       background:${i === page ? '#0f172a' : '#fff'};
-                       color:${i === page ? '#c9f31d' : '#64748b'};
-                       border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">${i}</button>`;
+                style="padding:4px 10px;border:1.5px solid ${i === page ? '#0E0E0C' : '#E8E5DD'};
+                       background:${i === page ? '#0E0E0C' : '#fff'};
+                       color:${i === page ? '#C6F24E' : '#57544D'};
+                       border-radius:3px;font-size:12px;font-weight:700;cursor:pointer">${i}</button>`;
         } else if (ellipsis) {
             btns += `<span style="color:#94a3b8;padding:0 2px">…</span>`;
         }

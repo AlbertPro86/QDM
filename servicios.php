@@ -16,12 +16,12 @@ include __DIR__ . '/includes/header.php';
 <div class="page-header">
     <div class="page-header-left"><h2 style="font-size:16px;color:var(--color-text-muted);font-weight:500">Administra los servicios y sus variantes</h2></div>
     <div class="page-header-right">
-        <button class="btn btn-outline" onclick="openPkgModal()" style="border-color:#6366f1;color:#6366f1" onmouseenter="this.style.background='#6366f1';this.style.color='#fff'" onmouseleave="this.style.background='';this.style.color='#6366f1'">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V11"/></svg>
+        <button class="btn btn-secondary" onclick="openPkgModal()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V11"/></svg>
             Crear Paquete
         </button>
-        <button class="btn btn-secondary" onclick="openSvcModal()">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        <button class="btn btn-accent" onclick="openSvcModal()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
             Nuevo Servicio
         </button>
     </div>
@@ -67,8 +67,8 @@ include __DIR__ . '/includes/header.php';
                 <div id="svcGananciaBox" style="display:none;margin-bottom:16px;padding:10px 14px;border-radius:10px;display:flex;align-items:center;justify-content:space-between">
                     <span style="font-size:12px;font-weight:700" id="svcGananciaLabel">Ganancia por ciclo</span>
                     <div style="display:flex;align-items:center;gap:12px">
-                        <span id="svcGananciaValor" style="font-size:15px;font-weight:900">$ 0</span>
-                        <span id="svcGananciaPct" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">0%</span>
+                        <span id="svcGananciaValor" style="font-size:15px;font-weight:700">$ 0</span>
+                        <span id="svcGananciaPct" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px">0%</span>
                     </div>
                 </div>
                 <div class="form-group"><label class="form-label">Facturación</label>
@@ -115,7 +115,7 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeSvcModal()">Cancelar</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('svcForm').requestSubmit()">Guardar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('svcForm').requestSubmit()">Guardar</button>
         </div>
     </div>
 </div>
@@ -144,11 +144,11 @@ include __DIR__ . '/includes/header.php';
                         <input type="number" class="form-input" id="subCosto" step="0.01" min="0" placeholder="0.00" oninput="calcSubGanancia()">
                     </div>
                 </div>
-                <div id="subGananciaBox" style="display:none;margin-top:8px;padding:10px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;display:flex;align-items:center;justify-content:space-between">
-                    <span style="font-size:12px;font-weight:700;color:#16a34a">Ganancia por ciclo</span>
+                <div id="subGananciaBox" style="display:none;margin-top:8px;padding:10px 14px;background:#E3F1E8;border:1.5px solid #2D8F5A;border-radius:4px;display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:12px;font-weight:700;color:#2D8F5A">Ganancia por ciclo</span>
                     <div style="display:flex;align-items:center;gap:12px">
-                        <span id="subGananciaValor" style="font-size:15px;font-weight:900;color:#15803d">$ 0</span>
-                        <span id="subGananciaPct" style="font-size:11px;font-weight:700;background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px">0%</span>
+                        <span id="subGananciaValor" style="font-size:15px;font-weight:700;color:#2D8F5A">$ 0</span>
+                        <span id="subGananciaPct" style="font-size:11px;font-weight:700;background:#E3F1E8;color:#2D8F5A;padding:2px 8px;border-radius:100px">0%</span>
                     </div>
                 </div>
                 <div class="form-group"><label class="form-label">Facturación</label>
@@ -195,7 +195,7 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeSubModal()">Cancelar</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('subForm').requestSubmit()">Guardar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('subForm').requestSubmit()">Guardar</button>
         </div>
     </div>
 </div>
@@ -223,23 +223,23 @@ include __DIR__ . '/includes/header.php';
                         </div>
 
                         <!-- Resumen de costos -->
-                        <div id="pkgResumen" style="display:none;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px 16px">
+                        <div id="pkgResumen" style="display:none;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;padding:14px 16px">
                             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
                                 <div style="text-align:center">
-                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 4px;letter-spacing:.06em">Costo total</p>
-                                    <p id="pkgCostoVal" style="font-size:16px;font-weight:900;color:#ef4444;margin:0">$ 0</p>
+                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 4px;letter-spacing:.06em">Costo total</p>
+                                    <p id="pkgCostoVal" style="font-size:16px;font-weight:700;color:#B0382F;margin:0">$ 0</p>
                                 </div>
                                 <div style="text-align:center">
-                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 4px;letter-spacing:.06em">Precio sugerido</p>
-                                    <p id="pkgPrecioSugVal" style="font-size:16px;font-weight:900;color:#10b981;margin:0">$ 0</p>
+                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 4px;letter-spacing:.06em">Precio sugerido</p>
+                                    <p id="pkgPrecioSugVal" style="font-size:16px;font-weight:700;color:#2D8F5A;margin:0">$ 0</p>
                                 </div>
                                 <div style="text-align:center">
-                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 4px;letter-spacing:.06em">Ganancia</p>
-                                    <p id="pkgGananciaVal" style="font-size:16px;font-weight:900;color:#0f172a;margin:0">$ 0</p>
+                                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 4px;letter-spacing:.06em">Ganancia</p>
+                                    <p id="pkgGananciaVal" style="font-size:16px;font-weight:700;color:#0E0E0C;margin:0">$ 0</p>
                                 </div>
                             </div>
                             <div>
-                                <label class="form-label" style="margin-bottom:6px">Precio de venta personalizado ($) <span style="font-weight:400;color:#94a3b8">— deja en 0 para usar precio sugerido</span></label>
+                                <label class="form-label" style="margin-bottom:6px">Precio de venta personalizado ($) <span style="font-weight:400;color:#8A867C">— deja en 0 para usar precio sugerido</span></label>
                                 <input type="number" class="form-input" id="pkgPrecioVenta" step="0.01" min="0" placeholder="0.00" oninput="calcPkgGanancia()">
                             </div>
                         </div>
@@ -275,13 +275,13 @@ include __DIR__ . '/includes/header.php';
                         <div>
                             <label class="form-label" style="margin-bottom:8px">Imagen del paquete</label>
                             <!-- Zona de imagen -->
-                            <div id="pkgImgZone" style="width:100%;aspect-ratio:4/3;border-radius:14px;border:2px dashed #e2e8f0;background:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;position:relative;transition:border-color .2s"
+                            <div id="pkgImgZone" style="width:100%;aspect-ratio:4/3;border-radius:6px;border:2px dashed #E8E5DD;background:#FAFAF7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;position:relative;transition:border-color .2s"
                                 onclick="document.getElementById('pkgImgInput').click()"
-                                onmouseenter="this.style.borderColor='#6366f1'" onmouseleave="this.style.borderColor='#e2e8f0'">
-                                <img id="pkgImgPreview" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px">
+                                onmouseenter="this.style.borderColor='#0E0E0C'" onmouseleave="this.style.borderColor='#E8E5DD'">
+                                <img id="pkgImgPreview" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:6px">
                                 <div id="pkgImgPlaceholder">
                                     <svg width="36" height="36" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5" fill="#cbd5e1" stroke="none"/></svg>
-                                    <p style="font-size:12px;color:#94a3b8;margin:0;text-align:center">Clic para subir imagen<br><span style="font-size:10px">JPG, PNG, WEBP · máx 5MB</span></p>
+                                    <p style="font-size:12px;color:#8A867C;margin:0;text-align:center">Clic para subir imagen<br><span style="font-size:10px">JPG, PNG, WEBP · máx 5MB</span></p>
                                 </div>
                             </div>
                             <input type="file" id="pkgImgInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onPkgImgChange(this)">
@@ -297,7 +297,7 @@ include __DIR__ . '/includes/header.php';
                                 Enlace del paquete
                             </label>
                             <input type="url" class="form-input" id="pkgEnlace" placeholder="https://..." style="font-size:13px">
-                            <p style="font-size:11px;color:#94a3b8;margin:6px 0 0">Se mostrará como botón en la vista previa</p>
+                            <p style="font-size:11px;color:#8A867C;margin:6px 0 0">Se mostrará como botón en la vista previa</p>
                         </div>
                     </div>
                 </div>
@@ -305,7 +305,7 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closePkgModal()">Cancelar</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('pkgForm').requestSubmit()">Guardar Paquete</button>
+            <button class="btn btn-primary" onclick="document.getElementById('pkgForm').requestSubmit()">Guardar Paquete</button>
         </div>
     </div>
 </div>
@@ -364,30 +364,30 @@ function renderSvcKPIs(svcs) {
     const conMargen   = allVariantes.filter(g => g > 0).length;
     const totalVariantes = allVariantes.length;
 
-    const kpiCard = (label, value, footer, bg, textMain, textSub, pillBg, pillColor, pill) => `
-        <div style="background:${bg};border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s"
-            onmouseenter="this.style.filter='brightness(1.08)'" onmouseleave="this.style.filter='brightness(1)'">
-            <div style="flex:1;min-width:0">
-                <div style="font-size:10px;font-weight:700;color:${textSub};text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">${label}</div>
-                <div style="font-size:22px;font-weight:900;color:${textMain};line-height:1">${value}</div>
-                <div style="font-size:11px;color:${textSub};margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${footer}</div>
+    const kpiCard = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill) =>
+        `<div style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">${label}</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1">${value}</div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">${sub}</span>
+                <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillCol};padding:2px 8px;border-radius:100px;white-space:nowrap">${pill}</span>
             </div>
-            <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillColor};padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0">${pill}</span>
         </div>`;
 
     document.getElementById('svcKpis').innerHTML =
         kpiCard('Total Servicios',    activos.length,                          'En catálogo',
-                '#0f172a', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Total')
+                '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#0E0E0C', 'Total')
       + kpiCard('Sub-servicios',      totalSubs,                               `${conSubs} con variantes`,
-                '#4f46e5', '#ffffff', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.2)',  '#ffffff',  'Variantes')
+                '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#0E0E0C', 'Variantes')
       + kpiCard('Con enlace de pago', activos.filter(s=>s.enlace_pago).length, 'Links activos',
-                '#334155', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Links')
+                '#FEF3C7', '#FDE68A', '#92400E', '#FDE68A', '#92400E', 'Links')
       + kpiCard('Margen Positivo',    conMargen,                               `de ${totalVariantes} variantes`,
-                '#c9f31d', '#0f172a', 'rgba(0,0,0,0.45)',      'rgba(0,0,0,0.18)',       '#0f172a', 'Rentables');
+                '#C6F24E', '#A8D87A', 'rgba(0,0,0,.55)', 'rgba(0,0,0,0.12)', '#0E0E0C', 'Rentables');
 }
 
 /* ── TARJETAS ───────────────────────────────────────────────── */
-const CARD_ACCENTS = ['#c9f31d','#3b82f6','#10b981','#f59e0b','#8b5cf6','#06b6d4','#f97316','#ec4899','#ef4444'];
+const CARD_ACCENTS = ['#C6F24E','#3b82f6','#2D8F5A','#f59e0b','#8b5cf6','#06b6d4','#f97316','#ec4899','#ef4444'];
 const FREQ_LABELS  = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Pago Único', ninguna:'Ninguna' };
 const FREQ_ICONS   = {
     mes:      '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
@@ -408,28 +408,28 @@ function renderSvcs(svcs) {
 
     grid.innerHTML = activos.map((s, idx) => {
         const accent    = CARD_ACCENTS[idx % CARD_ACCENTS.length];
-        const isDark    = ['#c9f31d','#f59e0b'].includes(accent);
+        const isDark    = ['#C6F24E','#f59e0b'].includes(accent);
         const subs      = s.sub_servicios || [];
         const freqKey   = s.frecuencia || 'mes';
         const freqLabel = FREQ_LABELS[freqKey] || freqKey;
 
         const subItems = subs.map(ss => `
             <div data-id="${ss.id}" data-svc="${s.id}" style="display:flex;justify-content:space-between;align-items:center;
-                        padding:6px 10px;border-radius:8px;background:#fff;
-                        border:1px solid #e5e7eb;margin-bottom:5px">
+                        padding:6px 10px;border-radius:3px;background:#fff;
+                        border:1px solid #E8E5DD;margin-bottom:5px">
                 <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">
                     <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${accent};flex-shrink:0"></span>
                     <span style="font-size:12px;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(ss.nombre)}</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;margin-left:6px">
-                    <span style="font-size:12px;font-weight:800;color:#0f172a;font-family:var(--font-primary)">${formatMoney(ss.precio)}</span>
+                    <span style="font-size:12px;font-weight:700;color:#0E0E0C;font-family:var(--font-primary)">${formatMoney(ss.precio)}</span>
                     <button class="btn btn-ghost btn-icon sm" onclick='previewSub(${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Ver" style="color:#3b82f6;padding:2px">
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </button>
                     <button class="btn btn-ghost btn-icon sm" onclick='dupSub(${s.id},${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Duplicar" style="color:#f59e0b;padding:2px">
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                     </button>
-                    <button class="btn btn-ghost btn-icon sm" onclick='openSubModal(${s.id},${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Editar" style="color:#64748b;padding:2px">
+                    <button class="btn btn-ghost btn-icon sm" onclick='openSubModal(${s.id},${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Editar" style="color:#57544D;padding:2px">
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </button>
                     <button class="btn btn-ghost btn-icon sm" onclick="deleteSubSvc(${ss.id})" title="Eliminar" style="color:var(--color-danger);padding:2px">
@@ -439,21 +439,21 @@ function renderSvcs(svcs) {
             </div>`).join('');
 
         return `
-        <div class="animate-fade-up" data-id="${s.id}" style="background:#fff;border-radius:14px;border:1.5px solid #e5e7eb;box-shadow:0 2px 12px rgba(0,0,0,0.06);display:flex;flex-direction:column;overflow:hidden">
+        <div class="animate-fade-up" data-id="${s.id}" style="background:#fff;border-radius:6px;border:1.5px solid #E8E5DD;box-shadow:0 1px 2px rgba(14,14,12,.06);display:flex;flex-direction:column;overflow:hidden">
 
             <div style="padding:12px 14px 10px">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
                     <div style="min-width:0;flex:1">
                         <div style="min-width:0;flex:1">
-                            <h3 style="font-size:14px;font-weight:800;font-family:var(--font-primary);margin:0 0 2px;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.nombre)}</h3>
-                            ${s.descripcion ? `<p style="font-size:11px;color:#64748b;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.descripcion)}</p>` : ""}
+                            <h3 style="font-size:14px;font-weight:700;font-family:var(--font-primary);margin:0 0 2px;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.nombre)}</h3>
+                            ${s.descripcion ? `<p style="font-size:11px;color:#57544D;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.descripcion)}</p>` : ""}
                         </div>
                     </div>
                     <div style="display:flex;gap:2px;flex-shrink:0">
                         <button class="btn btn-ghost btn-icon sm" onclick="dupSvc(${s.id})" title="Duplicar" style="color:#f59e0b;padding:3px">
                             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="editSvc(${s.id})" title="Editar" style="color:#64748b;padding:3px">
+                        <button class="btn btn-ghost btn-icon sm" onclick="editSvc(${s.id})" title="Editar" style="color:#57544D;padding:3px">
                             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         </button>
                         <button class="btn btn-ghost btn-icon sm" onclick="deleteSvc(${s.id})" title="Desactivar" style="color:#ef4444;padding:3px">
@@ -462,26 +462,26 @@ function renderSvcs(svcs) {
                     </div>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px">
-                    ${freqKey !== 'ninguna' ? `<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:${isDark ? "#000" : "#fff"};background:${accent};padding:2px 8px;border-radius:20px">${freqLabel}</span>` : ''}
-                    ${parseFloat(s.precio_base) > 0 ? `<span style="font-size:12px;font-weight:800;color:#0f172a;font-family:var(--font-primary)">${formatMoney(s.precio_base)}</span>` : ""}
-                    ${parseFloat(s.costo) > 0 ? `<span style="font-size:10px;color:#94a3b8">costo ${formatMoney(s.costo)}</span>` : ""}
-                    ${s.enlace_pago ? `<a href="${escapeHtml(s.enlace_pago)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:#fff;background:#0f172a;padding:2px 8px;border-radius:20px;text-decoration:none"><svg width="8" height="8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>Link</a>` : ""}
+                    ${freqKey !== 'ninguna' ? `<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:${isDark ? "#000" : "#fff"};background:${accent};padding:2px 8px;border-radius:100px">${freqLabel}</span>` : ''}
+                    ${parseFloat(s.precio_base) > 0 ? `<span style="font-size:12px;font-weight:700;color:#0E0E0C;font-family:var(--font-primary)">${formatMoney(s.precio_base)}</span>` : ""}
+                    ${parseFloat(s.costo) > 0 ? `<span style="font-size:10px;color:#8A867C">costo ${formatMoney(s.costo)}</span>` : ""}
+                    ${s.enlace_pago ? `<a href="${escapeHtml(s.enlace_pago)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:#0E0E0C;background:#EFECE5;border:1px solid #E8E5DD;padding:2px 8px;border-radius:100px;text-decoration:none"><svg width="8" height="8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>Link</a>` : ""}
                 </div>
             </div>
 
-            <div style="padding:10px 12px 12px;flex:1;background:#f8fafc;border-top:1px solid #e5e7eb">
+            <div style="padding:10px 12px 12px;flex:1;background:#FAFAF7;border-top:1px solid #E8E5DD">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:flex;align-items:center;gap:4px">
+                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8A867C;display:flex;align-items:center;gap:4px">
                         Variantes
-                        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;border-radius:20px;background:${accent};color:${isDark ? "#000" : "#fff"};font-size:9px;font-weight:900">${subs.length}</span>
+                        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;border-radius:100px;background:${accent};color:${isDark ? "#000" : "#fff"};font-size:9px;font-weight:700">${subs.length}</span>
                     </span>
                     <button onclick="openSubModal(${s.id})"
-                        style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;cursor:pointer;color:#fff;background:#6366f1;border:none;padding:3px 8px;border-radius:20px"
-                        onmouseenter="this.style.background='#4f46e5'" onmouseleave="this.style.background='#6366f1'">
+                        style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;cursor:pointer;color:#fff;background:#0E0E0C;border:none;padding:3px 8px;border-radius:3px"
+                        onmouseenter="this.style.background='#333'" onmouseleave="this.style.background='#0E0E0C'">
                         <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg> Agregar
                     </button>
                 </div>
-                <div data-sub-list>${subs.length ? subItems : `<div style="text-align:center;padding:10px 0;font-size:11px;color:#94a3b8;font-style:italic">Sin variantes</div>`}</div>
+                <div data-sub-list>${subs.length ? subItems : `<div style="text-align:center;padding:10px 0;font-size:11px;color:#8A867C;font-style:italic">Sin variantes</div>`}</div>
             </div>
         </div>`;
     }).join('');
@@ -502,7 +502,7 @@ function toggleSvcEnlace() {
     const thumb = document.getElementById('svcEnlaceThumb');
     const label = document.getElementById('svcEnlaceToggleLabel');
     field.style.display = on ? 'block' : 'none';
-    track.style.background = on ? 'var(--color-secondary, #c9f31d)' : '#cbd5e1';
+    track.style.background = on ? 'var(--color-secondary, #C6F24E)' : '#D6D2C7';
     thumb.style.transform  = on ? 'translateX(16px)' : 'translateX(0)';
     label.textContent      = on ? 'Sí' : 'No';
     if(!on) document.getElementById('svcEnlace').value = '';
@@ -582,7 +582,7 @@ function toggleSubEnlace() {
     const thumb = document.getElementById('subEnlaceThumb');
     const label = document.getElementById('subEnlaceToggleLabel');
     field.style.display = on ? 'block' : 'none';
-    track.style.background = on ? 'var(--color-secondary, #c9f31d)' : '#cbd5e1';
+    track.style.background = on ? 'var(--color-secondary, #C6F24E)' : '#D6D2C7';
     thumb.style.transform  = on ? 'translateX(16px)' : 'translateX(0)';
     label.textContent      = on ? 'Sí' : 'No';
     if(!on) document.getElementById('subEnlace').value = '';
@@ -669,7 +669,7 @@ function renderFeatures(list, containerId, removeFn) {
         <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px">
             <svg width="13" height="13" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             <span style="flex:1;font-size:13px;color:var(--color-text)">${escapeHtml(f)}</span>
-            <button type="button" onclick="${removeFn}(${i})" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:0;line-height:1" title="Eliminar">
+            <button type="button" onclick="${removeFn}(${i})" style="background:none;border:none;cursor:pointer;color:#8A867C;padding:0;line-height:1" title="Eliminar">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>`).join('');
@@ -710,12 +710,12 @@ function calcSvcGanancia() {
     const ganancia = precio - costo;
     const pct      = precio > 0 ? Math.round((ganancia / precio) * 100) : 0;
     const color    = ganancia >= 0
-        ? { bg:'#f0fdf4', border:'#86efac', txt:'#15803d', badge:'#dcfce7', badgeTxt:'#16a34a' }
-        : { bg:'#fef2f2', border:'#fca5a5', txt:'#dc2626', badge:'#fee2e2', badgeTxt:'#dc2626' };
-    box.style.cssText = `display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 14px;background:${color.bg};border:1.5px solid ${color.border};border-radius:10px`;
+        ? { bg:'#E3F1E8', border:'#2D8F5A', txt:'#2D8F5A', badge:'#E3F1E8', badgeTxt:'#2D8F5A' }
+        : { bg:'#F4DEDB', border:'#B0382F', txt:'#B0382F', badge:'#F4DEDB', badgeTxt:'#B0382F' };
+    box.style.cssText = `display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 14px;background:${color.bg};border:1.5px solid ${color.border};border-radius:4px`;
     document.getElementById('svcGananciaLabel').style.color  = color.txt;
     document.getElementById('svcGananciaValor').style.color  = color.txt;
-    document.getElementById('svcGananciaPct').style.cssText  = `font-size:11px;font-weight:700;background:${color.badge};color:${color.badgeTxt};padding:2px 8px;border-radius:20px`;
+    document.getElementById('svcGananciaPct').style.cssText  = `font-size:11px;font-weight:700;background:${color.badge};color:${color.badgeTxt};padding:2px 8px;border-radius:100px`;
     document.getElementById('svcGananciaValor').textContent  = (ganancia >= 0 ? '+ ' : '- ') + formatMoney(Math.abs(ganancia));
     document.getElementById('svcGananciaPct').textContent    = pct + '%';
 }
@@ -728,11 +728,11 @@ function calcSubGanancia() {
     if (precio <= 0 && costo <= 0) { box.style.display = 'none'; return; }
     const ganancia = precio - costo;
     const pct      = precio > 0 ? Math.round((ganancia / precio) * 100) : 0;
-    const color    = ganancia >= 0 ? { bg:'#f0fdf4', border:'#86efac', txt:'#15803d', badge:'#dcfce7', badgeTxt:'#16a34a' }
-                                   : { bg:'#fef2f2', border:'#fca5a5', txt:'#dc2626', badge:'#fee2e2', badgeTxt:'#dc2626' };
-    box.style.cssText = `display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:10px 14px;background:${color.bg};border:1.5px solid ${color.border};border-radius:10px`;
+    const color    = ganancia >= 0 ? { bg:'#E3F1E8', border:'#2D8F5A', txt:'#2D8F5A', badge:'#E3F1E8', badgeTxt:'#2D8F5A' }
+                                   : { bg:'#F4DEDB', border:'#B0382F', txt:'#B0382F', badge:'#F4DEDB', badgeTxt:'#B0382F' };
+    box.style.cssText = `display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:10px 14px;background:${color.bg};border:1.5px solid ${color.border};border-radius:4px`;
     document.getElementById('subGananciaValor').style.color = color.txt;
-    document.getElementById('subGananciaPct').style.cssText = `font-size:11px;font-weight:700;background:${color.badge};color:${color.badgeTxt};padding:2px 8px;border-radius:20px`;
+    document.getElementById('subGananciaPct').style.cssText = `font-size:11px;font-weight:700;background:${color.badge};color:${color.badgeTxt};padding:2px 8px;border-radius:100px`;
     document.getElementById('subGananciaValor').textContent = (ganancia >= 0 ? '+ ' : '- ') + formatMoney(Math.abs(ganancia));
     document.getElementById('subGananciaPct').textContent   = pct + '%';
 }
@@ -742,18 +742,18 @@ function previewSub(ss) {
     const freq   = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Pago Único', ninguna:'Ninguna' };
     const ganancia = parseFloat(ss.precio) - parseFloat(ss.costo || 0);
     const pct      = parseFloat(ss.precio) > 0 ? Math.round((ganancia / parseFloat(ss.precio)) * 100) : 0;
-    const gColor   = ganancia >= 0 ? '#15803d' : '#dc2626';
-    const gBg      = ganancia >= 0 ? '#f0fdf4' : '#fef2f2';
-    const gBorder  = ganancia >= 0 ? '#86efac' : '#fca5a5';
+    const gColor   = ganancia >= 0 ? '#2D8F5A' : '#B0382F';
+    const gBg      = ganancia >= 0 ? '#E3F1E8' : '#F4DEDB';
+    const gBorder  = ganancia >= 0 ? '#2D8F5A' : '#B0382F';
 
     const featuresHtml = Array.isArray(ss.features) && ss.features.length
         ? `<div style="margin-top:20px">
-            <p style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 10px">Características incluidas</p>
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#57544D;margin:0 0 10px">Características incluidas</p>
             <div style="display:flex;flex-direction:column;gap:6px">
               ${ss.features.map(f => `
-                <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px">
-                  <svg width="15" height="15" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                  <span style="font-size:14px;color:#0f172a">${escapeHtml(f.texto)}</span>
+                <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:4px">
+                  <svg width="15" height="15" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  <span style="font-size:14px;color:#0E0E0C">${escapeHtml(f.texto)}</span>
                 </div>`).join('')}
             </div>
           </div>` : '';
@@ -762,13 +762,13 @@ function previewSub(ss) {
     document.getElementById('previewSubBody').innerHTML = `
         <!-- Fila superior: 2 cards precio/costo a ancho completo -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-            <div style="padding:24px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;text-align:center">
-                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 10px;letter-spacing:.07em">Precio de venta</p>
-                <p style="font-size:24px;font-weight:900;color:#10b981;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${formatMoney(ss.precio)}</p>
+            <div style="padding:24px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;text-align:center">
+                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 10px;letter-spacing:.07em">Precio de venta</p>
+                <p style="font-size:24px;font-weight:700;color:#2D8F5A;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${formatMoney(ss.precio)}</p>
             </div>
-            <div style="padding:24px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:16px;text-align:center">
-                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 10px;letter-spacing:.07em">Costo</p>
-                <p style="font-size:24px;font-weight:900;color:#ef4444;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${formatMoney(ss.costo || 0)}</p>
+            <div style="padding:24px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;text-align:center">
+                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 10px;letter-spacing:.07em">Costo</p>
+                <p style="font-size:24px;font-weight:700;color:#B0382F;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${formatMoney(ss.costo || 0)}</p>
             </div>
         </div>
         <!-- Fila inferior: descripción+meta | features -->
@@ -776,29 +776,29 @@ function previewSub(ss) {
             <div>
                 ${ss.descripcion ? `
                 <div style="margin-bottom:24px">
-                    <p style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 10px">Descripción</p>
+                    <p style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#57544D;margin:0 0 10px">Descripción</p>
                     <p style="font-size:15px;color:#334155;line-height:1.75;margin:0;white-space:pre-line">${escapeHtml(ss.descripcion)}</p>
                 </div>` : ''}
-                ${ss.frecuencia !== 'ninguna' ? `<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:14px">
-                    <svg width="15" height="15" fill="none" stroke="#64748b" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:14px;color:#475569;font-weight:600">Facturación: <strong style="color:#0f172a">${freq[ss.frecuencia] || ss.frecuencia}</strong></span>
+                ${ss.frecuencia !== 'ninguna' ? `<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:4px;margin-bottom:14px">
+                    <svg width="15" height="15" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <span style="font-size:14px;color:#57544D;font-weight:600">Facturación: <strong style="color:#0E0E0C">${freq[ss.frecuencia] || ss.frecuencia}</strong></span>
                 </div>` : ''}
-                <div style="padding:20px 24px;background:#c9f31d;border:none;border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div style="padding:20px 24px;background:${gBg};border:1.5px solid ${gBorder};border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:16px">
                     <div>
-                        <p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#000;margin:0 0 6px">Ganancia por ciclo</p>
-                        <p style="font-size:24px;font-weight:900;color:#000;margin:0;white-space:nowrap">${ganancia>=0?'+ ':'-'}${formatMoney(Math.abs(ganancia))}</p>
+                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${gColor};margin:0 0 6px">Ganancia por ciclo</p>
+                        <p style="font-size:24px;font-weight:700;color:${gColor};margin:0;white-space:nowrap">${ganancia>=0?'+ ':'-'}${formatMoney(Math.abs(ganancia))}</p>
                     </div>
-                    <span style="font-size:18px;font-weight:900;background:rgba(0,0,0,0.12);color:#000;padding:8px 14px;border-radius:14px;white-space:nowrap;flex-shrink:0">${pct}%</span>
+                    <span style="font-size:18px;font-weight:700;background:rgba(0,0,0,0.08);color:${gColor};padding:8px 14px;border-radius:6px;white-space:nowrap;flex-shrink:0">${pct}%</span>
                 </div>
                 ${ss.enlace_pago ? `
                 <div style="margin-top:14px">
-                    <a href="${escapeHtml(ss.enlace_pago)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:#111;padding:11px 18px;border-radius:10px;text-decoration:none">
+                    <a href="${escapeHtml(ss.enlace_pago)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fff;background:#0E0E0C;padding:11px 18px;border-radius:4px;text-decoration:none">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                         Ver enlace de pago
                     </a>
                 </div>` : ''}
             </div>
-            <div>${featuresHtml || '<div style="padding:50px 30px;text-align:center;color:#94a3b8;font-size:14px;font-style:italic;border:1.5px dashed #e2e8f0;border-radius:14px">Sin características agregadas</div>'}</div>
+            <div>${featuresHtml || '<div style="padding:50px 30px;text-align:center;color:#8A867C;font-size:14px;font-style:italic;border:1.5px dashed #E8E5DD;border-radius:6px">Sin características agregadas</div>'}</div>
         </div>`;
 
     document.getElementById('previewSubModal').classList.add('show');
@@ -813,30 +813,30 @@ function previewPkg(p) {
     const precioVenta = parseFloat(p.precio_venta) > 0 ? parseFloat(p.precio_venta) : precioSug;
     const ganancia    = precioVenta - costoReal;
     const pct         = precioVenta > 0 ? Math.round((ganancia / precioVenta) * 100) : 0;
-    const gColor      = ganancia >= 0 ? '#15803d' : '#dc2626';
-    const gBg         = ganancia >= 0 ? '#dcfce7' : '#fee2e2';
+    const gColor      = ganancia >= 0 ? '#2D8F5A' : '#B0382F';
+    const gBg         = ganancia >= 0 ? '#E3F1E8' : '#F4DEDB';
 
     document.getElementById('previewPkgTitle').textContent = p.nombre;
     document.getElementById('previewPkgBody').innerHTML = `
         <!-- Cards de precios: ancho completo -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
-            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px">
-                <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#15803d;letter-spacing:.06em;margin:0 0 4px">Precio de venta</p>
-                <p style="font-size:22px;font-weight:900;color:#15803d;margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(precioVenta)}</p>
-                <p style="font-size:10px;font-weight:700;color:#15803d;margin:2px 0 4px;opacity:.7">COP</p>
-                ${p.frecuencia !== 'ninguna' ? `<p style="font-size:10px;color:#86efac;margin:0">${FREQ[p.frecuencia] || p.frecuencia}</p>` : ''}
+            <div style="background:#E3F1E8;border:1px solid #2D8F5A;border-radius:4px;padding:14px 16px">
+                <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#2D8F5A;letter-spacing:.06em;margin:0 0 4px">Precio de venta</p>
+                <p style="font-size:22px;font-weight:700;color:#2D8F5A;margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(precioVenta)}</p>
+                <p style="font-size:10px;font-weight:700;color:#2D8F5A;margin:2px 0 4px;opacity:.7">COP</p>
+                ${p.frecuencia !== 'ninguna' ? `<p style="font-size:10px;color:#2D8F5A;margin:0;opacity:.7">${FREQ[p.frecuencia] || p.frecuencia}</p>` : ''}
             </div>
-            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px">
-                <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:.06em;margin:0 0 4px">Costo total</p>
-                <p style="font-size:22px;font-weight:900;color:#0f172a;margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(costoReal)}</p>
-                <p style="font-size:10px;font-weight:700;color:#64748b;margin:2px 0 4px;opacity:.7">COP</p>
-                <p style="font-size:10px;color:#94a3b8;margin:0">${p.items.length} sub-servicio${p.items.length !== 1 ? 's' : ''}</p>
+            <div style="background:#FAFAF7;border:1px solid #E8E5DD;border-radius:4px;padding:14px 16px">
+                <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#57544D;letter-spacing:.06em;margin:0 0 4px">Costo total</p>
+                <p style="font-size:22px;font-weight:700;color:#0E0E0C;margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(costoReal)}</p>
+                <p style="font-size:10px;font-weight:700;color:#57544D;margin:2px 0 4px;opacity:.7">COP</p>
+                <p style="font-size:10px;color:#8A867C;margin:0">${p.items.length} sub-servicio${p.items.length !== 1 ? 's' : ''}</p>
             </div>
-            <div style="background:${gBg};border:1px solid ${ganancia>=0?'#bbf7d0':'#fecaca'};border-radius:12px;padding:14px 16px">
+            <div style="background:${gBg};border:1px solid ${ganancia>=0?'#2D8F5A':'#B0382F'};border-radius:4px;padding:14px 16px">
                 <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:${gColor};letter-spacing:.06em;margin:0 0 4px">Ganancia</p>
                 <div style="display:flex;align-items:baseline;gap:6px">
-                    <p style="font-size:22px;font-weight:900;color:${gColor};margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(ganancia)}</p>
-                    <span style="font-size:12px;font-weight:800;color:${gColor}">${pct}%</span>
+                    <p style="font-size:22px;font-weight:700;color:${gColor};margin:0;line-height:1.1;font-family:var(--font-primary)">${moneyNum(ganancia)}</p>
+                    <span style="font-size:12px;font-weight:700;color:${gColor}">${pct}%</span>
                 </div>
                 <p style="font-size:10px;font-weight:700;color:${gColor};margin:2px 0 0;opacity:.7">COP</p>
             </div>
@@ -847,30 +847,30 @@ function previewPkg(p) {
 
             <!-- Columna izquierda: sub-servicios + características -->
             <div>
-                ${p.descripcion ? `<p style="font-size:13px;color:#475569;line-height:1.6;margin:0 0 16px;white-space:pre-line">${escapeHtml(p.descripcion)}</p>` : ''}
-                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.06em;margin:0 0 10px">Sub-servicios incluidos</p>
+                ${p.descripcion ? `<p style="font-size:13px;color:#57544D;line-height:1.6;margin:0 0 16px;white-space:pre-line">${escapeHtml(p.descripcion)}</p>` : ''}
+                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A867C;letter-spacing:.06em;margin:0 0 10px">Sub-servicios incluidos</p>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:${p.features&&p.features.length?'20px':'0'}">
                     ${p.items.map(it => `
-                    <div style="padding:10px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px">
+                    <div style="padding:10px 14px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:4px">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start">
                             <div>
-                                <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 2px">${escapeHtml(it.ss_nombre)}</p>
-                                <p style="font-size:11px;color:#94a3b8;margin:0">${escapeHtml(it.svc_nombre)}</p>
+                                <p style="font-size:13px;font-weight:700;color:#0E0E0C;margin:0 0 2px">${escapeHtml(it.ss_nombre)}</p>
+                                <p style="font-size:11px;color:#8A867C;margin:0">${escapeHtml(it.svc_nombre)}</p>
                             </div>
                             <div style="text-align:right;flex-shrink:0;margin-left:12px">
-                                <p style="font-size:13px;font-weight:800;color:#0f172a;margin:0 0 2px">${formatMoney(it.precio)}</p>
-                                <p style="font-size:11px;color:#94a3b8;margin:0">costo ${formatMoney(it.costo)}</p>
+                                <p style="font-size:13px;font-weight:800;color:#0E0E0C;margin:0 0 2px">${formatMoney(it.precio)}</p>
+                                <p style="font-size:11px;color:#8A867C;margin:0">costo ${formatMoney(it.costo)}</p>
                             </div>
                         </div>
-                    </div>`).join('') || '<p style="font-size:12px;color:#94a3b8;font-style:italic">Sin items</p>'}
+                    </div>`).join('') || '<p style="font-size:12px;color:#8A867C;font-style:italic">Sin items</p>'}
                 </div>
                 ${p.features && p.features.length ? `
-                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.06em;margin:0 0 10px">Características</p>
+                <p style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8A867C;letter-spacing:.06em;margin:0 0 10px">Características</p>
                 <div style="display:flex;flex-direction:column;gap:6px">
                     ${p.features.map(f => `
-                    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px">
-                        <svg width="13" height="13" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        <span style="font-size:13px;color:#0f172a">${escapeHtml(f.texto)}</span>
+                    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:3px">
+                        <svg width="13" height="13" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <span style="font-size:13px;color:#0E0E0C">${escapeHtml(f.texto)}</span>
                     </div>`).join('')}
                 </div>` : ''}
             </div>
@@ -878,19 +878,19 @@ function previewPkg(p) {
             <!-- Columna derecha: imagen + enlace -->
             <div style="display:flex;flex-direction:column;gap:12px">
                 ${p.imagen ? `
-                <div style="border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;aspect-ratio:4/3">
+                <div style="border-radius:6px;overflow:hidden;border:1px solid #E8E5DD;aspect-ratio:4/3">
                     <img src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" style="width:100%;height:100%;object-fit:cover;display:block">
                 </div>` : `
-                <div style="border-radius:14px;border:2px dashed #e2e8f0;background:#f8fafc;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                <div style="border-radius:6px;border:2px dashed #E8E5DD;background:#FAFAF7;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
                     <svg width="36" height="36" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="8.5" cy="8.5" r="1.5" fill="#cbd5e1" stroke="none"/></svg>
-                    <p style="font-size:12px;color:#94a3b8;margin:0">Sin imagen</p>
+                    <p style="font-size:12px;color:#8A867C;margin:0">Sin imagen</p>
                 </div>`}
                 ${p.enlace ? `
                 <a href="${escapeHtml(p.enlace)}" target="_blank" rel="noopener noreferrer"
                    style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;
-                          background:#0f172a;color:#fff;border-radius:12px;text-decoration:none;
+                          background:#0E0E0C;color:#fff;border-radius:4px;text-decoration:none;
                           font-size:13px;font-weight:700"
-                   onmouseenter="this.style.background='#1e293b'" onmouseleave="this.style.background='#0f172a'">
+                   onmouseenter="this.style.background='#333'" onmouseleave="this.style.background='#0E0E0C'">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                     Ver paquete
                 </a>` : ''}
@@ -926,23 +926,23 @@ function renderPkgs(pkgs) {
         const precioVenta = parseFloat(p.precio_venta) > 0 ? parseFloat(p.precio_venta) : precioSug;
         const ganancia = precioVenta - costoReal;
         const pct      = precioVenta > 0 ? Math.round((ganancia / precioVenta) * 100) : 0;
-        const gColor   = ganancia >= 0 ? '#15803d' : '#dc2626';
+        const gColor   = ganancia >= 0 ? '#2D8F5A' : '#B0382F';
         const itemsHtml = p.items.map(it => `
-            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px">
-                <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#c9f31d;flex-shrink:0"></span>
-                <span style="flex:1;font-size:12px;font-weight:600;color:#0f172a">${escapeHtml(it.svc_nombre)} — ${escapeHtml(it.ss_nombre)}</span>
-                <span style="font-size:11px;color:#94a3b8;font-weight:600">${formatMoney(it.precio)}</span>
+            <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:3px">
+                <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#C6F24E;flex-shrink:0"></span>
+                <span style="flex:1;font-size:12px;font-weight:600;color:#0E0E0C">${escapeHtml(it.svc_nombre)} — ${escapeHtml(it.ss_nombre)}</span>
+                <span style="font-size:11px;color:#8A867C;font-weight:600">${formatMoney(it.precio)}</span>
             </div>`).join('');
         return `
-        <div data-id="${p.id}" style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,0.07);display:flex;flex-direction:column;overflow:hidden;transition:transform .2s,box-shadow .2s"
+        <div data-id="${p.id}" style="background:#fff;border-radius:6px;border:1.5px solid #E8E5DD;box-shadow:0 1px 2px rgba(14,14,12,.06);display:flex;flex-direction:column;overflow:hidden;transition:transform .2s,box-shadow .2s"
              onmouseenter="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 36px rgba(0,0,0,0.12)'"
              onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,0.07)'">
             <div style="padding:18px 20px 0">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
                     <div>
                         <div>
-                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8">Paquete</span>
-                            <h3 style="font-size:16px;font-weight:800;color:#0f172a;margin:2px 0 0">${escapeHtml(p.nombre)}</h3>
+                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C">Paquete</span>
+                            <h3 style="font-size:16px;font-weight:800;color:#0E0E0C;margin:2px 0 0">${escapeHtml(p.nombre)}</h3>
                         </div>
                     </div>
                     <div style="display:flex;gap:4px">
@@ -952,7 +952,7 @@ function renderPkgs(pkgs) {
                         <button class="btn btn-ghost btn-icon sm" onclick="dupPkg(${p.id})" title="Duplicar" style="color:#f59e0b">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="editPkg(${p.id})" title="Editar" style="color:#64748b">
+                        <button class="btn btn-ghost btn-icon sm" onclick="editPkg(${p.id})" title="Editar" style="color:#57544D">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         </button>
                         <button class="btn btn-ghost btn-icon sm" onclick="deletePkg(${p.id})" title="Eliminar" style="color:#ef4444">
@@ -960,31 +960,31 @@ function renderPkgs(pkgs) {
                         </button>
                     </div>
                 </div>
-                ${p.descripcion ? `<p style="font-size:13px;color:#475569;line-height:1.5;margin:0 0 12px">${escapeHtml(p.descripcion.split(/\n\n|\n/)[0])}</p>` : ''}
+                ${p.descripcion ? `<p style="font-size:13px;color:#57544D;line-height:1.5;margin:0 0 12px">${escapeHtml(p.descripcion.split(/\n\n|\n/)[0])}</p>` : ''}
                 <!-- Items -->
-                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:${p.features&&p.features.length?'10px':'14px'}">${itemsHtml || '<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">Sin items</p>'}</div>
+                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:${p.features&&p.features.length?'10px':'14px'}">${itemsHtml || '<p style="font-size:12px;color:#8A867C;font-style:italic;margin:0">Sin items</p>'}</div>
                 ${p.features && p.features.length ? `
                 <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
-                    ${p.features.map(f=>`<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#0f172a;background:#f1f5f9;border:1px solid #e2e8f0;padding:3px 9px;border-radius:20px">
-                        <svg width="10" height="10" fill="none" stroke="#10b981" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>${escapeHtml(f.texto)}</span>`).join('')}
+                    ${p.features.map(f=>`<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#0E0E0C;background:#EFECE5;border:1px solid #E8E5DD;padding:3px 9px;border-radius:100px">
+                        <svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>${escapeHtml(f.texto)}</span>`).join('')}
                 </div>` : ''}
             </div>
             <!-- Footer con precios -->
-            <div style="margin-top:auto;padding:14px 20px;background:#f8fafc;border-top:1px solid #e2e8f0">
+            <div style="margin-top:auto;padding:14px 20px;background:#FAFAF7;border-top:1px solid #E8E5DD">
                 ${p.frecuencia !== 'ninguna' ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-                    <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:11px;color:#64748b;font-weight:600">${FREQ[p.frecuencia] || p.frecuencia}</span>
+                    <svg width="12" height="12" fill="none" stroke="#8A867C" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <span style="font-size:11px;color:#57544D;font-weight:600">${FREQ[p.frecuencia] || p.frecuencia}</span>
                 </div>` : ''}
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                     <div>
-                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 3px;letter-spacing:.05em">Precio de venta</p>
-                        <p style="font-size:16px;font-weight:900;color:#10b981;margin:0">${formatMoney(precioVenta)}</p>
+                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 3px;letter-spacing:.05em">Precio de venta</p>
+                        <p style="font-size:16px;font-weight:700;color:#2D8F5A;margin:0">${formatMoney(precioVenta)}</p>
                     </div>
                     <div style="text-align:right">
-                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 3px;letter-spacing:.05em">Ganancia</p>
+                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;color:#8A867C;margin:0 0 3px;letter-spacing:.05em">Ganancia</p>
                         <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
-                            <p style="font-size:16px;font-weight:900;color:${gColor};margin:0">${formatMoney(ganancia)}</p>
-                            <span style="font-size:10px;font-weight:800;background:${ganancia>=0?'#dcfce7':'#fee2e2'};color:${gColor};padding:2px 7px;border-radius:20px">${pct}%</span>
+                            <p style="font-size:16px;font-weight:700;color:${gColor};margin:0">${formatMoney(ganancia)}</p>
+                            <span style="font-size:10px;font-weight:700;background:${ganancia>=0?'#E3F1E8':'#F4DEDB'};color:${gColor};padding:2px 7px;border-radius:100px">${pct}%</span>
                         </div>
                     </div>
                 </div>
@@ -998,7 +998,7 @@ function renderPkgs(pkgs) {
 function buildPkgSubsList(selectedIds = []) {
     const container = document.getElementById('pkgSubsList');
     const allSubs = allSvcs.flatMap(s => (s.sub_servicios || []).map(ss => ({...ss, svc_nombre: s.nombre})));
-    if (!allSubs.length) { container.innerHTML = '<p style="color:#94a3b8;font-size:13px;padding:10px">No hay sub-servicios disponibles.</p>'; return; }
+    if (!allSubs.length) { container.innerHTML = '<p style="color:#8A867C;font-size:13px;padding:10px">No hay sub-servicios disponibles.</p>'; return; }
 
     // Agrupar por servicio
     const byService = {};
@@ -1009,16 +1009,16 @@ function buildPkgSubsList(selectedIds = []) {
 
     container.innerHTML = Object.entries(byService).map(([svcNombre, subs]) => `
         <div style="margin-bottom:8px">
-            <p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin:0 0 6px;padding:0 4px">${escapeHtml(svcNombre)}</p>
+            <p style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#57544D;margin:0 0 6px;padding:0 4px">${escapeHtml(svcNombre)}</p>
             ${subs.map(ss => `
             <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:background .1s;margin-bottom:4px"
                    onmouseenter="this.style.background='#f1f5f9'" onmouseleave="this.style.background=''">
                 <input type="checkbox" data-id="${ss.id}" data-precio="${ss.precio}" data-costo="${ss.costo}"
                        ${selectedIds.includes(parseInt(ss.id)) ? 'checked' : ''}
                        onchange="calcPkgResumen()" style="width:16px;height:16px;accent-color:#000;cursor:pointer;flex-shrink:0">
-                <span style="flex:1;font-size:13px;font-weight:600;color:#0f172a">${escapeHtml(ss.nombre)}</span>
+                <span style="flex:1;font-size:13px;font-weight:600;color:#0E0E0C">${escapeHtml(ss.nombre)}</span>
                 <span style="font-size:12px;color:#10b981;font-weight:700">${formatMoney(ss.precio)}</span>
-                <span style="font-size:11px;color:#94a3b8">costo: ${formatMoney(ss.costo)}</span>
+                <span style="font-size:11px;color:#8A867C">costo: ${formatMoney(ss.costo)}</span>
             </label>`).join('')}
         </div>`).join('');
 
@@ -1291,7 +1291,7 @@ function initDrag(containerId, tabla) {
 // Estilos drag
 const _dragStyle = document.createElement('style');
 _dragStyle.textContent = `
-[data-id].drag-over { outline:2px dashed #6366f1; outline-offset:3px; border-radius:14px; background:#f5f3ff !important; }
+[data-id].drag-over { outline:2px dashed #0E0E0C; outline-offset:3px; border-radius:6px; background:#EFECE5 !important; }
 [data-id] { transition: opacity .15s, transform .15s; }
 .drag-handle { opacity: .25; cursor: grab; flex-shrink:0; }
 [data-id]:hover .drag-handle { opacity: .5; }

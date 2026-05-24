@@ -13,6 +13,9 @@ if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
 $method = $_SERVER['REQUEST_METHOD'];
 $pdo = db();
 
+// Auto-migración
+try { $pdo->exec("ALTER TABLE clientes_archivos ADD COLUMN descripcion VARCHAR(500) DEFAULT NULL"); } catch(PDOException $e){}
+
 switch ($method) {
     case 'GET':
         $cliente_id = $_GET['cliente_id'] ?? null;
@@ -33,13 +36,15 @@ switch ($method) {
         $targetPath = $targetDir . $newName;
 
         if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            $stmt = $pdo->prepare("INSERT INTO clientes_archivos (cliente_id, nombre_archivo, archivo_url, tipo_archivo, peso_archivo) VALUES (?, ?, ?, ?, ?)");
+            $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : null;
+            $stmt = $pdo->prepare("INSERT INTO clientes_archivos (cliente_id, nombre_archivo, archivo_url, tipo_archivo, peso_archivo, descripcion) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $cliente_id,
                 $file['name'],
                 'uploads/clientes/' . $newName,
                 $file['type'],
-                $file['size']
+                $file['size'],
+                $descripcion ?: null,
             ]);
             jsonResponse(['success' => true, 'message' => 'Archivo subido correctamente']);
         } else {

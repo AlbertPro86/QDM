@@ -44,8 +44,8 @@ include __DIR__ . '/includes/header.php';
             <option value="ganado">Ganados</option>
             <option value="perdido">Perdidos</option>
         </select>
-        <button class="btn btn-secondary" onclick="openLeadModal()" id="btnNewLead">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        <button class="btn btn-accent" onclick="openLeadModal()" id="btnNewLead">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
             Nuevo Lead
         </button>
     </div>
@@ -56,15 +56,15 @@ include __DIR__ . '/includes/header.php';
 <!-- Vista Tabla -->
 <div class="card" id="tableView">
     <!-- Barra de acciones masivas -->
-    <div id="leadsBulkBar" style="display:none;align-items:center;gap:12px;padding:10px 16px;background:#fef2f2;border-bottom:1.5px solid #fecaca">
-        <span id="leadsBulkCount" style="font-size:13px;font-weight:700;color:#dc2626"></span>
+    <div id="leadsBulkBar" style="display:none;align-items:center;gap:12px;padding:10px 16px;background:#F4DEDB;border-bottom:1.5px solid #D6D2C7">
+        <span id="leadsBulkCount" style="font-size:13px;font-weight:700;color:#B0382F"></span>
         <button onclick="deleteSelectedLeads()"
-            style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;background:#dc2626;border:none;border-radius:8px;cursor:pointer">
+            style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;background:#B0382F;border:none;border-radius:4px;cursor:pointer">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             Eliminar seleccionados
         </button>
         <button onclick="clearLeadsSelection()"
-            style="padding:6px 12px;font-size:12px;font-weight:600;color:#64748b;background:none;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer">
+            style="padding:6px 12px;font-size:12px;font-weight:600;color:#57544D;background:none;border:1.5px solid #E8E5DD;border-radius:4px;cursor:pointer">
             Cancelar
         </button>
     </div>
@@ -73,7 +73,7 @@ include __DIR__ . '/includes/header.php';
             <thead><tr>
                 <th style="width:36px;padding-left:16px">
                     <input type="checkbox" id="leadsCheckAll" onchange="leadsToggleAll(this)"
-                        style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626">
+                        style="width:15px;height:15px;cursor:pointer;accent-color:#B0382F">
                 </th>
                 <th>Lead</th><th>WhatsApp</th><th>Servicio</th><th>Presupuesto</th><th>Estado</th><th>Fecha</th><th style="width:90px">Acciones</th>
             </tr></thead>
@@ -89,7 +89,7 @@ include __DIR__ . '/includes/header.php';
     <?php
     $columns = [
         'nuevo' => ['Nuevos', 'var(--color-info)'],
-        'contactado' => ['Contactados', 'var(--color-secondary)'],
+        'contactado' => ['Contactados', 'var(--color-text-muted)'],
         'en_negociacion' => ['En Negociación', 'var(--color-warning)'],
         'ganado' => ['Ganados', 'var(--color-success)'],
         'perdido' => ['Perdidos', 'var(--color-danger)']
@@ -111,7 +111,7 @@ include __DIR__ . '/includes/header.php';
         <div class="modal-header">
             <div>
                 <h3 id="leadModalTitle" class="modal-title">Nuevo Lead</h3>
-                <p style="font-size:13px;color:#94a3b8;margin:4px 0 0">Completa la información del prospecto</p>
+                <p style="font-size:13px;color:#8A867C;margin:4px 0 0">Completa la información del prospecto</p>
             </div>
             <button class="modal-close" onclick="closeLeadModal()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
@@ -121,22 +121,22 @@ include __DIR__ . '/includes/header.php';
                 <!-- Fila 1: Nombre + WhatsApp -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Nombre *</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Nombre *</label>
                         <input type="text" class="form-input" id="leadNombre" required placeholder="Nombre del prospecto">
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">WhatsApp *</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">WhatsApp *</label>
                         <input type="text" class="form-input" id="leadWhatsapp" required placeholder="+57 300 123 4567">
                     </div>
                 </div>
                 <!-- Fila 2: Email + Servicio -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Email</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Email</label>
                         <input type="email" class="form-input" id="leadEmail" placeholder="email@ejemplo.com">
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Servicio de Interés *</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Servicio de Interés *</label>
                         <select class="form-select" id="leadServicio" required>
                             <option value="">Seleccionar...</option>
                             <?php foreach($servicios as $s): ?>
@@ -149,11 +149,11 @@ include __DIR__ . '/includes/header.php';
                 <!-- Fila 3: Presupuesto + Fuente -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Presupuesto ($)</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Presupuesto ($)</label>
                         <input type="number" class="form-input" id="leadPresupuesto" step="0.01" min="0" placeholder="0.00">
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Fuente</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Fuente</label>
                         <select class="form-select" id="leadFuente">
                             <option value="manual">Manual</option>
                             <option value="wordpress">WordPress</option>
@@ -166,11 +166,11 @@ include __DIR__ . '/includes/header.php';
                 <!-- Fila 4: URL + Estado (estado oculto por defecto) -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">URL Actual</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">URL Actual</label>
                         <input type="url" class="form-input" id="leadUrl" placeholder="https://...">
                     </div>
                     <div id="leadEstadoGroup" style="display:none">
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Estado</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Estado</label>
                         <select class="form-select" id="leadEstado">
                             <option value="nuevo">Nuevo</option>
                             <option value="contactado">Contactado</option>
@@ -182,14 +182,14 @@ include __DIR__ . '/includes/header.php';
                 </div>
                 <!-- Notas: ancho completo -->
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Notas</label>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Notas</label>
                     <textarea class="form-textarea" id="leadNotas" rows="3" placeholder="Observaciones adicionales..."></textarea>
                 </div>
             </form>
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeLeadModal()">Cancelar</button>
-            <button class="btn btn-secondary" onclick="document.getElementById('leadForm').requestSubmit()" id="leadSaveBtn">Guardar Lead</button>
+            <button class="btn btn-primary" onclick="document.getElementById('leadForm').requestSubmit()" id="leadSaveBtn">Guardar Lead</button>
         </div>
     </div>
 </div>

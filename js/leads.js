@@ -27,28 +27,27 @@ async function loadLeads() {
 
 function renderKPIs(counts) {
     const total = Object.values(counts||{}).reduce((a,b)=>a+parseInt(b),0);
-    const perdidos = counts?.perdido || 0;
     const tasa = total ? Math.round((counts?.ganado||0) / total * 100) : 0;
-    const kpi = (label, value, footer, bg, tMain, tSub, pBg, pCol, pill) =>
-        `<div style="background:${bg};border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s"
-            onmouseenter="this.style.filter='brightness(1.08)'" onmouseleave="this.style.filter='brightness(1)'">
-            <div style="flex:1;min-width:0">
-                <div style="font-size:10px;font-weight:700;color:${tSub};text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">${label}</div>
-                <div style="font-size:22px;font-weight:900;color:${tMain};line-height:1">${value}</div>
-                <div style="font-size:11px;color:${tSub};margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${footer}</div>
+    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill) =>
+        `<div style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">${label}</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1">${value}</div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">${sub}</span>
+                <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillCol};padding:2px 8px;border-radius:100px;white-space:nowrap">${pill}</span>
             </div>
-            <span style="font-size:10px;font-weight:700;background:${pBg};color:${pCol};padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0">${pill}</span>
         </div>`;
 
     document.getElementById('leadsKpiBar').innerHTML =
-        kpi('Total Leads',    total,                   'Pipeline completo',
-            '#0f172a', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Total')
-      + kpi('Nuevos',         counts?.nuevo||0,        'Sin contactar aún',
-            '#4f46e5', '#ffffff', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.2)',  '#ffffff', 'Nuevos')
+        kpi('Total Leads',    total,                     'Pipeline completo',
+            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#57544D', 'Total')
+      + kpi('Nuevos',         counts?.nuevo||0,          'Sin contactar aún',
+            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#0E0E0C', 'Nuevos')
       + kpi('En Negociación', counts?.en_negociacion||0, `${counts?.contactado||0} contactados`,
-            '#334155', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Activos')
-      + kpi('Ganados',        counts?.ganado||0,       `${tasa}% tasa de cierre`,
-            '#c9f31d', '#0f172a', 'rgba(0,0,0,0.45)',      'rgba(0,0,0,0.15)',       '#0f172a', 'Ganados');
+            '#FEF3C7', '#FDE68A', '#92400E', '#FDE68A', '#92400E', 'Activos')
+      + kpi('Ganados',        counts?.ganado||0,         `${tasa}% tasa de cierre`,
+            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Ganados');
 }
 
 function renderTable(leads) {

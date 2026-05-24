@@ -26,6 +26,7 @@ try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN imagen_path VARCHAR(500) 
 try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN cliente_id INT DEFAULT NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE transacciones ADD CONSTRAINT fk_tx_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN negocio_id INT DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN fecha_pago DATE DEFAULT NULL"); } catch(PDOException $e){}
 
 switch ($method) {
     case 'GET':
@@ -87,15 +88,15 @@ switch ($method) {
             $params[] = $negocioIdFiltro;
         }
         if ($mes) {
-            $where[] = "DATE_FORMAT(COALESCE(t.fecha_vencimiento, t.created_at), '%Y-%m') = ?";
+            $where[] = "DATE_FORMAT(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at), '%Y-%m') = ?";
             $params[] = $mes;
         }
         if ($desde && !$mes) {
-            $where[] = "DATE(COALESCE(t.fecha_vencimiento, t.created_at)) >= ?";
+            $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) >= ?";
             $params[] = $desde;
         }
         if ($hasta && !$mes) {
-            $where[] = "DATE(COALESCE(t.fecha_vencimiento, t.created_at)) <= ?";
+            $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) <= ?";
             $params[] = $hasta;
         }
         if ($buscar) {
@@ -110,15 +111,15 @@ switch ($method) {
         $resumenWhere = [];
         $resumenParams = [];
         if ($mes) {
-            $resumenWhere[] = "DATE_FORMAT(COALESCE(fecha_vencimiento, created_at), '%Y-%m') = ?";
+            $resumenWhere[] = "DATE_FORMAT(COALESCE(fecha_pago, fecha_vencimiento, created_at), '%Y-%m') = ?";
             $resumenParams[] = $mes;
         }
         if ($desde && !$mes) {
-            $resumenWhere[] = "DATE(COALESCE(fecha_vencimiento, created_at)) >= ?";
+            $resumenWhere[] = "DATE(COALESCE(fecha_pago, fecha_vencimiento, created_at)) >= ?";
             $resumenParams[] = $desde;
         }
         if ($hasta && !$mes) {
-            $resumenWhere[] = "DATE(COALESCE(fecha_vencimiento, created_at)) <= ?";
+            $resumenWhere[] = "DATE(COALESCE(fecha_pago, fecha_vencimiento, created_at)) <= ?";
             $resumenParams[] = $hasta;
         }
         $resumenClause = $resumenWhere ? 'WHERE ' . implode(' AND ', $resumenWhere) : '';
@@ -277,7 +278,7 @@ switch ($method) {
             $fields = [];
             $values = [];
 
-            $updatable = ['tipo', 'monto', 'concepto', 'titulo', 'descripcion', 'fecha_vencimiento', 'estado', 'lead_id', 'cliente_id', 'servicio_id', 'factura_id', 'frecuencia', 'descuento', 'proveedor', 'factura_path', 'documento_path', 'imagen_path', 'negocio_id'];
+            $updatable = ['tipo', 'monto', 'concepto', 'titulo', 'descripcion', 'fecha_vencimiento', 'fecha_pago', 'estado', 'lead_id', 'cliente_id', 'servicio_id', 'factura_id', 'frecuencia', 'descuento', 'proveedor', 'factura_path', 'documento_path', 'imagen_path', 'negocio_id'];
 
             foreach ($updatable as $field) {
                 if (isset($input[$field])) {

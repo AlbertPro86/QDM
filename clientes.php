@@ -36,21 +36,22 @@ $stmt = $pdo->query("SELECT * FROM leads WHERE estado = 'ganado' AND id NOT IN (
 $leadsToConvert = $stmt->fetchAll();
 ?>
 
-<!-- KPI Bar -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="clientKpis"></div>
-
-<div class="page-header" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-        <div class="tabs-nav" id="clientTabs">
-            <button class="tab-btn active" data-tab="activeClients">Mis Clientes</button>
-            <button class="tab-btn" data-tab="uniqueClients">Pagos únicos</button>
-            <button class="tab-btn" data-tab="renewals">Próximas Renovaciones</button>
-            <button class="tab-btn" data-tab="pipeline">Conversión (<?= count($leadsToConvert) ?>)</button>
+<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="tabs-nav" id="clientTabs">
+                <button class="tab-btn active" data-tab="activeClients">Mis Clientes</button>
+                <button class="tab-btn" data-tab="uniqueClients">Pagos únicos</button>
+                <button class="tab-btn" data-tab="renewals">Próximas Renovaciones</button>
+                <button class="tab-btn" data-tab="pipeline">Conversión (<?= count($leadsToConvert) ?>)</button>
+            </div>
         </div>
-        <button class="btn btn-secondary" onclick="openClientModal()" style="display: inline-flex; align-items: center; gap: 8px;">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            <span>Nuevo Cliente</span>
-        </button>
+        <div class="page-header-right">
+            <button class="btn btn-accent" onclick="openClientModal()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Nuevo Cliente
+            </button>
+        </div>
     </div>
 
     <!-- Filtros -->
@@ -58,11 +59,11 @@ $leadsToConvert = $stmt->fetchAll();
         <div class="search-bar" style="flex: 1; min-width: 250px; position:relative">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" id="clientSearch" placeholder="Buscar por cliente, contacto, NIT..." style="border: none; outline: none; width: 100%; font-size: 14px;" oninput="onClientSearch()">
-            <button id="clientSearchClear" onclick="limpiarBusqueda()" title="Limpiar" style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:#94a3b8;font-size:16px;line-height:1;padding:2px 4px" onmouseenter="this.style.color='#0f172a'" onmouseleave="this.style.color='#94a3b8'">&times;</button>
+            <button id="clientSearchClear" onclick="limpiarBusqueda()" title="Limpiar" style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:#8A867C;font-size:16px;line-height:1;padding:2px 4px" onmouseenter="this.style.color='var(--color-text)'" onmouseleave="this.style.color='var(--color-text-light)'">&times;</button>
         </div>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Servicio / Sub Servicio / Paquete</label>
+                <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Servicio / Sub Servicio / Paquete</label>
                 <select class="form-select" id="filterSvcType" style="width: 320px; padding: 8px 12px;">
                     <option value="todos">Todos</option>
                     <optgroup label="Servicios">
@@ -83,7 +84,7 @@ $leadsToConvert = $stmt->fetchAll();
                 </select>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Frecuencia</label>
+                <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Frecuencia</label>
                 <select class="form-select" id="filterFrecuencia" style="width: 160px; padding: 8px 12px;">
                     <option value="todos">Todas</option>
                     <option value="unico">Pago único</option>
@@ -94,17 +95,14 @@ $leadsToConvert = $stmt->fetchAll();
                 </select>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Estado</label>
+                <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Estado</label>
                 <select class="form-select" id="filterStatus" style="width: 150px; padding: 8px 12px;">
                     <option value="todos">Todos los estados</option>
                     <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
                 </select>
             </div>
-            <button onclick="limpiarTodosLosFiltros()"
-                style="align-self:flex-end;padding:8px 16px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px;white-space:nowrap"
-                onmouseenter="this.style.background='#fee2e2';this.style.borderColor='#fca5a5';this.style.color='#dc2626'"
-                onmouseleave="this.style.background='#f1f5f9';this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+            <button class="btn btn-ghost btn-sm" onclick="limpiarTodosLosFiltros()" style="align-self:flex-end">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 Limpiar filtros
             </button>
@@ -117,15 +115,13 @@ $leadsToConvert = $stmt->fetchAll();
     <div class="card">
         <div class="table-responsive">
             <!-- Barra de acciones masivas -->
-            <div id="bulkBar" style="display:none;align-items:center;gap:12px;padding:10px 16px;background:#fef2f2;border-bottom:1.5px solid #fecaca">
+            <div id="bulkBar" style="display:none;align-items:center;gap:12px;padding:10px 16px;background:#F4DEDB;border-bottom:1.5px solid #E8BCB8">
                 <span id="bulkCount" style="font-size:13px;font-weight:700;color:#dc2626"></span>
-                <button onclick="deleteSelected()"
-                    style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;background:#dc2626;border:none;border-radius:8px;cursor:pointer">
+                <button onclick="deleteSelected()" class="btn btn-danger btn-sm">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Eliminar seleccionados
                 </button>
-                <button onclick="clearSelection()"
-                    style="padding:6px 12px;font-size:12px;font-weight:600;color:#64748b;background:none;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer">
+                <button onclick="clearSelection()" class="btn btn-ghost btn-sm">
                     Cancelar
                 </button>
             </div>
@@ -136,11 +132,11 @@ $leadsToConvert = $stmt->fetchAll();
                             <input type="checkbox" id="checkAll" onchange="toggleAll(this)"
                                 style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626">
                         </th>
-                        <th onclick="sortClients('nombre')" style="cursor:pointer;user-select:none;white-space:nowrap">Nombre Marca / Empresa <span id="sort_nombre" style="color:#94a3b8;font-size:10px"></span></th>
-                        <th onclick="sortClients('contacto')" style="cursor:pointer;user-select:none;white-space:nowrap">Contacto <span id="sort_contacto" style="color:#94a3b8;font-size:10px"></span></th>
+                        <th onclick="sortClients('nombre')" style="cursor:pointer;user-select:none;white-space:nowrap">Nombre Marca / Empresa <span id="sort_nombre" style="color:#8A867C;font-size:10px"></span></th>
+                        <th onclick="sortClients('contacto')" style="cursor:pointer;user-select:none;white-space:nowrap">Contacto <span id="sort_contacto" style="color:#8A867C;font-size:10px"></span></th>
                         <th>Servicios Activos</th>
-                        <th onclick="sortClients('renovacion')" style="cursor:pointer;user-select:none;white-space:nowrap">Próx. Renovación <span id="sort_renovacion" style="color:#94a3b8;font-size:10px"></span></th>
-                        <th onclick="sortClients('ingresos')" style="cursor:pointer;user-select:none;white-space:nowrap">Ingresos <span id="sort_ingresos" style="color:#94a3b8;font-size:10px"></span></th>
+                        <th onclick="sortClients('renovacion')" style="cursor:pointer;user-select:none;white-space:nowrap">Próx. Renovación <span id="sort_renovacion" style="color:#8A867C;font-size:10px"></span></th>
+                        <th onclick="sortClients('ingresos')" style="cursor:pointer;user-select:none;white-space:nowrap">Ingresos <span id="sort_ingresos" style="color:#8A867C;font-size:10px"></span></th>
                         <th>WhatsApp</th>
                         <th>Frecuencia</th>
                         <th style="width: 80px;"></th>
@@ -157,21 +153,21 @@ $leadsToConvert = $stmt->fetchAll();
 <!-- Tab: Pagos únicos -->
 <div class="tab-content hidden" id="uniqueClients">
     <!-- Filtros -->
-    <div style="padding:14px 20px;border-bottom:1px solid #f1f5f9;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fff;border-radius:12px 12px 0 0;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--color-border);display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--color-surface)">
         <input type="text" id="unicoBuscar" placeholder="Buscar cliente o concepto..."
                oninput="renderUnicoClients()"
-               style="flex:1;min-width:180px;max-width:280px;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;color:#0f172a;outline:none;transition:border .15s"
-               onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'">
+               style="flex:1;min-width:180px;max-width:280px;padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--color-text);outline:none;transition:border .15s"
+               onfocus="this.style.borderColor='var(--color-text)'" onblur="this.style.borderColor='var(--color-border)'">
         <select id="unicoEstado" onchange="renderUnicoClients()"
-                style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;color:#0f172a;background:#fff;cursor:pointer">
+                style="padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--color-text);background:var(--color-surface);cursor:pointer">
             <option value="todos">Todos los estados</option>
             <option value="pendiente">Pendientes</option>
             <option value="vencido">Vencidos</option>
             <option value="pagado">Pagados</option>
         </select>
-        <div id="unicosResumen" style="margin-left:auto;font-size:12px;color:#64748b;font-weight:600"></div>
+        <div id="unicosResumen" style="margin-left:auto;font-size:12px;color:var(--color-text-muted);font-weight:600"></div>
     </div>
-    <div class="card" style="border-radius:0 0 12px 12px;margin-top:0">
+    <div class="card" style="margin-top:0">
         <div class="table-responsive">
             <table class="data-table">
                 <thead>
@@ -221,7 +217,7 @@ $leadsToConvert = $stmt->fetchAll();
                             <h3 style="font-size:16px;font-weight:700"><?= sanitize($lead['nombre']) ?></h3>
                             <span class="badge badge-success">Lead Ganado</span>
                         </div>
-                        <button class="btn btn-primary sm" onclick="convertLead(<?= $lead['id'] ?>, <?= htmlspecialchars(json_encode($lead['nombre']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['whatsapp']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['email']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['servicio_interes']), ENT_QUOTES, 'UTF-8') ?>)">Convertir</button>
+                        <button class="btn btn-accent btn-sm" onclick="convertLead(<?= $lead['id'] ?>, <?= htmlspecialchars(json_encode($lead['nombre']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['whatsapp']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['email']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lead['servicio_interes']), ENT_QUOTES, 'UTF-8') ?>)">Convertir</button>
                     </div>
                     <p style="font-size:13px;color:var(--color-text-muted)">Servicio: <?= sanitize($lead['servicio_interes']) ?></p>
                 </div>
@@ -238,7 +234,7 @@ $leadsToConvert = $stmt->fetchAll();
         <div class="modal-header">
             <div>
                 <h3 class="modal-title" id="clientModalTitle">Nuevo Cliente</h3>
-                <p id="clientModalSubtitle" style="font-size:12px;color:#94a3b8;margin:3px 0 0;display:none"></p>
+                <p id="clientModalSubtitle" style="font-size:12px;color:#8A867C;margin:3px 0 0;display:none"></p>
             </div>
             <button class="modal-close" onclick="closeClientModal()">&times;</button>
         </div>
@@ -255,7 +251,7 @@ $leadsToConvert = $stmt->fetchAll();
                         </div>
                     </div>
                     <button onclick="limpiarContactoSeleccionado()" title="Quitar"
-                        style="flex-shrink:0;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:19px;line-height:1;padding:2px 5px">×</button>
+                        style="flex-shrink:0;background:none;border:none;color:#8A867C;cursor:pointer;font-size:19px;line-height:1;padding:2px 5px">×</button>
                 </div>
                 <div style="font-size:11px;color:#166534;margin-top:5px">✓ Nombre del contacto copiado — completa los datos propios del nuevo negocio.</div>
             </div>
@@ -276,7 +272,7 @@ $leadsToConvert = $stmt->fetchAll();
                                onfocus="if(this.value.length>=2) buscarContactoExistente(this.value)"
                                placeholder="Nombre del contacto…">
                         <div id="clientBuscarResults"
-                             style="display:none;position:absolute;top:100%;left:0;right:0;z-index:400;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden;max-height:220px;overflow-y:auto;margin-top:3px"></div>
+                             style="display:none;position:absolute;top:100%;left:0;right:0;z-index:400;background:#fff;border:1.5px solid #E8E5DD;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.03);overflow:hidden;max-height:220px;overflow-y:auto;margin-top:3px"></div>
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -292,7 +288,7 @@ $leadsToConvert = $stmt->fetchAll();
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeClientModal()">Cancelar</button>
-            <button class="btn btn-secondary" id="clientModalSaveBtn"
+            <button class="btn btn-primary" id="clientModalSaveBtn"
                 onclick="document.getElementById('clientForm').requestSubmit()">Guardar</button>
         </div>
     </div>
@@ -309,7 +305,7 @@ $leadsToConvert = $stmt->fetchAll();
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                     Enviar mensaje a <span id="msgClienteNombre" style="color:var(--color-primary)"></span>
                 </h3>
-                <p style="font-size:12px;color:#94a3b8;margin:3px 0 0">Selecciona plantilla y canal de envío</p>
+                <p style="font-size:12px;color:#8A867C;margin:3px 0 0">Selecciona plantilla y canal de envío</p>
             </div>
             <button class="modal-close" onclick="cerrarModalMsgCliente()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -317,14 +313,14 @@ $leadsToConvert = $stmt->fetchAll();
         </div>
 
         <!-- Tabs WA / Email -->
-        <div style="display:flex;gap:0;border-bottom:2px solid #f1f5f9;padding:0 20px;flex-shrink:0">
+        <div style="display:flex;gap:0;border-bottom:2px solid var(--color-border-light);padding:0 20px;flex-shrink:0">
             <button id="msgTabWA" onclick="msgSwitchTab('wa')"
-                style="display:inline-flex;align-items:center;gap:6px;padding:11px 16px;background:none;border:none;border-bottom:3px solid #25D366;margin-bottom:-2px;font-size:13px;font-weight:700;color:#0f172a;cursor:pointer">
+                style="display:inline-flex;align-items:center;gap:6px;padding:11px 16px;background:none;border:none;border-bottom:3px solid #25D366;margin-bottom:-2px;font-size:13px;font-weight:700;color:var(--color-text);cursor:pointer">
                 <svg width="14" height="14" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378c-1.567.934-2.582 2.325-2.582 3.972 0 2.487 1.998 4.614 4.644 5.048h.004c.987.135 2.025.027 2.906-.784l.384.622c.542.922.927 1.359 1.203 1.487.278.151.645.15.93-.002.393-.229.79-.767 1.144-1.649.19-.497.502-1.311.737-1.88-2.296-1.24-3.923-3.529-3.923-6.121 0-1.273.337-2.471.922-3.519m9.574-3.051c2.289 2.287 3.706 5.646 3.706 9.269 0 7.278-5.601 13.16-12.508 13.16-2.103 0-4.126-.494-5.911-1.369l-.67.11c-.5.083-.902.077-1.202-.022-.463-.15-.758-.544-.882-1.022-.149-.552-.05-1.215.38-1.95l.671-1.167c-.331-1.664-.5-3.406-.5-5.183 0-7.275 5.6-13.159 12.506-13.159 2.6 0 5.068.681 7.19 1.873-.37 1.564-.582 3.204-.582 4.919z"/></svg>
                 WhatsApp
             </button>
             <button id="msgTabEmail" onclick="msgSwitchTab('email')"
-                style="display:inline-flex;align-items:center;gap:6px;padding:11px 16px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px;font-weight:700;color:#94a3b8;cursor:pointer">
+                style="display:inline-flex;align-items:center;gap:6px;padding:11px 16px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px;font-weight:700;color:var(--color-text-light);cursor:pointer">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Correo
             </button>
@@ -335,40 +331,40 @@ $leadsToConvert = $stmt->fetchAll();
 
             <!-- STEP 1: Grid de plantillas -->
             <div id="msgStep1">
-                <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Elige una plantilla</div>
+                <div style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Elige una plantilla</div>
                 <div id="msgPlantillasGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                    <div style="grid-column:1/-1;text-align:center;padding:30px;color:#94a3b8;font-size:13px">Cargando plantillas...</div>
+                    <div style="grid-column:1/-1;text-align:center;padding:30px;color:#8A867C;font-size:13px">Cargando plantillas...</div>
                 </div>
             </div>
 
             <!-- STEP 2 WhatsApp -->
             <div id="msgStep2WA" style="display:none;flex-direction:column;gap:16px">
-                <button onclick="msgVolverStep1()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:0;margin-bottom:4px">
+                <button onclick="msgVolverStep1()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#57544D;font-size:12px;font-weight:700;cursor:pointer;padding:0;margin-bottom:4px">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     Volver a plantillas
                 </button>
-                <div style="background:#f8fafc;border-radius:10px;padding:12px 16px;font-size:12px;color:#475569">
+                <div style="background:#FAFAF7;border-radius:10px;padding:12px 16px;font-size:12px;color:#57544D">
                     Enviando a: <strong id="msgWADest"></strong>
                 </div>
                 <!-- Preview burbuja -->
                 <div>
-                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Vista previa</div>
-                    <div id="msgWAPreview" style="padding:14px 16px;background:#dcfce7;border-radius:12px 12px 12px 0;font-size:13px;color:#0f172a;line-height:1.6;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #bbf7d0;min-height:60px"></div>
+                    <div style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Vista previa</div>
+                    <div id="msgWAPreview" style="padding:14px 16px;background:#dcfce7;border-radius:12px 12px 12px 0;font-size:13px;color:#0E0E0C;line-height:1.6;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid #bbf7d0;min-height:60px"></div>
                 </div>
                 <!-- Imagen si hay -->
-                <div id="msgWAImagenBox" style="display:none;background:#f8fafc;border-radius:10px;padding:12px;display:none;align-items:center;gap:12px;border:1.5px solid #e2e8f0">
+                <div id="msgWAImagenBox" style="display:none;background:#FAFAF7;border-radius:10px;padding:12px;display:none;align-items:center;gap:12px;border:1.5px solid #E8E5DD">
                     <img id="msgWAImagenThumb" src="" style="width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0">
-                    <div style="flex:1;min-width:0;font-size:12px;color:#64748b">Imagen adjunta a la plantilla.<br>Se copiará al portapapeles al abrir WhatsApp.</div>
+                    <div style="flex:1;min-width:0;font-size:12px;color:#57544D">Imagen adjunta a la plantilla.<br>Se copiará al portapapeles al abrir WhatsApp.</div>
                 </div>
             </div>
 
             <!-- STEP 2 Email -->
             <div id="msgStep2Email" style="display:none;flex-direction:column;gap:14px">
-                <button onclick="msgVolverStep1()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:0;margin-bottom:4px">
+                <button onclick="msgVolverStep1()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#57544D;font-size:12px;font-weight:700;cursor:pointer;padding:0;margin-bottom:4px">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     Volver a plantillas
                 </button>
-                <div style="background:#f8fafc;border-radius:10px;padding:12px 16px;font-size:12px;color:#475569">
+                <div style="background:#FAFAF7;border-radius:10px;padding:12px 16px;font-size:12px;color:#57544D">
                     Enviando a: <strong id="msgEmailDest"></strong>
                 </div>
                 <div class="form-group" style="margin:0">
@@ -376,8 +372,8 @@ $leadsToConvert = $stmt->fetchAll();
                     <input type="text" id="msgEmailAsunto" class="form-input" placeholder="Asunto del correo">
                 </div>
                 <div>
-                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mensaje</div>
-                    <div id="msgEmailPreview" style="padding:12px 14px;background:#f8fafc;border-radius:8px;font-size:12px;color:#475569;line-height:1.6;white-space:pre-wrap;border:1.5px solid #e2e8f0;max-height:160px;overflow-y:auto"></div>
+                    <div style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mensaje</div>
+                    <div id="msgEmailPreview" style="padding:12px 14px;background:#FAFAF7;border-radius:8px;font-size:12px;color:#57544D;line-height:1.6;white-space:pre-wrap;border:1.5px solid #E8E5DD;max-height:160px;overflow-y:auto"></div>
                 </div>
             </div>
         </div>
@@ -407,7 +403,7 @@ $leadsToConvert = $stmt->fetchAll();
         <div class="modal-header">
             <div>
                 <h3 class="modal-title" id="modalMarcasTitle"></h3>
-                <p id="modalMarcasSubtitle" style="font-size:12px;color:#94a3b8;margin-top:2px"></p>
+                <p id="modalMarcasSubtitle" style="font-size:12px;color:#8A867C;margin-top:2px"></p>
             </div>
             <button class="modal-close" onclick="cerrarModalMarcas()">&times;</button>
         </div>
@@ -419,12 +415,12 @@ $leadsToConvert = $stmt->fetchAll();
 
 <script src="js/clientes.js?v=<?= APP_VERSION ?>"></script>
 <style>
-.tabs-nav { display: flex; gap: 8px; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 12px; }
-.tab-btn { padding: 8px 16px; border-radius: 8px; border: none; background: transparent; font-size: 14px; font-weight: 600; color: var(--color-text-muted); cursor: pointer; transition: all 0.2s; }
-.tab-btn.active { background: white; color: var(--color-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.hidden { display: none !important; }
-.client-card { transition: transform 0.2s; }
-.client-card:hover { transform: translateY(-4px); }
+.tabs-nav { display:flex;gap:4px;background:rgba(0,0,0,0.04);padding:4px;border-radius:6px; }
+.tab-btn { padding:7px 14px;border-radius:4px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--color-text-muted);cursor:pointer;transition:all 0.15s; }
+.tab-btn.active { background:#ffffff;color:var(--color-text);font-weight:700;box-shadow:0 1px 4px rgba(14,14,12,.08); }
+.hidden { display:none !important; }
+.client-card { transition:transform 0.15s; }
+.client-card:hover { transform:translateY(-2px); }
 </style>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

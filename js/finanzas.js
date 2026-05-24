@@ -88,17 +88,17 @@ function fnMsgRenderPlantillas() {
         const card = document.createElement('div');
         card.style.cssText = 'border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;background:#fff';
         card.onmouseenter = () => { card.style.borderColor='#4f46e5'; card.style.background='#fafaff'; };
-        card.onmouseleave = () => { card.style.borderColor='#e2e8f0'; card.style.background='#fff'; };
+        card.onmouseleave = () => { card.style.borderColor='#E8E5DD'; card.style.background='#fff'; };
         const preview = p.contenido.length > 80 ? p.contenido.substring(0,80) + '…' : p.contenido;
         const badge   = p.es_predefinida
-            ? '<span style="background:#0f172a;color:#c9f31d;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700">Predefinida</span>'
-            : '<span style="background:#eef2ff;color:#4f46e5;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700">Personal</span>';
+            ? '<span style="background:#0E0E0C;color:#C6F24E;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700">Predefinida</span>'
+            : '<span style="background:var(--color-info-bg);color:var(--color-info);padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700">Personal</span>';
         card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
-                <div style="font-size:12px;font-weight:800;color:#0f172a;line-height:1.3">${escapeHtml(p.nombre)}</div>
+                <div style="font-size:12px;font-weight:800;color:#0E0E0C;line-height:1.3">${escapeHtml(p.nombre)}</div>
                 ${badge}
             </div>
-            <div style="font-size:11px;color:#64748b;font-style:italic;line-height:1.5">"${escapeHtml(preview)}"</div>`;
+            <div style="font-size:11px;color:#57544D;font-style:italic;line-height:1.5">"${escapeHtml(preview)}"</div>`;
         card.onclick = () => fnMsgSeleccionarPlantilla(p);
         grid.appendChild(card);
     });
@@ -227,9 +227,9 @@ function setPeriodo(tipo) {
     // Resaltar botón activo
     document.querySelectorAll('#fnPeriodoBtns button').forEach(btn => {
         const isActive = btn.getAttribute('data-periodo') === tipo;
-        btn.style.background = isActive ? '#0f172a' : '#fff';
-        btn.style.color = isActive ? '#c9f31d' : '#64748b';
-        btn.style.borderColor = isActive ? '#0f172a' : '#e2e8f0';
+        btn.style.background = isActive ? '#0E0E0C' : '#fff';
+        btn.style.color = isActive ? '#C6F24E' : '#57544D';
+        btn.style.borderColor = isActive ? '#0E0E0C' : '#E8E5DD';
     });
 
     loadAll();
@@ -291,33 +291,36 @@ function renderKpis(r) {
         .filter(t => t.tipo === 'ingreso' && (t.estado === 'pendiente' || t.estado === 'vencido'))
         .reduce((s, t) => s + parseFloat(t.monto || 0), 0);
 
-    const balBg       = balPos ? '#c9f31d' : '#b91c1c';
-    const balTextMain = balPos ? '#0f172a'  : '#ffffff';
-    const balTextSub  = balPos ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.6)';
-    const balPillBg   = balPos ? 'rgba(0,0,0,0.15)'  : 'rgba(255,255,255,0.2)';
-    const balPillCol  = balPos ? '#0f172a'  : '#ffffff';
+    const balBg       = balPos ? '#C6F24E' : '#F4DEDB';
+    const balTextMain = '#0E0E0C';
+    const balTextSub  = balPos ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.4)';
+    const balPillBg   = balPos ? 'rgba(0,0,0,0.12)'  : '#E8BCB8';
+    const balPillCol  = '#0E0E0C';
     const balPill     = balPos ? 'Positivo' : 'Negativo';
 
-    const kpi = (label, value, footer, bg, tMain, tSub, pBg, pCol, pill) =>
-        `<div style="background:${bg};border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s"
-            onmouseenter="this.style.filter='brightness(1.08)'" onmouseleave="this.style.filter='brightness(1)'">
-            <div style="flex:1;min-width:0">
-                <div style="font-size:10px;font-weight:700;color:${tSub};text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">${label}</div>
-                <div style="font-size:22px;font-weight:900;color:${tMain};line-height:1">${value}</div>
-                <div style="font-size:11px;color:${tSub};margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${footer}</div>
+    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill) =>
+        `<div style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;position:relative;overflow:hidden;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">${label}</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1;font-family:var(--font-secondary)">${value}</div>
+            <div style="font-size:10px;color:#8A867C;margin-top:5px;font-family:var(--font-secondary)">COP</div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">${sub}</span>
+                <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillCol};padding:2px 8px;border-radius:100px;white-space:nowrap">${pill}</span>
             </div>
-            <span style="font-size:10px;font-weight:700;background:${pBg};color:${pCol};padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0">${pill}</span>
         </div>`;
 
     document.getElementById('fnKpis').innerHTML =
-        kpi('Cobrado',    moneyNum(cobrado),       `${r.count_ingresos||0} ingresos pagados · COP`,
-            '#0f172a', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Cobrado')
-      + kpi('Egresos',    moneyNum(egresos),        `${r.count_egresos||0} gastos registrados · COP`,
-            '#b91c1c', '#ffffff', 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.2)',  '#ffffff', 'Gastos')
-      + kpi('Por Cobrar', moneyNum(pendienteMonto), `${(r.total_pendientes||0)+(r.total_vencidos||0)} pendientes · COP`,
-            '#334155', '#ffffff', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0.15)', '#ffffff', 'Pendiente')
-      + kpi('Balance',    moneyNum(balance),        `Cobrado − Egresos · COP`,
-            balBg, balTextMain, balTextSub, balPillBg, balPillCol, balPill);
+        kpi('Cobrado',    moneyNum(cobrado),       `${r.count_ingresos||0} ingresos pagados`,
+            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Cobrado')
+      + kpi('Egresos',    moneyNum(egresos),        `${r.count_egresos||0} gastos registrados`,
+            '#F4DEDB', '#E8BCB8', '#6E211B', '#F4DEDB', '#6E211B', 'Gastos')
+      + kpi('Por Cobrar', moneyNum(pendienteMonto), `${(r.total_pendientes||0)+(r.total_vencidos||0)} pendientes`,
+            '#FEF3C7', '#FDE68A', '#92400E', '#FEF3C7', '#92400E', 'Pendiente')
+      + kpi('Balance',    moneyNum(balance),        'Cobrado − Egresos',
+            balBg, balPos ? '#A8D87A' : '#E8BCB8', balPos ? '#1B5A39' : '#6E211B',
+            balPos ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)',
+            balPos ? '#0E0E0C' : '#ffffff', balPill);
 }
 
 function renderTxTable(data) {
@@ -325,7 +328,7 @@ function renderTxTable(data) {
     if (!wrap) return;
 
     if (!data || data.length === 0) {
-        wrap.innerHTML = `<div style="padding:60px 20px;text-align:center;color:#94a3b8;font-size:13px;font-style:italic">
+        wrap.innerHTML = `<div style="padding:60px 20px;text-align:center;color:#8A867C;font-size:13px;font-style:italic">
             Sin transacciones para el período y filtros seleccionados.
         </div>`;
         return;
@@ -337,8 +340,9 @@ function renderTxTable(data) {
     const totalBal = totalIng - totalEgr;
 
     const rows = data.map(tx => {
-        const fecha = (tx.fecha_vencimiento || tx.created_at)
-            ? new Date((tx.fecha_vencimiento || tx.created_at.split(' ')[0]) + 'T12:00:00').toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
+        const fechaRef = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : null);
+        const fecha = fechaRef
+            ? new Date(fechaRef + 'T12:00:00').toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
             : '—';
 
         const titulo   = escapeHtml(tx.titulo || tx.concepto || '—');
@@ -350,54 +354,54 @@ function renderTxTable(data) {
             : escapeHtml(tx.cliente_nombre || tx.lead_nombre || '—');
         const destLabel = tx.tipo === 'egreso' ? 'Proveedor' : 'Cliente';
 
-        const tipoBg    = tx.tipo === 'ingreso' ? '#dcfce7' : '#fee2e2';
-        const tipoColor = tx.tipo === 'ingreso' ? '#16a34a' : '#dc2626';
+        const tipoBg    = tx.tipo === 'ingreso' ? '#E3F1E8' : '#F4DEDB';
+        const tipoColor = tx.tipo === 'ingreso' ? '#1B5A39' : '#6E211B';
         const tipoLabel = tx.tipo === 'ingreso' ? '↑ Ingreso' : '↓ Egreso';
 
         let estadoBg, estadoColor, estadoLabel;
-        if (tx.estado === 'pagado')        { estadoBg = '#f0fdf4'; estadoColor = '#16a34a'; estadoLabel = '✓ Pagado'; }
-        else if (tx.estado === 'vencido')  { estadoBg = '#fef2f2'; estadoColor = '#dc2626'; estadoLabel = '⚠ Vencido'; }
-        else                               { estadoBg = '#fffbeb'; estadoColor = '#d97706'; estadoLabel = '◷ Pendiente'; }
+        if (tx.estado === 'pagado')        { estadoBg = '#E3F1E8'; estadoColor = '#1B5A39'; estadoLabel = '✓ Pagado'; }
+        else if (tx.estado === 'vencido')  { estadoBg = '#F4DEDB'; estadoColor = '#6E211B'; estadoLabel = '⚠ Vencido'; }
+        else                               { estadoBg = '#FEF3C7'; estadoColor = '#92400E'; estadoLabel = '◷ Pendiente'; }
 
-        const montoColor = tx.tipo === 'ingreso' ? '#16a34a' : '#dc2626';
+        const montoColor = tx.tipo === 'ingreso' ? '#1B5A39' : '#6E211B';
         const montoSign  = tx.tipo === 'egreso' ? '−' : '+';
-        const rowBg      = tx.tipo === 'egreso' ? 'background:linear-gradient(90deg,#fff5f5 0%,#fff 80%)' : '';
+        const rowBg      = tx.tipo === 'egreso' ? 'background:linear-gradient(90deg,#FDF5F4 0%,#FAFAF7 80%)' : '';
 
-        return `<tr style="border-bottom:1px solid #f1f5f9;transition:background .12s;${rowBg}"
-            onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter=''">
-            <td style="padding:11px 14px;font-size:12px;color:#64748b;white-space:nowrap">${fecha}</td>
+        return `<tr style="border-bottom:1px solid #E8E5DD;transition:background .12s;${rowBg}"
+            onmouseenter="this.style.background='#F5F3EE'" onmouseleave="this.style.background=''">
+            <td style="padding:11px 14px;font-size:12px;color:#8A867C;white-space:nowrap;font-family:var(--font-secondary)">${fecha}</td>
             <td style="padding:11px 14px">
-                <div style="font-size:13px;font-weight:700;color:#0f172a">${titulo}</div>
+                <div style="font-size:13px;font-weight:700;color:#0E0E0C">${titulo}</div>
                 ${concepto}
             </td>
             <td style="padding:11px 14px">
-                <div style="font-size:12px;color:#475569;font-weight:600">${dest}</div>
-                <div style="font-size:10px;color:#94a3b8">${destLabel}</div>
+                <div style="font-size:12px;color:#57544D;font-weight:600">${dest}</div>
+                <div style="font-size:10px;color:#8A867C">${destLabel}</div>
             </td>
             <td style="padding:11px 14px">
-                <span style="font-size:11px;font-weight:700;background:${tipoBg};color:${tipoColor};padding:3px 10px;border-radius:20px;white-space:nowrap">${tipoLabel}</span>
+                <span style="font-size:11px;font-weight:700;background:${tipoBg};color:${tipoColor};padding:3px 10px;border-radius:3px;white-space:nowrap">${tipoLabel}</span>
             </td>
-            <td style="padding:11px 14px;text-align:right;font-size:14px;font-weight:900;color:${montoColor};white-space:nowrap;letter-spacing:-.3px">${montoSign} ${formatMoney(tx.monto)}</td>
+            <td style="padding:11px 14px;text-align:right;font-size:14px;font-weight:900;color:${montoColor};white-space:nowrap;letter-spacing:-.3px;font-family:var(--font-secondary)">${montoSign} ${formatMoney(tx.monto)}</td>
             <td style="padding:11px 14px">
-                <span style="font-size:11px;font-weight:700;background:${estadoBg};color:${estadoColor};padding:3px 10px;border-radius:20px;white-space:nowrap">${estadoLabel}</span>
+                <span style="font-size:11px;font-weight:700;background:${estadoBg};color:${estadoColor};padding:3px 10px;border-radius:3px;white-space:nowrap">${estadoLabel}</span>
             </td>
             <td style="padding:11px 8px;text-align:center;white-space:nowrap">
                 <button onclick="verComprobante(${tx.id})" title="Ver comprobante"
-                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8;transition:all .12s"
-                    onmouseenter="this.style.background='#eff6ff';this.style.color='#2563eb'"
-                    onmouseleave="this.style.background='none';this.style.color='#94a3b8'">
+                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:3px;color:#8A867C;transition:all .12s"
+                    onmouseenter="this.style.background='#EFECE5';this.style.color='#0E0E0C'"
+                    onmouseleave="this.style.background='none';this.style.color='#8A867C'">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </button>
                 <button onclick="abrirModalTransaccion(${tx.id})" title="Editar"
-                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8;transition:all .12s"
-                    onmouseenter="this.style.background='#f1f5f9';this.style.color='#475569'"
-                    onmouseleave="this.style.background='none';this.style.color='#94a3b8'">
+                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:3px;color:#8A867C;transition:all .12s"
+                    onmouseenter="this.style.background='#EFECE5';this.style.color='#0E0E0C'"
+                    onmouseleave="this.style.background='none';this.style.color='#8A867C'">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </button>
                 <button onclick="eliminarTx(${tx.id})" title="Eliminar"
-                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#fca5a5;transition:all .12s"
-                    onmouseenter="this.style.background='#fef2f2';this.style.color='#dc2626'"
-                    onmouseleave="this.style.background='none';this.style.color='#fca5a5'">
+                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:3px;color:#D6C5C3;transition:all .12s"
+                    onmouseenter="this.style.background='#F4DEDB';this.style.color='#6E211B'"
+                    onmouseleave="this.style.background='none';this.style.color='#D6C5C3'">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </td>
@@ -408,26 +412,26 @@ function renderTxTable(data) {
         <div style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:13px">
                 <thead>
-                    <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
-                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Fecha</th>
-                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Descripción</th>
-                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Cliente / Proveedor</th>
-                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Tipo</th>
-                        <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Monto</th>
-                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Estado</th>
+                    <tr style="background:#F5F3EE;border-bottom:2px solid #E8E5DD">
+                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Fecha</th>
+                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Descripción</th>
+                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Cliente / Proveedor</th>
+                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Tipo</th>
+                        <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Monto</th>
+                        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Estado</th>
                         <th style="padding:10px 14px;width:70px"></th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
                 <tfoot>
-                    <tr style="background:#f8fafc;border-top:2px solid #e2e8f0">
-                        <td colspan="4" style="padding:10px 14px;font-size:11px;font-weight:700;color:#64748b">${data.length} movimiento${data.length!==1?'s':''}</td>
-                        <td style="padding:10px 14px;text-align:right">
-                            <div style="font-size:12px;font-weight:800;color:#16a34a">+ ${formatMoney(totalIng)}</div>
-                            <div style="font-size:12px;font-weight:800;color:#dc2626">− ${formatMoney(totalEgr)}</div>
+                    <tr style="background:#F5F3EE;border-top:2px solid #E8E5DD">
+                        <td colspan="4" style="padding:10px 14px;font-size:11px;font-weight:700;color:#8A867C">${data.length} movimiento${data.length!==1?'s':''}</td>
+                        <td style="padding:10px 14px;text-align:right;font-family:var(--font-secondary)">
+                            <div style="font-size:12px;font-weight:800;color:#1B5A39">+ ${formatMoney(totalIng)}</div>
+                            <div style="font-size:12px;font-weight:800;color:#6E211B">− ${formatMoney(totalEgr)}</div>
                         </td>
-                        <td colspan="2" style="padding:10px 14px">
-                            <div style="font-size:12px;font-weight:900;color:${totalBal>=0?'#15803d':'#dc2626'}">= ${totalBal>=0?'+':''}${formatMoney(totalBal)}</div>
+                        <td colspan="2" style="padding:10px 14px;font-family:var(--font-secondary)">
+                            <div style="font-size:12px;font-weight:900;color:${totalBal>=0?'#1B5A39':'#6E211B'}">= ${totalBal>=0?'+':''}${formatMoney(totalBal)}</div>
                         </td>
                     </tr>
                 </tfoot>
@@ -449,9 +453,9 @@ async function eliminarTx(id) {
 function switchTab(tab) {
     document.querySelectorAll('#fnTabs button').forEach(btn => {
         const active = btn.getAttribute('data-tab') === tab;
-        btn.style.color          = active ? '#0f172a' : '#94a3b8';
-        btn.style.fontWeight     = active ? '700' : '600';
-        btn.style.borderBottomColor = active ? '#0f172a' : 'transparent';
+        btn.style.color             = active ? '#0E0E0C' : '#8A867C';
+        btn.style.fontWeight        = active ? '700' : '600';
+        btn.style.borderBottomColor = active ? '#0E0E0C' : 'transparent';
     });
     const tabMov    = document.getElementById('tabMovimientos');
     const tabUnicos = document.getElementById('tabPagosUnicos');
@@ -541,11 +545,11 @@ function renderPagosUnicos(data) {
     const countPend = unicosConCliente.filter(t => t.estado === 'pendiente' || t.estado === 'vencido').length;
 
     resumenEl.innerHTML = countPend
-        ? `<div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:10px 16px;display:inline-flex;align-items:center;gap:10px">
-            <svg width="16" height="16" fill="none" stroke="#d97706" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-            <span style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em">Por cobrar</span>
-            <span style="font-size:15px;font-weight:900;color:#d97706">${formatMoney(totalPendMonto)}</span>
-            <span style="font-size:11px;color:#92400e;font-weight:600">${countPend} pendiente${countPend !== 1 ? 's' : ''}</span>
+        ? `<div style="background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:3px;padding:10px 16px;display:inline-flex;align-items:center;gap:10px">
+            <svg width="16" height="16" fill="none" stroke="#92400E" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <span style="font-size:10px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.05em">Por cobrar</span>
+            <span style="font-size:15px;font-weight:900;color:#92400E;font-family:var(--font-secondary)">${formatMoney(totalPendMonto)}</span>
+            <span style="font-size:11px;color:#92400E;font-weight:600">${countPend} pendiente${countPend !== 1 ? 's' : ''}</span>
           </div>`
         : '';
 
@@ -557,40 +561,40 @@ function renderPagosUnicos(data) {
     const rows = clientes.map(cli => {
         // Badge de estado predominante
         let estadoBg, estadoColor, estadoLabel;
-        if (cli.vencido > 0)        { estadoBg='#fef2f2'; estadoColor='#dc2626'; estadoLabel=`⚠ ${cli.vencido} vencido${cli.vencido>1?'s':''}`; }
-        else if (cli.pendiente > 0) { estadoBg='#fffbeb'; estadoColor='#d97706'; estadoLabel=`◷ ${cli.pendiente} pendiente${cli.pendiente>1?'s':''}`; }
-        else                        { estadoBg='#f0fdf4'; estadoColor='#16a34a'; estadoLabel='✓ Al día'; }
+        if (cli.vencido > 0)        { estadoBg='#F4DEDB'; estadoColor='#6E211B'; estadoLabel=`⚠ ${cli.vencido} vencido${cli.vencido>1?'s':''}`; }
+        else if (cli.pendiente > 0) { estadoBg='#FEF3C7'; estadoColor='#92400E'; estadoLabel=`◷ ${cli.pendiente} pendiente${cli.pendiente>1?'s':''}`; }
+        else                        { estadoBg='#E3F1E8'; estadoColor='#1B5A39'; estadoLabel='✓ Al día'; }
 
         const tienePendiente = cli.pendiente > 0 || cli.vencido > 0;
         const notifBtn = (cli.cliente_id && tienePendiente)
             ? `<button onclick="fnAbrirMsgModal(${cli.cliente_id})" title="Notificar al cliente"
-                style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:7px;font-size:11px;font-weight:700;color:#d97706;cursor:pointer;transition:all .12s"
-                onmouseenter="this.style.background='#d97706';this.style.color='#fff';this.style.borderColor='#d97706'"
-                onmouseleave="this.style.background='#fffbeb';this.style.color='#d97706';this.style.borderColor='#fde68a'">
+                style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:3px;font-size:11px;font-weight:700;color:#92400E;cursor:pointer;transition:all .12s"
+                onmouseenter="this.style.background='#92400E';this.style.color='#fff';this.style.borderColor='#92400E'"
+                onmouseleave="this.style.background='#FEF3C7';this.style.color='#92400E';this.style.borderColor='#FDE68A'">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 Notificar
               </button>`
             : '';
         const accionBtn = cli.cliente_id
             ? `<button onclick="window.location.href='cliente_detalle.php?id=${cli.cliente_id}'" title="Ver cliente"
-                style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;font-weight:700;color:#475569;cursor:pointer;transition:all .12s"
-                onmouseenter="this.style.background='#0f172a';this.style.color='#c9f31d';this.style.borderColor='#0f172a'"
-                onmouseleave="this.style.background='#f8fafc';this.style.color='#475569';this.style.borderColor='#e2e8f0'">
+                style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;font-size:11px;font-weight:700;color:#57544D;cursor:pointer;transition:all .12s"
+                onmouseenter="this.style.background='#0E0E0C';this.style.color='#C6F24E';this.style.borderColor='#0E0E0C'"
+                onmouseleave="this.style.background='#FAFAF7';this.style.color='#57544D';this.style.borderColor='#E8E5DD'">
                 Ver →
               </button>`
             : '';
 
-        return `<tr style="border-bottom:1px solid #f1f5f9;transition:background .12s"
-            onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter=''">
+        return `<tr style="border-bottom:1px solid #E8E5DD;transition:background .12s"
+            onmouseenter="this.style.background='#F5F3EE'" onmouseleave="this.style.background=''">
             <td style="padding:12px 16px">
-                <div style="font-size:13px;font-weight:700;color:#0f172a">${escapeHtml(cli.nombre)}</div>
-                <div style="font-size:11px;color:#94a3b8;margin-top:2px">${cli.txs.length} trabajo${cli.txs.length>1?'s':''} registrado${cli.txs.length>1?'s':''}</div>
+                <div style="font-size:13px;font-weight:700;color:#0E0E0C">${escapeHtml(cli.nombre)}</div>
+                <div style="font-size:11px;color:#8A867C;margin-top:2px">${cli.txs.length} trabajo${cli.txs.length>1?'s':''} registrado${cli.txs.length>1?'s':''}</div>
             </td>
-            <td style="padding:12px 16px;text-align:right;font-size:15px;font-weight:900;color:#16a34a;white-space:nowrap">
+            <td style="padding:12px 16px;text-align:right;font-size:15px;font-weight:900;color:#1B5A39;white-space:nowrap;font-family:var(--font-secondary)">
                 ${formatMoney(cli.totalMonto)}
             </td>
             <td style="padding:12px 16px">
-                <span style="font-size:11px;font-weight:700;background:${estadoBg};color:${estadoColor};padding:3px 10px;border-radius:20px;white-space:nowrap">${estadoLabel}</span>
+                <span style="font-size:11px;font-weight:700;background:${estadoBg};color:${estadoColor};padding:3px 10px;border-radius:3px;white-space:nowrap">${estadoLabel}</span>
             </td>
             <td style="padding:12px 14px;text-align:right;white-space:nowrap;display:flex;gap:6px;justify-content:flex-end">${notifBtn}${accionBtn}</td>
         </tr>`;
@@ -601,18 +605,18 @@ function renderPagosUnicos(data) {
     wrap.innerHTML = `<div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:13px">
             <thead>
-                <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0">
-                    <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Cliente</th>
-                    <th style="padding:10px 16px;text-align:right;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Total</th>
-                    <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Estado</th>
-                    <th style="padding:10px 16px;width:120px"></th>
+                <tr style="background:#F5F3EE;border-bottom:2px solid #E8E5DD">
+                    <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Cliente</th>
+                    <th style="padding:10px 16px;text-align:right;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Total</th>
+                    <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:800;color:#57544D;text-transform:uppercase;letter-spacing:.06em">Estado</th>
+                    <th style="padding:10px 16px;width:160px"></th>
                 </tr>
             </thead>
             <tbody>${rows}</tbody>
             <tfoot>
-                <tr style="background:#f8fafc;border-top:2px solid #e2e8f0">
-                    <td style="padding:10px 16px;font-size:11px;font-weight:700;color:#64748b">${clientes.length} cliente${clientes.length!==1?'s':''}</td>
-                    <td style="padding:10px 16px;text-align:right;font-size:13px;font-weight:900;color:#16a34a">${formatMoney(totalGeneral)}</td>
+                <tr style="background:#F5F3EE;border-top:2px solid #E8E5DD">
+                    <td style="padding:10px 16px;font-size:11px;font-weight:700;color:#8A867C">${clientes.length} cliente${clientes.length!==1?'s':''}</td>
+                    <td style="padding:10px 16px;text-align:right;font-size:13px;font-weight:900;color:#1B5A39;font-family:var(--font-secondary)">${formatMoney(totalGeneral)}</td>
                     <td colspan="2"></td>
                 </tr>
             </tfoot>
@@ -679,7 +683,7 @@ function aplicarFiltrosClientes() {
         if (!msg) {
             msg = document.createElement('tr');
             msg.className = 'sin-resultados';
-            msg.innerHTML = '<td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;font-style:italic">Sin clientes que coincidan con los filtros.</td>';
+            msg.innerHTML = '<td colspan="8" style="text-align:center;padding:40px;color:#8A867C;font-size:13px;font-style:italic">Sin clientes que coincidan con los filtros.</td>';
             tbody.appendChild(msg);
         }
     } else {
@@ -745,6 +749,9 @@ function renderClientesKpis(r, periodo) {
 }
 
 function renderClientesDetalle(porCliente, proximas, porServicio) {
+    // Guardar en cache para exportación Excel
+    fnClientesDataCache = { porCliente: porCliente || [], proximas: proximas || [], porServicio: porServicio || [] };
+
     const det = document.getElementById('clientesDetalle');
 
     // Tabla por cliente
@@ -791,7 +798,7 @@ function renderClientesDetalle(porCliente, proximas, porServicio) {
             <td style="padding:10px 8px;text-align:right;font-size:12px;color:#64748b">${formatMoney(c.mrr)}/mes</td>
             <td style="padding:10px 14px;text-align:right">${fechaCell}</td>
         </tr>`;
-    }).join('') : `<tr><td colspan="8" style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;font-style:italic">Sin clientes activos con servicios asignados.</td></tr>`;
+    }).join('') : `<tr><td colspan="8" style="text-align:center;padding:40px;color:#8A867C;font-size:13px;font-style:italic">Sin clientes activos con servicios asignados.</td></tr>`;
 
     // Totales
     const sumIng  = porCliente.reduce((s, c) => s + c.ingresos, 0);
@@ -869,7 +876,7 @@ function renderClientesDetalle(porCliente, proximas, porServicio) {
                 ${p.margen > 0 ? `<span style="font-size:10px;color:#94a3b8">·</span><span style="font-size:10px;color:#64748b">Margen: ${formatMoney(p.margen)}</span>` : ''}
             </div>
         </a>`;
-    }).join('') : `<div style="padding:40px 20px;text-align:center;color:#94a3b8;font-size:13px;font-style:italic">Sin renovaciones en los próximos 30 días</div>`;
+    }).join('') : `<div style="padding:40px 20px;text-align:center;color:#8A867C;font-size:13px;font-style:italic">Sin renovaciones en los próximos 30 días</div>`;
 
     // Panel por servicio
     const svcRows = porServicio.slice(0, 5).map(s => `
@@ -1282,8 +1289,8 @@ function setTxTipo(tipo) {
     if (!ing || !egr) return;
 
     if (tipo === 'ingreso') {
-        ing.style.background = '#0f172a'; ing.style.color = '#c9f31d';
-        egr.style.background = '#fff';    egr.style.color = '#94a3b8';
+        ing.style.background = '#0E0E0C'; ing.style.color = '#C6F24E';
+        egr.style.background = '#fff';    egr.style.color = '#8A867C';
         // Mostrar secciones de ingreso
         document.getElementById('txDestSection').style.display = '';
         document.getElementById('txEgresoSection').style.display = 'none';
@@ -1291,8 +1298,8 @@ function setTxTipo(tipo) {
         document.getElementById('txTituloSection').style.display = '';
         document.getElementById('txArchivosSection').style.display = '';
     } else {
-        egr.style.background = '#0f172a'; egr.style.color = '#c9f31d';
-        ing.style.background = '#fff';    ing.style.color = '#94a3b8';
+        egr.style.background = '#0E0E0C'; egr.style.color = '#C6F24E';
+        ing.style.background = '#fff';    ing.style.color = '#8A867C';
         // Ocultar destinatario, catálogo, título y archivos — egresos son gastos simples
         document.getElementById('txDestSection').style.display = 'none';
         document.getElementById('txEgresoSection').style.display = '';
@@ -1506,7 +1513,7 @@ function renderTxCatalogo(items, tab) {
         + '</div>'
         + '<div style="text-align:right;margin-left:12px;flex-shrink:0;display:flex;align-items:center;gap:8px">'
         +   '<span style="font-size:12px;font-weight:800;color:#10b981">' + formatMoney(item.precio) + '</span>'
-        +   '<button class="tx-add-btn" style="padding:3px 8px;background:#0f172a;color:#c9f31d;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">+ Añadir</button>'
+        +   '<button class="tx-add-btn" style="padding:3px 8px;background:#0E0E0C;color:#C6F24E;border:none;border-radius:3px;font-size:10px;font-weight:700;cursor:pointer">+ Añadir</button>'
         + '</div>'
         + '</div>'
     ).join('');
@@ -1867,8 +1874,9 @@ ${topSvcsHtml ? `<h2>Top Servicios</h2><div style="font-size:13px">${topSvcsHtml
 
     // Incluir tabla de movimientos del período actual
     const movRows = fnTxDataFull.map(tx => {
-        const fecha = (tx.fecha_vencimiento || tx.created_at?.split(' ')[0] || '')
-            ? new Date((tx.fecha_vencimiento || tx.created_at.split(' ')[0]) + 'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})
+        const fechaRefM = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : null);
+        const fecha = fechaRefM
+            ? new Date(fechaRefM + 'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})
             : '—';
         const sign  = tx.tipo === 'egreso' ? '−' : '+';
         const color = tx.tipo === 'egreso' ? '#dc2626' : '#16a34a';
@@ -2060,4 +2068,160 @@ function descargarComprobante() {
         <script>window.onload=function(){window.print()}<\/script>
     </body></html>`);
     w.document.close();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXPORTAR A EXCEL
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// Cache para datos de clientes/servicios (se llena en renderClientesDetalle)
+let fnClientesDataCache = { porCliente: [], porServicio: [], proximas: [] };
+
+/* ── Helper: genera y descarga el .xlsx ──────────────────────────────────── */
+function exportXLSX(rows, sheetName, filename) {
+    if (!rows.length) {
+        if (typeof showToast === 'function') showToast('Sin datos para exportar', 'warning');
+        return;
+    }
+    if (typeof XLSX === 'undefined') {
+        if (typeof showToast === 'function') showToast('Librería Excel no cargada, reintenta', 'error');
+        return;
+    }
+    try {
+        const ws = XLSX.utils.json_to_sheet(rows);
+        // Ajuste automático de ancho de columnas
+        const headers = Object.keys(rows[0]);
+        ws['!cols'] = headers.map(h => ({
+            wch: Math.max(h.length + 2, ...rows.map(r => String(r[h] ?? '').length)) + 2
+        }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        XLSX.writeFile(wb, filename);
+        if (typeof showToast === 'function') showToast('Excel descargado ✓', 'success');
+    } catch (e) {
+        console.error('exportXLSX error:', e);
+        if (typeof showToast === 'function') showToast('Error al generar Excel', 'error');
+    }
+}
+
+/* ── Tab Movimientos ─────────────────────────────────────────────────────── */
+function exportarMovimientosExcel() {
+    const buscar = (document.getElementById('fnBuscar')?.value || '').toLowerCase();
+    const tipo   = document.getElementById('fnTipo')?.value   || 'todos';
+    const estado = document.getElementById('fnEstado')?.value || 'todos';
+
+    let data = fnTxDataFull;
+    if (tipo   !== 'todos') data = data.filter(t => t.tipo   === tipo);
+    if (estado !== 'todos') data = data.filter(t => t.estado === estado);
+    if (buscar) data = data.filter(t =>
+        (t.concepto      || '').toLowerCase().includes(buscar) ||
+        (t.titulo        || '').toLowerCase().includes(buscar) ||
+        (t.cliente_nombre|| '').toLowerCase().includes(buscar) ||
+        (t.lead_nombre   || '').toLowerCase().includes(buscar) ||
+        (t.proveedor     || '').toLowerCase().includes(buscar)
+    );
+
+    const rows = data.map(tx => {
+        const fechaRef = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : '');
+        const dest = tx.tipo === 'egreso'
+            ? (tx.proveedor     || '')
+            : (tx.cliente_nombre || tx.lead_nombre || '');
+        return {
+            'Fecha':              fechaRef,
+            'Título':             tx.titulo    || '',
+            'Concepto':           tx.concepto  || '',
+            'Cliente / Proveedor':dest,
+            'Tipo':               tx.tipo === 'ingreso' ? 'Ingreso' : 'Egreso',
+            'Monto (COP)':        parseFloat(tx.monto || 0),
+            'Estado':             tx.estado     || '',
+            'Frecuencia':         tx.frecuencia || '',
+            'Notas':              tx.notas      || '',
+        };
+    });
+
+    const p = fnPeriodo;
+    exportXLSX(rows, 'Movimientos', `finanzas_movimientos_${p.desde}_${p.hasta}.xlsx`);
+}
+
+/* ── Tab Pagos únicos ────────────────────────────────────────────────────── */
+function exportarPagosUnicosExcel() {
+    const buscar = (document.getElementById('fnUnicoBuscar')?.value  || '').toLowerCase();
+    const estado  = document.getElementById('fnUnicoEstado')?.value  || 'todos';
+
+    let data = fnUnicosDataFull.filter(t => t.cliente_id);
+    if (buscar) data = data.filter(t =>
+        (t.cliente_nombre || '').toLowerCase().includes(buscar) ||
+        (t.lead_nombre    || '').toLowerCase().includes(buscar)
+    );
+    if (estado !== 'todos') {
+        const keysConEstado = new Set(
+            fnUnicosDataFull
+                .filter(t => t.estado === estado)
+                .map(t => t.cliente_id ? `c_${t.cliente_id}` : `l_${t.lead_id || t.id}`)
+        );
+        data = data.filter(t => {
+            const key = t.cliente_id ? `c_${t.cliente_id}` : `l_${t.lead_id || t.id}`;
+            return keysConEstado.has(key);
+        });
+    }
+
+    const rows = data.map(tx => ({
+        'Cliente':            tx.cliente_nombre || tx.lead_nombre || '',
+        'Título':             tx.titulo         || '',
+        'Concepto':           tx.concepto       || '',
+        'Monto (COP)':        parseFloat(tx.monto || 0),
+        'Estado':             tx.estado         || '',
+        'Fecha Vencimiento':  tx.fecha_vencimiento || '',
+        'Fecha Creación':     tx.created_at ? tx.created_at.split(' ')[0] : '',
+        'Notas':              tx.notas          || '',
+    }));
+
+    exportXLSX(rows, 'Pagos Únicos', 'finanzas_pagos_unicos.xlsx');
+}
+
+/* ── Tab Clientes / Servicios ────────────────────────────────────────────── */
+function exportarClientesExcel() {
+    const porCliente = fnClientesDataCache.porCliente || [];
+    if (!porCliente.length) {
+        if (typeof showToast === 'function') showToast('Abre el tab Clientes/Servicios primero', 'warning');
+        return;
+    }
+
+    // Aplicar filtros actuales del tab Clientes
+    const filtroNombre   = (document.getElementById('filterClienteNombre')?.value   || '').toLowerCase();
+    const filtroServicio = document.getElementById('filterServicio')?.value           || '';
+    const filtroEstado   = document.getElementById('filterEstadoRenovacion')?.value  || '';
+    const hoy = new Date();
+
+    let data = porCliente;
+    if (filtroNombre)   data = data.filter(c => (c.nombre || '').toLowerCase().includes(filtroNombre));
+    if (filtroServicio) data = data.filter(c =>
+        (c.servicios || []).some(s => String(s.servicio_id) === filtroServicio)
+    );
+    if (filtroEstado) {
+        data = data.filter(c => {
+            if (!c.proxima_renovacion) return filtroEstado === 'activo';
+            const vd = new Date(c.proxima_renovacion + 'T12:00:00');
+            const vm = c.proxima_renovacion.substring(0, 7);
+            const mes = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0');
+            if (filtroEstado === 'vencido')    return vd < hoy;
+            if (filtroEstado === 'vence_mes')  return vm === mes && vd >= hoy;
+            if (filtroEstado === 'activo')     return vd >= hoy;
+            return true;
+        });
+    }
+
+    const rows = data.map(c => ({
+        'Cliente':              c.nombre              || '',
+        'Servicios Activos':    c.servicios_activos   || 0,
+        'Ingresos Período (COP)': parseFloat(c.ingresos || 0),
+        'Costos Período (COP)': parseFloat(c.costos   || 0),
+        'Margen (%)':           parseFloat(c.margen_pct || 0).toFixed(1),
+        'Próxima Renovación':   c.proxima_renovacion  || '—',
+        'Email':                c.email               || '',
+        'Teléfono':             c.telefono            || '',
+    }));
+
+    const p = fnPeriodo;
+    exportXLSX(rows, 'Clientes', `finanzas_clientes_${p.desde}_${p.hasta}.xlsx`);
 }

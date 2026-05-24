@@ -1215,8 +1215,9 @@ function _fillOrdenFromConfig(cfg) {
     if (tipSel && cfg.banco_tipo) {
         tipSel.value = cfg.banco_tipo === 'Corriente' ? 'Cuenta Corriente' : 'Cuenta de Ahorros';
     }
-    // Activar toggle si hay al menos un dato
-    const hayDatos = [cfg.banco_titular, cfg.banco_nombre, cfg.banco_numero, cfg.banco_llave].some(v => v && v.trim());
+    // Activar toggle si hay al menos un dato (convertimos a String para evitar errores si viene como número)
+    const hayDatos = [cfg.banco_titular, cfg.banco_nombre, cfg.banco_numero, cfg.banco_llave]
+        .some(v => v !== null && v !== undefined && String(v).trim() !== '');
     _setBancariosToggle(hayDatos);
 }
 
@@ -1932,9 +1933,9 @@ function saveOrdenDraft() {
 }
 
 function _loadOrdenDraftIfExists() {
-    const raw = localStorage.getItem(_ordenDraftKey());
-    if (!raw) return;
     try {
+        const raw = localStorage.getItem(_ordenDraftKey());
+        if (!raw) return;
         const draft = JSON.parse(raw);
         // Cargar items
         const container = document.getElementById('ordenItemsContainer');

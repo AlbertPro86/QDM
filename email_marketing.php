@@ -8,6 +8,9 @@ require_once __DIR__ . '/includes/functions.php';
 requireAuth();
 
 $pageTitle = 'Email Marketing';
+$pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
+    . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
+    . '<span style="font-weight:600;color:var(--color-text)">Email Marketing</span>';
 
 // KPI data
 $pdo = db();
@@ -61,8 +64,8 @@ include __DIR__ . '/includes/header.php';
 
 <style>
 /* ── Page scope styles ────────────────────────────────────────────── */
-.em-wrap { padding: 28px 32px; }
-@media(max-width:768px) { .em-wrap { padding: 16px; } }
+.em-wrap { padding: 0; }
+@media(max-width:768px) { .em-wrap { padding: 0; } }
 
 /* KPI row */
 .em-kpi-row {
@@ -75,33 +78,34 @@ include __DIR__ . '/includes/header.php';
 @media(max-width:500px) { .em-kpi-row { grid-template-columns: 1fr; } }
 
 .em-kpi {
-    background: #0f172a;
-    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #E8E5DD;
+    border-radius: 6px;
     padding: 22px 24px 18px;
-    color: #fff;
+    color: #0E0E0C;
     position: relative;
     overflow: hidden;
 }
-.em-kpi.lime  { background: #c9f31d; color: #0f172a; }
-.em-kpi.red   { background: #ef4444; }
-.em-kpi.slate { background: #1e293b; }
+.em-kpi.lime  { background: #C6F24E; color: #0E0E0C; }
+.em-kpi.red   { background: #F4DEDB; color: #B0382F; }
+.em-kpi.slate { background: #FAFAF7; border-color: #E8E5DD; color: #0E0E0C; }
 .em-kpi-label {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .06em;
     text-transform: uppercase;
-    opacity: .7;
+    color: #57544D;
     margin-bottom: 6px;
 }
 .em-kpi-val {
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.1;
     letter-spacing: -.02em;
 }
 .em-kpi-sub {
     font-size: 11px;
-    opacity: .6;
+    color: #8A867C;
     margin-top: 4px;
 }
 
@@ -110,23 +114,23 @@ include __DIR__ . '/includes/header.php';
     display: flex;
     gap: 4px;
     margin-bottom: 20px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid #E8E5DD;
 }
 .em-tab {
     padding: 10px 20px;
     font-size: 13px;
     font-weight: 700;
-    color: #64748b;
+    color: #57544D;
     cursor: pointer;
     border: none;
     background: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     transition: color .15s, border-color .15s;
-    border-radius: 8px 8px 0 0;
+    border-radius: 4px 4px 0 0;
 }
-.em-tab:hover { color: #0f172a; background: #f8fafc; }
-.em-tab.active { color: #0f172a; border-bottom-color: #c9f31d; }
+.em-tab:hover { color: #0E0E0C; background: #FAFAF7; }
+.em-tab.active { color: #0E0E0C; border-bottom-color: #C6F24E; }
 
 .em-tab-panel { display: none; }
 .em-tab-panel.active { display: block; }
@@ -134,9 +138,9 @@ include __DIR__ . '/includes/header.php';
 /* Card */
 .em-card {
     background: #fff;
-    border-radius: 12px;
-    border: 1.5px solid #e2e8f0;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    border-radius: 6px;
+    border: 1.5px solid #E8E5DD;
+    box-shadow: 0 1px 2px rgba(0,0,0,.02);
     overflow: hidden;
 }
 .em-card-head {
@@ -144,14 +148,14 @@ include __DIR__ . '/includes/header.php';
     align-items: center;
     justify-content: space-between;
     padding: 18px 22px;
-    border-bottom: 1.5px solid #f1f5f9;
+    border-bottom: 1.5px solid #EFECE5;
     gap: 12px;
     flex-wrap: wrap;
 }
 .em-card-title {
     font-size: 15px;
-    font-weight: 800;
-    color: #0f172a;
+    font-weight: 700;
+    color: #0E0E0C;
 }
 
 /* Table */
@@ -162,27 +166,27 @@ include __DIR__ . '/includes/header.php';
     font-size: 13px;
 }
 .em-table th {
-    background: #f8fafc;
-    color: #64748b;
+    background: #FAFAF7;
+    color: #57544D;
     font-weight: 700;
     font-size: 11px;
     letter-spacing: .05em;
     text-transform: uppercase;
     padding: 10px 16px;
     text-align: left;
-    border-bottom: 1.5px solid #e2e8f0;
+    border-bottom: 1.5px solid #E8E5DD;
     white-space: nowrap;
 }
 .em-table td {
     padding: 13px 16px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid #EFECE5;
+    color: #2A2926;
     vertical-align: middle;
 }
 .em-table tr:last-child td { border-bottom: none; }
-.em-table tr:hover td { background: #fafbfc; }
-.em-table .name { font-weight: 700; color: #0f172a; }
-.em-table .sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+.em-table tr:hover td { background: #FAFAF7; }
+.em-table .name { font-weight: 700; color: #0E0E0C; }
+.em-table .sub { font-size: 11px; color: #8A867C; margin-top: 2px; }
 
 /* Badges */
 .badge {
@@ -203,30 +207,30 @@ include __DIR__ . '/includes/header.php';
     background: currentColor;
     opacity: .7;
 }
-.badge-gray    { background: #f1f5f9; color: #64748b; }
-.badge-blue    { background: #dbeafe; color: #1d4ed8; }
-.badge-green   { background: #dcfce7; color: #15803d; }
-.badge-red     { background: #fee2e2; color: #dc2626; }
-.badge-purple  { background: #ede9fe; color: #7c3aed; }
+.badge-gray    { background: #EFECE5; color: #57544D; }
+.badge-blue    { background: #E1E7F2; color: #3F5E9E; }
+.badge-green   { background: #E3F1E8; color: #2D8F5A; }
+.badge-red     { background: #F4DEDB; color: #B0382F; }
+.badge-purple  { background: #EFECE5; color: #57544D; }
 
 /* Action buttons */
 .em-actions { display: flex; gap: 6px; align-items: center; }
 .btn-icon {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
-    border: 1.5px solid #e2e8f0;
+    border-radius: 4px;
+    border: 1.5px solid #E8E5DD;
     background: #fff;
-    color: #64748b;
+    color: #57544D;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all .15s;
 }
-.btn-icon:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
-.btn-icon.danger:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
-.btn-icon.send:hover   { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.btn-icon:hover { background: #FAFAF7; border-color: #D6D2C7; color: #0E0E0C; }
+.btn-icon.danger:hover { background: #F4DEDB; border-color: #e8c9c6; color: #B0382F; }
+.btn-icon.send:hover   { background: #E3F1E8; border-color: #c8e6d4; color: #2D8F5A; }
 .btn-icon:disabled     { opacity: .35; cursor: not-allowed; pointer-events: none; }
 
 /* Buttons */
@@ -235,7 +239,7 @@ include __DIR__ . '/includes/header.php';
     align-items: center;
     gap: 7px;
     padding: 9px 18px;
-    border-radius: 10px;
+    border-radius: 4px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -243,13 +247,13 @@ include __DIR__ . '/includes/header.php';
     transition: all .15s;
     white-space: nowrap;
 }
-.btn-primary { background: #0f172a; color: #c9f31d; }
-.btn-primary:hover { background: #1e293b; }
-.btn-outline { background: #fff; color: #0f172a; border: 1.5px solid #e2e8f0; }
-.btn-outline:hover { border-color: #0f172a; }
-.btn-ghost { background: transparent; color: #64748b; }
-.btn-ghost:hover { background: #f1f5f9; color: #0f172a; }
-.btn-lime { background: #c9f31d; color: #0f172a; }
+.btn-primary { background: #0E0E0C; color: #C6F24E; }
+.btn-primary:hover { background: #2A2926; }
+.btn-outline { background: #fff; color: #0E0E0C; border: 1.5px solid #E8E5DD; }
+.btn-outline:hover { border-color: #0E0E0C; }
+.btn-ghost { background: transparent; color: #57544D; }
+.btn-ghost:hover { background: #EFECE5; color: #0E0E0C; }
+.btn-lime { background: #C6F24E; color: #0E0E0C; }
 .btn-lime:hover { background: #b8e019; }
 .btn-sm { padding: 7px 14px; font-size: 12px; }
 
@@ -257,7 +261,7 @@ include __DIR__ . '/includes/header.php';
 .em-empty {
     text-align: center;
     padding: 56px 24px;
-    color: #94a3b8;
+    color: #8A867C;
 }
 .em-empty svg { margin: 0 auto 16px; display: block; opacity: .3; }
 .em-empty p { font-size: 14px; margin: 0; }
@@ -271,21 +275,21 @@ include __DIR__ . '/includes/header.php';
 }
 .em-tpl-card {
     background: #fff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1.5px solid #E8E5DD;
+    border-radius: 6px;
     padding: 18px;
     transition: box-shadow .15s;
 }
-.em-tpl-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.em-tpl-card:hover { box-shadow: 0 1px 3px rgba(0,0,0,.03); }
 .em-tpl-card .tpl-name {
-    font-weight: 800;
+    font-weight: 700;
     font-size: 14px;
-    color: #0f172a;
+    color: #0E0E0C;
     margin-bottom: 4px;
 }
 .em-tpl-card .tpl-asunto {
     font-size: 12px;
-    color: #64748b;
+    color: #57544D;
     margin-bottom: 12px;
     white-space: nowrap;
     overflow: hidden;
@@ -293,14 +297,14 @@ include __DIR__ . '/includes/header.php';
 }
 .em-tpl-card .tpl-date {
     font-size: 11px;
-    color: #94a3b8;
+    color: #8A867C;
 }
 .em-tpl-card .tpl-actions {
     display: flex;
     gap: 6px;
     margin-top: 14px;
     padding-top: 14px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid #EFECE5;
 }
 
 /* Modal base */
@@ -321,8 +325,8 @@ include __DIR__ . '/includes/header.php';
 .modal-overlay.show { opacity: 1; visibility: visible; }
 .modal {
     background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 32px 80px rgba(0,0,0,.18);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
     width: 100%;
     max-height: 96vh;
     overflow-y: auto;
@@ -339,31 +343,31 @@ include __DIR__ . '/includes/header.php';
     align-items: center;
     justify-content: space-between;
     padding: 22px 28px 18px;
-    border-bottom: 1.5px solid #f1f5f9;
+    border-bottom: 1.5px solid #EFECE5;
 }
-.modal-head h2 { font-size: 17px; font-weight: 800; color: #0f172a; margin: 0; }
+.modal-head h2 { font-size: 17px; font-weight: 700; color: #0E0E0C; margin: 0; }
 .modal-close {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
-    border: 1.5px solid #e2e8f0;
+    border-radius: 4px;
+    border: 1.5px solid #E8E5DD;
     background: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content:center;
-    color: #64748b;
+    color: #57544D;
     transition: all .15s;
     flex-shrink: 0;
 }
-.modal-close:hover { background: #f8fafc; color: #0f172a; }
+.modal-close:hover { background: #FAFAF7; color: #0E0E0C; }
 .modal-body { padding: 24px 28px; }
 .modal-foot {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
     padding: 16px 28px 22px;
-    border-top: 1.5px solid #f1f5f9;
+    border-top: 1.5px solid #EFECE5;
     flex-wrap: wrap;
 }
 
@@ -373,7 +377,7 @@ include __DIR__ . '/includes/header.php';
     display: block;
     font-size: 12px;
     font-weight: 700;
-    color: #475569;
+    color: #57544D;
     margin-bottom: 6px;
     letter-spacing: .03em;
     text-transform: uppercase;
@@ -381,10 +385,10 @@ include __DIR__ . '/includes/header.php';
 .form-control {
     width: 100%;
     padding: 9px 13px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1.5px solid #E8E5DD;
+    border-radius: 4px;
     font-size: 13px;
-    color: #0f172a;
+    color: #0E0E0C;
     background: #fff;
     transition: border-color .15s, box-shadow .15s;
     box-sizing: border-box;
@@ -392,8 +396,8 @@ include __DIR__ . '/includes/header.php';
 }
 .form-control:focus {
     outline: none;
-    border-color: #0f172a;
-    box-shadow: 0 0 0 3px rgba(15,23,42,.07);
+    border-color: #0E0E0C;
+    box-shadow: 0 0 0 3px rgba(14,14,12,.06);
 }
 select.form-control { cursor: pointer; }
 textarea.form-control { resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; }
@@ -405,32 +409,32 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
     gap: 6px;
     padding: 6px 14px;
     border-radius: 99px;
-    background: #f0fdf4;
-    color: #15803d;
+    background: #E3F1E8;
+    color: #2D8F5A;
     font-size: 12px;
     font-weight: 700;
-    border: 1.5px solid #bbf7d0;
+    border: 1.5px solid #c8e6d4;
     margin-top: 8px;
     transition: all .2s;
 }
-.dest-preview.loading { background: #f8fafc; color: #94a3b8; border-color: #e2e8f0; }
-.dest-preview.zero    { background: #fef9ec; color: #92400e; border-color: #fde68a; }
+.dest-preview.loading { background: #FAFAF7; color: #8A867C; border-color: #E8E5DD; }
+.dest-preview.zero    { background: #F5EBD3; color: #B47A1E; border-color: #e8d5a8; }
 
 /* Variable chips */
 .var-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .var-chip {
     padding: 4px 12px;
     border-radius: 99px;
-    background: #f1f5f9;
-    color: #334155;
+    background: #EFECE5;
+    color: #2A2926;
     font-size: 11px;
     font-weight: 700;
     font-family: monospace;
     cursor: pointer;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #E8E5DD;
     transition: all .15s;
 }
-.var-chip:hover { background: #0f172a; color: #c9f31d; border-color: #0f172a; }
+.var-chip:hover { background: #0E0E0C; color: #C6F24E; border-color: #0E0E0C; }
 
 /* Editor layout (template modal) */
 .tpl-editor-grid {
@@ -440,11 +444,11 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
 }
 @media(max-width:900px) { .tpl-editor-grid { grid-template-columns: 1fr; } }
 .tpl-preview-frame {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1.5px solid #E8E5DD;
+    border-radius: 4px;
     width: 100%;
     height: 620px;
-    background: #f8fafc;
+    background: #FAFAF7;
     position: sticky;
     top: 0;
 }
@@ -479,40 +483,85 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
 <div class="em-wrap">
 
     <!-- Page header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap;">
-        <div>
-            <h1 style="font-size:24px;font-weight:800;color:#0f172a;margin:0;">Email Marketing</h1>
-            <p style="font-size:13px;color:#64748b;margin:4px 0 0;">Crea y envía campañas de correo a tus clientes</p>
+    <div class="page-header" style="margin-bottom:24px">
+        <div class="page-header-left" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1">
+            <div style="position:relative">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"
+                    style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--color-text-light);pointer-events:none">
+                    <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" id="em-filtro-nombre" placeholder="Buscar campaña…"
+                    oninput="renderCampanas()"
+                    style="width:220px;padding:8px 12px 8px 33px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;background:#fff;color:var(--color-text);outline:none"
+                    onfocus="this.style.borderColor='var(--color-text)'" onblur="this.style.borderColor='var(--color-border)'">
+            </div>
+            <select id="em-filtro-estado" onchange="renderCampanas()"
+                style="padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;color:var(--color-text);background:#fff;cursor:pointer;outline:none">
+                <option value="todos">Todos los estados</option>
+                <option value="borrador">Borrador</option>
+                <option value="enviando">Enviando</option>
+                <option value="enviada">Enviada</option>
+                <option value="programada">Programada</option>
+                <option value="error">Error</option>
+            </select>
+            <span id="em-filtro-conteo" style="font-size:12px;color:var(--color-text-muted);white-space:nowrap"></span>
         </div>
-        <button class="btn btn-primary" onclick="openNuevaCampana()">
-            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-            </svg>
-            Nueva Campaña
-        </button>
+        <div class="page-header-right">
+            <button class="btn btn-accent" onclick="openNuevaCampana()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Nueva Campaña
+            </button>
+        </div>
     </div>
 
     <!-- KPIs -->
     <div class="em-kpi-row">
-        <div class="em-kpi">
-            <div class="em-kpi-label">Total Campañas</div>
-            <div class="em-kpi-val" id="kpi-campanas"><?= $kpiCampanas ?></div>
-            <div class="em-kpi-sub">historial completo</div>
+        <!-- Total Campañas -->
+        <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Total Campañas</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-campanas"><?= $kpiCampanas ?></div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">historial completo</span>
+                <span style="font-size:10px;font-weight:700;background:#E8E5DD;color:#0E0E0C;padding:2px 8px;border-radius:100px">Total</span>
+            </div>
         </div>
-        <div class="em-kpi lime">
-            <div class="em-kpi-label">Emails Enviados</div>
-            <div class="em-kpi-val" id="kpi-enviados"><?= number_format($kpiEnviados) ?></div>
-            <div class="em-kpi-sub">correos despachados</div>
+        <!-- Emails Enviados -->
+        <div style="background:#C6F24E;border:1.5px solid #A8D87A;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:rgba(0,0,0,.55);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Emails Enviados</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-enviados"><?= number_format($kpiEnviados) ?></div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:rgba(0,0,0,.5)">correos despachados</span>
+                <span style="font-size:10px;font-weight:700;background:rgba(0,0,0,0.12);color:#0E0E0C;padding:2px 8px;border-radius:100px">Enviados</span>
+            </div>
         </div>
-        <div class="em-kpi slate">
-            <div class="em-kpi-label">Plantillas</div>
-            <div class="em-kpi-val" id="kpi-plantillas"><?= $kpiPlantillas ?></div>
-            <div class="em-kpi-sub">guardadas</div>
+        <!-- Plantillas -->
+        <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Plantillas</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-plantillas"><?= $kpiPlantillas ?></div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">guardadas</span>
+                <span style="font-size:10px;font-weight:700;background:#E8E5DD;color:#0E0E0C;padding:2px 8px;border-radius:100px">Activas</span>
+            </div>
         </div>
-        <div class="em-kpi <?= $kpiTasa < 80 && $kpiTotal > 0 ? 'red' : '' ?>">
-            <div class="em-kpi-label">Tasa de Entrega</div>
-            <div class="em-kpi-val" id="kpi-tasa"><?= $kpiTasa ?>%</div>
-            <div class="em-kpi-sub">de <?= number_format($kpiTotal) ?> intentos</div>
+        <!-- Tasa de Entrega -->
+        <?php
+            $tasaBg     = ($kpiTasa < 80 && $kpiTotal > 0) ? '#F4DEDB' : '#E3F1E8';
+            $tasaBorder = ($kpiTasa < 80 && $kpiTotal > 0) ? '#E8BCB8' : '#B8DEC5';
+            $tasaAccent = ($kpiTasa < 80 && $kpiTotal > 0) ? '#6E211B' : '#1B5A39';
+            $tasaPillBg = ($kpiTasa < 80 && $kpiTotal > 0) ? '#EFCFCC' : '#C8EAD3';
+            $tasaPillCol= ($kpiTasa < 80 && $kpiTotal > 0) ? '#6E211B' : '#1B5A39';
+        ?>
+        <div style="background:<?= $tasaBg ?>;border:1.5px solid <?= $tasaBorder ?>;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:<?= $tasaAccent ?>;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Tasa de Entrega</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-tasa"><?= $kpiTasa ?>%</div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D">de <?= number_format($kpiTotal) ?> intentos</span>
+                <span style="font-size:10px;font-weight:700;background:<?= $tasaPillBg ?>;color:<?= $tasaPillCol ?>;padding:2px 8px;border-radius:100px"><?= $kpiTasa >= 80 || $kpiTotal === 0 ? 'Óptima' : 'Revisar' ?></span>
+            </div>
         </div>
     </div>
 
@@ -564,7 +613,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                         </tr>
                     </thead>
                     <tbody id="campanas-tbody">
-                        <tr><td colspan="7"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#94a3b8;width:24px;height:24px;border-width:3px;"></div><p>Cargando campañas…</p></div></td></tr>
+                        <tr><td colspan="7"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#8A867C;width:24px;height:24px;border-width:3px;"></div><p>Cargando campañas…</p></div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -576,7 +625,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
         <div class="em-card">
             <div class="em-card-head">
                 <span class="em-card-title">Plantillas de email</span>
-                <button class="btn btn-primary btn-sm" onclick="openTplEditor(null)">
+                <button class="btn btn-accent btn-sm" onclick="openTplEditor(null)">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -585,7 +634,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             </div>
             <div id="plantillas-container">
                 <div class="em-empty">
-                    <div class="spinner" style="margin:0 auto 12px;color:#94a3b8;width:24px;height:24px;border-width:3px;"></div>
+                    <div class="spinner" style="margin:0 auto 12px;color:#8A867C;width:24px;height:24px;border-width:3px;"></div>
                     <p>Cargando plantillas…</p>
                 </div>
             </div>
@@ -598,7 +647,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             <div class="em-card-head">
                 <span class="em-card-title">Historial de envíos</span>
                 <div class="em-hist-filter">
-                    <label style="font-size:12px;font-weight:700;color:#64748b;">Campaña:</label>
+                    <label style="font-size:12px;font-weight:700;color:#57544D;">Campaña:</label>
                     <select class="form-control" id="hist-campana-sel" onchange="loadHistorial()" style="width:220px;">
                         <option value="">— Seleccionar campaña —</option>
                     </select>
@@ -661,11 +710,11 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <label class="form-label">Destinatarios</label>
                 <div style="display:flex;gap:6px;margin-bottom:10px">
                     <button type="button" id="btn-modo-segmento" onclick="setModoDestinatarios('segmento')"
-                        style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #c9f31d;background:#c9f31d;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer">
+                        style="flex:1;padding:7px 0;border-radius:4px;border:1.5px solid #C6F24E;background:#C6F24E;color:#0E0E0C;font-size:12px;font-weight:700;cursor:pointer">
                         Por segmento
                     </button>
                     <button type="button" id="btn-modo-manual" onclick="setModoDestinatarios('manual')"
-                        style="flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer">
+                        style="flex:1;padding:7px 0;border-radius:4px;border:1.5px solid #E8E5DD;background:#fff;color:#57544D;font-size:12px;font-weight:700;cursor:pointer">
                         Selección manual
                     </button>
                 </div>
@@ -685,13 +734,13 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                     <input type="text" id="cp-buscar-cliente" class="form-control" placeholder="Buscar cliente por nombre o contacto…"
                         oninput="filtrarListaClientes()" style="margin-bottom:8px">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                        <span id="cp-sel-count" style="font-size:12px;color:#64748b">0 seleccionados</span>
+                        <span id="cp-sel-count" style="font-size:12px;color:#57544D">0 seleccionados</span>
                         <div style="display:flex;gap:8px">
-                            <button type="button" onclick="seleccionarTodosClientes()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;font-weight:700">Todos</button>
-                            <button type="button" onclick="limpiarSeleccionClientes()" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer;font-weight:700">Limpiar</button>
+                            <button type="button" onclick="seleccionarTodosClientes()" style="font-size:11px;color:#57544D;background:none;border:none;cursor:pointer;font-weight:700">Todos</button>
+                            <button type="button" onclick="limpiarSeleccionClientes()" style="font-size:11px;color:#B0382F;background:none;border:none;cursor:pointer;font-weight:700">Limpiar</button>
                         </div>
                     </div>
-                    <div id="cp-lista-clientes" style="max-height:200px;overflow-y:auto;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 0">
+                    <div id="cp-lista-clientes" style="max-height:200px;overflow-y:auto;border:1.5px solid #E8E5DD;border-radius:4px;padding:4px 0">
                         <div style="padding:20px;text-align:center;color:#94a3b8;font-size:13px">Cargando clientes…</div>
                     </div>
                 </div>
@@ -705,8 +754,8 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
         </div>
         <!-- Programar envío -->
         <div style="padding:0 24px 16px">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:#475569">
-                <input type="checkbox" id="cp-programar" onchange="toggleProgramar()" style="width:15px;height:15px;accent-color:#6366f1">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:#57544D">
+                <input type="checkbox" id="cp-programar" onchange="toggleProgramar()" style="width:15px;height:15px;accent-color:#0E0E0C">
                 Programar envío para después
             </label>
             <div id="cp-programar-wrap" style="display:none;margin-top:10px">
@@ -807,7 +856,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             <div>
                 <div class="form-label" style="margin-bottom:8px">Vista previa del email</div>
                 <iframe id="prev-iframe" title="Vista previa del email"
-                    style="width:100%;height:440px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc"></iframe>
+                    style="width:100%;height:440px;border:1.5px solid #E8E5DD;border-radius:4px;background:#FAFAF7"></iframe>
             </div>
         </div>
         <div class="modal-foot">
@@ -948,7 +997,25 @@ function renderCampanas() {
         tbody.innerHTML = '<tr><td colspan="7"><div class="em-empty"><svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><p>No hay campañas. ¡Crea la primera!</p></div></td></tr>';
         return;
     }
-    tbody.innerHTML = campanas.map(c => {
+
+    const q      = (document.getElementById('em-filtro-nombre')?.value || '').toLowerCase().trim();
+    const estado = document.getElementById('em-filtro-estado')?.value || 'todos';
+
+    const filtradas = campanas.filter(c => {
+        const matchQ = !q || c.nombre.toLowerCase().includes(q) || (c.asunto || '').toLowerCase().includes(q);
+        const matchE = estado === 'todos' || c.estado === estado;
+        return matchQ && matchE;
+    });
+
+    const conteo = document.getElementById('em-filtro-conteo');
+    if (conteo) conteo.textContent = filtradas.length + ' de ' + campanas.length + ' campañas';
+
+    if (!filtradas.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="em-empty"><p>No hay campañas con los filtros aplicados.</p></div></td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtradas.map(c => {
         const badgeClass = { borrador:'badge-gray', enviando:'badge-blue', enviada:'badge-green', error:'badge-red', programada:'badge-purple' }[c.estado] || 'badge-gray';
         const badgeLabel = { borrador:'Borrador', enviando:'Enviando…', enviada:'Enviada', error:'Error', programada:'Programada' }[c.estado] || c.estado;
         const fechaStr = c.enviada_at
@@ -1110,12 +1177,12 @@ function setModoDestinatarios(modo) {
     const btnSeg = document.getElementById('btn-modo-segmento');
     const btnMan = document.getElementById('btn-modo-manual');
     if (modo === 'segmento') {
-        btnSeg.style.cssText = 'flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #c9f31d;background:#c9f31d;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
-        btnMan.style.cssText = 'flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer';
+        btnSeg.style.cssText = 'flex:1;padding:7px 0;border-radius:3px;border:1.5px solid #C6F24E;background:#C6F24E;color:#0E0E0C;font-size:12px;font-weight:700;cursor:pointer';
+        btnMan.style.cssText = 'flex:1;padding:7px 0;border-radius:3px;border:1.5px solid #E8E5DD;background:#fff;color:#57544D;font-size:12px;font-weight:700;cursor:pointer';
         previewDestinatarios();
     } else {
-        btnMan.style.cssText = 'flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #c9f31d;background:#c9f31d;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer';
-        btnSeg.style.cssText = 'flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:12px;font-weight:700;cursor:pointer';
+        btnMan.style.cssText = 'flex:1;padding:7px 0;border-radius:3px;border:1.5px solid #C6F24E;background:#C6F24E;color:#0E0E0C;font-size:12px;font-weight:700;cursor:pointer';
+        btnSeg.style.cssText = 'flex:1;padding:7px 0;border-radius:3px;border:1.5px solid #E8E5DD;background:#fff;color:#57544D;font-size:12px;font-weight:700;cursor:pointer';
         cargarListaClientes();
     }
 }
@@ -1148,12 +1215,12 @@ function renderListaClientes() {
             onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''">
             <input type="checkbox" value="${c.id}" ${clientesSeleccionados.has(c.id) ? 'checked' : ''}
                 onchange="toggleClienteSeleccion(${c.id})"
-                style="width:15px;height:15px;accent-color:#6366f1;cursor:pointer;flex-shrink:0">
+                style="width:15px;height:15px;accent-color:#0E0E0C;cursor:pointer;flex-shrink:0">
             <div style="min-width:0;flex:1">
-                <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(c.nombre_comercial)}</div>
-                ${c.persona_contacto ? `<div style="font-size:11px;color:#64748b">${escHtml(c.persona_contacto)}</div>` : ''}
+                <div style="font-size:13px;font-weight:600;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(c.nombre_comercial)}</div>
+                ${c.persona_contacto ? `<div style="font-size:11px;color:var(--color-text-muted)">${escHtml(c.persona_contacto)}</div>` : ''}
             </div>
-            <div style="font-size:11px;color:#94a3b8;flex-shrink:0;max-width:140px;overflow:hidden;text-overflow:ellipsis">${escHtml(c.email_facturacion)}</div>
+            <div style="font-size:11px;color:var(--color-text-light);flex-shrink:0;max-width:140px;overflow:hidden;text-overflow:ellipsis">${escHtml(c.email_facturacion)}</div>
         </label>`).join('');
     actualizarContadorSeleccion();
 }
@@ -1298,7 +1365,7 @@ async function sendCampana(id, selectedIds = []) {
         title: '¿Enviar campaña?',
         okText: 'Sí, enviar ahora',
         okColor: '#0f172a',
-        okHover: '#1e293b'
+        okHover: '#2A2926'
     });
     if (!ok) return;
 
@@ -1333,7 +1400,7 @@ async function changeEstadoCampana(id, nuevoEstado, mensaje) {
         title: 'Cambiar estado',
         okText: `Mover a ${labels[nuevoEstado]}`,
         okColor: '#0f172a',
-        okHover: '#1e293b'
+        okHover: '#2A2926'
     });
     if (!ok) return;
     try {
@@ -1494,11 +1561,11 @@ async function previewCampana(id) {
         }
         const names = todosClientes.filter(cl => ids.includes(cl.id));
         destHtml = `<div class="form-label">Destinatarios seleccionados (${ids.length})</div>
-            <div style="max-height:180px;overflow-y:auto;border:1.5px solid #e2e8f0;border-radius:8px">
+            <div style="max-height:180px;overflow-y:auto;border:1.5px solid var(--color-border);border-radius:var(--radius-sm)">
             ${(names.length ? names : ids.map(i => ({ nombre_comercial: `Cliente #${i}`, email_facturacion: '' }))).map(cl =>
-                `<div style="padding:7px 12px;font-size:12px;color:#0f172a;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;gap:8px">
+                `<div style="padding:7px 12px;font-size:12px;color:var(--color-text);border-bottom:1px solid var(--color-border-light);display:flex;justify-content:space-between;gap:8px">
                     <span style="font-weight:600">${escHtml(cl.nombre_comercial)}</span>
-                    <span style="color:#94a3b8;font-size:11px;flex-shrink:0">${escHtml(cl.email_facturacion || '')}</span>
+                    <span style="color:var(--color-text-light);font-size:11px;flex-shrink:0">${escHtml(cl.email_facturacion || '')}</span>
                 </div>`).join('')}
             </div>`;
     } else {
@@ -1632,7 +1699,7 @@ async function loadHistorial() {
         tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><p>Selecciona una campaña para ver el historial</p></div></td></tr>';
         return;
     }
-    tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#94a3b8;width:24px;height:24px;border-width:3px;"></div><p>Cargando…</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#8A867C;width:24px;height:24px;border-width:3px;"></div><p>Cargando…</p></div></td></tr>';
     try {
         const r = await fetch(`${API}?resource=historial&campana_id=${id}`);
         const d = await r.json();
