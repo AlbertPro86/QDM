@@ -1729,17 +1729,49 @@ function _getOrdenBancarios() {
 function refreshOrdenPreview() {
     const items = _getOrdenItems();
     const banc  = _getOrdenBancarios();
-    document.getElementById('ordenFormCsId').value       = document.getElementById('currentCsId').value;
-    document.getElementById('ordenFormCsIds').value      = document.getElementById('currentCsIds').value;
-    document.getElementById('ordenFormItemsJson').value  = JSON.stringify(items);
-    document.getElementById('ordenFormMetodoPago').value = document.getElementById('ordenMetodoPago').value;
-    document.getElementById('ordenFormNotas').value      = document.getElementById('ordenNotas').value;
-    document.getElementById('ordenFormBancarios').value     = JSON.stringify(banc);
-    document.getElementById('ordenFormFechaUltPago').value  = document.getElementById('ordenFechaUltPago').value;
-    document.getElementById('ordenFormLinkPago').value      = document.getElementById('ordenLinkPago')?.value || '';
-    document.getElementById('ordenFormPlantillaId').value   = document.getElementById('ordenPlantillaSelect')?.value || '';
-    document.getElementById('ordenFormDocTipo').value       = window._ordenModalTipo || 'orden_compra';
-    document.getElementById('ordenPreviewForm').submit();
+    const csId  = document.getElementById('currentCsId').value;
+    const csIds = document.getElementById('currentCsIds').value;
+
+    // Construir FormData directamente (más robusto que form.submit + target)
+    const fd = new FormData();
+    fd.append('cs_id',              csId);
+    fd.append('cs_ids',             csIds);
+    fd.append('items_json',         JSON.stringify(items));
+    fd.append('metodo_pago',        document.getElementById('ordenMetodoPago').value);
+    fd.append('notas_pie_override', document.getElementById('ordenNotas').value);
+    fd.append('bancarios_json',     JSON.stringify(banc));
+    fd.append('fecha_ult_pago',     document.getElementById('ordenFechaUltPago').value);
+    fd.append('link_pago',          document.getElementById('ordenLinkPago')?.value || '');
+    fd.append('plantilla_id',       document.getElementById('ordenPlantillaSelect')?.value || '');
+    fd.append('doc_tipo',           window._ordenModalTipo || 'orden_compra');
+
+    const iframe = document.getElementById('ordenIframe');
+    // Mostrar loading
+    iframe.srcdoc = '<body style="background:#f8fafc;display:flex;align-items:center;justify-content:center;height:100%;margin:0;font-family:sans-serif"><div style="color:#94a3b8;font-size:13px">Cargando vista previa…</div></body>';
+
+    fetch('orden_compra.php', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function(r) {
+            if (!r.ok) {
+                throw new Error('HTTP ' + r.status + ' ' + r.statusText);
+            }
+            return r.text();
+        })
+        .then(function(html) {
+            if (!html || html.trim().length === 0) {
+                iframe.srcdoc = '<body style="font-family:sans-serif;padding:40px;color:#f59e0b"><h3>Respuesta vacía del servidor</h3></body>';
+                return;
+            }
+            // Inyectar <base> para que rutas relativas (imágenes, etc.) resuelvan correctamente
+            var base = window.location.href.replace(/\/[^/]*$/, '/');
+            var baseTag = '<base href="' + base + '">';
+            var finalHtml = html.indexOf('<head>') !== -1
+                ? html.replace('<head>', '<head>' + baseTag)
+                : baseTag + html;
+            iframe.srcdoc = finalHtml;
+        })
+        .catch(function(err) {
+            iframe.srcdoc = '<body style="font-family:sans-serif;padding:40px;color:#ef4444"><h3>Error al cargar vista previa</h3><p>' + err.message + '</p></body>';
+        });
 }
 
 function openOrdenModal(csId) {
@@ -1764,15 +1796,22 @@ function openOrdenModal(csId) {
 
 function closeOrdenModal() {
     document.getElementById('ordenModal').classList.remove('show');
-    document.getElementById('ordenIframe').src = '';
+    const iframe = document.getElementById('ordenIframe');
+    iframe.removeAttribute('srcdoc');
+    iframe.src = '';
 }
 
 function downloadOrdenPDF() {
     refreshOrdenPreview();
-    setTimeout(() => {
-        const iframe = document.getElementById('ordenIframe');
-        if(iframe.contentWindow) iframe.contentWindow.print();
-    }, 800);
+    const iframe = document.getElementById('ordenIframe');
+    // Esperar a que el iframe cargue el contenido antes de imprimir
+    const handler = () => {
+        iframe.removeEventListener('load', handler);
+        setTimeout(() => { if(iframe.contentWindow) iframe.contentWindow.print(); }, 300);
+    };
+    iframe.addEventListener('load', handler);
+    // Fallback por si onload no se dispara
+    setTimeout(() => { iframe.removeEventListener('load', handler); if(iframe.contentWindow) iframe.contentWindow.print(); }, 3000);
 }
 
 // ── Selector de destinatario ──────────────────────────────────────────────────
