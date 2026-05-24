@@ -315,14 +315,6 @@ include __DIR__ . '/includes/header.php';
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
                 <h3 class="card-title">Servicios Activos y Renovaciones</h3>
                 <div style="display:flex;gap:12px">
-                    <button class="btn btn-outline sm" onclick="generateSelectedOrder()">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Facturar Seleccionados
-                    </button>
-                    <button class="btn btn-outline sm" onclick="openRenovarModal()" style="border-color:#3F5E9E;color:#3F5E9E" onmouseenter="this.style.background='#E1E7F2'" onmouseleave="this.style.background=''">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Renovar
-                    </button>
                     <button class="btn btn-secondary sm" onclick="openAddSvcModal()">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                         Nuevo Servicio
@@ -336,6 +328,19 @@ include __DIR__ . '/includes/header.php';
                         <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--color-text-light)">Cargando servicios...</td></tr>
                     </tbody>
                 </table>
+            </div>
+            <!-- Barra flotante de selección -->
+            <div id="svcSelectionBar" style="display:none;background:#0f172a;border-radius:10px;margin:10px 20px 4px;padding:10px 16px;align-items:center;justify-content:space-between;gap:12px">
+                <span id="svcSelectionCount" style="font-size:13px;font-weight:600;color:#e2e8f0">0 servicios seleccionados</span>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button onclick="generateSelectedOrder()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:#c9f31d;color:#0f172a;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.92)'" onmouseleave="this.style.filter=''">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Generar Orden de Renovación
+                    </button>
+                    <button onclick="clearSvcSelection()" style="padding:8px 12px;background:transparent;color:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='rgba(255,255,255,.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)'">
+                        Cancelar
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1005,7 +1010,7 @@ function renderServices(svcs) {
                     : '';
 
         return `<tr style="${rowStyle}">
-            <td><input type="checkbox" class="svc-check" value="${s.id}"></td>
+            <td><input type="checkbox" class="svc-check" value="${s.id}" onchange="_updateSvcSelectionBar()"></td>
             <td style="font-weight:700">
                 ${escapeHtml(s.servicio_nombre)}
                 <div style="font-size:10px;color:var(--color-text-muted)">${{mes:'Mensual',trimestre:'Trimestral',semestre:'Semestral',año:'Anual',unico:'Pago Único',ninguna:'Ninguna'}[s.frecuencia] || s.frecuencia || 'Anual'}</div>
@@ -1111,6 +1116,27 @@ async function sendPaymentLink(enlace, servicioNombre) {
 function toggleAllSvcs(master) {
     const checks = document.querySelectorAll('.svc-check');
     checks.forEach(c => c.checked = master.checked);
+    _updateSvcSelectionBar();
+}
+
+function _updateSvcSelectionBar() {
+    const checked = document.querySelectorAll('.svc-check:checked');
+    const bar   = document.getElementById('svcSelectionBar');
+    const count = document.getElementById('svcSelectionCount');
+    if (!bar) return;
+    if (checked.length > 0) {
+        bar.style.display = 'flex';
+        count.textContent = checked.length + ' servicio' + (checked.length !== 1 ? 's' : '') + ' seleccionado' + (checked.length !== 1 ? 's' : '');
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+function clearSvcSelection() {
+    document.querySelectorAll('.svc-check').forEach(c => c.checked = false);
+    const master = document.querySelector('#clientSvcsTable').closest('table').querySelector('th input[type=checkbox]');
+    if (master) master.checked = false;
+    _updateSvcSelectionBar();
 }
 
 // ── Órdenes de Renovación — helpers ─────────────────────────────────────────
@@ -1728,51 +1754,24 @@ function _getOrdenBancarios() {
 }
 
 function refreshOrdenPreview() {
-    const items = _getOrdenItems();
-    const banc  = _getOrdenBancarios();
-    const csId  = document.getElementById('currentCsId').value;
-    const csIds = document.getElementById('currentCsIds').value;
+    var items = _getOrdenItems();
+    var banc  = _getOrdenBancarios();
+    var csId  = document.getElementById('currentCsId').value;
+    var csIds = document.getElementById('currentCsIds').value;
 
-    // Construir FormData directamente (más robusto que form.submit + target)
-    const fd = new FormData();
-    fd.append('cs_id',              csId);
-    fd.append('cs_ids',             csIds);
-    fd.append('items_json',         JSON.stringify(items));
-    fd.append('metodo_pago',        document.getElementById('ordenMetodoPago').value);
-    fd.append('notas_pie_override', document.getElementById('ordenNotas').value);
-    fd.append('bancarios_json',     JSON.stringify(banc));
-    fd.append('fecha_ult_pago',     document.getElementById('ordenFechaUltPago').value);
-    fd.append('link_pago',          document.getElementById('ordenLinkPago')?.value || '');
-    fd.append('plantilla_id',       document.getElementById('ordenPlantillaSelect')?.value || '');
-    fd.append('doc_tipo',           window._ordenModalTipo || 'orden_compra');
+    // Rellenar el form oculto y hacer POST directo al iframe (enfoque confiable)
+    document.getElementById('ordenFormCsId').value        = csId;
+    document.getElementById('ordenFormCsIds').value       = csIds;
+    document.getElementById('ordenFormItemsJson').value   = JSON.stringify(items);
+    document.getElementById('ordenFormMetodoPago').value  = document.getElementById('ordenMetodoPago').value;
+    document.getElementById('ordenFormNotas').value       = document.getElementById('ordenNotas').value;
+    document.getElementById('ordenFormBancarios').value   = JSON.stringify(banc);
+    document.getElementById('ordenFormFechaUltPago').value= document.getElementById('ordenFechaUltPago').value;
+    document.getElementById('ordenFormLinkPago').value    = (document.getElementById('ordenLinkPago') || {value:''}).value;
+    document.getElementById('ordenFormPlantillaId').value = (document.getElementById('ordenPlantillaSelect') || {value:''}).value;
+    document.getElementById('ordenFormDocTipo').value     = window._ordenModalTipo || 'orden_renovacion';
 
-    const iframe = document.getElementById('ordenIframe');
-    // Mostrar loading
-    iframe.srcdoc = '<body style="background:#f8fafc;display:flex;align-items:center;justify-content:center;height:100%;margin:0;font-family:sans-serif"><div style="color:#94a3b8;font-size:13px">Cargando vista previa…</div></body>';
-
-    fetch('orden_compra.php', { method: 'POST', body: fd, credentials: 'same-origin' })
-        .then(function(r) {
-            if (!r.ok) {
-                throw new Error('HTTP ' + r.status + ' ' + r.statusText);
-            }
-            return r.text();
-        })
-        .then(function(html) {
-            if (!html || html.trim().length === 0) {
-                iframe.srcdoc = '<body style="font-family:sans-serif;padding:40px;color:#f59e0b"><h3>Respuesta vacía del servidor</h3></body>';
-                return;
-            }
-            // Inyectar <base> para que rutas relativas (imágenes, etc.) resuelvan correctamente
-            var base = window.location.href.replace(/\/[^/]*$/, '/');
-            var baseTag = '<base href="' + base + '">';
-            var finalHtml = html.indexOf('<head>') !== -1
-                ? html.replace('<head>', '<head>' + baseTag)
-                : baseTag + html;
-            iframe.srcdoc = finalHtml;
-        })
-        .catch(function(err) {
-            iframe.srcdoc = '<body style="font-family:sans-serif;padding:40px;color:#ef4444"><h3>Error al cargar vista previa</h3><p>' + err.message + '</p></body>';
-        });
+    document.getElementById('ordenPreviewForm').submit();
 }
 
 function openOrdenModal(csId) {
@@ -1797,22 +1796,19 @@ function openOrdenModal(csId) {
 
 function closeOrdenModal() {
     document.getElementById('ordenModal').classList.remove('show');
-    const iframe = document.getElementById('ordenIframe');
-    iframe.removeAttribute('srcdoc');
-    iframe.src = '';
+    document.getElementById('ordenIframe').src = 'about:blank';
 }
 
 function downloadOrdenPDF() {
-    refreshOrdenPreview();
-    const iframe = document.getElementById('ordenIframe');
-    // Esperar a que el iframe cargue el contenido antes de imprimir
-    const handler = () => {
+    var iframe = document.getElementById('ordenIframe');
+    function handler() {
         iframe.removeEventListener('load', handler);
-        setTimeout(() => { if(iframe.contentWindow) iframe.contentWindow.print(); }, 300);
-    };
+        setTimeout(function() { if (iframe.contentWindow) iframe.contentWindow.print(); }, 400);
+    }
     iframe.addEventListener('load', handler);
+    refreshOrdenPreview();
     // Fallback por si onload no se dispara
-    setTimeout(() => { iframe.removeEventListener('load', handler); if(iframe.contentWindow) iframe.contentWindow.print(); }, 3000);
+    setTimeout(function() { iframe.removeEventListener('load', handler); if (iframe.contentWindow) iframe.contentWindow.print(); }, 4000);
 }
 
 // ── Selector de destinatario ──────────────────────────────────────────────────
