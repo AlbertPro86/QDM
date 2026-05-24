@@ -337,19 +337,6 @@ include __DIR__ . '/includes/header.php';
                     </tbody>
                 </table>
             </div>
-            <!-- Barra flotante de selección -->
-            <div id="svcSelectionBar" style="display:none;background:#0f172a;border-radius:10px;margin:10px 20px 4px;padding:10px 16px;align-items:center;justify-content:space-between;gap:12px">
-                <span id="svcSelectionCount" style="font-size:13px;font-weight:600;color:#e2e8f0">0 servicios seleccionados</span>
-                <div style="display:flex;gap:8px;align-items:center">
-                    <button onclick="generateSelectedOrder()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;background:#c9f31d;color:#0f172a;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.92)'" onmouseleave="this.style.filter=''">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Generar Orden de Renovación
-                    </button>
-                    <button onclick="clearSvcSelection()" style="padding:8px 12px;background:transparent;color:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='rgba(255,255,255,.4)'" onmouseleave="this.style.borderColor='rgba(255,255,255,.15)'">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- ── Trabajos Adicionales (pagos únicos) ─────────────────────────── -->
@@ -1018,7 +1005,7 @@ function renderServices(svcs) {
                     : '';
 
         return `<tr style="${rowStyle}">
-            <td><input type="checkbox" class="svc-check" value="${s.id}" onchange="_updateSvcSelectionBar()"></td>
+            <td><input type="checkbox" class="svc-check" value="${s.id}"></td>
             <td style="font-weight:700">
                 ${escapeHtml(s.servicio_nombre)}
                 <div style="font-size:10px;color:var(--color-text-muted)">${{mes:'Mensual',trimestre:'Trimestral',semestre:'Semestral',año:'Anual',unico:'Pago Único',ninguna:'Ninguna'}[s.frecuencia] || s.frecuencia || 'Anual'}</div>
@@ -1124,27 +1111,6 @@ async function sendPaymentLink(enlace, servicioNombre) {
 function toggleAllSvcs(master) {
     const checks = document.querySelectorAll('.svc-check');
     checks.forEach(c => c.checked = master.checked);
-    _updateSvcSelectionBar();
-}
-
-function _updateSvcSelectionBar() {
-    const checked = document.querySelectorAll('.svc-check:checked');
-    const bar   = document.getElementById('svcSelectionBar');
-    const count = document.getElementById('svcSelectionCount');
-    if (!bar) return;
-    if (checked.length > 0) {
-        bar.style.display = 'flex';
-        count.textContent = checked.length + ' servicio' + (checked.length !== 1 ? 's' : '') + ' seleccionado' + (checked.length !== 1 ? 's' : '');
-    } else {
-        bar.style.display = 'none';
-    }
-}
-
-function clearSvcSelection() {
-    document.querySelectorAll('.svc-check').forEach(c => c.checked = false);
-    const master = document.querySelector('#clientSvcsTable').closest('table').querySelector('th input[type=checkbox]');
-    if (master) master.checked = false;
-    _updateSvcSelectionBar();
 }
 
 // ── Órdenes de Renovación — helpers ─────────────────────────────────────────
@@ -1290,10 +1256,11 @@ function onOrdenPlantillaChange() {
 }
 
 function generateSelectedOrder() {
-    const ids = Array.from(document.querySelectorAll('.svc-check:checked')).map(c => c.value);
-    if(!ids.length) {
-        showToast('Debes seleccionar al menos un servicio para generar la factura.', 'warning');
-        return;
+    let ids = Array.from(document.querySelectorAll('.svc-check:checked')).map(c => c.value);
+    if (!ids.length) {
+        // Si no hay selección, tomar todos los servicios disponibles
+        ids = Array.from(document.querySelectorAll('.svc-check')).map(c => c.value);
+        if (!ids.length) { showToast('No hay servicios disponibles.', 'warning'); return; }
     }
     window._ordenModalTipo = 'orden_renovacion';
     document.getElementById('ordenModalTitle').textContent = 'Orden de Renovación';
@@ -1767,6 +1734,10 @@ function refreshOrdenPreview() {
     var csId  = document.getElementById('currentCsId').value;
     var csIds = document.getElementById('currentCsIds').value;
 
+    // Mostrar loader
+    var loader = document.getElementById('ordenIframeLoader');
+    if (loader) loader.style.display = 'flex';
+
     // Rellenar el form oculto y hacer POST directo al iframe (enfoque confiable)
     document.getElementById('ordenFormCsId').value        = csId;
     document.getElementById('ordenFormCsIds').value       = csIds;
@@ -1805,6 +1776,8 @@ function openOrdenModal(csId) {
 function closeOrdenModal() {
     document.getElementById('ordenModal').classList.remove('show');
     document.getElementById('ordenIframe').src = 'about:blank';
+    var loader = document.getElementById('ordenIframeLoader');
+    if (loader) loader.style.display = 'flex';
 }
 
 function downloadOrdenPDF() {
@@ -3238,7 +3211,11 @@ async function confirmarEnvioMsgEmail() {
             </div>
             <!-- Preview -->
             <div style="flex:1;overflow:hidden;position:relative">
-                <iframe id="ordenIframe" name="ordenIframe" style="width:100%;height:100%;border:none" src=""></iframe>
+                <div id="ordenIframeLoader" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f8fafc;z-index:2;gap:10px">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c9f31d" stroke-width="2.5" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span style="font-size:12px;color:#64748b;font-weight:600">Generando vista previa...</span>
+                </div>
+                <iframe id="ordenIframe" name="ordenIframe" style="width:100%;height:100%;border:none" src="" onload="document.getElementById('ordenIframeLoader').style.display='none'"></iframe>
             </div>
         </div>
         <!-- Form oculto para POST al iframe — fuera del footer para no afectar layout -->
