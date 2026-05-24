@@ -27,30 +27,32 @@ if (!empty($cliente['persona_contacto'])) {
     $otrasMarcas = $stmtMarcas->fetchAll();
     if ($otrasMarcas) {
         $items = '<div style="padding:6px 0">';
-        $items .= '<a href="cliente_detalle.php?id=' . $cliente['id'] . '" style="display:flex;align-items:center;gap:8px;padding:8px 14px;text-decoration:none;background:#f0fdf4">'
-            . '<span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>'
-            . '<span style="font-size:13px;font-weight:800;color:#0f172a">' . sanitize($cliente['nombre_comercial']) . '</span></a>';
+        $items .= '<a href="cliente_detalle.php?id=' . $cliente['id'] . '" style="display:flex;align-items:center;gap:8px;padding:8px 14px;text-decoration:none;background:#E3F1E8">'
+            . '<span style="width:7px;height:7px;border-radius:50%;background:#2D8F5A;flex-shrink:0"></span>'
+            . '<span style="font-size:13px;font-weight:700;color:#0E0E0C">' . sanitize($cliente['nombre_comercial']) . '</span></a>';
         foreach ($otrasMarcas as $m) {
-            $items .= '<a href="cliente_detalle.php?id=' . $m['id'] . '" style="display:flex;align-items:center;gap:8px;padding:8px 14px;text-decoration:none;background:#fff;transition:background .1s" onmouseenter="this.style.background=\'#f8fafc\'" onmouseleave="this.style.background=\'#fff\'">'
-                . '<span style="width:7px;height:7px;border-radius:50%;background:#cbd5e1;flex-shrink:0"></span>'
-                . '<span style="font-size:13px;font-weight:600;color:#334155">' . sanitize($m['nombre_comercial']) . '</span></a>';
+            $items .= '<a href="cliente_detalle.php?id=' . $m['id'] . '" style="display:flex;align-items:center;gap:8px;padding:8px 14px;text-decoration:none;background:#fff;transition:background .1s" onmouseenter="this.style.background=\'#FAFAF7\'" onmouseleave="this.style.background=\'#fff\'">'
+                . '<span style="width:7px;height:7px;border-radius:50%;background:#D6D2C7;flex-shrink:0"></span>'
+                . '<span style="font-size:13px;font-weight:600;color:#2A2926">' . sanitize($m['nombre_comercial']) . '</span></a>';
         }
         $items .= '</div>';
         $pageTitleSuffix = '<div style="position:relative;display:inline-block">'
             . '<button onclick="(function(e){e.stopPropagation();var d=document.getElementById(\'nhDrop\');d.style.display=d.style.display===\'none\'?\'block\':\'none\';})(event)"'
-            . ' style="display:flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:20px;font-size:12px;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s"'
-            . ' onmouseenter="this.style.background=\'#e9edf2\';this.style.borderColor=\'#c9f31d\';this.style.color=\'#0f172a\'"'
-            . ' onmouseleave="this.style.background=\'#f1f5f9\';this.style.borderColor=\'#e2e8f0\';this.style.color=\'#64748b\'">'
+            . ' style="display:flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;background:#EFECE5;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;font-weight:700;color:#57544D;cursor:pointer;font-family:inherit;transition:all .15s"'
+            . ' onmouseenter="this.style.background=\'#E8E5DD\';this.style.borderColor=\'#D6D2C7\';this.style.color=\'#0E0E0C\'"'
+            . ' onmouseleave="this.style.background=\'#EFECE5\';this.style.borderColor=\'#E8E5DD\';this.style.color=\'#57544D\'">'
             . '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>'
             . sanitize($cliente['nombre_comercial'])
             . '</button>'
-            . '<div id="nhDrop" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.12);min-width:210px;overflow:hidden">'
+            . '<div id="nhDrop" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:400;background:#fff;border:1.5px solid #E8E5DD;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.03);min-width:210px;overflow:hidden">'
             . $items . '</div>'
             . '</div>'
             . '<script>document.addEventListener("click",function(){var d=document.getElementById("nhDrop");if(d)d.style.display="none";},true);</script>';
     }
 }
-$pageBreadcrumb = '';
+$pageBreadcrumb = '<a href="clientes.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Clientes</a>'
+    . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
+    . '<span style="font-weight:700;color:var(--color-text)">' . sanitize($personaDisplay) . '</span>';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -58,16 +60,16 @@ include __DIR__ . '/includes/header.php';
 <div class="card animate-fade-up" style="margin-bottom:20px;padding:14px 20px">
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <!-- Avatar -->
-        <div style="width:46px;height:46px;border-radius:12px;background:#0f172a;color:#c9f31d;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0">
+        <div style="width:46px;height:46px;border-radius:var(--radius-md);background:var(--color-border-light);color:var(--color-text);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0">
             <?= strtoupper(substr($cliente['nombre_comercial'], 0, 1)) ?>
         </div>
         <!-- Nombre del negocio + estado + tabs inline -->
         <div style="flex:0 0 auto;min-width:0">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <div id="heroClienteName" style="font-size:18px;font-weight:800;color:#0f172a;line-height:1.2"><?= sanitize($cliente['nombre_comercial']) ?></div>
+                <div id="heroClienteName" style="font-size:18px;font-weight:800;color:var(--color-text);line-height:1.2"><?= sanitize($cliente['nombre_comercial']) ?></div>
                 <span style="width:10px;height:10px;border-radius:50%;background:<?= $cliente['estado']==='activo'?'#22c55e':'#ef4444' ?>;flex-shrink:0;display:inline-block" title="<?= ucfirst($cliente['estado']) ?>"></span>
                 <!-- Selector de negocios compacto -->
-                <select id="negocioTopbarSelector" onchange="selectNegocioFromDropdown(this.value)" style="display:none;padding:5px 10px;border:1.5px solid #e2e8f0;border-radius:7px;background:#f8fafc;color:#0f172a;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='#c9f31d'" onmouseout="this.style.borderColor='#e2e8f0'">
+                <select id="negocioTopbarSelector" onchange="selectNegocioFromDropdown(this.value)" style="display:none;padding:5px 10px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface);color:var(--color-text);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--color-text-muted)'" onmouseout="this.style.borderColor='var(--color-border)'">
                   <option value="">Negocio ▼</option>
                 </select>
                 <!-- Indicador Tareas Pendientes -->
@@ -97,7 +99,7 @@ include __DIR__ . '/includes/header.php';
             <?php if($cliente['email_facturacion']): ?>
             <div style="display:flex;align-items:center;gap:6px">
                 <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span style="font-size:12px;color:#0f172a"><?= sanitize($cliente['email_facturacion']) ?></span>
+                <span style="font-size:12px;color:var(--color-text)"><?= sanitize($cliente['email_facturacion']) ?></span>
             </div>
             <?php endif; ?>
             <?php if($cliente['nit_cedula']): ?>
@@ -140,22 +142,22 @@ include __DIR__ . '/includes/header.php';
                 </div>
             </div>
 
-            <!-- Card: Egresos / Costos -->
+            <!-- Card: Descuentos -->
             <div class="cf-card cf-card--expense">
                 <div class="cf-card__body">
                     <div class="cf-card__header">
-                        <span class="cf-card__label">Egresos / Costos</span>
-                        <span class="cf-pill cf-pill--expense">Costos</span>
+                        <span class="cf-card__label">Descuentos</span>
+                        <span class="cf-pill cf-pill--expense">Desc.</span>
                     </div>
                     <p class="cf-card__value" id="totalEgreso">$ 0 COP</p>
                 </div>
             </div>
 
-            <!-- Card: Ganancia Real -->
+            <!-- Card: Ingreso Neto -->
             <div class="cf-card cf-card--profit">
                 <div class="cf-card__body">
                     <div class="cf-card__header">
-                        <span class="cf-card__label">Ganancia Real</span>
+                        <span class="cf-card__label">Ingreso Neto</span>
                         <span class="cf-pill cf-pill--profit">Neto</span>
                     </div>
                     <p class="cf-card__value" id="totalGanancia">$ 0 COP</p>
@@ -172,7 +174,7 @@ include __DIR__ . '/includes/header.php';
         }
 
         .cf-card {
-            border-radius: 16px;
+            border-radius: 6px;
             padding: 0;
             display: flex;
             align-items: stretch;
@@ -183,13 +185,13 @@ include __DIR__ . '/includes/header.php';
 
         .cf-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+            box-shadow: 0 1px 3px rgba(0,0,0,.03);
         }
 
         /* Fondos de cada card */
-        .cf-card--income { background: #2a2a2a; }
-        .cf-card--expense { background: #4b5563; }
-        .cf-card--profit  { background: #c9f31d; }
+        .cf-card--income { background: #ffffff; border: 1px solid #E8E5DD; }
+        .cf-card--expense { background: #ffffff; border: 1px solid #E8E5DD; }
+        .cf-card--profit  { background: #FAFAF7; border: 1px solid #E8E5DD; }
 
         .cf-card__body {
             flex: 1;
@@ -215,13 +217,13 @@ include __DIR__ . '/includes/header.php';
             letter-spacing: 0.01em;
         }
 
-        .cf-card--income .cf-card__value { color: #ffffff; }
-        .cf-card--expense .cf-card__value { color: #ffffff; }
-        .cf-card--profit  .cf-card__value { color: #000000; }
+        .cf-card--income .cf-card__value { color: #0E0E0C; }
+        .cf-card--expense .cf-card__value { color: #0E0E0C; }
+        .cf-card--profit  .cf-card__value { color: #0E0E0C; }
 
-        .cf-card--income .cf-card__label { color: rgba(255,255,255,0.65); }
-        .cf-card--expense .cf-card__label { color: rgba(255,255,255,0.65); }
-        .cf-card--profit  .cf-card__label { color: rgba(0,0,0,0.55); }
+        .cf-card--income .cf-card__label { color: #57544D; }
+        .cf-card--expense .cf-card__label { color: #57544D; }
+        .cf-card--profit  .cf-card__label { color: #57544D; }
 
         /* Pill badges */
         .cf-pill {
@@ -234,24 +236,24 @@ include __DIR__ . '/includes/header.php';
         }
 
         .cf-pill--income {
-            background: #3d3d3d;
-            color: rgba(255,255,255,0.85);
+            background: #E3F1E8;
+            color: #1B5A39;
         }
 
         .cf-pill--expense {
-            background: #374151;
-            color: rgba(255,255,255,0.8);
+            background: #F4DEDB;
+            color: #6E211B;
         }
 
         .cf-pill--profit {
-            background: #000000;
-            color: #c9f31d;
+            background: #E3F1E8;
+            color: #1B5A39;
         }
 
         /* Value */
         .cf-card__value {
             font-size: 30px;
-            font-weight: 900;
+            font-weight: 700;
             font-family: var(--font-primary);
             line-height: 1;
             margin: 0;
@@ -277,19 +279,19 @@ include __DIR__ . '/includes/header.php';
             opacity: 0.8;
         }
 
-        .cf-card--income .cf-card__icon { color: #10b981; background: #ecfdf5; opacity: 0.7; }
-        .cf-card--expense .cf-card__icon { color: #ef4444; background: #fef2f2; opacity: 0.7; }
-        .cf-card--profit .cf-card__icon { color: #000000; background: rgba(201,243,29,0.15); opacity: 0.7; }
+        .cf-card--income .cf-card__icon { color: #2D8F5A; background: #E3F1E8; opacity: 0.7; }
+        .cf-card--expense .cf-card__icon { color: #B0382F; background: #F4DEDB; opacity: 0.7; }
+        .cf-card--profit .cf-card__icon { color: #0E0E0C; background: #EFECE5; opacity: 0.7; }
 
         /* Card destacada: Ganancia */
         .cf-card--profit {
-            background: #fafdf0;
-            border-color: rgba(201,243,29,0.3);
+            background: #FAFAF7;
+            border-color: #D6D2C7;
         }
 
         .cf-card--profit:hover {
-            border-color: rgba(201,243,29,0.5);
-            box-shadow: 0 8px 24px rgba(201,243,29,0.12);
+            border-color: #8A867C;
+            box-shadow: 0 1px 3px rgba(0,0,0,.03);
         }
 
         /* Responsive */
@@ -317,7 +319,7 @@ include __DIR__ . '/includes/header.php';
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Facturar Seleccionados
                     </button>
-                    <button class="btn btn-outline sm" onclick="openRenovarModal()" style="border-color:#3b82f6;color:#3b82f6" onmouseenter="this.style.background='#eff6ff'" onmouseleave="this.style.background=''">
+                    <button class="btn btn-outline sm" onclick="openRenovarModal()" style="border-color:#3F5E9E;color:#3F5E9E" onmouseenter="this.style.background='#E1E7F2'" onmouseleave="this.style.background=''">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         Renovar
                     </button>
@@ -329,7 +331,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div class="table-responsive">
                 <table class="data-table">
-                    <thead><tr><th style="width:40px"><input type="checkbox" onclick="toggleAllSvcs(this)"></th><th>Servicio</th><th>Monto (Ingreso)</th><th>Costo (Egreso)</th><th>Ganancia</th><th>Vencimiento</th><th>Estado</th><th style="width:80px"></th></tr></thead>
+                    <thead><tr><th style="width:40px"><input type="checkbox" onclick="toggleAllSvcs(this)"></th><th>Servicio</th><th>Monto (Ingreso)</th><th>Descuento</th><th>Neto</th><th>Vencimiento</th><th>Estado</th><th style="width:80px"></th></tr></thead>
                     <tbody id="clientSvcsTable">
                         <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--color-text-light)">Cargando servicios...</td></tr>
                     </tbody>
@@ -337,27 +339,81 @@ include __DIR__ . '/includes/header.php';
             </div>
         </div>
 
-        <!-- ── Editor de Detalles ──────────────────────────────────────────── -->
-        <div class="card animate-fade-up" style="overflow:hidden">
-            <div onclick="togglePanel('panelEditor','arrowEditor')"
-                 style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;cursor:pointer;background:#c9f31d;user-select:none">
+        <!-- ── Trabajos Adicionales (pagos únicos) ─────────────────────────── -->
+        <div class="card animate-fade-up stagger-2" id="trabajosAdicionalesCard" style="overflow:hidden">
+            <div onclick="togglePanel('panelTrabajos','arrowTrabajos')"
+                 style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;background:#FAFAF7;border-bottom:1px solid var(--color-border);user-select:none">
                 <div style="display:flex;align-items:center;gap:8px">
-                    <div style="width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                        <svg width="13" height="13" fill="none" stroke="#0f172a" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <div style="width:26px;height:26px;border-radius:4px;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M5 11h.01"/></svg>
                     </div>
                     <div>
-                        <div style="font-size:12px;font-weight:800;color:#0f172a;line-height:1.2">Detalles del cliente</div>
-                        <div style="font-size:9px;color:rgba(15,23,42,0.55)">Notas internas · editor de texto</div>
+                        <div style="font-size:12px;font-weight:700;color:#0E0E0C;line-height:1.2">Trabajos Adicionales <span id="trabajosBadge" style="font-size:10px;font-weight:600;background:#E8E5DD;color:#57544D;padding:1px 7px;border-radius:100px;display:none;margin-left:4px"></span></div>
+                        <div style="font-size:9px;color:#8A867C">Trabajos puntuales · no recurrentes</div>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
-                    <span id="editorSavedAt" style="font-size:9px;color:rgba(15,23,42,0.5)"></span>
-                    <svg id="arrowEditor" width="16" height="16" fill="none" stroke="#0f172a" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s;transform:rotate(-90deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    <button onclick="event.stopPropagation();abrirModalNuevoTrabajo()"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#ffffff;color:#0E0E0C;border:1px solid #E8E5DD;border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s;font-family:inherit"
+                        onmouseenter="this.style.background='#F0EFEB'" onmouseleave="this.style.background='#ffffff'">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        Nuevo trabajo
+                    </button>
+                    <svg id="arrowTrabajos" width="15" height="15" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s;transform:rotate(-90deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </div>
+            <div id="panelTrabajos" style="display:none">
+                <div class="table-responsive">
+                    <table class="data-table" style="font-size:12px;table-layout:fixed;width:100%">
+                        <colgroup>
+                            <col style="width:auto">
+                            <col style="width:160px">
+                            <col style="width:110px">
+                            <col style="width:160px">
+                            <col style="width:72px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th style="text-align:right">Monto</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="trabajosAdicionalesTable">
+                            <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--color-text-light)">Sin trabajos adicionales.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="trabajosTotal" style="display:none;padding:10px 18px;text-align:right;border-top:1px solid var(--color-border)">
+                    <span style="font-size:11px;color:var(--color-text-muted)">Total trabajos adicionales:&nbsp;</span>
+                    <span id="trabajosTotalMonto" style="font-size:12px;font-weight:700;color:var(--color-text);font-family:var(--font-secondary)"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Editor de Detalles ──────────────────────────────────────────── -->
+        <div class="card animate-fade-up" style="overflow:hidden">
+            <div onclick="togglePanel('panelEditor','arrowEditor')"
+                 style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;cursor:pointer;background:#0E0E0C;user-select:none">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:26px;height:26px;border-radius:4px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <svg width="13" height="13" fill="none" stroke="#ffffff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;font-weight:700;color:#ffffff;line-height:1.2">Detalles del cliente</div>
+                        <div style="font-size:9px;color:rgba(255,255,255,0.55)">Notas internas · editor de texto</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span id="editorSavedAt" style="font-size:9px;color:rgba(255,255,255,0.5)"></span>
+                    <svg id="arrowEditor" width="16" height="16" fill="none" stroke="#ffffff" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s;transform:rotate(-90deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </div>
             </div>
             <div id="panelEditor" style="display:none">
                 <!-- Toolbar -->
-                <div style="display:flex;align-items:center;gap:2px;padding:5px 10px;border-bottom:1px solid #f1f5f9;background:#fafbff;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:2px;padding:5px 10px;border-bottom:1px solid #EFECE5;background:#FAFAF7;flex-wrap:wrap">
                     <?php
                     $editorBtns = [
                         ['cmd'=>'bold',        'icon'=>'<b style="font-size:13px">B</b>',  'title'=>'Negrita (Ctrl+B)'],
@@ -381,8 +437,8 @@ include __DIR__ . '/includes/header.php';
                         <?php else: ?>
                         <button type="button" title="<?= $b['title'] ?>"
                             onclick="editorCmd('<?= $b['cmd'] ?>')"
-                            style="width:30px;height:30px;border:1px solid transparent;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0f172a;transition:all .15s"
-                            onmouseenter="this.style.background='#e0e7ff';this.style.borderColor='#c7d2fe'"
+                            style="width:30px;height:30px;border:1px solid transparent;background:transparent;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0E0E0C;transition:all .15s"
+                            onmouseenter="this.style.background='#EFECE5';this.style.borderColor='#D6D2C7'"
                             onmouseleave="this.style.background='transparent';this.style.borderColor='transparent'">
                             <?= $b['icon'] ?>
                         </button>
@@ -390,7 +446,7 @@ include __DIR__ . '/includes/header.php';
                     endforeach; ?>
                     <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
                         <button onclick="saveEditor()" id="btnSaveEditor"
-                            style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#0f172a;color:#c9f31d;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:filter .15s"
+                            style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#0E0E0C;color:#ffffff;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:filter .15s"
                             onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">
                             <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                             Guardar
@@ -399,7 +455,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
                 <!-- Área editable -->
                 <div id="clienteEditor" contenteditable="true"
-                    style="min-height:160px;max-height:360px;overflow-y:auto;padding:10px 14px;font-size:13px;line-height:1.6;color:#1e293b;outline:none;font-family:inherit"
+                    style="min-height:160px;max-height:360px;overflow-y:auto;padding:10px 14px;font-size:13px;line-height:1.6;color:#0E0E0C;outline:none;font-family:inherit"
                     oninput="markEditorDirty()"
                     onkeydown="if((event.ctrlKey||event.metaKey)&&event.key==='s'){event.preventDefault();saveEditor();}">
                 </div>
@@ -409,24 +465,24 @@ include __DIR__ . '/includes/header.php';
         <!-- ── Inventario de Accesos / Credenciales ────────────────────────── -->
         <div class="card animate-fade-up" style="overflow:hidden">
             <div onclick="togglePanel('panelCredenciales','arrowCred')"
-                 style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;cursor:pointer;background:#475569;user-select:none">
+                 style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;cursor:pointer;background:#FAFAF7;user-select:none">
                 <div style="display:flex;align-items:center;gap:8px">
-                    <div style="width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                        <svg width="13" height="13" fill="none" stroke="#ffffff" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    <div style="width:26px;height:26px;border-radius:4px;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                     </div>
                     <div>
-                        <div style="font-size:12px;font-weight:800;color:#ffffff;line-height:1.2">Inventario de accesos</div>
-                        <div style="font-size:9px;color:rgba(255,255,255,0.6)">Correos, contraseñas y credenciales del cliente</div>
+                        <div style="font-size:12px;font-weight:700;color:#0E0E0C;line-height:1.2">Inventario de accesos</div>
+                        <div style="font-size:9px;color:#8A867C">Correos, contraseñas y credenciales del cliente</div>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
                     <button onclick="event.stopPropagation();openCredModal()"
-                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s"
-                        onmouseenter="this.style.background='rgba(255,255,255,0.25)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)'">
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#ffffff;color:#0E0E0C;border:1px solid #E8E5DD;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s"
+                        onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='#ffffff'">
                         <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                         Agregar
                     </button>
-                    <svg id="arrowCred" width="16" height="16" fill="none" stroke="#ffffff" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s;transform:rotate(-90deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    <svg id="arrowCred" width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s;transform:rotate(-90deg)"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </div>
             </div>
             <div id="panelCredenciales" style="display:none">
@@ -456,45 +512,44 @@ include __DIR__ . '/includes/header.php';
 
         <!-- Disparadores -->
         <div class="card animate-fade-up stagger-2">
-            <div class="card-header" style="padding:12px 16px"><h3 class="card-title" style="font-size:13px">Disparadores</h3></div>
             <div class="card-body" style="padding:10px 14px;display:grid;gap:7px">
-                <button style="display:inline-flex;align-items:center;gap:10px;padding:11px 18px;background:#25D366;color:#ffffff;border:none;border-radius:24px;font-size:12px;font-weight:700;cursor:pointer;width:100%;justify-content:flex-start;transition:filter .15s;box-shadow:0 2px 4px rgba(37,211,102,.2)" onclick="sendPrompt('reminder')" onmouseenter="this.style.filter='brightness(.9)'" onmouseleave="this.style.filter=''">
+                <button style="display:inline-flex;align-items:center;gap:10px;padding:11px 18px;background:#25D366;color:#ffffff;border:none;border-radius:24px;font-size:12px;font-weight:700;cursor:pointer;width:100%;justify-content:flex-start;transition:filter .15s;box-shadow:0 2px 4px rgba(37,211,102,.2)" onclick="abrirChatCliente()" onmouseenter="this.style.filter='brightness(.9)'" onmouseleave="this.style.filter=''">
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                    Recordatorio de Pago
+                    Chatear con el cliente
                 </button>
                 <button class="btn btn-outline sm" style="justify-content:flex-start;gap:8px;width:100%;font-size:12px" onclick="openMensajesModal()">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    Notificar por WhatsApp/Correo
+                    Notificar por Correo
                 </button>
             </div>
         </div>
 
-        <!-- Área Multimedia -->
+        <!-- Adjuntos -->
         <div class="card animate-fade-up stagger-4">
             <div class="card-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-                <h3 class="card-title" style="font-size:13px">Multimedia <span style="font-size:10px;font-weight:400;color:var(--color-text-muted)">(Facturas, Docs)</span></h3>
-                <label class="btn btn-primary sm" style="cursor:pointer;padding:4px 10px;font-size:11px;gap:4px">
+                <h3 class="card-title" style="font-size:13px">Adjuntos <span style="font-size:10px;font-weight:400;color:var(--color-text-muted)">(Facturas, Docs)</span></h3>
+                <label class="btn btn-primary btn-sm" style="cursor:pointer;gap:4px">
                     <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg> Subir
                     <input type="file" id="mediaUpload" style="display:none" onchange="uploadMedia(this)">
                 </label>
             </div>
-            <div class="card-body" style="padding:10px 14px">
-                <div id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px">
-                    <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--color-text-light);font-size:12px">Sin archivos cargados.</div>
+            <div class="card-body" style="padding:6px 0">
+                <div id="mediaGrid">
+                    <div style="text-align:center;padding:20px;color:var(--color-text-light);font-size:12px">Sin archivos cargados.</div>
                 </div>
             </div>
         </div>
 
         <!-- Notificaciones de renovación -->
         <button onclick="openNotifModal()"
-            style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:var(--radius-md);cursor:pointer;transition:all .15s;text-align:left"
-            onmouseenter="this.style.borderColor='#c9f31d';this.style.background='#fafff0'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#ffffff'">
-            <div style="width:32px;height:32px;background:#f0fdf4;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="15" height="15" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:var(--radius-md);cursor:pointer;transition:all .15s;text-align:left"
+            onmouseenter="this.style.borderColor='#8A867C';this.style.background='#FAFAF7'" onmouseleave="this.style.borderColor='#E8E5DD';this.style.background='#ffffff'">
+            <div style="width:32px;height:32px;background:#E3F1E8;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="15" height="15" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             </div>
             <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:#0f172a">Notificaciones de renovación</div>
-                <div id="notifStatusLabel" style="font-size:10px;color:#94a3b8">Cargando configuración...</div>
+                <div style="font-size:12px;font-weight:700;color:#0E0E0C">Notificaciones de renovación</div>
+                <div id="notifStatusLabel" style="font-size:10px;color:#8A867C">Cargando configuración...</div>
             </div>
             <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </button>
@@ -518,12 +573,107 @@ include __DIR__ . '/includes/header.php';
 
 </div><!-- /grid principal -->
 
+<!-- Modal Subir Adjunto -->
+<div class="modal-overlay" id="adjuntoUploadModal">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header">
+            <h3 class="modal-title">Subir adjunto</h3>
+            <button class="modal-close" onclick="document.getElementById('adjuntoUploadModal').classList.remove('show')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" style="display:grid;gap:14px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0EFEB;border-radius:var(--radius-sm)">
+                <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                <span id="adjuntoFileName" style="font-size:12px;font-weight:600;color:#0E0E0C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Leyenda <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
+                <input type="text" id="adjuntoDesc" class="form-input" placeholder="Ej: Contrato firmado, Comprobante de pago…"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarSubirAdjunto();}">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="document.getElementById('adjuntoUploadModal').classList.remove('show');_pendingMediaFile=null">Cancelar</button>
+            <button class="btn btn-primary" onclick="confirmarSubirAdjunto()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Subir
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo / Editar Trabajo Adicional -->
+<div class="modal-overlay" id="trabajoAdModal">
+    <div class="modal" style="max-width:480px">
+        <div class="modal-header">
+            <h3 id="trabajoModalTitle" class="modal-title">Nuevo Trabajo Adicional</h3>
+            <button class="modal-close" onclick="document.getElementById('trabajoAdModal').classList.remove('show')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" style="display:grid;gap:14px">
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Concepto <span style="color:var(--color-danger)">*</span></label>
+                <input type="text" id="trabajoTxConcepto" class="form-input" placeholder="Ej: Diseño de logo, Mantenimiento…">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Título corto</label>
+                <input type="text" id="trabajoTxTitulo" class="form-input" placeholder="Nombre breve para mostrar en tabla">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Descripción</label>
+                <textarea id="trabajoTxDesc" class="form-input" rows="2" placeholder="Detalles del trabajo realizado…" style="resize:vertical"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Monto (COP) <span style="color:var(--color-danger)">*</span></label>
+                    <input type="number" id="trabajoTxMonto" class="form-input" placeholder="0" min="0" step="1000">
+                </div>
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Estado</label>
+                    <select id="trabajoTxEstado" class="form-input">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagado">Pagado</option>
+                        <option value="vencido">Vencido</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Fecha</label>
+                <input type="date" id="trabajoTxFecha" class="form-input">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="document.getElementById('trabajoAdModal').classList.remove('show')">Cancelar</button>
+            <button class="btn btn-primary" onclick="guardarTrabajoAdicional()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalle Trabajo Adicional -->
+<div class="modal-overlay" id="detalleTxModal">
+    <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+            <h3 class="modal-title">Detalle del Trabajo</h3>
+            <button class="modal-close" onclick="document.getElementById('detalleTxModal').classList.remove('show')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="detalleTxBody" class="modal-body"></div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="document.getElementById('detalleTxModal').classList.remove('show')">Cerrar</button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Renovar Servicios -->
 <div class="modal-overlay" id="renovarModal">
     <div class="modal" style="max-width:730px">
         <div class="modal-header">
             <h3 class="modal-title" style="display:flex;align-items:center;gap:8px">
-                <svg width="18" height="18" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <svg width="18" height="18" fill="none" stroke="#3F5E9E" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 Renovar Servicios
             </h3>
             <button class="modal-close" onclick="closeRenovarModal()">&times;</button>
@@ -532,19 +682,19 @@ include __DIR__ . '/includes/header.php';
             <p style="font-size:13px;color:#64748b;margin-bottom:16px" id="renovarSubtitle">
                 Calculando nuevas fechas...
             </p>
-            <div style="border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden">
+            <div style="border:1.5px solid #E8E5DD;border-radius:4px;overflow:hidden">
                 <table style="width:100%;border-collapse:collapse;font-size:13px">
                     <thead>
-                        <tr style="background:#f8fafc;border:1.5px solid #cbd5e1">
+                        <tr style="background:#FAFAF7;border:1.5px solid #D6D2C7">
                             <th style="padding:9px 14px;width:36px">
                                 <input type="checkbox" id="renovarCheckAll" checked
                                     onchange="toggleAllRenov(this)"
-                                    style="width:16px;height:16px;cursor:pointer;accent-color:#3b82f6">
+                                    style="width:16px;height:16px;cursor:pointer;accent-color:#3F5E9E">
                             </th>
                             <th style="padding:9px 8px;text-align:left;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase">Servicio</th>
                             <th style="padding:9px 8px;text-align:center;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase">Ciclo</th>
                             <th style="padding:9px 8px;text-align:right;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase">Vence hoy</th>
-                            <th style="padding:9px 14px;text-align:right;font-size:11px;font-weight:800;color:#10b981;text-transform:uppercase">Nueva fecha</th>
+                            <th style="padding:9px 14px;text-align:right;font-size:11px;font-weight:700;color:#2D8F5A;text-transform:uppercase">Nueva fecha</th>
                         </tr>
                     </thead>
                     <tbody id="renovarPreviewBody">
@@ -552,7 +702,7 @@ include __DIR__ . '/includes/header.php';
                     </tbody>
                 </table>
             </div>
-            <div id="renovarWarning" style="display:none;margin-top:12px;padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#92400e">
+            <div id="renovarWarning" style="display:none;margin-top:12px;padding:10px 14px;background:#F5EBD3;border:1px solid #e0c99a;border-radius:4px;font-size:12px;color:#6E4A12">
                 ⚠ Los servicios de <strong>Pago Único</strong> no se renuevan y no aparecen en esta lista.
             </div>
         </div>
@@ -566,16 +716,16 @@ include __DIR__ . '/includes/header.php';
                 </button>
             </div>
             <button class="btn" id="renovarConfirmBtn" onclick="confirmarRenovacion()"
-                style="background:#3b82f6;color:#fff;font-weight:700;display:flex;align-items:center;gap:8px">
+                style="background:#3F5E9E;color:#fff;font-weight:700;display:flex;align-items:center;gap:8px">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 Confirmar Renovación
             </button>
         </div>
 
         <!-- Mini modal confirmación reversión -->
-        <div id="revertConfirmBox" style="display:none;position:absolute;inset:0;background:rgba(15,23,42,.45);border-radius:20px;z-index:10;align-items:center;justify-content:center">
-            <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center">
-                <div style="width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <div id="revertConfirmBox" style="display:none;position:absolute;inset:0;background:rgba(15,23,42,.45);border-radius:6px;z-index:10;align-items:center;justify-content:center">
+            <div style="background:#fff;border-radius:6px;padding:28px 28px 24px;max-width:340px;width:100%;box-shadow:0 1px 3px rgba(0,0,0,.03);text-align:center">
+                <div style="width:48px;height:48px;border-radius:50%;background:#F4DEDB;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
                     <svg width="22" height="22" fill="none" stroke="#ef4444" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 </div>
                 <h4 style="font-size:15px;font-weight:800;color:#0f172a;margin:0 0 8px">¿Revertir renovación?</h4>
@@ -636,12 +786,8 @@ include __DIR__ . '/includes/header.php';
                         <input type="number" class="form-input" id="newSvcDesc" oninput="calculateNet()" value="0" min="0" step="0.01">
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Costo Agencia / Egreso ($) *</label>
-                        <input type="number" class="form-input" id="newSvcCosto" oninput="calculateNet()" placeholder="Lo que pagas tú" min="0" step="0.01" required>
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Ingreso Neto</label>
-                        <input type="text" class="form-input" id="newSvcNeto" readonly style="background:#f0fdf4;font-weight:800;color:#10b981;cursor:default">
+                        <label style="display:block;font-size:12px;font-weight:700;color:#2D8F5A;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Ingreso Neto</label>
+                        <input type="text" class="form-input" id="newSvcNeto" readonly style="background:#E3F1E8;font-weight:700;color:#1B5A39;cursor:default">
                     </div>
                 </div>
 
@@ -839,12 +985,10 @@ function renderServices(svcs) {
 
         const monto    = parseFloat(s.monto_renovacion) || 0;
         const descuento = parseFloat(s.descuento) || 0;
-        const costo    = parseFloat(s.costo_servicio) || 0;
         const subtotal = monto - descuento;
-        const ganancia = subtotal - costo;
 
-        totalIn  += subtotal;
-        totalOut += costo;
+        totalIn  += monto;
+        totalOut += descuento;
 
         const descLabel = descuento > 0
             ? `<div style="font-size:10px;color:var(--color-danger)">- ${formatMoney(descuento)} DESC.</div>`
@@ -870,8 +1014,8 @@ function renderServices(svcs) {
                 ${formatMoney(subtotal)}
                 ${descLabel}
             </td>
-            <td style="color:var(--color-danger)">${formatMoney(costo)}</td>
-            <td style="font-weight:800;color:var(--color-primary)">${formatMoney(ganancia)}</td>
+            <td style="color:var(--color-danger)">${descuento > 0 ? formatMoney(descuento) : '—'}</td>
+            <td style="font-weight:800;color:var(--color-primary)">${formatMoney(subtotal)}</td>
             <td>
                 <span style="font-size:13px;${(esMes||vencido)?'color:#ef4444;font-weight:700':''}">${vence.toLocaleDateString('es-CO')}</span>
                 ${fechaLabel}
@@ -883,7 +1027,7 @@ function renderServices(svcs) {
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </button>
                     ${s.enlace_pago
-                        ? `<button class="btn btn-ghost btn-icon sm" onclick="sendPaymentLink('${escapeJs(s.enlace_pago)}','${escapeJs(s.servicio_nombre)}')" title="Enviar Enlace de Pago" style="color:var(--color-secondary);background:var(--color-primary)">
+                        ? `<button class="btn btn-ghost btn-icon sm" onclick="sendPaymentLink('${escapeJs(s.enlace_pago)}','${escapeJs(s.servicio_nombre)}')" title="Enviar Enlace de Pago" style="color:var(--q-lima);background:var(--color-primary)">
                             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                            </button>`
                         : `<button class="btn btn-ghost btn-icon sm" title="Sin enlace de pago configurado" disabled style="opacity:0.3;cursor:default">
@@ -903,7 +1047,7 @@ function renderServices(svcs) {
 
     document.getElementById('totalIngreso').textContent = formatMoney(totalIn);
     document.getElementById('totalEgreso').textContent = formatMoney(totalOut);
-    document.getElementById('totalGanancia').textContent = formatMoney(totalIn - totalOut);
+    document.getElementById('totalGanancia').textContent = formatMoney(totalIn - totalOut); // Neto = bruto - descuentos
 
     window._ordenSvcMap = {};
     svcs.forEach(s => { window._ordenSvcMap[s.id] = s; });
@@ -969,12 +1113,157 @@ function toggleAllSvcs(master) {
     checks.forEach(c => c.checked = master.checked);
 }
 
+// ── Órdenes de Renovación — helpers ─────────────────────────────────────────
+window._ordenModalTipo = 'orden_compra';
+window._ordenPlantillasCache = [];
+
+function _toggleOrdenRenovacionFields(show) {
+    document.getElementById('ordenPlantillaWrap').style.display  = show ? '' : 'none';
+    document.getElementById('ordenLinkPagoWrap').style.display   = show ? '' : 'none';
+    const btnCfg  = document.getElementById('btnOrdenCargarConfig');
+    const btnSave = document.getElementById('btnGuardarEnConfig');
+    if (btnCfg)  btnCfg.style.display  = show ? '' : 'none';
+    if (btnSave) btnSave.style.display  = show ? 'inline-flex' : 'none';
+    if (!show) {
+        // Modo Orden de Compra: toggle bancarios OFF por defecto
+        _setBancariosToggle(false);
+        const lp = document.getElementById('ordenLinkPago'); if (lp) lp.value = '';
+    }
+    // En modo renovación: el toggle se activa en _fillOrdenFromConfig según si hay datos
+}
+
+async function guardarBancariosEnConfig() {
+    const btn = document.getElementById('btnGuardarEnConfig');
+    const bancarios = _getOrdenBancarios();
+    // Mapeo de campos del modal → claves de configuraciones
+    const payload = {
+        banco_titular: bancarios.titular,
+        banco_cedula:  bancarios.cedula,
+        banco_nombre:  bancarios.banco,
+        banco_numero:  bancarios.cuenta,
+        banco_tipo:    bancarios.tipo === 'Cuenta Corriente' ? 'Corriente' : 'Ahorros',
+        banco_llave:   bancarios.llave,
+    };
+    const hasDatos = Object.values(payload).some(v => v && v.trim());
+    if (!hasDatos) { showToast('No hay datos bancarios que guardar', 'warning'); return; }
+
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Guardando...';
+    try {
+        const r = await fetch('api/configuraciones.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            window._ordenCfgCache = { ...(window._ordenCfgCache || {}), ...payload };
+            showToast('✓ Datos bancarios guardados en Configuraciones', 'success');
+        } else {
+            showToast(d.error || 'Error al guardar', 'error');
+        }
+    } catch(e) {
+        showToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+    }
+}
+
+async function _loadOrdenPlantillas() {
+    const sel = document.getElementById('ordenPlantillaSelect');
+    sel.innerHTML = '<option value="">Cargando...</option>';
+    try {
+        const [rP, rC] = await Promise.all([
+            fetch('api/plantillas_factura.php?categoria=orden_renovacion'),
+            fetch('api/configuraciones.php')
+        ]);
+        const [dP, dC] = await Promise.all([rP.json(), rC.json()]);
+
+        // Plantillas
+        if (dP.success && dP.data.length) {
+            window._ordenPlantillasCache = dP.data;
+            sel.innerHTML = dP.data.map(p =>
+                `<option value="${p.id}" ${p.es_default == 1 ? 'selected' : ''}>${p.nombre}</option>`
+            ).join('');
+        } else {
+            sel.innerHTML = '<option value="">Sin plantillas — crea una en Plantillas</option>';
+        }
+
+        // Auto-fill configuraciones → campos del modal
+        if (dC.success && dC.data) {
+            _fillOrdenFromConfig(dC.data);
+            window._ordenCfgCache = dC.data;
+        }
+
+        scheduleOrdenPreview();
+    } catch(e) {
+        sel.innerHTML = '<option value="">Error al cargar</option>';
+    }
+}
+
+function _fillOrdenFromConfig(cfg) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+    set('bancTitular', cfg.banco_titular);
+    set('bancCedula',  cfg.banco_cedula);
+    set('bancBanco',   cfg.banco_nombre);
+    set('bancCuenta',  cfg.banco_numero);
+    set('bancLlave',   cfg.banco_llave);
+    const tipSel = document.getElementById('bancTipo');
+    if (tipSel && cfg.banco_tipo) {
+        tipSel.value = cfg.banco_tipo === 'Corriente' ? 'Cuenta Corriente' : 'Cuenta de Ahorros';
+    }
+    // Activar toggle si hay al menos un dato
+    const hayDatos = [cfg.banco_titular, cfg.banco_nombre, cfg.banco_numero, cfg.banco_llave].some(v => v && v.trim());
+    _setBancariosToggle(hayDatos);
+}
+
+let _bancIncluir = true;
+
+function _setBancariosToggle(on) {
+    _bancIncluir = on;
+    const track  = document.getElementById('trackBancarios');
+    const thumb  = document.getElementById('thumbBancarios');
+    const campos = document.getElementById('bancariosCampos');
+    const lbl    = document.getElementById('lblBancarios');
+    if (!track) return;
+    track.style.background  = on ? '#22c55e' : '#cbd5e1';
+    thumb.style.transform   = on ? 'translateX(15px)' : 'translateX(0)';
+    if (campos) campos.style.display = on ? '' : 'none';
+    if (lbl)    lbl.style.color = on ? '#15803d' : '#94a3b8';
+    // NO scheduleOrdenPreview() aquí — solo se llama desde toggleBancariosIncluir (interacción usuario)
+}
+
+function toggleBancariosIncluir() {
+    _setBancariosToggle(!_bancIncluir);
+    scheduleOrdenPreview();
+}
+
+function onOrdenCargarMisDatos() {
+    const cfg = window._ordenCfgCache;
+    if (!cfg) { showToast('Configuraciones no cargadas aún', 'warning'); return; }
+    _fillOrdenFromConfig(cfg);
+    _setBancariosToggle(true);
+    scheduleOrdenPreview();
+    showToast('Datos cargados desde Configuraciones', 'success');
+}
+
+function onOrdenPlantillaChange() {
+    scheduleOrdenPreview();
+}
+
 function generateSelectedOrder() {
     const ids = Array.from(document.querySelectorAll('.svc-check:checked')).map(c => c.value);
     if(!ids.length) {
         showToast('Debes seleccionar al menos un servicio para generar la factura.', 'warning');
         return;
     }
+    window._ordenModalTipo = 'orden_renovacion';
+    document.getElementById('ordenModalTitle').textContent = 'Orden de Renovación';
+    _toggleOrdenRenovacionFields(true);
+    _loadOrdenPlantillas();
     openOrdenModalMultiple(ids.join(','));
 }
 
@@ -1017,7 +1306,6 @@ function onCatalogSelect(sel) {
     const costo  = parseFloat(opt.dataset.costo)  || 0;
     const freq   = opt.dataset.freq || 'año';
     if (precio) document.getElementById('newSvcMonto').value = precio;
-    if (costo)  document.getElementById('newSvcCosto').value = costo;
     if (freq)   document.getElementById('newSvcFreq').value  = freq;
     calculateNet();
 }
@@ -1113,7 +1401,6 @@ function editSvcLink(s) {
     document.getElementById('newSvcReadonlyName').textContent = s.servicio_nombre;
     document.getElementById('newSvcMonto').value              = s.monto_renovacion;
     document.getElementById('newSvcDesc').value               = s.descuento || 0;
-    document.getElementById('newSvcCosto').value              = s.costo_servicio;
     document.getElementById('newSvcFreq').value               = s.frecuencia || 'año';
     document.getElementById('newSvcStart').value              = s.fecha_inicio;
     document.getElementById('newSvcEnd').value                = s.fecha_vencimiento;
@@ -1182,7 +1469,7 @@ async function saveSvc(e) {
         nombre_display:   nombreDisplay,
         monto_renovacion: parseFloat(document.getElementById('newSvcMonto').value) || 0,
         descuento:        parseFloat(document.getElementById('newSvcDesc').value)  || 0,
-        costo_servicio:   parseFloat(document.getElementById('newSvcCosto').value) || 0,
+        costo_servicio:   0,
         frecuencia:       document.getElementById('newSvcFreq').value || 'año',
         fecha_inicio:     document.getElementById('newSvcStart').value,
         fecha_vencimiento: document.getElementById('newSvcEnd').value
@@ -1205,6 +1492,12 @@ async function saveSvc(e) {
     }
 }
 
+function abrirChatCliente() {
+    const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
+    if (!tel) { showToast('El cliente no tiene número registrado', 'warning'); return; }
+    window.open(`https://wa.me/${tel}`, '_blank');
+}
+
 async function sendPrompt(type) {
     let msg = "";
     let actionLabel = "";
@@ -1215,7 +1508,6 @@ async function sendPrompt(type) {
     const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
     window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 
-    // Auto-log to history
     try {
         await fetch('api/cliente_notas.php', {
             method: 'POST',
@@ -1341,32 +1633,32 @@ function _ordenItemRow(desc, qty, precio, descuento) {
         <div style="display:flex;gap:6px;align-items:center">
             <input type="text" placeholder="Descripción del servicio" value="${desc.replace(/"/g,'&quot;')}"
                 style="flex:1;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none"
-                onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"
+                onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
                 oninput="recalcOrdenTotals();scheduleOrdenPreview()" data-field="desc">
-            <button onclick="removeOrdenItem(this)" style="flex-shrink:0;width:26px;height:26px;background:transparent;border:none;cursor:pointer;color:#94a3b8;display:flex;align-items:center;justify-content:center;border-radius:4px" onmouseenter="this.style.color='#ef4444'" onmouseleave="this.style.color='#94a3b8'">
+            <button onclick="removeOrdenItem(this)" style="flex-shrink:0;width:26px;height:26px;background:transparent;border:none;cursor:pointer;color:#8A867C;display:flex;align-items:center;justify-content:center;border-radius:3px" onmouseenter="this.style.color='#B0382F'" onmouseleave="this.style.color='#8A867C'">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
         <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:6px">
             <div>
-                <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">QTY</div>
+                <div style="font-size:10px;font-weight:700;color:#8A867C;margin-bottom:3px">QTY</div>
                 <input type="number" min="1" value="${qty}" data-field="qty"
-                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none"
-                    onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"
+                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;outline:none"
+                    onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
                     oninput="recalcOrdenTotals();scheduleOrdenPreview()">
             </div>
             <div>
-                <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">PRECIO UNIT.</div>
+                <div style="font-size:10px;font-weight:700;color:#8A867C;margin-bottom:3px">PRECIO UNIT.</div>
                 <input type="number" min="0" value="${precio}" data-field="precio"
-                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none"
-                    onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"
+                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;outline:none"
+                    onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
                     oninput="recalcOrdenTotals();scheduleOrdenPreview()">
             </div>
             <div>
-                <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">DESCUENTO</div>
+                <div style="font-size:10px;font-weight:700;color:#8A867C;margin-bottom:3px">DESCUENTO</div>
                 <input type="number" min="0" value="${descuento}" data-field="desc_val"
-                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none"
-                    onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"
+                    style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;outline:none"
+                    onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
                     oninput="recalcOrdenTotals();scheduleOrdenPreview()">
             </div>
         </div>`;
@@ -1423,6 +1715,7 @@ function _getOrdenItems() {
 }
 
 function _getOrdenBancarios() {
+    if (!_bancIncluir) return {}; // toggle OFF → no incluir
     return {
         titular:  (document.getElementById('bancTitular')?.value  || '').trim(),
         cedula:   (document.getElementById('bancCedula')?.value   || '').trim(),
@@ -1443,10 +1736,16 @@ function refreshOrdenPreview() {
     document.getElementById('ordenFormNotas').value      = document.getElementById('ordenNotas').value;
     document.getElementById('ordenFormBancarios').value     = JSON.stringify(banc);
     document.getElementById('ordenFormFechaUltPago').value  = document.getElementById('ordenFechaUltPago').value;
+    document.getElementById('ordenFormLinkPago').value      = document.getElementById('ordenLinkPago')?.value || '';
+    document.getElementById('ordenFormPlantillaId').value   = document.getElementById('ordenPlantillaSelect')?.value || '';
+    document.getElementById('ordenFormDocTipo').value       = window._ordenModalTipo || 'orden_compra';
     document.getElementById('ordenPreviewForm').submit();
 }
 
 function openOrdenModal(csId) {
+    window._ordenModalTipo = 'orden_compra';
+    document.getElementById('ordenModalTitle').textContent = 'Orden de Compra';
+    _toggleOrdenRenovacionFields(false);
     document.getElementById('currentCsId').value  = csId;
     document.getElementById('currentCsIds').value = '';
     const svc = (window._ordenSvcMap || {})[csId];
@@ -1489,8 +1788,8 @@ function sendOrdenByEmail() {
 
     const opcionesHTML = opciones.map((o, i) => `
         <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px;transition:border-color .15s"
-               onmouseenter="this.style.borderColor='#4f46e5'" onmouseleave="this.style.borderColor=document.getElementById('emailOpt${i}').checked?'#4f46e5':'#e2e8f0'">
-            <input type="radio" id="emailOpt${i}" name="emailDestinatario" value="${o.email}" ${i===0?'checked':''} style="accent-color:#4f46e5">
+               onmouseenter="this.style.borderColor='#0E0E0C'" onmouseleave="this.style.borderColor=document.getElementById('emailOpt${i}').checked?'#0E0E0C':'#E8E5DD'">
+            <input type="radio" id="emailOpt${i}" name="emailDestinatario" value="${o.email}" ${i===0?'checked':''} style="accent-color:#0E0E0C">
             <span>
                 <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">${o.label}</span>
                 <span style="font-size:13px;color:#0f172a">${o.email}</span>
@@ -1502,29 +1801,29 @@ function sendOrdenByEmail() {
     overlay.id = 'emailSelectorOverlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = `
-        <div style="background:#fff;border-radius:12px;width:420px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2)">
-            <div style="padding:20px 24px;border-bottom:1.5px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
+        <div style="background:#fff;border-radius:6px;width:420px;max-width:94vw;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+            <div style="padding:20px 24px;border-bottom:1.5px solid #E8E5DD;display:flex;align-items:center;justify-content:space-between">
                 <div>
-                    <h3 style="margin:0;font-size:15px;font-weight:800;color:#0f172a">Enviar por Correo</h3>
-                    <p style="margin:3px 0 0;font-size:12px;color:#94a3b8">Selecciona el destinatario</p>
+                    <h3 style="margin:0;font-size:15px;font-weight:700;color:#0E0E0C">Enviar por Correo</h3>
+                    <p style="margin:3px 0 0;font-size:12px;color:#8A867C">Selecciona el destinatario</p>
                 </div>
-                <button onclick="document.getElementById('emailSelectorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:20px;line-height:1">×</button>
+                <button onclick="document.getElementById('emailSelectorOverlay').remove()" style="background:none;border:none;cursor:pointer;color:#8A867C;font-size:20px;line-height:1">×</button>
             </div>
             <div style="padding:20px 24px">
                 ${opcionesHTML}
                 <label style="display:block;margin-top:4px">
-                    <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block;margin-bottom:6px">Otro correo</span>
+                    <span style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;display:block;margin-bottom:6px">Otro correo</span>
                     <input id="emailPersonalizado" type="email" placeholder="otro@correo.com"
-                        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none"
-                        onfocus="this.style.borderColor='#4f46e5';document.querySelectorAll('[name=emailDestinatario]').forEach(r=>r.checked=false)"
-                        onblur="this.style.borderColor='#e2e8f0'">
+                        style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;outline:none"
+                        onfocus="this.style.borderColor='#0E0E0C';document.querySelectorAll('[name=emailDestinatario]').forEach(r=>r.checked=false)"
+                        onblur="this.style.borderColor='#E8E5DD'">
                 </label>
             </div>
-            <div style="padding:16px 24px;border-top:1.5px solid #e2e8f0;display:flex;gap:10px;justify-content:flex-end">
+            <div style="padding:16px 24px;border-top:1.5px solid #E8E5DD;display:flex;gap:10px;justify-content:flex-end">
                 <button onclick="document.getElementById('emailSelectorOverlay').remove()"
-                    style="padding:9px 18px;background:#f1f5f9;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+                    style="padding:9px 18px;background:#FAFAF7;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
                 <button onclick="_confirmarEnvioOrden()"
-                    style="padding:9px 20px;background:#4f46e5;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px">
+                    style="padding:9px 20px;background:#0E0E0C;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     Enviar
                 </button>
@@ -1555,6 +1854,9 @@ async function _confirmarEnvioOrden() {
         payload.notas_pie       = document.getElementById('ordenNotas').value || null;
         payload.bancarios       = _getOrdenBancarios();
         payload.fecha_ult_pago  = document.getElementById('ordenFechaUltPago').value || null;
+        payload.doc_tipo        = window._ordenModalTipo || 'orden_compra';
+        payload.link_pago       = document.getElementById('ordenLinkPago')?.value || null;
+        payload.plantilla_id    = document.getElementById('ordenPlantillaSelect')?.value || null;
 
         const r = await fetch('api/enviar_orden.php', {
             method: 'POST',
@@ -1673,38 +1975,268 @@ async function loadMedia() {
 
 function renderMedia(media) {
     const cont = document.getElementById('mediaGrid');
-    if(!media.length) { cont.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--color-text-light);font-size:13px">Sin archivos cargados.</div>'; return; }
-    
+    if (!media.length) {
+        cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--color-text-light);font-size:12px">Sin archivos cargados.</div>';
+        return;
+    }
+
+    const extIcon = (mime, ext) => {
+        if (mime.startsWith('image/')) return { bg:'#E3EEFF', color:'#2D5FBE', label: ext };
+        if (mime === 'application/pdf') return { bg:'#FDECEA', color:'#B0382F', label:'PDF' };
+        if (mime.includes('word') || ext === 'doc' || ext === 'docx') return { bg:'#E3EEFF', color:'#1A56A4', label: ext.toUpperCase() };
+        if (mime.includes('excel') || mime.includes('spreadsheet') || ext === 'xlsx' || ext === 'xls') return { bg:'#E3F1E8', color:'#1B5A39', label: ext.toUpperCase() };
+        return { bg:'#F0EFEB', color:'#57544D', label: ext.toUpperCase() };
+    };
+
     cont.innerHTML = media.map(m => {
-        const isImg = m.tipo_archivo.startsWith('image/');
-        const icon = isImg ? `<img src="${m.archivo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">` 
-                           : `<div style="display:flex;flex-direction:column;align-items:center;padding:20px;color:var(--color-primary)"><svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg><span style="font-size:10px;font-weight:700;margin-top:4px">${m.nombre_archivo.split('.').pop().toUpperCase()}</span></div>`;
-        
-        return `
-        <div class="card" style="padding:8px;position:relative;overflow:hidden">
-            <a href="${m.archivo_url}" target="_blank" style="display:block;height:100px;text-decoration:none;background:rgba(0,0,0,0.02);border-radius:8px">
-                ${icon}
-            </a>
-            <div style="margin-top:8px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</div>
-            <button onclick="deleteMedia(${m.id})" style="position:absolute;top:5px;right:5px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--color-danger);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.1)">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        const ext  = m.nombre_archivo.split('.').pop().toLowerCase();
+        const isImg = m.tipo_archivo && m.tipo_archivo.startsWith('image/');
+        const ic   = extIcon(m.tipo_archivo || '', ext);
+
+        const avatar = isImg
+            ? `<a href="${m.archivo_url}" target="_blank" style="display:block;width:36px;height:36px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;border:1px solid var(--color-border)">
+                   <img src="${m.archivo_url}" style="width:100%;height:100%;object-fit:cover">
+               </a>`
+            : `<a href="${m.archivo_url}" target="_blank" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);background:${ic.bg};flex-shrink:0;text-decoration:none">
+                   <span style="font-size:9px;font-weight:800;color:${ic.color};font-family:var(--font-secondary)">${ic.label}</span>
+               </a>`;
+
+        const added = m.created_at
+            ? new Date(m.created_at).toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
+            : '';
+
+        const descLine = m.descripcion
+            ? `<div style="font-size:10px;color:var(--color-text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</div>`
+            : (added ? `<div style="font-size:10px;color:var(--color-text-light)">${added}</div>` : '');
+
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border)" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
+            ${avatar}
+            <div style="flex:1;min-width:0">
+                <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
+                ${descLine}
+            </div>
+            <button onclick="deleteMedia(${m.id})" title="Eliminar" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:4px;transition:all .12s" onmouseenter="this.style.color='var(--color-danger)';this.style.background='#FEF2F2'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
         </div>`;
     }).join('');
+    // Remove last border
+    const items = cont.querySelectorAll('[style*="border-bottom"]');
+    if (items.length) items[items.length - 1].style.borderBottom = 'none';
 }
 
-async function uploadMedia(input) {
-    if(!input.files.length) return;
+let _pendingMediaFile = null;
+
+function uploadMedia(input) {
+    if (!input.files.length) return;
+    _pendingMediaFile = input.files[0];
+    input.value = ''; // reset so same file can be re-selected
+
+    document.getElementById('adjuntoFileName').textContent = _pendingMediaFile.name;
+    document.getElementById('adjuntoDesc').value = '';
+    document.getElementById('adjuntoUploadModal').classList.add('show');
+    setTimeout(() => document.getElementById('adjuntoDesc').focus(), 120);
+}
+
+async function confirmarSubirAdjunto() {
+    if (!_pendingMediaFile) return;
+    const desc = document.getElementById('adjuntoDesc').value.trim();
     const formData = new FormData();
-    formData.append('archivo', input.files[0]);
+    formData.append('archivo', _pendingMediaFile);
     formData.append('cliente_id', clienteId);
-    
+    if (desc) formData.append('descripcion', desc);
+
+    document.getElementById('adjuntoUploadModal').classList.remove('show');
     showToast('Subiendo archivo...', 'info');
     try {
         const r = await fetch('api/cliente_archivos.php', { method: 'POST', body: formData });
         const d = await r.json();
-        if(d.success) { showToast(d.message,'success'); loadMedia(); } else showToast(d.error,'error');
+        if (d.success) { showToast(d.message, 'success'); loadMedia(); }
+        else showToast(d.error || 'Error al subir', 'error');
     } catch(e) { showToast('Error al subir', 'error'); }
+    _pendingMediaFile = null;
+}
+
+/* ── TRABAJOS ADICIONALES (pagos únicos del cliente) ───────────────────── */
+async function loadTrabajosAdicionales() {
+    try {
+        const r = await fetch(`api/transacciones.php?frecuencia=unico&cliente_id=${clienteId}&limite=100`);
+        const d = await r.json();
+        if (!d.success) return;
+        renderTrabajosAdicionales(d.data || []);
+    } catch(e) { console.error('Error cargando trabajos adicionales:', e); }
+}
+
+function renderTrabajosAdicionales(txs) {
+    const card       = document.getElementById('trabajosAdicionalesCard');
+    const tbody      = document.getElementById('trabajosAdicionalesTable');
+    const badge      = document.getElementById('trabajosBadge');
+    const totalWrap  = document.getElementById('trabajosTotal');
+    const totalMonto = document.getElementById('trabajosTotalMonto');
+
+    card.style.display = '';
+
+    if (!txs.length) {
+        badge.style.display = 'none';
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--color-text-light);font-size:12px">Sin trabajos adicionales registrados.</td></tr>`;
+        totalWrap.style.display = 'none';
+        return;
+    }
+
+    badge.textContent   = txs.length + ' trabajo' + (txs.length !== 1 ? 's' : '');
+    badge.style.display = 'inline';
+
+    const estadoMap = {
+        pagado:   { label:'Pagado',    cls:'badge-success'   },
+        pendiente:{ label:'Pendiente', cls:'badge-warning'   },
+        vencido:  { label:'Vencido',   cls:'badge-danger'    },
+        cancelado:{ label:'Cancelado', cls:'badge-secondary' },
+    };
+
+    let totalGeneral = 0;
+
+    tbody.innerHTML = txs.map(tx => {
+        const monto = parseFloat(tx.monto) || 0;
+        totalGeneral += monto;
+
+        const fechaRef = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : null);
+        const fecha = fechaRef
+            ? new Date(fechaRef + 'T12:00:00').toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
+            : '—';
+
+        const est     = estadoMap[tx.estado] || { label: tx.estado, cls:'badge-secondary' };
+        const concepto = escapeHtml(tx.titulo || tx.concepto || '—');
+        const desc     = tx.descripcion
+            ? `<div style="font-size:10px;color:var(--color-text-muted)">${escapeHtml(tx.descripcion)}</div>`
+            : '';
+
+        return `<tr>
+            <td style="padding-top:12px;padding-bottom:12px">
+                <div style="font-weight:600">${concepto}</div>
+                ${desc}
+            </td>
+            <td style="color:var(--color-text-muted);white-space:nowrap;padding-top:12px;padding-bottom:12px">${fecha}</td>
+            <td style="padding-top:12px;padding-bottom:12px"><span class="badge ${est.cls}">${est.label}</span></td>
+            <td style="text-align:right;font-weight:700;font-family:var(--font-secondary);padding-top:12px;padding-bottom:12px;white-space:nowrap">${formatMoney(monto)}</td>
+            <td style="padding-top:8px;padding-bottom:8px">
+                <div style="display:flex;gap:3px;justify-content:flex-end">
+                    <button class="btn btn-ghost btn-icon sm" onclick="abrirDetalleTrabajoAdicional(${tx.id})" title="Ver detalle">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </button>
+                    <button class="btn btn-ghost btn-icon sm" onclick="abrirEditarTrabajoAdicional(${JSON.stringify(tx).replace(/"/g,'&quot;')})" title="Editar">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+
+    totalMonto.textContent = formatMoney(totalGeneral);
+    totalWrap.style.display = 'block';
+}
+
+/* ── MODAL NUEVO / EDITAR TRABAJO ADICIONAL ──────────────────────────────── */
+let _trabajoEditId = null;
+
+function abrirModalNuevoTrabajo() {
+    _trabajoEditId = null;
+    document.getElementById('trabajoModalTitle').textContent = 'Nuevo Trabajo Adicional';
+    document.getElementById('trabajoTxConcepto').value  = '';
+    document.getElementById('trabajoTxTitulo').value    = '';
+    document.getElementById('trabajoTxDesc').value      = '';
+    document.getElementById('trabajoTxMonto').value     = '';
+    document.getElementById('trabajoTxFecha').value     = new Date().toISOString().split('T')[0];
+    document.getElementById('trabajoTxEstado').value    = 'pendiente';
+    document.getElementById('trabajoAdModal').classList.add('show');
+}
+
+function abrirEditarTrabajoAdicional(tx) {
+    _trabajoEditId = tx.id;
+    document.getElementById('trabajoModalTitle').textContent = 'Editar Trabajo Adicional';
+    document.getElementById('trabajoTxConcepto').value  = tx.concepto || '';
+    document.getElementById('trabajoTxTitulo').value    = tx.titulo   || '';
+    document.getElementById('trabajoTxDesc').value      = tx.descripcion || '';
+    document.getElementById('trabajoTxMonto').value     = tx.monto    || '';
+    document.getElementById('trabajoTxFecha').value     = tx.fecha_pago || tx.fecha_vencimiento || '';
+    document.getElementById('trabajoTxEstado').value    = tx.estado   || 'pendiente';
+    document.getElementById('trabajoAdModal').classList.add('show');
+}
+
+async function abrirDetalleTrabajoAdicional(id) {
+    try {
+        const r = await fetch(`api/transacciones.php?id=${id}`);
+        const d = await r.json();
+        if (!d.success || !d.data) { showToast('No se pudo cargar el detalle', 'error'); return; }
+        const tx = d.data;
+        const fechaRef = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : null);
+        const fecha = fechaRef ? new Date(fechaRef+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+        const estadoMap = { pagado:'Pagado', pendiente:'Pendiente', vencido:'Vencido', cancelado:'Cancelado' };
+        document.getElementById('detalleTxBody').innerHTML = `
+            <div style="display:grid;gap:12px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div style="background:#FAFAF7;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px">
+                        <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Concepto</div>
+                        <div style="font-size:13px;font-weight:600">${escapeHtml(tx.titulo || tx.concepto || '—')}</div>
+                    </div>
+                    <div style="background:#FAFAF7;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px">
+                        <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Monto</div>
+                        <div style="font-size:18px;font-weight:700;font-family:var(--font-secondary)">${formatMoney(tx.monto)}</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div style="background:#FAFAF7;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px">
+                        <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Fecha</div>
+                        <div style="font-size:13px">${fecha}</div>
+                    </div>
+                    <div style="background:#FAFAF7;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px">
+                        <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Estado</div>
+                        <div style="font-size:13px;font-weight:700">${estadoMap[tx.estado] || tx.estado}</div>
+                    </div>
+                </div>
+                ${tx.descripcion ? `<div style="background:#FAFAF7;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:12px">
+                    <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Descripción</div>
+                    <div style="font-size:13px;line-height:1.6;color:var(--color-text)">${escapeHtml(tx.descripcion)}</div>
+                </div>` : ''}
+                ${tx.items && tx.items.length ? `<div>
+                    <div style="font-size:10px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Ítems</div>
+                    ${tx.items.map(i=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--color-border);font-size:12px">
+                        <span>${escapeHtml(i.nombre)} × ${i.cantidad}</span>
+                        <span style="font-weight:700">${formatMoney(i.subtotal)}</span>
+                    </div>`).join('')}
+                </div>` : ''}
+            </div>`;
+        document.getElementById('detalleTxModal').classList.add('show');
+    } catch(e) { showToast('Error al cargar detalle', 'error'); }
+}
+
+async function guardarTrabajoAdicional() {
+    const concepto = document.getElementById('trabajoTxConcepto').value.trim();
+    const monto    = parseFloat(document.getElementById('trabajoTxMonto').value);
+    if (!concepto || isNaN(monto) || monto <= 0) {
+        showToast('Concepto y monto son requeridos', 'warning'); return;
+    }
+    const payload = {
+        tipo:              'ingreso',
+        concepto,
+        titulo:            document.getElementById('trabajoTxTitulo').value.trim() || concepto,
+        descripcion:       document.getElementById('trabajoTxDesc').value.trim() || null,
+        monto,
+        fecha_vencimiento: document.getElementById('trabajoTxFecha').value || null,
+        estado:            document.getElementById('trabajoTxEstado').value,
+        frecuencia:        'unico',
+        cliente_id:        clienteId,
+    };
+    if (_trabajoEditId) payload.id = _trabajoEditId;
+    const method = _trabajoEditId ? 'PUT' : 'POST';
+    try {
+        const r = await fetch('api/transacciones.php', { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        showToast(_trabajoEditId ? 'Trabajo actualizado ✓' : 'Trabajo registrado ✓', 'success');
+        document.getElementById('trabajoAdModal').classList.remove('show');
+        loadTrabajosAdicionales();
+        loadPagosUnicosBanner();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 async function deleteMedia(id) {
@@ -1797,7 +2329,7 @@ function renderNegocioSelector() {
       <button onclick="selectNegocio(null)"
         style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;
                ${genActive
-                 ? 'background:#0f172a;color:#c9f31d;border:1.5px solid #0f172a'
+                 ? 'background:#0E0E0C;color:#ffffff;border:1.5px solid #0E0E0C'
                  : 'background:#f1f5f9;color:#64748b;border:1.5px solid #e2e8f0'}"
         ${genActive ? '' : 'onmouseenter="this.style.background=\'#e9edf2\'" onmouseleave="this.style.background=\'#f1f5f9\'"'}>
         <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>
@@ -1881,18 +2413,18 @@ async function renderNegocioPanel() {
     wrap.innerHTML = `
       <div class="card animate-fade-up" style="overflow:hidden;margin-bottom:20px">
         <!-- Header del negocio -->
-        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:#0f172a;flex-wrap:wrap">
-          <div style="width:10px;height:10px;border-radius:50%;background:${ec.dot};flex-shrink:0;box-shadow:0 0 0 3px rgba(255,255,255,.12)"></div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e3e8ef;flex-wrap:wrap">
+          <div style="width:10px;height:10px;border-radius:50%;background:${ec.dot};flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,.06)"></div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:15px;font-weight:800;color:#fff;line-height:1.2">${escapeHtml(n.nombre)}</div>
-            ${n.tipo ? `<div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:1px">${escapeHtml(n.tipo)}</div>` : ''}
+            <div style="font-size:15px;font-weight:800;color:#0f172a;line-height:1.2">${escapeHtml(n.nombre)}</div>
+            ${n.tipo ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px">${escapeHtml(n.tipo)}</div>` : ''}
           </div>
           <span style="font-size:10px;font-weight:700;background:${ec.bg};color:${ec.color};padding:3px 10px;border-radius:20px;flex-shrink:0">${ec.label}</span>
-          ${n.monto ? `<span style="font-size:14px;font-weight:900;color:#c9f31d;flex-shrink:0">${fmtMoney(n.monto)}</span>` : ''}
+          ${n.monto ? `<span style="font-size:14px;font-weight:900;color:#0f172a;flex-shrink:0">${fmtMoney(n.monto)}</span>` : ''}
           <div style="display:flex;gap:6px;flex-shrink:0">
             <button onclick="abrirModalNegocio(${n.id})" title="Editar negocio"
-              style="width:30px;height:30px;border:1.5px solid rgba(255,255,255,.15);border-radius:7px;background:rgba(255,255,255,.06);cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);transition:all .12s"
-              onmouseenter="this.style.background='rgba(255,255,255,.15)'" onmouseleave="this.style.background='rgba(255,255,255,.06)'">
+              style="width:30px;height:30px;border:1.5px solid #e2e8f0;border-radius:7px;background:#ffffff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;transition:all .12s"
+              onmouseenter="this.style.background='#f1f5f9'" onmouseleave="this.style.background='#ffffff'">
               <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
             </button>
             <button onclick="eliminarNegocio(${n.id})" title="Eliminar negocio"
@@ -1917,7 +2449,7 @@ async function renderNegocioPanel() {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Trabajos / Pagos</div>
             <button onclick="abrirModalTrabajo(${n.id}, '${safeName}')"
-              style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:#0f172a;color:#c9f31d;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter .12s"
+              style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:#0E0E0C;color:#ffffff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:filter .12s"
               onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">
               <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
               Agregar trabajo
@@ -2103,6 +2635,7 @@ loadServices();
 loadNotes();
 loadMedia();
 loadPagosUnicosBanner();
+loadTrabajosAdicionales();
 
 /* ── RENOVAR SERVICIOS ──────────────────────────────────────── */
 const FREQ_LABELS_REN = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Pago Único' };
@@ -2302,7 +2835,7 @@ async function saveClientData(event) {
 
 // ── Modal Mensajes ─────────────────────────────────────────────────────────────
 let _msgPlantilla = null;
-let _msgCanal = 'whatsapp';
+let _msgCanal = 'correo';
 
 function _hesc(str) {
     if (!str) return '';
@@ -2313,8 +2846,11 @@ function _hesc(str) {
 
 function openMensajesModal() {
     document.getElementById('mensajesModal').classList.add('show');
+    // Hide WA tab — only email notifications
+    const tabWA = document.getElementById('msgTabWA');
+    if (tabWA) tabWA.style.display = 'none';
     mostrarMsgStep1();
-    switchMensajeTab('whatsapp');
+    switchMensajeTab('correo');
 }
 
 function closeMensajesModal() {
@@ -2357,9 +2893,9 @@ async function cargarMsgPlantillas() {
                         <div style="font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${_hesc(m.nombre)}${badge}</div>
                         <div style="font-size:12px;color:#64748b;line-height:1.4">${m.contenido ? _hesc(m.contenido.substring(0,90)) + (m.contenido.length > 90 ? '…' : '') : 'Sin contenido'}</div>
                     </div>
-                    <span style="font-size:10px;font-weight:700;background:#0f172a;color:#c9f31d;padding:4px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0">Usar</span>
+                    <span style="font-size:10px;font-weight:700;background:#1e293b;color:#ffffff;padding:4px 8px;border-radius:14px;white-space:nowrap;flex-shrink:0">Usar</span>
                 `;
-                div.addEventListener('mouseenter', () => { div.style.borderColor='#0f172a'; div.style.background='#f8fafc'; });
+                div.addEventListener('mouseenter', () => { div.style.borderColor='#94a3b8'; div.style.background='#f8fafc'; });
                 div.addEventListener('mouseleave', () => { div.style.borderColor='#e2e8f0'; div.style.background=''; });
                 div.addEventListener('click', () => seleccionarMsgPlantilla(m));
                 cont.appendChild(div);
@@ -2548,7 +3084,7 @@ async function confirmarEnvioMsgEmail() {
 <div class="modal-overlay" id="ordenModal" style="z-index:1001">
     <div class="modal" style="max-width:1100px;width:96vw;height:90vh;display:flex;flex-direction:column">
         <div class="modal-header">
-            <h3 class="modal-title">Orden de Compra</h3>
+            <h3 class="modal-title" id="ordenModalTitle">Orden de Compra</h3>
             <button class="modal-close" onclick="closeOrdenModal()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -2556,6 +3092,13 @@ async function confirmarEnvioMsgEmail() {
         <div style="flex:1;overflow:hidden;display:flex;border-top:1.5px solid #e2e8f0">
             <!-- Panel editor -->
             <div style="width:340px;min-width:280px;overflow-y:auto;background:#f8fafc;border-right:1.5px solid #e2e8f0;display:flex;flex-direction:column;gap:0">
+                <!-- Selector de plantilla (solo renovación) -->
+                <div id="ordenPlantillaWrap" style="display:none;padding:12px 16px;border-bottom:1.5px solid #e2e8f0">
+                    <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Plantilla</label>
+                    <select id="ordenPlantillaSelect" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;cursor:pointer" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="onOrdenPlantillaChange()">
+                        <option value="">Cargando plantillas...</option>
+                    </select>
+                </div>
                 <div style="padding:16px 16px 0">
                     <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0 0 10px">Items de la orden</p>
                     <div id="ordenItemsContainer" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -2580,11 +3123,31 @@ async function confirmarEnvioMsgEmail() {
                         <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Notas / Pie de página</label>
                         <textarea id="ordenNotas" rows="2" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;resize:vertical" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()"></textarea>
                     </div>
+                    <!-- Enlace de pago (solo renovación) -->
+                    <div id="ordenLinkPagoWrap" style="display:none">
+                        <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Enlace de Pago (opcional)</label>
+                        <input id="ordenLinkPago" type="url" placeholder="https://pago.ejemplo.com/..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()">
+                    </div>
                 </div>
                 <div style="margin:4px 16px 0;height:1px;background:#e2e8f0"></div>
                 <!-- Datos bancarios -->
                 <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px">
-                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin:0 0 4px">Datos Bancarios</p>
+                    <!-- Header: toggle + label + botón cargar -->
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;min-width:0">
+                            <div style="position:relative;width:34px;height:19px;flex-shrink:0" onclick="toggleBancariosIncluir()">
+                                <div id="trackBancarios" style="width:34px;height:19px;border-radius:10px;background:#cbd5e1;transition:background .2s"></div>
+                                <div id="thumbBancarios" style="position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s"></div>
+                            </div>
+                            <span id="lblBancarios" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b">Datos Bancarios</span>
+                        </label>
+                        <button id="btnOrdenCargarConfig" onclick="onOrdenCargarMisDatos()" style="display:none;padding:4px 9px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:filter .15s" onmouseenter="this.style.filter='brightness(.95)'" onmouseleave="this.style.filter=''">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="vertical-align:middle;margin-right:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            Cargar
+                        </button>
+                    </div>
+                    <!-- Campos bancarios (se ocultan con el toggle) -->
+                    <div id="bancariosCampos">
                     <?php
                     $inputBancStyle = 'width:100%;box-sizing:border-box;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none';
                     $labelBancStyle = 'font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px';
@@ -2634,20 +3197,28 @@ async function confirmarEnvioMsgEmail() {
                 <iframe id="ordenIframe" name="ordenIframe" style="width:100%;height:100%;border:none" src=""></iframe>
             </div>
         </div>
-        <div class="modal-footer" style="gap:8px;border-top:1.5px solid #e2e8f0;flex-wrap:wrap">
-            <input type="hidden" id="currentCsId">
-            <input type="hidden" id="currentCsIds">
-            <!-- Form oculto para POST al iframe -->
-            <form id="ordenPreviewForm" method="POST" action="orden_compra.php" target="ordenIframe" style="display:none">
-                <input type="hidden" name="cs_id" id="ordenFormCsId">
-                <input type="hidden" name="cs_ids" id="ordenFormCsIds">
-                <input type="hidden" name="items_json" id="ordenFormItemsJson">
-                <input type="hidden" name="metodo_pago" id="ordenFormMetodoPago">
-                <input type="hidden" name="notas_pie_override" id="ordenFormNotas">
-                <input type="hidden" name="bancarios_json" id="ordenFormBancarios">
-                <input type="hidden" name="fecha_ult_pago" id="ordenFormFechaUltPago">
-            </form>
+        <!-- Form oculto para POST al iframe — fuera del footer para no afectar layout -->
+        <input type="hidden" id="currentCsId">
+        <input type="hidden" id="currentCsIds">
+        <form id="ordenPreviewForm" method="POST" action="orden_compra.php" target="ordenIframe" style="display:none">
+            <input type="hidden" name="cs_id" id="ordenFormCsId">
+            <input type="hidden" name="cs_ids" id="ordenFormCsIds">
+            <input type="hidden" name="items_json" id="ordenFormItemsJson">
+            <input type="hidden" name="metodo_pago" id="ordenFormMetodoPago">
+            <input type="hidden" name="notas_pie_override" id="ordenFormNotas">
+            <input type="hidden" name="bancarios_json" id="ordenFormBancarios">
+            <input type="hidden" name="fecha_ult_pago" id="ordenFormFechaUltPago">
+            <input type="hidden" name="link_pago" id="ordenFormLinkPago">
+            <input type="hidden" name="plantilla_id" id="ordenFormPlantillaId">
+            <input type="hidden" name="doc_tipo" id="ordenFormDocTipo">
+        </form>
+        <div class="modal-footer" style="gap:8px;border-top:1.5px solid #e2e8f0;flex-wrap:wrap;align-items:center">
             <button class="btn btn-outline" onclick="closeOrdenModal()">Cerrar</button>
+            <!-- Guardar datos bancarios en config (solo renovación) -->
+            <button id="btnGuardarEnConfig" onclick="guardarBancariosEnConfig()" style="display:none;align-items:center;gap:7px;padding:10px 18px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.95)'" onmouseleave="this.style.filter=''">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Guardar datos
+            </button>
             <button onclick="saveOrdenDraft()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;background:#f8fafc;color:#475569;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.background='#f1f5f9'" onmouseleave="this.style.background='#f8fafc'" title="Guardar borrador">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
                 Guardar Borrador
@@ -2657,7 +3228,7 @@ async function confirmarEnvioMsgEmail() {
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 Vista Previa
             </button>
-            <button onclick="downloadOrdenPDF()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:#0f172a;color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.9)'" onmouseleave="this.style.filter=''">
+            <button onclick="downloadOrdenPDF()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:#1e293b;color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.9)'" onmouseleave="this.style.filter=''">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 Descargar PDF
             </button>
@@ -2672,12 +3243,12 @@ async function confirmarEnvioMsgEmail() {
 <!-- Modal Detalles de Tarea del Cliente -->
 <div class="modal-overlay" id="detallesTareaClienteModal">
     <div class="modal" style="max-width:730px">
-        <div class="modal-header" style="background:#0f172a;border-bottom:1.5px solid #e2e8f0;padding:20px 24px">
+        <div class="modal-header" style="background:#ffffff;border-bottom:1.5px solid #e2e8f0;padding:20px 24px">
             <div>
-                <h3 class="modal-title" style="color:#ffffff">Detalles de la Tarea</h3>
-                <p style="font-size:12px;color:#c9f31d;margin:3px 0 0" id="detalleTareaClienteTitulo">—</p>
+                <h3 class="modal-title" style="color:#0f172a">Detalles de la Tarea</h3>
+                <p style="font-size:12px;color:#64748b;margin:3px 0 0" id="detalleTareaClienteTitulo">—</p>
             </div>
-            <button class="modal-close" onclick="closeDetallesTareaClienteModal()" style="color:#c9f31d">
+            <button class="modal-close" onclick="closeDetallesTareaClienteModal()" style="color:#94a3b8">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -3045,7 +3616,7 @@ async function confirmarEnvioMsgEmail() {
             <div style="display:flex;gap:8px">
                 <button class="btn btn-outline" onclick="closeNotifModal()">Cancelar</button>
                 <button onclick="guardarNotifConfig()" id="btnGuardarNotif"
-                    style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#0f172a;color:#c9f31d;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#1e293b;color:#ffffff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s"
                     onmouseenter="this.style.filter='brightness(1.3)'" onmouseleave="this.style.filter=''">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     Guardar

@@ -35,6 +35,19 @@ $defaults = [
     'notif_incluir_tareas'       => '1',
     'notif_incluir_renovaciones' => '1',
     'notif_logo_url'             => '',
+    // Datos bancarios
+    'banco_nombre'               => '',
+    'banco_numero'               => '',
+    'banco_tipo'                 => 'Ahorros',
+    'banco_titular'              => '',
+    'banco_cedula'               => '',
+    'banco_llave'                => '',
+    // Datos de la empresa
+    'empresa_nombre'             => '',
+    'empresa_nit'                => '',
+    'empresa_email'              => '',
+    'empresa_tel'                => '',
+    'empresa_dir'                => '',
 ];
 
 switch ($_SERVER['REQUEST_METHOD']) {

@@ -58,9 +58,6 @@ if (!empty($_POST['items_json'])) {
     }
 }
 $metodoPago = !empty($_POST['metodo_pago']) ? htmlspecialchars($_POST['metodo_pago']) : 'Transferencia Bancaria / PSE / QR';
-if (!empty($_POST['notas_pie_override'])) {
-    $template['notas_pie'] = $_POST['notas_pie_override'];
-}
 $bancarios = [];
 if (!empty($_POST['bancarios_json'])) {
     $bancarios = json_decode($_POST['bancarios_json'], true) ?: [];
@@ -70,6 +67,9 @@ if (!empty($_POST['fecha_ult_pago'])) {
     $d = DateTime::createFromFormat('Y-m-d', $_POST['fecha_ult_pago']);
     $fechaUltPago = $d ? $d->format('d/m/Y') : '';
 }
+$linkPago = trim($_POST['link_pago'] ?? '');
+$docTipo  = $_POST['doc_tipo'] ?? 'orden_compra';
+$plantillaIdOverride = intval($_POST['plantilla_id'] ?? 0);
 
 $totalOriginal = 0;
 $totalDescuento = 0;
@@ -78,18 +78,26 @@ foreach($servicios as $s) {
     $totalDescuento += ($s['descuento'] ?? 0);
 }
 $totalFinal = $totalOriginal - $totalDescuento;
-$orderNumber = ($cs_id || $cs_ids ? "S-" : "OC-") . str_pad($id, 4, '0', STR_PAD_LEFT) . "-" . date('Ymd');
+$docTipoLabel = $docTipo === 'orden_renovacion' ? 'Orden de Renovación' : 'Orden de Compra';
+$orderPrefix  = $docTipo === 'orden_renovacion' ? 'OR-' : (($cs_id || $cs_ids) ? "S-" : "OC-");
+$orderNumber  = $orderPrefix . str_pad($id, 4, '0', STR_PAD_LEFT) . "-" . date('Ymd');
 
-// Fetch default template
-$stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
-$stmt->execute();
-$template = $stmt->fetch();
+// Fetch template (by ID if provided, else default)
+if ($plantillaIdOverride > 0) {
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE id = ? AND activo = 1 LIMIT 1");
+    $stmt->execute([$plantillaIdOverride]);
+    $template = $stmt->fetch();
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
+    $stmt->execute();
+    $template = $stmt->fetch();
+}
 
 if (!$template) {
     $template = [
         'layout_tipo' => 'ejecutiva',
-        'color_primario' => '#0f172a',
-        'color_secundario' => '#c9f31d',
+        'color_primario' => '#0E0E0C',
+        'color_secundario' => '#C6F24E',
         'fuente' => 'Poppins',
         'empresa_nombre' => 'QUANTUN Digital',
         'empresa_nit' => '900.567.123-4',
@@ -100,6 +108,10 @@ if (!$template) {
         'notas_pie' => 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.'
     ];
 }
+// Aplicar override de notas_pie DESPUÉS de obtener la plantilla
+if (!empty($_POST['notas_pie_override'])) {
+    $template['notas_pie'] = $_POST['notas_pie_override'];
+}
 
 $fmtCOP = function($n) {
     return 'COP ' . number_format($n, 0, ',', '.');
@@ -109,11 +121,11 @@ function generarTablaServicios($servicios, $fmtCOP) {
     $html = '';
     foreach($servicios as $svc) {
         $subtotal = $svc['monto_renovacion'] - ($svc['descuento'] ?? 0);
-        $html .= '<tr style="border-bottom:1px solid #f1f5f9">
-            <td style="padding:11px 14px;font-size:12px;color:#475569">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
-            <td style="padding:11px 14px;font-size:12px;color:#475569;text-align:center">1</td>
-            <td style="padding:11px 14px;font-size:12px;color:#475569;text-align:right">$ ' . number_format($svc['monto_renovacion'], 0, ',', '.') . '</td>
-            <td style="padding:11px 14px;font-size:12px;font-weight:700;color:#0f172a;text-align:right">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
+        $html .= '<tr style="border-bottom:1px solid #E8E5DD">
+            <td style="padding:11px 14px;font-size:12px;color:#57544D">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
+            <td style="padding:11px 14px;font-size:12px;color:#57544D;text-align:center">1</td>
+            <td style="padding:11px 14px;font-size:12px;color:#57544D;text-align:right">$ ' . number_format($svc['monto_renovacion'], 0, ',', '.') . '</td>
+            <td style="padding:11px 14px;font-size:12px;font-weight:700;color:#0E0E0C;text-align:right">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
         </tr>';
     }
     return $html;
@@ -123,41 +135,41 @@ function generarTablaServicios($servicios, $fmtCOP) {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Orden de Compra - <?= sanitize($cliente['nombre_comercial']) ?></title>
+    <title><?= $docTipoLabel ?> - <?= sanitize($cliente['nombre_comercial']) ?></title>
     <style>
-        body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #1e293b; line-height: 1.5; margin: 0; padding: 40px; background: #f3f4f6; }
+        body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #0E0E0C; line-height: 1.5; margin: 0; padding: 40px; background: #FAFAF7; }
         .invoice { background: white; max-width: 900px; margin: auto; }
         .header-dark { background: <?= $template['color_primario'] ?>; padding: 0; }
         .header-accent { background: <?= $template['color_secundario'] ?>; height: 6px; }
         .header-content { padding: 28px 36px; display: flex; justify-content: space-between; align-items: flex-end; }
         .logo-section { }
-        .logo-section h2 { margin: 0; color: white; font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+        .logo-section h2 { margin: 0; color: white; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
         .company-details { margin-top: 14px; font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.8; }
         .order-info { text-align: right; }
         .order-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; color: <?= $template['color_secundario'] ?>; }
-        .order-number { font-size: 26px; font-weight: 900; color: white; letter-spacing: -1px; margin-top: 4px; }
+        .order-number { font-size: 26px; font-weight: 700; color: white; letter-spacing: -1px; margin-top: 4px; }
         .order-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
-        .client-section { background: #f8fafc; padding: 20px 36px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; }
-        .client-info h3 { margin: 0; font-size: 14px; font-weight: 800; color: #0f172a; }
-        .client-info p { margin: 3px 0; font-size: 11px; color: #64748b; }
-        .label-small { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; margin-bottom: 6px; }
+        .client-section { background: #FAFAF7; padding: 20px 36px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E8E5DD; }
+        .client-info h3 { margin: 0; font-size: 14px; font-weight: 700; color: #0E0E0C; }
+        .client-info p { margin: 3px 0; font-size: 11px; color: #57544D; }
+        .label-small { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #8A867C; margin-bottom: 6px; }
         .dates-group { display: flex; gap: 28px; }
         .date-item { text-align: center; }
-        .date-value { font-size: 12px; font-weight: 700; color: #0f172a; }
+        .date-value { font-size: 12px; font-weight: 700; color: #0E0E0C; }
         .items-section { padding: 28px 36px; }
         .items-table { width: 100%; border-collapse: collapse; }
         .items-table thead tr { background: <?= $template['color_primario'] ?>; }
         .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: <?= $template['color_secundario'] ?>; }
-        .items-table td { padding: 11px 14px; font-size: 12px; color: #475569; border-bottom: 1px solid #f1f5f9; }
-        .items-table tr:nth-child(odd) { background: white; }
-        .items-table tr:nth-child(even) { background: #f8fafc; }
-        .amount { text-align: right; font-weight: 700; color: #0f172a; }
+        .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
+        .items-table tr:nth-child(odd) { background: #FFFFFF; }
+        .items-table tr:nth-child(even) { background: #FAFAF7; }
+        .amount { text-align: right; font-weight: 700; color: #0E0E0C; }
         .totals { display: flex; justify-content: flex-end; margin-top: 20px; }
         .totals-box { min-width: 250px; }
-        .total-row { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 12px; color: #64748b; }
-        .total-final { display: flex; justify-content: space-between; align-items: center; padding: 14px 12px; background: <?= $template['color_primario'] ?>; border-radius: 8px; margin-top: 10px; }
+        .total-row { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 12px; color: #57544D; }
+        .total-final { display: flex; justify-content: space-between; align-items: center; padding: 14px 12px; background: <?= $template['color_primario'] ?>; border-radius: 4px; margin-top: 10px; }
         .total-final span:first-child { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: <?= $template['color_secundario'] ?>; }
-        .total-final span:last-child { font-size: 18px; font-weight: 900; color: white; }
+        .total-final span:last-child { font-size: 18px; font-weight: 700; color: white; }
         .footer-dark { background: <?= $template['color_primario'] ?>; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; }
         .footer-text { font-size: 11px; color: rgba(255,255,255,.5); }
         .footer-accent { width: 40px; height: 4px; background: <?= $template['color_secundario'] ?>; border-radius: 2px; }
@@ -181,7 +193,7 @@ function generarTablaServicios($servicios, $fmtCOP) {
                     </div>
                 </div>
                 <div class="order-info">
-                    <div class="order-label">Orden de Compra</div>
+                    <div class="order-label"><?= $docTipoLabel ?></div>
                     <div class="order-number"><?= $orderNumber ?></div>
                     <div class="order-date"><?= date('d/m/Y') ?></div>
                 </div>
@@ -194,7 +206,7 @@ function generarTablaServicios($servicios, $fmtCOP) {
                 <div class="label-small">Facturado a</div>
                 <h3><?= htmlspecialchars($cliente['nombre_comercial']) ?></h3>
                 <?php if(!empty($cliente['nit_cedula'])): ?>
-                <p style="font-size:12px;font-weight:700;color:#0f172a;margin:2px 0">NIT / Cédula: <?= htmlspecialchars($cliente['nit_cedula'] ?? '') ?></p>
+                <p style="font-size:12px;font-weight:700;color:#0E0E0C;margin:2px 0">NIT / Cédula: <?= htmlspecialchars($cliente['nit_cedula'] ?? '') ?></p>
                 <?php endif; ?>
                 <p><?= htmlspecialchars($cliente['direccion'] ?? '') ?></p>
             </div>
@@ -271,25 +283,43 @@ function generarTablaServicios($servicios, $fmtCOP) {
             'banco'   => 'Banco',
             'cuenta'  => 'N° de Cuenta',
             'tipo'    => 'Tipo de Cuenta',
-            'llave'   => 'Llave (Nequi / Daviplata / QR)',
+            'llave'   => 'Nequi / Daviplata / QR',
         ];
         $anyBanc = !empty(array_filter($bancarios));
         if ($anyBanc):
         ?>
         <div style="padding:0 36px 28px">
-            <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden">
-                <div style="background:#0f172a;padding:14px 20px">
-                    <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:<?= $template['color_secundario'] ?>">Información de Pago — Datos Bancarios</span>
+            <div style="border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
+                <!-- Header compacto -->
+                <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:<?= $template['color_primario'] ?>">
+                    <svg width="13" height="13" fill="none" stroke="<?= $template['color_secundario'] ?>" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:<?= $template['color_secundario'] ?>">Datos para el pago</span>
                 </div>
-                <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-                    <?php foreach($bancFields as $key => $label): if(!empty($bancarios[$key])): ?>
-                    <div>
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:4px"><?= $label ?></div>
-                        <div style="font-size:15px;font-weight:800;color:#0f172a"><?= htmlspecialchars($bancarios[$key]) ?></div>
+                <!-- Grilla de campos -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;background:#fff">
+                    <?php
+                    $idx = 0;
+                    foreach($bancFields as $key => $label):
+                        if(empty($bancarios[$key])) continue;
+                        $bg = $idx % 2 === 0 ? '#FAFAF7' : '#fff';
+                    ?>
+                    <div style="padding:10px 16px;background:<?= $bg ?>;display:flex;flex-direction:column;gap:2px">
+                        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F"><?= $label ?></span>
+                        <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($bancarios[$key]) ?></span>
                     </div>
-                    <?php endif; endforeach; ?>
+                    <?php $idx++; endforeach; ?>
                 </div>
             </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Enlace de Pago -->
+        <?php if ($linkPago): ?>
+        <div style="padding:0 36px 24px;text-align:center">
+            <a href="<?= htmlspecialchars($linkPago) ?>" target="_blank" style="display:inline-block;padding:14px 36px;background:<?= $template['color_primario'] ?>;color:<?= $template['color_secundario'] ?>;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">
+                💳 Pagar Ahora
+            </a>
+            <p style="font-size:11px;color:#8A867C;margin:8px 0 0"><?= htmlspecialchars($linkPago) ?></p>
         </div>
         <?php endif; ?>
 

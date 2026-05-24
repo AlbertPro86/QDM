@@ -18,20 +18,20 @@ include __DIR__ . '/includes/header.php';
     <div class="card animate-fade-up">
         <div class="card-header" style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px">
             <div style="display:flex;align-items:center;gap:6px;min-width:0">
-                <div style="width:28px;height:28px;border-radius:6px;background:#eef2ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <svg width="14" height="14" fill="none" stroke="#4f46e5" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <div style="width:28px;height:28px;border-radius:4px;background:#E1E7F2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="14" height="14" fill="none" stroke="#3F5E9E" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 </div>
                 <div style="min-width:0">
                     <h3 class="card-title" style="margin:0;font-size:11px;font-weight:700">Notificaciones por correo</h3>
-                    <p style="margin:0;font-size:9px;color:#94a3b8;line-height:1.2">Resumen diario</p>
+                    <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Resumen diario</p>
                 </div>
             </div>
             <!-- Toggle activa -->
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;white-space:nowrap">
-                <span style="font-size:11px;color:#64748b;font-weight:600" id="lblActiva">Activa</span>
+                <span style="font-size:11px;color:#57544D;font-weight:600" id="lblActiva">Activa</span>
                 <div style="position:relative;width:40px;height:22px" onclick="toggleActiva()">
-                    <div id="trackActiva" style="width:40px;height:22px;border-radius:11px;background:#c9f31d;transition:background .2s"></div>
-                    <div id="thumbActiva" style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#0f172a;transition:transform .2s;transform:translateX(18px)"></div>
+                    <div id="trackActiva" style="width:40px;height:22px;border-radius:11px;background:#C6F24E;transition:background .2s"></div>
+                    <div id="thumbActiva" style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#0E0E0C;transition:transform .2s;transform:translateX(18px)"></div>
                 </div>
             </label>
         </div>
@@ -44,14 +44,14 @@ include __DIR__ . '/includes/header.php';
                 <div class="form-group" style="margin:0">
                     <label class="form-label" style="font-size:11px">Correo destinatario</label>
                     <input id="notif_email" class="form-input" type="email" placeholder="correo@ejemplo.com" style="padding:6px 10px;font-size:12px">
-                    <p style="margin:3px 0 0;font-size:10px;color:#94a3b8">El resumen llegará a este correo</p>
+                    <p style="margin:3px 0 0;font-size:10px;color:#8A867C">El resumen llegará a este correo</p>
                 </div>
 
                 <!-- Número WhatsApp -->
                 <div class="form-group" style="margin:0">
                     <label class="form-label" style="font-size:11px">Número WhatsApp</label>
                     <input id="notif_whatsapp" class="form-input" type="tel" placeholder="+57 3145979983" style="padding:6px 10px;font-size:12px">
-                    <p style="margin:3px 0 0;font-size:10px;color:#94a3b8">Número para notificaciones por WhatsApp (con código país)</p>
+                    <p style="margin:3px 0 0;font-size:10px;color:#8A867C">Número para notificaciones por WhatsApp (con código país)</p>
                 </div>
 
                 <!-- Hora de envío -->
@@ -77,12 +77,12 @@ include __DIR__ . '/includes/header.php';
                         foreach ($dias as $d): ?>
                         <button type="button" data-dia="<?= $d['val'] ?>"
                             onclick="toggleDia(this)"
-                            style="width:42px;height:42px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">
+                            style="width:42px;height:42px;border-radius:4px;border:1.5px solid #E8E5DD;background:#FAFAF7;color:#57544D;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">
                             <?= $d['label'] ?>
                         </button>
                         <?php endforeach; ?>
                     </div>
-                    <p style="margin:4px 0 0;font-size:10px;color:#94a3b8">Selecciona los días</p>
+                    <p style="margin:4px 0 0;font-size:10px;color:#8A867C">Selecciona los días</p>
                 </div>
             </div>
 
@@ -92,31 +92,31 @@ include __DIR__ . '/includes/header.php';
                 <div class="form-group" style="margin:0">
                     <label class="form-label" style="font-size:11px">Logo del correo (URL)</label>
                     <input id="notif_logo_url" class="form-input" type="text" placeholder="https://tudominio.com/logo.png" oninput="previewLogoNotif()" style="padding:6px 10px;font-size:12px">
-                    <div id="notifLogoPreview" style="display:none;margin-top:6px;padding:8px 10px;background:#0f172a;border-radius:6px;display:inline-flex;align-items:center;gap:8px">
+                    <div id="notifLogoPreview" style="display:none;margin-top:6px;padding:8px 10px;background:#EFECE5;border:1px solid #E8E5DD;border-radius:3px;display:inline-flex;align-items:center;gap:8px">
                         <img id="notifLogoImg" src="" alt="Logo" style="height:32px;max-width:150px;object-fit:contain"
                             onload="document.getElementById('notifLogoStatus').textContent='✓ Logo cargado';document.getElementById('notifLogoStatus').style.color='#4ade80'"
                             onerror="document.getElementById('notifLogoStatus').textContent='✗ No se pudo cargar';document.getElementById('notifLogoStatus').style.color='#f87171'">
-                        <span id="notifLogoStatus" style="font-size:10px;color:#94a3b8"></span>
+                        <span id="notifLogoStatus" style="font-size:10px;color:#8A867C"></span>
                     </div>
-                    <p style="margin:3px 0 0;font-size:10px;color:#94a3b8">Si está vacío se usa el logo local</p>
+                    <p style="margin:3px 0 0;font-size:10px;color:#8A867C">Si está vacío se usa el logo local</p>
                 </div>
 
                 <!-- Qué incluir -->
                 <div class="form-group" style="margin:0">
                     <label class="form-label" style="font-size:11px">Incluir en el resumen</label>
                     <div style="display:grid;gap:8px;margin-top:4px">
-                        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='#a5b4fc'" onmouseleave="this.style.borderColor='#e2e8f0'">
-                            <input type="checkbox" id="notif_incluir_tareas" style="width:16px;height:16px;accent-color:#4f46e5;cursor:pointer;flex-shrink:0">
+                        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAFAF7;border-radius:3px;border:1.5px solid #E8E5DD;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='#D6D2C7'" onmouseleave="this.style.borderColor='#E8E5DD'">
+                            <input type="checkbox" id="notif_incluir_tareas" style="width:16px;height:16px;accent-color:#0E0E0C;cursor:pointer;flex-shrink:0">
                             <div>
-                                <div style="font-size:12px;font-weight:700;color:#0f172a">✅ Tareas pendientes</div>
-                                <div style="font-size:10px;color:#94a3b8;line-height:1.3">Pendiente o en progreso</div>
+                                <div style="font-size:12px;font-weight:700;color:#0E0E0C">✅ Tareas pendientes</div>
+                                <div style="font-size:10px;color:#8A867C;line-height:1.3">Pendiente o en progreso</div>
                             </div>
                         </label>
-                        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1.5px solid #e2e8f0;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='#a5b4fc'" onmouseleave="this.style.borderColor='#e2e8f0'">
-                            <input type="checkbox" id="notif_incluir_renovaciones" style="width:16px;height:16px;accent-color:#4f46e5;cursor:pointer;flex-shrink:0">
+                        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAFAF7;border-radius:3px;border:1.5px solid #E8E5DD;cursor:pointer;transition:border-color .15s" onmouseenter="this.style.borderColor='#D6D2C7'" onmouseleave="this.style.borderColor='#E8E5DD'">
+                            <input type="checkbox" id="notif_incluir_renovaciones" style="width:16px;height:16px;accent-color:#0E0E0C;cursor:pointer;flex-shrink:0">
                             <div>
-                                <div style="font-size:12px;font-weight:700;color:#0f172a">🔄 Renovaciones</div>
-                                <div style="font-size:10px;color:#94a3b8;line-height:1.3">Próximos 2 meses</div>
+                                <div style="font-size:12px;font-weight:700;color:#0E0E0C">🔄 Renovaciones</div>
+                                <div style="font-size:10px;color:#8A867C;line-height:1.3">Próximos 2 meses</div>
                             </div>
                         </label>
                     </div>
@@ -125,34 +125,122 @@ include __DIR__ . '/includes/header.php';
 
         </div>
 
-        <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="padding:12px 14px;border-top:1px solid #EFECE5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
             <button onclick="enviarPrueba()" id="btnPrueba"
-                style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#f8fafc;color:#475569;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
-                onmouseenter="this.style.borderColor='#94a3b8'" onmouseleave="this.style.borderColor='#e2e8f0'">
+                style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#FAFAF7;color:#57544D;border:1.5px solid #E8E5DD;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
+                onmouseenter="this.style.borderColor='#8A867C'" onmouseleave="this.style.borderColor='#E8E5DD'">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 Enviar prueba ahora
             </button>
             <button onclick="guardarConfig()" id="btnGuardar"
-                style="display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:#0f172a;color:#c9f31d;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:filter .15s"
-                onmouseenter="this.style.filter='brightness(1.3)'" onmouseleave="this.style.filter=''">
+                class="btn btn-primary btn-sm">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                 Guardar configuración
             </button>
         </div>
     </div>
 
+    <!-- ── Datos de la Empresa ───────────────────────────────────────────── -->
+    <div class="card animate-fade-up">
+        <div class="card-header" style="padding:8px 12px;display:flex;align-items:center;gap:6px">
+            <div style="width:28px;height:28px;border-radius:4px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="14" height="14" fill="none" stroke="#7C3AED" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <div>
+                <h3 class="card-title" style="margin:0;font-size:11px;font-weight:700">Datos de la empresa</h3>
+                <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Se usan en órdenes, facturas y documentos</p>
+            </div>
+        </div>
+        <div class="card-body" style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Nombre / Razón social</label>
+                <input id="empresa_nombre" class="form-input" type="text" placeholder="Ej: QUANTUN Digital S.A.S" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">NIT / Cédula</label>
+                <input id="empresa_nit" class="form-input" type="text" placeholder="Ej: 900.567.123-4" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Correo electrónico</label>
+                <input id="empresa_email" class="form-input" type="email" placeholder="Ej: contacto@empresa.com" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Teléfono / WhatsApp</label>
+                <input id="empresa_tel" class="form-input" type="text" placeholder="Ej: +57 314 597 9983" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0;grid-column:1/-1">
+                <label class="form-label" style="font-size:11px">Dirección</label>
+                <input id="empresa_dir" class="form-input" type="text" placeholder="Ej: Cra 42 # 43A-12, Montería, Córdoba" style="padding:6px 10px;font-size:12px">
+            </div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid #EFECE5;display:flex;justify-content:flex-end">
+            <button onclick="guardarEmpresa()" id="btnGuardarEmpresa" class="btn btn-primary btn-sm">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Guardar datos de empresa
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Datos bancarios ───────────────────────────────────────────────── -->
+    <div class="card animate-fade-up">
+        <div class="card-header" style="padding:8px 12px;display:flex;align-items:center;gap:6px">
+            <div style="width:28px;height:28px;border-radius:4px;background:#E3F1E8;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="14" height="14" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+                <h3 class="card-title" style="margin:0;font-size:11px;font-weight:700">Datos bancarios</h3>
+                <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Se incluyen en órdenes, cotizaciones y cuentas de cobro</p>
+            </div>
+        </div>
+        <div class="card-body" style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Titular de la cuenta</label>
+                <input id="banco_titular" class="form-input" type="text" placeholder="Ej: QUANTUN Digital S.A.S" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Cédula / NIT del titular</label>
+                <input id="banco_cedula" class="form-input" type="text" placeholder="Ej: 900.567.123-4" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Nombre del banco</label>
+                <input id="banco_nombre" class="form-input" type="text" placeholder="Ej: Bancolombia" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Número de cuenta</label>
+                <input id="banco_numero" class="form-input" type="text" placeholder="Ej: 123-456789-00" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Tipo de cuenta</label>
+                <select id="banco_tipo" class="form-input" style="padding:6px 10px;font-size:12px;cursor:pointer">
+                    <option value="Ahorros">Ahorros</option>
+                    <option value="Corriente">Corriente</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label" style="font-size:11px">Llave (Nequi / Daviplata / QR)</label>
+                <input id="banco_llave" class="form-input" type="text" placeholder="Ej: +57 300 000 0000" style="padding:6px 10px;font-size:12px">
+            </div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid #EFECE5;display:flex;justify-content:flex-end">
+            <button onclick="guardarBanco()" id="btnGuardarBanco" class="btn btn-primary btn-sm">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Guardar datos bancarios
+            </button>
+        </div>
+    </div>
+
     <!-- ── Info tarea programada ──────────────────────────────────────────── -->
-    <div class="card animate-fade-up" style="background:#0f172a">
+    <div class="card animate-fade-up" style="background:#fff;border:1.5px solid var(--color-border)">
         <div class="card-body" style="padding:14px 16px;display:flex;align-items:flex-start;gap:12px">
-            <div style="width:36px;height:36px;border-radius:8px;background:rgba(201,243,29,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="18" height="18" fill="none" stroke="#c9f31d" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div style="width:36px;height:36px;border-radius:4px;background:#E1E7F2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="18" height="18" fill="none" stroke="#3F5E9E" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div style="min-width:0">
-                <div style="font-size:12px;font-weight:800;color:#ffffff;margin-bottom:4px">Tarea programada automática</div>
-                <div id="infoTarea" style="font-size:11px;color:#94a3b8;line-height:1.6">Cargando configuración...</div>
-                <div style="margin-top:8px;font-size:10px;color:#64748b">
+                <div style="font-size:12px;font-weight:700;color:#0E0E0C;margin-bottom:4px">Tarea programada automática</div>
+                <div id="infoTarea" style="font-size:11px;color:#57544D;line-height:1.6">Cargando configuración...</div>
+                <div style="margin-top:8px;font-size:10px;color:#8A867C">
                     El resumen se envía ejecutando:<br>
-                    <code style="background:#1e293b;color:#c9f31d;padding:3px 6px;border-radius:4px;font-size:9px;display:inline-block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;word-break:break-all">
+                    <code style="background:#EFECE5;color:#0E0E0C;padding:3px 6px;border-radius:3px;font-size:9px;display:inline-block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;word-break:break-all">
                         C:\xampp\php\php.exe C:\xampp\htdocs\CRM-QUANTUN-Digital\api\notificacion_resumen.php
                     </code>
                 </div>
@@ -184,6 +272,21 @@ async function cargarConfig() {
         document.getElementById('notif_logo_url').value               = cfg.notif_logo_url || '';
         previewLogoNotif();
 
+        // Datos de la empresa
+        document.getElementById('empresa_nombre').value = cfg.empresa_nombre || '';
+        document.getElementById('empresa_nit').value    = cfg.empresa_nit    || '';
+        document.getElementById('empresa_email').value  = cfg.empresa_email  || '';
+        document.getElementById('empresa_tel').value    = cfg.empresa_tel    || '';
+        document.getElementById('empresa_dir').value    = cfg.empresa_dir    || '';
+
+        // Datos bancarios
+        document.getElementById('banco_titular').value  = cfg.banco_titular  || '';
+        document.getElementById('banco_cedula').value   = cfg.banco_cedula   || '';
+        document.getElementById('banco_nombre').value   = cfg.banco_nombre   || '';
+        document.getElementById('banco_numero').value   = cfg.banco_numero   || '';
+        document.getElementById('banco_tipo').value     = cfg.banco_tipo     || 'Ahorros';
+        document.getElementById('banco_llave').value    = cfg.banco_llave    || '';
+
         notifActiva = cfg.notif_activa === '1';
         diasSeleccionados = Array.isArray(cfg.notif_dias) ? cfg.notif_dias.map(Number) : [1,2,3,4,5];
 
@@ -203,7 +306,7 @@ function actualizarToggle() {
     const thumb = document.getElementById('thumbActiva');
     const lbl   = document.getElementById('lblActiva');
     const panel = document.getElementById('panelNotif');
-    track.style.background     = notifActiva ? '#c9f31d' : '#e2e8f0';
+    track.style.background     = notifActiva ? '#C6F24E' : '#E8E5DD';
     thumb.style.transform      = notifActiva ? 'translateX(18px)' : 'translateX(0)';
     lbl.textContent            = notifActiva ? 'Activa' : 'Inactiva';
     lbl.style.color            = notifActiva ? '#16a34a' : '#94a3b8';
@@ -224,9 +327,10 @@ function actualizarDias() {
     document.querySelectorAll('[data-dia]').forEach(btn => {
         const val = parseInt(btn.dataset.dia);
         const sel = diasSeleccionados.includes(val);
-        btn.style.background   = sel ? '#0f172a' : '#f8fafc';
-        btn.style.color        = sel ? '#c9f31d' : '#64748b';
-        btn.style.borderColor  = sel ? '#0f172a' : '#e2e8f0';
+        btn.style.background   = sel ? '#C6F24E' : '#FAFAF7';
+        btn.style.color        = sel ? '#0E0E0C' : '#57544D';
+        btn.style.borderColor  = sel ? '#C6F24E' : '#E8E5DD';
+        btn.style.fontWeight   = '700';
         btn.style.transform    = sel ? 'scale(1.05)' : '';
     });
 }
@@ -240,9 +344,9 @@ function actualizarInfoTarea() {
         : diasSeleccionados.sort().map(d => DIAS_LABEL[d]).join(', ');
 
     document.getElementById('infoTarea').innerHTML =
-        `📧 Destinatario: <strong style="color:#fff">${email}</strong><br>` +
-        `🕐 Hora: <strong style="color:#fff">${hora}</strong><br>` +
-        `📅 Días: <strong style="color:#c9f31d">${diasTxt}</strong>`;
+        `📧 Destinatario: <strong style="color:#0E0E0C">${email}</strong><br>` +
+        `🕐 Hora: <strong style="color:#0E0E0C">${hora}</strong><br>` +
+        `📅 Días: <strong style="color:#0E0E0C">${diasTxt}</strong>`;
 }
 
 // Actualizar info al cambiar campos
@@ -296,11 +400,67 @@ function previewLogoNotif() {
     if (url) {
         preview.style.display = 'inline-flex';
         status.textContent    = 'Cargando...';
-        status.style.color    = '#94a3b8';
+        status.style.color    = '#8A867C';
         img.src               = url;
     } else {
         preview.style.display = 'none';
         img.src               = '';
+    }
+}
+
+// ── Guardar datos de empresa ──────────────────────────────────────────────────
+async function guardarEmpresa() {
+    const btn = document.getElementById('btnGuardarEmpresa');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const payload = {
+        empresa_nombre: document.getElementById('empresa_nombre').value.trim(),
+        empresa_nit:    document.getElementById('empresa_nit').value.trim(),
+        empresa_email:  document.getElementById('empresa_email').value.trim(),
+        empresa_tel:    document.getElementById('empresa_tel').value.trim(),
+        empresa_dir:    document.getElementById('empresa_dir').value.trim(),
+    };
+    try {
+        const r = await fetch('api/configuraciones.php', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify(payload) });
+        const d = await r.json();
+        if (d.success) showToast('✓ Datos de empresa guardados', 'success');
+        else showToast(d.error || 'Error al guardar', 'error');
+    } catch(e) { showToast('Error de conexión', 'error'); }
+    finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Guardar datos de empresa';
+    }
+}
+
+// ── Guardar datos bancarios ───────────────────────────────────────────────────
+async function guardarBanco() {
+    const btn = document.getElementById('btnGuardarBanco');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    const payload = {
+        banco_titular:  document.getElementById('banco_titular').value.trim(),
+        banco_cedula:   document.getElementById('banco_cedula').value.trim(),
+        banco_nombre:   document.getElementById('banco_nombre').value.trim(),
+        banco_numero:   document.getElementById('banco_numero').value.trim(),
+        banco_tipo:     document.getElementById('banco_tipo').value,
+        banco_llave:    document.getElementById('banco_llave').value.trim(),
+    };
+
+    try {
+        const r = await fetch('api/configuraciones.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) showToast('✓ Datos bancarios guardados', 'success');
+        else showToast(d.error || 'Error al guardar', 'error');
+    } catch(e) {
+        showToast('Error de conexión', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Guardar datos bancarios';
     }
 }
 

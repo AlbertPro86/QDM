@@ -15,11 +15,28 @@ if ($editId) {
     if (!$editData) $editId = 0;
 }
 
-$pageTitle    = $editId ? 'Editar Cotización' : 'Cotizador';
+// ── Tipo de documento ─────────────────────────────────────────────────────────
+$tipo_doc = $editData['tipo'] ?? ($_GET['tipo'] ?? 'cotizacion');
+$tipo_labels_doc = [
+    'cotizacion'        => 'Cotización',
+    'cuenta_cobro'      => 'Cuenta de cobro',
+    'orden_compra'      => 'Orden de compra',
+    'orden_renovacion'  => 'Orden de renovación',
+];
+$tipo_labels_doc_plural = [
+    'cotizacion'        => 'Cotizaciones',
+    'cuenta_cobro'      => 'Cuentas de cobro',
+    'orden_compra'      => 'Órdenes de compra',
+    'orden_renovacion'  => 'Órdenes de renovación',
+];
+$titulo_doc = $tipo_labels_doc[$tipo_doc] ?? 'Cotización';
+$titulo_doc_plural = $tipo_labels_doc_plural[$tipo_doc] ?? 'Cotizaciones';
+
+$pageTitle    = $editId ? 'Editar ' . $titulo_doc : $titulo_doc;
 $pageSubtitle = '';
-$pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
+$pageBreadcrumb = '<a href="cotizaciones.php?tipo=' . urlencode($tipo_doc) . '" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">' . htmlspecialchars($titulo_doc_plural) . '</a>'
     . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
-    . '<span style="font-weight:700;color:var(--color-text)">Cotizador</span>';
+    . '<span style="font-weight:700;color:var(--color-text)">' . ($editId ? 'Editar' : 'Nueva') . ' ' . htmlspecialchars($titulo_doc) . '</span>';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -31,54 +48,44 @@ include __DIR__ . '/includes/header.php';
 
 
 <!-- ── Recipient Strip ──────────────────────────────────────── -->
-<div id="destinatarioStrip" style="background:#fff;border:1.5px solid var(--color-border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px">
-    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center">
+<div id="destinatarioStrip" style="background:#fff;border:1.5px solid var(--color-border);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;min-height:40px">
 
         <!-- Tipo de destinatario -->
-        <div>
-            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);margin-bottom:10px">Tipo</div>
-            <div style="display:flex;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);overflow:hidden">
-                <button onclick="setTipo('cliente')" id="tipoBtnCliente" class="tipo-btn" style="padding:8px 14px;border:none;background:#000;color:#c9f31d;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap">Cliente</button>
-                <button onclick="setTipo('lead')" id="tipoBtnLead" class="tipo-btn" style="padding:8px 14px;border:none;background:#fff;color:var(--color-text-muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;border-left:1.5px solid var(--color-border);white-space:nowrap">Lead</button>
-            </div>
+        <div style="display:flex;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;align-self:center">
+            <button onclick="setTipo('cliente')" id="tipoBtnCliente" class="tipo-btn" style="padding:7px 14px;border:none;background:var(--q-lima);color:#0E0E0C;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap">Cliente</button>
+            <button onclick="setTipo('lead')" id="tipoBtnLead" class="tipo-btn" style="padding:7px 14px;border:none;background:#fff;color:var(--color-text-muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;border-left:1.5px solid var(--color-border);white-space:nowrap">Lead</button>
         </div>
 
         <!-- Búsqueda / datos -->
-        <div>
-            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);margin-bottom:10px">Destinatario</div>
+        <div style="min-width:0">
             <div id="destinatarioBuscador" style="position:relative">
-                <div style="position:relative">
-                    <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--color-text-light)" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <input type="text" id="destinatarioInput" placeholder="Buscar por nombre, email o teléfono..."
-                        style="width:100%;padding:9px 14px 9px 36px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s"
-                        onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'"
-                        oninput="buscarDestinatario()">
-                    <div id="destinatarioDropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--color-border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:220px;overflow-y:auto;display:none;z-index:20;box-shadow:var(--shadow-lg)"></div>
-                </div>
+                <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--color-text-light);pointer-events:none" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" id="destinatarioInput" placeholder="Buscar cliente activo..."
+                    style="width:100%;padding:8px 14px 8px 34px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s"
+                    onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'"
+                    oninput="buscarDestinatario()">
+                <div id="destinatarioDropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--color-border);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:220px;overflow-y:auto;display:none;z-index:20;box-shadow:var(--shadow-lg)"></div>
             </div>
-            <div id="destinatarioManual" style="display:none;margin-top:12px;display:none">
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-                    <div>
-                        <input type="text" id="manualNombre" placeholder="Nombre completo *" style="width:100%;padding:9px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
-                    </div>
-                    <div>
-                        <input type="email" id="manualEmail" placeholder="Email" style="width:100%;padding:9px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
-                    </div>
-                    <div>
-                        <input type="text" id="manualWhatsapp" placeholder="WhatsApp (con código país)" style="width:100%;padding:9px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
-                    </div>
+            <div id="destinatarioManual" style="display:none">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+                    <input type="text" id="manualNombre" placeholder="Nombre completo *" style="width:100%;padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
+                    <input type="email" id="manualEmail" placeholder="Email" style="width:100%;padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
+                    <input type="text" id="manualWhatsapp" placeholder="WhatsApp (con código país)" style="width:100%;padding:8px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'">
                 </div>
             </div>
         </div>
 
         <!-- Info del seleccionado -->
-        <div id="destInfoBox" style="display:none;min-width:200px">
-            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);margin-bottom:10px">Seleccionado</div>
-            <div style="padding:10px 14px;background:var(--color-surface);border-radius:var(--radius-sm);border-left:3px solid var(--color-primary)">
-                <div style="font-weight:800;font-size:13px;color:var(--color-text);margin-bottom:3px" id="destNombreBox"></div>
-                <div style="font-size:11px;color:var(--color-text-muted)" id="destEmailBox"></div>
-                <div style="font-size:11px;color:var(--color-text-muted)" id="destWABox"></div>
-                <button onclick="limpiarDestinatario()" style="margin-top:6px;font-size:10px;font-weight:700;color:var(--color-text-muted);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Cambiar</button>
+        <div id="destInfoBox" style="display:none;align-self:center">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--color-surface);border-radius:var(--radius-sm);border:1px solid var(--color-border);white-space:nowrap">
+                <div>
+                    <div style="font-weight:800;font-size:12px;color:var(--color-text)" id="destNombreBox"></div>
+                    <div style="font-size:10px;color:var(--color-text-muted);margin-top:1px" id="destEmailBox"></div>
+                </div>
+                <button onclick="limpiarDestinatario()" title="Cambiar destinatario" style="flex-shrink:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--color-border);border-radius:var(--radius-sm);background:#fff;cursor:pointer;color:var(--color-text-muted);transition:all .15s" onmouseenter="this.style.borderColor='var(--color-danger)';this.style.color='var(--color-danger)'" onmouseleave="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -91,9 +98,9 @@ include __DIR__ . '/includes/header.php';
     <div style="background:#fff;border:1.5px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;position:sticky;top:20px">
 
         <!-- Header catálogo -->
-        <div style="padding:16px 20px;border-bottom:1.5px solid var(--color-border);background:var(--color-primary)">
-            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#c9f31d;margin-bottom:2px">Catálogo</div>
-            <div style="font-size:13px;color:#fff;font-weight:600">Selecciona los servicios</div>
+        <div style="padding:16px 20px;border-bottom:1.5px solid var(--color-border);background:var(--color-surface)">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--color-primary);margin-bottom:2px">Catálogo</div>
+            <div style="font-size:13px;color:var(--color-text);font-weight:600">Selecciona los servicios</div>
         </div>
 
         <!-- Search catálogo -->
@@ -234,8 +241,8 @@ include __DIR__ . '/includes/header.php';
                     </div>
                     <div style="height:1px;background:var(--color-border);margin:12px 0"></div>
                     <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="font-size:14px;font-weight:800;color:var(--color-text)">TOTAL</span>
-                        <span style="font-size:20px;font-weight:900;color:var(--color-primary)" id="totTotal">$ 0.00</span>
+                        <span style="font-size:14px;font-weight:700;color:var(--color-text)">TOTAL</span>
+                        <span style="font-size:20px;font-weight:700;color:var(--color-primary)" id="totTotal">$ 0.00</span>
                     </div>
                     <div style="font-size:10px;color:var(--color-text-light);text-align:right;margin-top:4px" id="totMonedaLabel">en USD</div>
                 </div>
@@ -250,26 +257,11 @@ include __DIR__ . '/includes/header.php';
 
                 <!-- Botones de acción -->
                 <div style="padding:16px 20px;display:flex;flex-direction:column;gap:8px">
-                    <button id="btnGuardar" onclick="guardarCotizacion()" style="width:100%;padding:12px;background:var(--color-primary);color:#c9f31d;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px" onmouseenter="this.style.background='#1e293b'" onmouseleave="this.style.background='var(--color-primary)'">
+                    <button id="btnGuardar" onclick="guardarCotizacion()" style="width:100%;padding:12px;background:var(--q-lima);color:#0E0E0C;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px" onmouseenter="this.style.filter='brightness(.93)'" onmouseleave="this.style.filter=''">
                         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                         Guardar cotización
                     </button>
 
-                    <!-- Acciones post-guardado -->
-                    <div id="accionesPostGuardado" style="display:none;flex-direction:column;gap:6px">
-                        <button onclick="abrirVista()" style="width:100%;padding:10px;border:1.5px solid var(--color-primary);background:#fff;color:var(--color-primary);border-radius:var(--radius-sm);font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px" onmouseenter="this.style.background='var(--color-primary)';this.style.color='#c9f31d'" onmouseleave="this.style.background='#fff';this.style.color='var(--color-primary)'">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                            Ver e imprimir PDF
-                        </button>
-                        <button onclick="enviarWA()" style="width:100%;padding:10px;border:1.5px solid #c9f31d;background:#c9f31d;color:#000;border-radius:var(--radius-sm);font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px" onmouseenter="this.style.background='#b8dc1f';this.style.borderColor='#b8dc1f'" onmouseleave="this.style.background='#c9f31d';this.style.borderColor='#c9f31d'">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.112 1.522 5.842L.057 23.926a.5.5 0 00.617.617l6.084-1.465A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.898 0-3.67-.523-5.178-1.432l-.37-.223-3.837.924.94-3.837-.241-.384A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                            Enviar por WhatsApp
-                        </button>
-                        <button onclick="enviarEmail()" style="width:100%;padding:10px;border:1.5px solid var(--color-border);background:#fff;color:var(--color-text-muted);border-radius:var(--radius-sm);font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px" onmouseenter="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseleave="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            Enviar por email
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -299,7 +291,7 @@ include __DIR__ . '/includes/header.php';
     background: #fff;
 }
 .catalog-item:hover { border-color: var(--color-primary); background: var(--color-surface); }
-.catalog-item:hover .cat-add-btn { background: var(--color-primary); color: #c9f31d; }
+.catalog-item:hover .cat-add-btn { background: var(--q-lima); color: #0E0E0C; }
 .catalog-item.added { border-color: var(--color-primary); background: var(--color-surface); }
 .cat-add-btn {
     width: 28px; height: 28px; min-width: 28px;
@@ -376,6 +368,11 @@ include __DIR__ . '/includes/header.php';
 <!-- ── JavaScript ────────────────────────────────────────────── -->
 <script>
 /* ═══════════════════════════════════════════════
+   Tipo de documento
+═══════════════════════════════════════════════ */
+const DOC_TIPO = '<?= $tipo_doc ?>';
+
+/* ═══════════════════════════════════════════════
    Estado central
 ═══════════════════════════════════════════════ */
 const cot = {
@@ -411,8 +408,8 @@ function setTipo(tipo) {
     ['cliente','lead'].forEach(t => {
         const btn = document.getElementById(`tipoBtn${t.charAt(0).toUpperCase()+t.slice(1)}`);
         if (t === tipo) {
-            btn.style.background = '#000';
-            btn.style.color = '#c9f31d';
+            btn.style.background = 'var(--q-lima)';
+            btn.style.color = '#0E0E0C';
         } else {
             btn.style.background = '#fff';
             btn.style.color = 'var(--color-text-muted)';
@@ -473,8 +470,7 @@ function seleccionarDestinatario(tipo, id, nombre, email, whatsapp) {
     cot.destinatario = { tipo, id, nombre, email, whatsapp };
     document.getElementById('destinatarioBuscador').style.display = 'none';
     document.getElementById('destNombreBox').textContent = nombre;
-    document.getElementById('destEmailBox').textContent = email || 'Sin email';
-    document.getElementById('destWABox').textContent = whatsapp || 'Sin WhatsApp';
+    document.getElementById('destEmailBox').textContent = email || (whatsapp ? whatsapp : 'Sin email');
     document.getElementById('destInfoBox').style.display = 'block';
 }
 
@@ -784,7 +780,8 @@ async function guardarCotizacion() {
         notas: document.getElementById('notas').value,
         vigencia_dias: parseInt(document.getElementById('vigencia').value),
         moneda: document.getElementById('moneda').value,
-        estado: document.getElementById('estadoCot').value
+        estado: document.getElementById('estadoCot').value,
+        tipo: DOC_TIPO
     };
     if (isEdit) payload.id = cot.savedId;
 
@@ -799,8 +796,8 @@ async function guardarCotizacion() {
             cot.savedId     = d.id || cot.savedId;
             cot.savedNumero = d.numero || cot.savedNumero;
             document.getElementById('previewNumero').textContent = cot.savedNumero || 'COT-guardada';
-            btn.style.display = 'none';
-            document.getElementById('accionesPostGuardado').style.display = 'flex';
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg> ${isEdit ? 'Actualizar cotización' : 'Guardar cotización'}`;
             showToast(isEdit ? 'Cotización actualizada' : 'Cotización guardada correctamente', 'success', 3000);
         } else {
             showToast('Error: ' + (d.error || 'No se pudo guardar'), 'error', 4000);
@@ -814,31 +811,6 @@ async function guardarCotizacion() {
     }
 }
 
-/* ═══════════════════════════════════════════════
-   Acciones post-guardado
-═══════════════════════════════════════════════ */
-function abrirVista() {
-    if (!cot.savedId) { showToast('Guarda la cotización primero', 'warning'); return; }
-    window.open(`cotizacion_vista.php?id=${cot.savedId}`, '_blank');
-}
-
-function enviarWA() {
-    if (!cot.savedId) { showToast('Guarda la cotización primero', 'warning'); return; }
-    const wa = (cot.destinatario.whatsapp||'').replace(/\D/g,'');
-    if (!wa) { showToast('No hay número de WhatsApp para este destinatario', 'warning', 3000); return; }
-    const url = `${window.location.origin}${window.location.pathname.replace('cotizador.php','')}cotizacion_vista.php?id=${cot.savedId}`;
-    const msg = `Hola *${cot.destinatario.nombre}*, te compartimos la cotización *${cot.savedNumero}*:\n${url}\n\nQuedamos atentos. — QUANTUN Digital`;
-    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-function enviarEmail() {
-    if (!cot.savedId) { showToast('Guarda la cotización primero', 'warning'); return; }
-    if (!cot.destinatario.email) { showToast('No hay email para este destinatario', 'warning', 3000); return; }
-    const url = `${window.location.origin}${window.location.pathname.replace('cotizador.php','')}cotizacion_vista.php?id=${cot.savedId}`;
-    const subj = `Cotización ${cot.savedNumero} — QUANTUN Digital`;
-    const body = `Hola ${cot.destinatario.nombre},\n\nTe compartimos la cotización solicitada:\n${url}\n\nQuedamos atentos a tus comentarios.\n\nSaludos,\nQUANTUN Digital`;
-    window.location.href = `mailto:${cot.destinatario.email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-}
 
 /* ═══════════════════════════════════════════════
    Helpers
@@ -924,13 +896,11 @@ if (window._editData) {
         if (notasEl && ed.notas) notasEl.value = ed.notas;
         recalcular();
 
-        // Mostrar acciones post-guardado si ya tiene ID
-        const ag = document.getElementById('accionesPostGuardado');
-        if (ag) ag.style.display = 'flex';
         const pg = document.getElementById('previewNumero');
         if (pg) pg.textContent = ed.numero;
     };
 }
 </script>
+
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

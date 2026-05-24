@@ -24,6 +24,9 @@ $metodoPagoOver  = $input['metodo_pago'] ?? 'Transferencia / PSE / QR';
 $notasPieOver    = $input['notas_pie'] ?? null;
 $bancariosOver   = $input['bancarios'] ?? [];
 $fechaUltPagoRaw = $input['fecha_ult_pago'] ?? '';
+$docTipo         = $input['doc_tipo'] ?? 'orden_compra';
+$linkPago        = trim($input['link_pago'] ?? '');
+$plantillaIdOver = intval($input['plantilla_id'] ?? 0);
 $fechaUltPago    = '';
 if ($fechaUltPagoRaw) {
     $d = DateTime::createFromFormat('Y-m-d', $fechaUltPagoRaw);
@@ -82,13 +85,21 @@ if (!$smtpUser || $smtpUser === 'tu_correo@gmail.com' || !$smtpPass || $smtpPass
 }
 
 // Generar número de orden
-$orderType = ($csId || (count($servicios) === 1)) ? "S" : "OC";
+$docTipoLabel = $docTipo === 'orden_renovacion' ? 'Orden de Renovación' : 'Orden de Compra';
+$orderType = $docTipo === 'orden_renovacion' ? 'OR' : (($csId || (count($servicios) === 1)) ? "S" : "OC");
 $orderNumber = $orderType . "-" . str_pad($clienteId, 4, '0', STR_PAD_LEFT) . "-" . date('Ymd');
 
-// Fetch default template
-$stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
-$stmt->execute();
-$template = $stmt->fetch();
+// Fetch template (by ID or default)
+if ($plantillaIdOver > 0) {
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE id = ? AND activo = 1 LIMIT 1");
+    $stmt->execute([$plantillaIdOver]);
+    $template = $stmt->fetch();
+}
+if (empty($template)) {
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
+    $stmt->execute();
+    $template = $stmt->fetch();
+}
 
 if (!$template) {
     $template = [
@@ -176,7 +187,7 @@ $htmlFinal = '<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Orden de Compra ' . $orderNumber . '</title>
+<title>' . $docTipoLabel . ' ' . $orderNumber . '</title>
 </head>
 <body style="font-family:' . $template['fuente'] . ',system-ui,sans-serif;color:#1e293b;line-height:1.5;margin:0;padding:40px;background:#f3f4f6">
 <div style="background:white;max-width:900px;margin:auto">
@@ -192,7 +203,7 @@ $htmlFinal = '<!DOCTYPE html>
 </div>
 </td>
 <td style="padding:24px 36px 24px 36px;width:45%;vertical-align:bottom;text-align:right">
-<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $template['color_secundario'] . '">Orden de Compra</div>
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $template['color_secundario'] . '">' . htmlspecialchars($docTipoLabel) . '</div>
 <div style="font-size:24px;font-weight:900;color:#ffffff;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
 <div style="font-size:11px;color:#94a3b8;margin-top:4px">' . date('d/m/Y') . '</div>
 </td>
@@ -263,22 +274,51 @@ $htmlFinal = '<!DOCTYPE html>
 </table>
 
 ' . (function() use ($bancariosOver, $template) {
-    $bancFields = ['titular'=>'Titular','cedula'=>'Cédula / NIT','banco'=>'Banco','cuenta'=>'N° de Cuenta','tipo'=>'Tipo de Cuenta','llave'=>'Llave (Nequi / Daviplata / QR)'];
-    $rows = '';
+    $bancFields = ['titular'=>'Titular','cedula'=>'Cédula / NIT','banco'=>'Banco','cuenta'=>'N° de Cuenta','tipo'=>'Tipo de Cuenta','llave'=>'Nequi / Daviplata / QR'];
+    $cells = '';
+    $idx = 0;
     foreach ($bancFields as $k => $lbl) {
         if (!empty($bancariosOver[$k])) {
-            $rows .= '<tr><td style="padding:8px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;width:40%">' . $lbl . '</td>'
-                   . '<td style="padding:8px 16px;font-size:15px;font-weight:800;color:#0f172a">' . htmlspecialchars($bancariosOver[$k]) . '</td></tr>';
+            $bg = $idx % 2 === 0 ? '#FAFAF7' : '#ffffff';
+            $cells .= '<td style="padding:10px 16px;background:' . $bg . ';vertical-align:top;width:50%">'
+                    . '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">' . $lbl . '</div>'
+                    . '<div style="font-size:12px;font-weight:600;color:#2D2B28">' . htmlspecialchars($bancariosOver[$k]) . '</div>'
+                    . '</td>';
+            $idx++;
         }
     }
-    if (!$rows) return '';
-    return '<table style="width:100%;border-collapse:collapse;margin:0 0 0 0">
-<tr><td style="padding:36px 36px 0">
-<table style="width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1.5px solid #e2e8f0">
-<tr><td colspan="2" style="padding:14px 16px;background:' . $template['color_primario'] . ';font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:' . $template['color_secundario'] . '">Información de Pago — Datos Bancarios</td></tr>'
+    if (!$cells) return '';
+    // Group into rows of 2
+    $allVals = [];
+    foreach ($bancFields as $k => $lbl) {
+        if (!empty($bancariosOver[$k])) $allVals[] = ['lbl'=>$lbl,'val'=>$bancariosOver[$k]];
+    }
+    $rows = '';
+    for ($i = 0; $i < count($allVals); $i += 2) {
+        $bg0 = $i % 4 === 0 ? '#FAFAF7' : '#ffffff';
+        $bg1 = $bg0;
+        $cell0 = '<td style="padding:10px 16px;background:'.$bg0.';vertical-align:top;width:50%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.$allVals[$i]['lbl'].'</div><div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i]['val']).'</div></td>';
+        $cell1 = isset($allVals[$i+1])
+            ? '<td style="padding:10px 16px;background:#ffffff;vertical-align:top;width:50%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.$allVals[$i+1]['lbl'].'</div><div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i+1]['val']).'</div></td>'
+            : '<td style="width:50%"></td>';
+        $rows .= '<tr>'.$cell0.$cell1.'</tr>';
+    }
+    return '<table style="width:100%;border-collapse:collapse"><tr><td style="padding:0 36px 28px">
+<table style="width:100%;border-collapse:collapse;border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
+<tr><td colspan="2" style="padding:10px 16px;background:' . $template['color_primario'] . '">
+  <table style="border-collapse:collapse"><tr>
+    <td style="padding:0 8px 0 0;vertical-align:middle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' . $template['color_secundario'] . '" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></td>
+    <td style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:' . $template['color_secundario'] . '">Datos para el pago</td>
+  </tr></table>
+</td></tr>'
 . $rows .
 '</table></td></tr></table>';
 })() . '
+
+' . ($linkPago ? '<table style="width:100%;border-collapse:collapse"><tr><td style="padding:24px 36px;text-align:center">
+<a href="' . htmlspecialchars($linkPago) . '" target="_blank" style="display:inline-block;padding:14px 40px;background:' . $template['color_primario'] . ';color:' . $template['color_secundario'] . ';font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">💳 Pagar Ahora</a>
+<div style="font-size:11px;color:#94a3b8;margin-top:8px">' . htmlspecialchars($linkPago) . '</div>
+</td></tr></table>' : '') . '
 
 <table style="width:100%;border-collapse:collapse;background:' . $template['color_primario'] . '">
 <tr>
@@ -297,22 +337,61 @@ $htmlFinal = '<!DOCTYPE html>
 $mailer = new Mailer();
 $result = $mailer->send(
     $data['nombre_comercial'] . ' <' . $emailDest . '>',
-    'Orden de Compra #' . $orderNumber . ' - QUANTUN Digital',
+    $docTipoLabel . ' #' . $orderNumber . ' - QUANTUN Digital',
     $htmlFinal
 );
 
 if ($result['ok']) {
-    // Log
+    $userId = $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null;
+
+    // Log en notas del cliente
     try {
         $stmt = $pdo->prepare("
             INSERT INTO cliente_notas (cliente_id, nota, usuario_id, created_at)
             VALUES (?, ?, ?, NOW())
         ");
-        $userId = $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null;
-        $stmt->execute([$clienteId, '[📧] Orden de Compra #' . $orderNumber . ' enviada por correo a ' . $emailDest, $userId]);
+        $stmt->execute([$clienteId, '[📧] ' . $docTipoLabel . ' #' . $orderNumber . ' enviada por correo a ' . $emailDest, $userId]);
     } catch (Exception $e) {}
 
-    jsonResponse(['success' => true, 'message' => "Orden enviada a $emailDest"]);
+    // Registrar en cotizaciones si es orden de renovación
+    if ($docTipo === 'orden_renovacion') {
+        try {
+            // Migración por si la tabla no tiene las nuevas columnas
+            try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN link_pago VARCHAR(500) DEFAULT NULL"); } catch(PDOException $e){}
+            try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN datos_bancarios LONGTEXT DEFAULT NULL"); } catch(PDOException $e){}
+            try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN plantilla_id INT DEFAULT NULL"); } catch(PDOException $e){}
+
+            $itemsJson = json_encode($itemsOverride ?: array_map(function($s) {
+                return [
+                    'descripcion' => $s['servicio_nombre'],
+                    'qty'         => $s['_qty'] ?? 1,
+                    'precio'      => $s['_precio_unit'] ?? $s['monto_renovacion'],
+                    'descuento'   => $s['descuento'] ?? 0,
+                ];
+            }, $servicios));
+
+            $stmtIns = $pdo->prepare("INSERT INTO cotizaciones
+                (numero, cliente_tipo, cliente_id, nombre_cliente, email, items, subtotal, descuento, total, notas, tipo, estado, link_pago, datos_bancarios, plantilla_id, creado_por)
+                VALUES (?, 'cliente', ?, ?, ?, ?, ?, ?, ?, ?, 'orden_renovacion', 'enviada', ?, ?, ?, ?)");
+            $stmtIns->execute([
+                $orderNumber,
+                $clienteId,
+                $data['nombre_comercial'],
+                $emailDest,
+                $itemsJson,
+                $totalOriginal,
+                $totalDescuento,
+                $totalFinal,
+                $notasPieOver,
+                $linkPago ?: null,
+                !empty($bancariosOver) ? json_encode($bancariosOver) : null,
+                $plantillaIdOver ?: null,
+                $userId,
+            ]);
+        } catch (Exception $e) {}
+    }
+
+    jsonResponse(['success' => true, 'message' => "$docTipoLabel enviada a $emailDest"]);
 } else {
     jsonResponse(['error' => 'Error al enviar: ' . $result['error']], 500);
 }

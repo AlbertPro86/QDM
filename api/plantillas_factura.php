@@ -19,6 +19,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS plantillas_factura (
     nombre           VARCHAR(120) NOT NULL,
     descripcion      VARCHAR(255) DEFAULT NULL,
     layout_tipo      VARCHAR(30)  NOT NULL DEFAULT 'clasica',
+    categoria        VARCHAR(50)  NOT NULL DEFAULT 'cotizacion',
     color_primario   VARCHAR(7)   NOT NULL DEFAULT '#0f172a',
     color_secundario VARCHAR(7)   NOT NULL DEFAULT '#c9f31d',
     fuente           VARCHAR(50)  NOT NULL DEFAULT 'Poppins',
@@ -29,11 +30,25 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS plantillas_factura (
     empresa_dir      VARCHAR(255) DEFAULT NULL,
     logo_url         VARCHAR(500) DEFAULT NULL,
     notas_pie        TEXT         DEFAULT NULL,
+    mostrar_banco    TINYINT(1)   NOT NULL DEFAULT 0,
     es_default       TINYINT(1)   NOT NULL DEFAULT 0,
     activo           TINYINT(1)   NOT NULL DEFAULT 1,
     created_at       TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+// Migración incremental — añade columnas a tablas existentes
+try { $pdo->exec("ALTER TABLE plantillas_factura ADD COLUMN mostrar_banco TINYINT(1) NOT NULL DEFAULT 0"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE plantillas_factura ADD COLUMN categoria VARCHAR(50) NOT NULL DEFAULT 'cotizacion'"); } catch (PDOException $e) {}
+
+// Seed: crear plantilla default de Orden de Renovación si no existe
+try {
+    $chkOR = $pdo->query("SELECT COUNT(*) FROM plantillas_factura WHERE categoria = 'orden_renovacion'")->fetchColumn();
+    if ($chkOR == 0) {
+        $pdo->exec("INSERT INTO plantillas_factura (nombre, descripcion, layout_tipo, categoria, color_primario, color_secundario, fuente, empresa_nombre, empresa_nit, empresa_email, empresa_tel, empresa_dir, notas_pie, mostrar_banco, es_default, activo)
+            VALUES ('Orden de Renovación - Default', 'Plantilla predeterminada para órdenes de renovación de servicios', 'clasica', 'orden_renovacion', '#0E0E0C', '#C6F24E', 'Poppins', 'QUANTUN Digital', '', '', '', '', 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.', 1, 1, 1)");
+    }
+} catch (PDOException $e) {}
 
 switch ($method) {
 
@@ -58,9 +73,17 @@ switch ($method) {
             jsonResponse(['success' => true, 'data' => $row]);
         }
 
-        $rows = $pdo->query(
-            "SELECT * FROM plantillas_factura WHERE activo = 1 ORDER BY es_default DESC, nombre ASC"
-        )->fetchAll();
+        // Filtro por categoría (opcional)
+        $catFilter = $_GET['categoria'] ?? null;
+        if ($catFilter) {
+            $stmtCat = $pdo->prepare("SELECT * FROM plantillas_factura WHERE activo = 1 AND categoria = ? ORDER BY es_default DESC, nombre ASC");
+            $stmtCat->execute([$catFilter]);
+            $rows = $stmtCat->fetchAll();
+        } else {
+            $rows = $pdo->query(
+                "SELECT * FROM plantillas_factura WHERE activo = 1 ORDER BY es_default DESC, nombre ASC"
+            )->fetchAll();
+        }
 
         jsonResponse(['success' => true, 'data' => $rows, 'total' => count($rows)]);
 
@@ -74,14 +97,15 @@ switch ($method) {
 
         $s = $pdo->prepare(
             "INSERT INTO plantillas_factura
-             (nombre,descripcion,layout_tipo,color_primario,color_secundario,fuente,
-              empresa_nombre,empresa_nit,empresa_email,empresa_tel,empresa_dir,logo_url,notas_pie,es_default)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+             (nombre,descripcion,layout_tipo,categoria,color_primario,color_secundario,fuente,
+              empresa_nombre,empresa_nit,empresa_email,empresa_tel,empresa_dir,logo_url,notas_pie,mostrar_banco,es_default)
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
         );
         $s->execute([
             $in['nombre'],
             $in['descripcion']      ?? null,
             $in['layout_tipo']      ?? 'clasica',
+            $in['categoria']        ?? 'cotizacion',
             $in['color_primario']   ?? '#0f172a',
             $in['color_secundario'] ?? '#c9f31d',
             $in['fuente']           ?? 'Poppins',
@@ -92,6 +116,7 @@ switch ($method) {
             $in['empresa_dir']      ?? null,
             $in['logo_url']         ?? null,
             $in['notas_pie']        ?? null,
+            !empty($in['mostrar_banco']) ? 1 : 0,
             !empty($in['es_default']) ? 1 : 0,
         ]);
         $newId = $pdo->lastInsertId();
@@ -109,8 +134,8 @@ switch ($method) {
 
         if (!empty($in['es_default'])) $pdo->exec("UPDATE plantillas_factura SET es_default = 0");
 
-        $allowed = ['nombre','descripcion','layout_tipo','color_primario','color_secundario','fuente',
-                    'empresa_nombre','empresa_nit','empresa_email','empresa_tel','empresa_dir','logo_url','notas_pie','es_default'];
+        $allowed = ['nombre','descripcion','layout_tipo','categoria','color_primario','color_secundario','fuente',
+                    'empresa_nombre','empresa_nit','empresa_email','empresa_tel','empresa_dir','logo_url','notas_pie','mostrar_banco','es_default'];
         $fields = []; $values = [];
         foreach ($allowed as $f) {
             if (array_key_exists($f, $in)) {

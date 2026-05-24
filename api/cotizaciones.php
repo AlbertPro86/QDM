@@ -41,6 +41,12 @@ try {
     ");
 } catch (PDOException $e) { /* tabla ya existe */ }
 
+// Migración incremental
+try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN tipo VARCHAR(30) NOT NULL DEFAULT 'cotizacion'"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN link_pago VARCHAR(500) DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN datos_bancarios LONGTEXT DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN plantilla_id INT DEFAULT NULL"); } catch(PDOException $e){}
+
 switch ($method) {
     case 'GET':
         // Buscar destinatarios (clientes + leads)
@@ -122,8 +128,8 @@ switch ($method) {
                 $stmt = $pdo->prepare("
                     INSERT INTO cotizaciones
                     (numero, cliente_tipo, cliente_id, nombre_cliente, email, whatsapp, items,
-                     subtotal, descuento, total, notas, vigencia_dias, moneda, estado, creado_por)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)
+                     subtotal, descuento, total, notas, vigencia_dias, moneda, tipo, estado, creado_por)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)
                 ");
                 $stmt->execute([
                     $nuevoNumero,
@@ -139,6 +145,7 @@ switch ($method) {
                     $origen['notas'],
                     $origen['vigencia_dias'],
                     $origen['moneda'] ?? 'COP',
+                    $origen['tipo'] ?? 'cotizacion',
                     $usuario_id
                 ]);
 
@@ -161,12 +168,15 @@ switch ($method) {
             $stmt = $pdo->prepare("
                 INSERT INTO cotizaciones
                 (cliente_tipo, cliente_id, nombre_cliente, email, whatsapp, items,
-                 subtotal, descuento, total, notas, vigencia_dias, moneda, estado, creado_por)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 subtotal, descuento, total, notas, vigencia_dias, moneda, tipo, estado, creado_por)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
             $estadoValido = in_array($input['estado'] ?? '', ['borrador','enviada','aceptada','rechazada','pendiente'])
                 ? $input['estado'] : 'pendiente';
+
+            $tiposValidos = ['cotizacion', 'cuenta_cobro', 'orden_compra', 'orden_renovacion'];
+            $tipoDoc = in_array($input['tipo'] ?? '', $tiposValidos) ? $input['tipo'] : 'cotizacion';
 
             $stmt->execute([
                 $input['cliente_tipo'],
@@ -181,6 +191,7 @@ switch ($method) {
                 $input['notas'] ?? null,
                 intval($input['vigencia_dias'] ?? 15),
                 $input['moneda'] ?? 'USD',
+                $tipoDoc,
                 $estadoValido,
                 $_SESSION['user_id'] ?? null
             ]);
@@ -225,12 +236,15 @@ switch ($method) {
             $items   = is_string($input['items']) ? $input['items'] : json_encode($input['items'] ?? []);
             $estadoV = in_array($input['estado'] ?? '', ['borrador','enviada','aceptada','rechazada','pendiente']) ? $input['estado'] : 'pendiente';
 
+            $tiposValidos = ['cotizacion', 'cuenta_cobro', 'orden_compra', 'orden_renovacion'];
+            $tipoDocPut = in_array($input['tipo'] ?? '', $tiposValidos) ? $input['tipo'] : null;
+
             $stmt = $pdo->prepare("UPDATE cotizaciones SET
                 cliente_tipo=?, cliente_id=?, nombre_cliente=?, email=?, whatsapp=?,
                 items=?, subtotal=?, descuento=?, total=?, notas=?, vigencia_dias=?,
-                moneda=?, estado=?, updated_at=NOW()
+                moneda=?, estado=?" . ($tipoDocPut ? ", tipo=?" : "") . ", updated_at=NOW()
                 WHERE id=?");
-            $stmt->execute([
+            $executeParams = [
                 $input['cliente_tipo'] ?? 'lead',
                 $input['cliente_id']  ?? null,
                 $input['nombre_cliente'],
@@ -244,8 +258,10 @@ switch ($method) {
                 intval($input['vigencia_dias'] ?? 15),
                 $input['moneda']      ?? 'COP',
                 $estadoV,
-                $id
-            ]);
+            ];
+            if ($tipoDocPut) $executeParams[] = $tipoDocPut;
+            $executeParams[] = $id;
+            $stmt->execute($executeParams);
 
             // Obtener número actual
             $row = $pdo->prepare("SELECT numero FROM cotizaciones WHERE id=?");
