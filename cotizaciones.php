@@ -499,6 +499,7 @@ async function eliminarSeleccionadas() {
 let cotizacionActual = null;
 let disenoSeleccionado = null; // plantilla_factura elegida (null = básico)
 let _disenosCache = null;
+const _filtroTipoActual = <?= json_encode($filtro_tipo) ?>;
 
 async function abrirModalEnviar(id) {
     try {
@@ -526,12 +527,12 @@ async function cargarGaleriaDiseños() {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#94a3b8;font-size:13px">Cargando diseños...</div>';
     try {
         if (!_disenosCache) {
-            const r = await fetch('api/plantillas_factura.php');
+            const r = await fetch('api/plantillas_factura.php?categoria=' + encodeURIComponent(_filtroTipoActual));
             const d = await r.json();
             _disenosCache = (d.success && d.data) ? d.data : [];
         }
         if (!_disenosCache.length) {
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#94a3b8;font-size:13px">No hay diseños de plantilla aún.<br><a href="configuraciones.php" style="color:#0E0E0C;font-weight:700">Crear plantilla</a></div>';
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:#94a3b8;font-size:13px">No hay diseños de plantilla aún.<br><a href="plantillas_factura.php" style="color:#0E0E0C;font-weight:700">Crear plantilla</a></div>';
             return;
         }
         grid.innerHTML = _disenosCache.map(p => {

@@ -27,6 +27,7 @@ include __DIR__ . '/includes/header.php';
             <option value="cotizacion">Cotización</option>
             <option value="cuenta_cobro">Cuenta de cobro</option>
             <option value="orden_compra">Orden de compra</option>
+            <option value="orden_renovacion">Orden de Renovación</option>
             <option value="propuesta">Propuesta</option>
             <option value="recibo">Recibo</option>
             <option value="otro">Otro</option>

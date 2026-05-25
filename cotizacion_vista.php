@@ -27,14 +27,27 @@ $descuento = floatval($cot['descuento']);
 
 // ── Plantilla ─────────────────────────────────────────────────────────────────
 $plantilla = null;
+// Prioridad: GET > guardado en la cotización > default de la categoría > cualquier default
 $plantillaId = intval($_GET['plantilla_id'] ?? 0);
+if (!$plantillaId) {
+    $plantillaId = intval($cot['plantilla_id'] ?? 0); // leer del registro guardado
+}
 if ($plantillaId) {
     $ps = $pdo->prepare("SELECT * FROM plantillas_factura WHERE id = ? AND activo = 1");
     $ps->execute([$plantillaId]);
     $plantilla = $ps->fetch() ?: null;
 }
 if (!$plantilla) {
-    // Intentar plantilla default
+    // Intentar plantilla default de la categoría del documento
+    $catMap = ['cotizacion'=>'cotizacion','cuenta_cobro'=>'cuenta_cobro','orden_compra'=>'orden_compra','orden_renovacion'=>'orden_renovacion'];
+    $tipoDoc = $_GET['tipo'] ?? 'cotizacion';
+    $catBuscar = $catMap[$tipoDoc] ?? 'cotizacion';
+    $ps = $pdo->prepare("SELECT * FROM plantillas_factura WHERE categoria = ? AND es_default = 1 AND activo = 1 LIMIT 1");
+    $ps->execute([$catBuscar]);
+    $plantilla = $ps->fetch() ?: null;
+}
+if (!$plantilla) {
+    // Último recurso: cualquier default activa
     $plantilla = $pdo->query("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1")->fetch() ?: null;
 }
 
