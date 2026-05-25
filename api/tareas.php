@@ -55,8 +55,19 @@ switch ($method) {
             jsonResponse(['success' => true, 'data' => $row]);
         }
 
-        $where  = ["t.estado != 'cancelado'"];
+        $cliente_id_filter = isset($_GET['cliente_id']) ? intval($_GET['cliente_id']) : null;
+        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 500;
+
+        $where  = [];
         $params = [];
+
+        // Si viene cliente_id, mostrar todas las tareas (incluso canceladas) de ese cliente
+        if ($cliente_id_filter) {
+            $where[] = "t.cliente_id = ?";
+            $params[] = $cliente_id_filter;
+        } else {
+            $where[] = "t.estado != 'cancelado'";
+        }
 
         if ($estado) { $where[] = "t.estado = ?";    $params[] = $estado; }
         if ($prior)  { $where[] = "t.prioridad = ?"; $params[] = $prior;  }
@@ -68,8 +79,8 @@ switch ($method) {
         if ($desde) { $where[] = "DATE(t.created_at) >= ?"; $params[] = $desde; }
         if ($hasta) { $where[] = "DATE(t.created_at) <= ?"; $params[] = $hasta; }
 
-        $sql = "$base WHERE " . implode(' AND ', $where)
-             . " ORDER BY FIELD(t.prioridad,'alta','media','baja'), t.fecha_limite ASC";
+        $whereStr = $where ? "WHERE " . implode(' AND ', $where) : "";
+        $sql = "$base $whereStr ORDER BY FIELD(t.estado,'pendiente','en_progreso','revision','completado','cancelado'), FIELD(t.prioridad,'alta','media','baja'), t.fecha_limite ASC LIMIT " . $limite;
 
         $s = $pdo->prepare($sql);
         $s->execute($params);

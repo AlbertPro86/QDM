@@ -115,8 +115,16 @@ include __DIR__ . '/includes/header.php';
             </div>
             <?php endif; ?>
         </div>
-        <!-- Botón editar -->
-        <button class="btn btn-outline sm" style="flex-shrink:0" onclick="openEditModal()">Editar datos</button>
+        <!-- Botones acción -->
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <!-- Botón RUT -->
+            <button id="btnRut" onclick="openRutModal()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='#94a3b8';this.style.background='#f8fafc'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span id="btnRutLabel">RUT</span>
+                <span id="btnRutDot" style="display:none;width:7px;height:7px;background:#22c55e;border-radius:50%;flex-shrink:0"></span>
+            </button>
+            <button class="btn btn-outline sm" style="flex-shrink:0" onclick="openEditModal()">Editar datos</button>
+        </div>
     </div>
 
 </div>
@@ -505,6 +513,48 @@ include __DIR__ . '/includes/header.php';
             </div>
         </div>
 
+        <!-- ── Sección Tareas del Cliente ─────────────────────────────────── -->
+        <div class="card animate-fade-up" style="overflow:hidden" id="tareasClienteCard">
+            <div onclick="togglePanel('panelTareasCliente','arrowTareasCliente')"
+                 style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;cursor:pointer;background:#FAFAF7;user-select:none">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:26px;height:26px;border-radius:4px;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                        <div style="display:flex;align-items:center;gap:7px">
+                            <div style="font-size:12px;font-weight:700;color:#0E0E0C;line-height:1.2">Tareas del Cliente</div>
+                            <span id="tareasClienteBadgePend" style="display:none;background:#fee2e2;color:#dc2626;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px"></span>
+                            <span id="tareasClienteBadgeTotal" style="display:none;background:#f1f5f9;color:#64748b;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px"></span>
+                        </div>
+                        <div style="font-size:9px;color:#8A867C">Seguimiento de actividades y pendientes</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button onclick="event.stopPropagation();openTareasModal()"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#ffffff;color:#0E0E0C;border:1px solid #E8E5DD;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s"
+                        onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='#ffffff'">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        Agregar
+                    </button>
+                    <svg id="arrowTareasCliente" width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .25s"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </div>
+            <div id="panelTareasCliente">
+                <!-- Filtros de estado -->
+                <div style="display:flex;align-items:center;gap:6px;padding:10px 12px 4px;flex-wrap:wrap">
+                    <button class="tarea-filtro-btn active" data-filtro="todos" onclick="filtrarTareasCliente('todos',this)" style="padding:4px 11px;border-radius:20px;border:1px solid #e2e8f0;background:#0f172a;color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s">Todas</button>
+                    <button class="tarea-filtro-btn" data-filtro="pendiente" onclick="filtrarTareasCliente('pendiente',this)" style="padding:4px 11px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Pendiente</button>
+                    <button class="tarea-filtro-btn" data-filtro="en_progreso" onclick="filtrarTareasCliente('en_progreso',this)" style="padding:4px 11px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">En progreso</button>
+                    <button class="tarea-filtro-btn" data-filtro="completado" onclick="filtrarTareasCliente('completado',this)" style="padding:4px 11px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Completadas</button>
+                    <button class="tarea-filtro-btn" data-filtro="cancelado" onclick="filtrarTareasCliente('cancelado',this)" style="padding:4px 11px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">Canceladas</button>
+                </div>
+                <div id="tareasClienteLista" style="padding:4px 0 8px">
+                    <div style="text-align:center;padding:28px;color:var(--color-text-light);font-size:12px">Cargando...</div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- /columna principal -->
 
     <!-- Sidebar derecho -->
@@ -572,6 +622,32 @@ include __DIR__ . '/includes/header.php';
     </div><!-- /sidebar -->
 
 </div><!-- /grid principal -->
+
+<!-- ── Modal RUT ──────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="rutModal">
+    <div class="modal" style="max-width:520px">
+        <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;background:#eff6ff;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="16" height="16" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <h3 class="modal-title">RUT del Cliente</h3>
+                    <p style="font-size:11px;color:#94a3b8;margin:2px 0 0">Registro Único Tributario</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeRutModal()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" id="rutModalBody" style="min-height:120px">
+            <!-- contenido dinámico -->
+        </div>
+        <div class="modal-footer" id="rutModalFooter" style="flex-wrap:wrap;gap:8px">
+            <!-- botones dinámicos -->
+        </div>
+    </div>
+</div>
 
 <!-- Modal Subir Adjunto -->
 <div class="modal-overlay" id="adjuntoUploadModal">
@@ -3202,6 +3278,7 @@ async function confirmarEnvioMsgEmail() {
                         <input id="bancLlave" type="text" placeholder="Ej: +57 300 000 0000" style="<?= $inputBancStyle ?>" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()">
                     </div>
                 </div>
+                </div>
                 <div style="padding:0 16px 16px">
                     <div style="padding:10px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px">
                         <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:4px"><span>Subtotal</span><span id="ordenResumenSubtotal">$ 0</span></div>
@@ -4219,15 +4296,274 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNotifConfig();
     loadTareasIndicador();
     loadNegocios();
+    loadTareasCliente();
+    loadRutStatus();
 });
 
 // Actualizar indicador después de crear tarea
 const originalCrearTarea = window.crearTarea;
 window.crearTarea = function() {
     originalCrearTarea.call(this);
-    // Recargar el indicador después de 1 segundo
-    setTimeout(loadTareasIndicador, 1000);
+    // Recargar el indicador y la sección de tareas
+    setTimeout(() => { loadTareasIndicador(); loadTareasCliente(); }, 1000);
 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SECCIÓN TAREAS DEL CLIENTE
+// ══════════════════════════════════════════════════════════════════════════════
+
+let _tareasClienteData = [];
+let _tareasClienteFiltro = 'todos';
+
+async function loadTareasCliente() {
+    try {
+        const r = await fetch(`api/tareas.php?cliente_id=${clienteId}&limite=100`);
+        const d = await r.json();
+        if (!d.success) return;
+        _tareasClienteData = Array.isArray(d.data) ? d.data : [];
+        renderTareasCliente();
+        updateTareasBadges();
+    } catch(e) { console.error('Error cargando tareas:', e); }
+}
+
+function updateTareasBadges() {
+    const pend = _tareasClienteData.filter(t => t.estado === 'pendiente' || t.estado === 'en_progreso').length;
+    const total = _tareasClienteData.length;
+    const bPend = document.getElementById('tareasClienteBadgePend');
+    const bTot  = document.getElementById('tareasClienteBadgeTotal');
+    if (pend > 0) {
+        bPend.textContent = pend + ' pendiente' + (pend !== 1 ? 's' : '');
+        bPend.style.display = 'inline';
+    } else {
+        bPend.style.display = 'none';
+    }
+    if (total > 0) {
+        bTot.textContent = total + ' tarea' + (total !== 1 ? 's' : '');
+        bTot.style.display = 'inline';
+    } else {
+        bTot.style.display = 'none';
+    }
+}
+
+function filtrarTareasCliente(filtro, btn) {
+    _tareasClienteFiltro = filtro;
+    document.querySelectorAll('.tarea-filtro-btn').forEach(b => {
+        const active = b === btn;
+        b.style.background = active ? '#0f172a' : '#fff';
+        b.style.color = active ? '#fff' : '#475569';
+        b.style.fontWeight = active ? '700' : '600';
+    });
+    renderTareasCliente();
+}
+
+function renderTareasCliente() {
+    const lista = document.getElementById('tareasClienteLista');
+    const filtro = _tareasClienteFiltro;
+    let tareas = _tareasClienteData;
+    if (filtro !== 'todos') tareas = tareas.filter(t => t.estado === filtro);
+
+    if (!tareas.length) {
+        lista.innerHTML = `<div style="text-align:center;padding:32px 20px">
+            <svg width="36" height="36" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5" style="margin:0 auto 10px;display:block"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <p style="font-size:12px;color:#94a3b8;margin:0">${filtro === 'todos' ? 'Sin tareas registradas para este cliente.' : 'Sin tareas con este estado.'}</p>
+            ${filtro === 'todos' ? `<button onclick="openTareasModal()" style="margin-top:12px;padding:7px 16px;background:#4f46e5;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">+ Agregar tarea</button>` : ''}
+        </div>`;
+        return;
+    }
+
+    const prioData = {
+        alta:   { bg:'#fee2e2', clr:'#dc2626', label:'Alta' },
+        media:  { bg:'#fef3c7', clr:'#d97706', label:'Media' },
+        baja:   { bg:'#dcfce7', clr:'#16a34a', label:'Baja' },
+    };
+    const estadoData = {
+        pendiente:   { bg:'#fff7ed', clr:'#ea580c', label:'Pendiente', icon:'⏳' },
+        en_progreso: { bg:'#eff6ff', clr:'#2563eb', label:'En progreso', icon:'🔄' },
+        revision:    { bg:'#f5f3ff', clr:'#7c3aed', label:'Revisión', icon:'🔍' },
+        completado:  { bg:'#f0fdf4', clr:'#16a34a', label:'Completado', icon:'✅' },
+        cancelado:   { bg:'#f8fafc', clr:'#94a3b8', label:'Cancelado', icon:'✗' },
+    };
+
+    lista.innerHTML = tareas.map(t => {
+        const prio = prioData[t.prioridad] || prioData.media;
+        const est  = estadoData[t.estado]  || estadoData.pendiente;
+        const fechaStr = t.fecha_limite
+            ? (() => {
+                const d = new Date(t.fecha_limite + 'T12:00:00');
+                const hoy = new Date(); hoy.setHours(0,0,0,0);
+                const diff = Math.round((d - hoy) / 86400000);
+                const label = d.toLocaleDateString('es-CO', {day:'2-digit', month:'short'});
+                const color = diff < 0 ? '#dc2626' : diff === 0 ? '#ea580c' : diff <= 3 ? '#d97706' : '#64748b';
+                const prefix = diff < 0 ? 'Venció ' : diff === 0 ? 'Hoy' : '';
+                return `<span style="color:${color};font-weight:${diff <= 0 ? '700' : '500'}">${prefix}${label}</span>`;
+            })()
+            : '<span style="color:#cbd5e1">Sin fecha</span>';
+        const completado = t.estado === 'completado' || t.estado === 'cancelado';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #f1f5f9;transition:background .12s" onmouseenter="this.style.background='#fafafa'" onmouseleave="this.style.background=''">
+            <!-- Checkbox circular -->
+            <button onclick="toggleTareaEstado(${t.id}, '${t.estado}')" title="${completado ? 'Marcar como pendiente' : 'Marcar como completada'}"
+                style="width:20px;height:20px;border-radius:50%;border:2px solid ${completado ? '#22c55e' : '#cbd5e1'};background:${completado ? '#22c55e' : 'transparent'};flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0"
+                onmouseenter="this.style.borderColor='#22c55e'" onmouseleave="this.style.borderColor='${completado ? '#22c55e' : '#cbd5e1'}'">
+                ${completado ? '<svg width="10" height="10" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+            </button>
+            <!-- Contenido -->
+            <div style="flex:1;min-width:0;cursor:pointer" onclick="verDetallesTareaCliente(${t.id})">
+                <div style="font-size:12px;font-weight:${completado ? '500' : '700'};color:${completado ? '#94a3b8' : '#0f172a'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${completado ? 'text-decoration:line-through' : ''}">${escapeHtmlClient(t.titulo)}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">
+                    <span style="font-size:10px;background:${est.bg};color:${est.clr};padding:2px 7px;border-radius:20px;font-weight:700">${est.icon} ${est.label}</span>
+                    <span style="font-size:10px;background:${prio.bg};color:${prio.clr};padding:2px 7px;border-radius:20px;font-weight:600">${prio.label}</span>
+                    <span style="font-size:10px;color:#94a3b8">${fechaStr}</span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function toggleTareaEstado(id, estadoActual) {
+    const nuevoEstado = (estadoActual === 'completado') ? 'pendiente' : 'completado';
+    try {
+        const r = await fetch('api/tareas.php', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, estado: nuevoEstado })
+        });
+        const d = await r.json();
+        if (d.success) {
+            // Actualizar localmente sin recargar todo
+            const tarea = _tareasClienteData.find(t => t.id == id);
+            if (tarea) tarea.estado = nuevoEstado;
+            renderTareasCliente();
+            updateTareasBadges();
+            loadTareasIndicador();
+        } else {
+            showToast(d.error || 'Error al actualizar', 'error');
+        }
+    } catch(e) { showToast('Error al actualizar tarea', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BOTÓN Y MODAL RUT
+// ══════════════════════════════════════════════════════════════════════════════
+
+let _rutUrl = null;
+
+async function loadRutStatus() {
+    try {
+        const r = await fetch(`api/cliente_rut.php?cliente_id=${clienteId}`);
+        const d = await r.json();
+        _rutUrl = d.rut_url || null;
+        const dot = document.getElementById('btnRutDot');
+        const label = document.getElementById('btnRutLabel');
+        if (_rutUrl) {
+            dot.style.display = 'inline-block';
+            label.textContent = 'RUT ✓';
+        } else {
+            dot.style.display = 'none';
+            label.textContent = 'RUT';
+        }
+    } catch(e) {}
+}
+
+function openRutModal() {
+    const body = document.getElementById('rutModalBody');
+    const footer = document.getElementById('rutModalFooter');
+
+    if (_rutUrl) {
+        const isPdf = _rutUrl.toLowerCase().endsWith('.pdf');
+        body.innerHTML = `
+            <div style="margin-bottom:12px">
+                <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:12px">
+                    <svg width="14" height="14" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <span style="font-size:12px;color:#15803d;font-weight:600">RUT cargado</span>
+                </div>
+                ${isPdf
+                    ? `<iframe src="${_rutUrl}#toolbar=0" style="width:100%;height:340px;border:1.5px solid #e2e8f0;border-radius:8px" title="Vista previa RUT"></iframe>`
+                    : `<img src="${_rutUrl}" alt="RUT" style="width:100%;max-height:340px;object-fit:contain;border:1.5px solid #e2e8f0;border-radius:8px">`
+                }
+            </div>`;
+        footer.innerHTML = `
+            <button class="btn btn-ghost" onclick="closeRutModal()">Cerrar</button>
+            <label class="btn btn-outline" style="cursor:pointer;gap:6px">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Cambiar RUT
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none" onchange="subirRut(this)">
+            </label>
+            <a href="${_rutUrl}" download class="btn btn-outline" style="gap:6px;text-decoration:none">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m0 0l-4-4m4 4l4-4"/></svg>
+                Descargar
+            </a>
+            <button onclick="eliminarRut()" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:#fee2e2;color:#dc2626;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.95)'" onmouseleave="this.style.filter=''">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Eliminar
+            </button>`;
+    } else {
+        body.innerHTML = `
+            <div style="text-align:center;padding:28px 20px">
+                <div style="width:52px;height:52px;background:#f1f5f9;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                    <svg width="24" height="24" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <p style="font-size:13px;font-weight:600;color:#0f172a;margin:0 0 4px">Sin RUT cargado</p>
+                <p style="font-size:12px;color:#94a3b8;margin:0 0 16px">Adjunta el RUT del cliente para tenerlo siempre a mano.</p>
+                <label class="btn btn-primary" style="cursor:pointer;gap:8px;display:inline-flex;align-items:center">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+                    Subir RUT (PDF o imagen)
+                    <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none" onchange="subirRut(this)">
+                </label>
+                <p style="font-size:10px;color:#cbd5e1;margin:10px 0 0">Formatos: PDF, JPG, PNG · Máx. 10 MB</p>
+            </div>`;
+        footer.innerHTML = `<button class="btn btn-ghost" onclick="closeRutModal()">Cerrar</button>`;
+    }
+    document.getElementById('rutModal').classList.add('show');
+}
+
+function closeRutModal() {
+    document.getElementById('rutModal').classList.remove('show');
+}
+
+async function subirRut(input) {
+    if (!input.files.length) return;
+    const file = input.files[0];
+    input.value = '';
+    closeRutModal();
+    showToast('Subiendo RUT...', 'info');
+    const fd = new FormData();
+    fd.append('rut', file);
+    fd.append('cliente_id', clienteId);
+    try {
+        const r = await fetch('api/cliente_rut.php', { method: 'POST', body: fd });
+        const d = await r.json();
+        if (d.success) {
+            _rutUrl = d.rut_url;
+            await loadRutStatus();
+            showToast('RUT guardado correctamente', 'success');
+        } else {
+            showToast(d.error || 'Error al subir RUT', 'error');
+        }
+    } catch(e) { showToast('Error al subir RUT', 'error'); }
+}
+
+async function eliminarRut() {
+    const ok = await confirmAction({
+        title: 'Eliminar RUT',
+        message: '¿Seguro que quieres eliminar el RUT del cliente? Esta acción no se puede deshacer.',
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        type: 'danger'
+    });
+    if (!ok) return;
+    closeRutModal();
+    try {
+        const r = await fetch(`api/cliente_rut.php?cliente_id=${clienteId}`, { method: 'DELETE' });
+        const d = await r.json();
+        if (d.success) {
+            _rutUrl = null;
+            await loadRutStatus();
+            showToast('RUT eliminado', 'success');
+        } else {
+            showToast(d.error || 'Error al eliminar', 'error');
+        }
+    } catch(e) { showToast('Error al eliminar RUT', 'error'); }
+}
 </script>
 
 <style>
