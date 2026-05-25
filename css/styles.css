@@ -107,8 +107,10 @@ img {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     background: var(--color-surface);
     position: relative;
+    min-width: 0;
 }
 
 .content-area {
@@ -797,6 +799,12 @@ img {
 }
 
 /* ─── Tables ─── */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .data-table {
     width: 100%;
     text-align: left;
