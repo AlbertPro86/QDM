@@ -146,7 +146,8 @@ include __DIR__ . '/includes/header.php';
                         <span class="cf-card__label">Ingreso Bruto</span>
                         <span class="cf-pill cf-pill--income">Ingresos</span>
                     </div>
-                    <p class="cf-card__value" id="totalIngreso">$ 0 COP</p>
+                    <p class="cf-card__value" id="totalIngreso">$ 0</p>
+                    <p class="cf-card__currency">COP</p>
                 </div>
             </div>
 
@@ -157,7 +158,8 @@ include __DIR__ . '/includes/header.php';
                         <span class="cf-card__label">Descuentos</span>
                         <span class="cf-pill cf-pill--expense">Desc.</span>
                     </div>
-                    <p class="cf-card__value" id="totalEgreso">$ 0 COP</p>
+                    <p class="cf-card__value" id="totalEgreso">$ 0</p>
+                    <p class="cf-card__currency">COP</p>
                 </div>
             </div>
 
@@ -168,7 +170,8 @@ include __DIR__ . '/includes/header.php';
                         <span class="cf-card__label">Ingreso Neto</span>
                         <span class="cf-pill cf-pill--profit">Neto</span>
                     </div>
-                    <p class="cf-card__value" id="totalGanancia">$ 0 COP</p>
+                    <p class="cf-card__value" id="totalGanancia">$ 0</p>
+                    <p class="cf-card__currency">COP</p>
                 </div>
             </div>
         </div>
@@ -265,6 +268,14 @@ include __DIR__ . '/includes/header.php';
             font-family: var(--font-primary);
             line-height: 1;
             margin: 0;
+            white-space: nowrap;
+        }
+        .cf-card__currency {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin: 4px 0 0;
+            letter-spacing: 0.04em;
         }
 
         /* Icon */
@@ -558,7 +569,7 @@ include __DIR__ . '/includes/header.php';
     </div><!-- /columna principal -->
 
     <!-- Sidebar derecho -->
-    <div style="display:grid;gap:16px;align-self:start;position:sticky;top:20px;min-width:0;width:100%;overflow:hidden">
+    <div style="display:flex;flex-direction:column;gap:16px;align-self:start;position:sticky;top:20px;min-width:0;width:100%;overflow:hidden">
 
         <!-- Disparadores -->
         <div class="card animate-fade-up stagger-2">
@@ -1121,9 +1132,9 @@ function renderServices(svcs) {
         </tr>`;
     }).join('');
 
-    document.getElementById('totalIngreso').textContent = formatMoney(totalIn);
-    document.getElementById('totalEgreso').textContent = formatMoney(totalOut);
-    document.getElementById('totalGanancia').textContent = formatMoney(totalIn - totalOut); // Neto = bruto - descuentos
+    document.getElementById('totalIngreso').textContent = moneyNum(totalIn);
+    document.getElementById('totalEgreso').textContent = moneyNum(totalOut);
+    document.getElementById('totalGanancia').textContent = moneyNum(totalIn - totalOut); // Neto = bruto - descuentos
 
     window._ordenSvcMap = {};
     svcs.forEach(s => { window._ordenSvcMap[s.id] = s; });
@@ -2102,7 +2113,7 @@ function renderMedia(media) {
             ? `<div style="font-size:10px;color:var(--color-text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</div>`
             : (added ? `<div style="font-size:10px;color:var(--color-text-light)">${added}</div>` : '');
 
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border)" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
