@@ -135,7 +135,7 @@
     (function() {
         const overlay = document.createElement('div');
         overlay.id = 'confirmModal';
-        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s;backdrop-filter:blur(2px)';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s,visibility .18s;backdrop-filter:blur(2px)';
         overlay.innerHTML = `
             <div id="confirmBox" style="background:#FFFFFF;border-radius:6px;padding:32px 32px 24px;max-width:400px;width:90%;box-shadow:0 1px 2px rgba(14,14,12,.06);transform:translateY(12px) scale(.97);transition:transform .18s,opacity .18s;opacity:0;text-align:center">
                 <div id="confirmIcon" style="width:52px;height:52px;border-radius:50%;background:#F4DEDB;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
@@ -155,6 +155,7 @@
         document.body.appendChild(overlay);
 
         function openConfirm() {
+            overlay.style.pointerEvents = 'auto';
             overlay.style.opacity = '1';
             overlay.style.visibility = 'visible';
             const box = document.getElementById('confirmBox');
@@ -162,6 +163,7 @@
             box.style.transform = 'translateY(0) scale(1)';
         }
         function closeConfirm() {
+            overlay.style.pointerEvents = 'none'; // ← bloquea inmediatamente, antes de la transición
             overlay.style.opacity = '0';
             overlay.style.visibility = 'hidden';
             const box = document.getElementById('confirmBox');
@@ -203,6 +205,30 @@
             maximumFractionDigits: 0
         });
     }
+
+    // ── Cerrar cualquier modal-overlay al hacer clic en el fondo ──────────────
+    document.addEventListener('click', function(e) {
+        // Detecta clic directo sobre el overlay (no sobre el modal interior)
+        if (e.target.classList && e.target.classList.contains('modal-overlay') && e.target.classList.contains('show')) {
+            e.target.classList.remove('show');
+        }
+    });
+
+    // ── Tecla Escape: cierra todos los modales abiertos ───────────────────────
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        // Cierra modal-overlay estándar
+        document.querySelectorAll('.modal-overlay.show').forEach(function(m) {
+            m.classList.remove('show');
+        });
+        // Cierra confirmModal si estuviera visible
+        const cm = document.getElementById('confirmModal');
+        if (cm && cm.style.visibility === 'visible') {
+            cm.style.pointerEvents = 'none';
+            cm.style.opacity = '0';
+            cm.style.visibility = 'hidden';
+        }
+    }, true); // capture=true para interceptar antes de cualquier handler en la página
 
     // Close sidebar on window resize (desktop)
     window.addEventListener('resize', function() {

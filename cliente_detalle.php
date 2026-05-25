@@ -541,7 +541,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Notificaciones de renovación -->
-        <button onclick="openNotifModal()"
+        <button type="button" onclick="openNotifModal()"
             style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:var(--radius-md);cursor:pointer;transition:all .15s;text-align:left"
             onmouseenter="this.style.borderColor='#8A867C';this.style.background='#FAFAF7'" onmouseleave="this.style.borderColor='#E8E5DD';this.style.background='#ffffff'">
             <div style="width:32px;height:32px;background:#E3F1E8;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -555,7 +555,7 @@ include __DIR__ . '/includes/header.php';
         </button>
 
         <!-- Agregar Tarea -->
-        <button class="btn btn-outline" onclick="openTareasModal()" style="width:100%;justify-content:center;gap:8px;font-size:12px">
+        <button type="button" class="btn btn-outline" onclick="openTareasModal()" style="width:100%;justify-content:center;gap:8px;font-size:12px">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M5 11h.01"/></svg>
             Agregar Tarea
         </button>
@@ -564,7 +564,7 @@ include __DIR__ . '/includes/header.php';
         <div id="pagosUnicosBanner" style="display:none"></div>
 
         <!-- Ver Historial -->
-        <button class="btn btn-outline" onclick="openHistorialModal()" style="width:100%;justify-content:center;gap:8px;font-size:12px">
+        <button type="button" class="btn btn-outline" onclick="openHistorialModal()" style="width:100%;justify-content:center;gap:8px;font-size:12px">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Ver Historial / Novedades
         </button>
@@ -3098,7 +3098,7 @@ async function confirmarEnvioMsgEmail() {
 </div>
 
 <!-- Modal Orden de Compra -->
-<div class="modal-overlay" id="ordenModal" style="z-index:1001">
+<div class="modal-overlay" id="ordenModal">
     <div class="modal" style="max-width:1100px;width:96vw;height:90vh;display:flex;flex-direction:column">
         <div class="modal-header">
             <h3 class="modal-title" id="ordenModalTitle">Orden de Compra</h3>

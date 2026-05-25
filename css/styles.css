@@ -1072,7 +1072,8 @@ img {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: all var(--transition-base);
+    /* Sólo transiciona opacity y visibility — nunca z-index ni pointer-events */
+    transition: opacity var(--transition-base), visibility var(--transition-base);
 }
 
 .modal-overlay.show {
