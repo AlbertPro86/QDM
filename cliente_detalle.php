@@ -97,21 +97,21 @@ include __DIR__ . '/includes/header.php';
             </a>
             <?php endif; ?>
             <?php if($cliente['email_facturacion']): ?>
-            <div style="display:flex;align-items:center;gap:6px">
-                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span style="font-size:12px;color:var(--color-text)"><?= sanitize($cliente['email_facturacion']) ?></span>
+            <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span style="font-size:12px;color:var(--color-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px"><?= sanitize($cliente['email_facturacion']) ?></span>
             </div>
             <?php endif; ?>
             <?php if($cliente['nit_cedula']): ?>
-            <div style="display:flex;align-items:center;gap:6px">
-                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
                 <span style="font-size:12px;color:#94a3b8"><?= sanitize($cliente['nit_cedula']) ?></span>
             </div>
             <?php endif; ?>
             <?php if($cliente['direccion']): ?>
-            <div style="display:flex;align-items:center;gap:6px">
-                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span style="font-size:12px;color:#94a3b8"><?= sanitize($cliente['direccion']) ?></span>
+            <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span style="font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px" title="<?= sanitize($cliente['direccion']) ?>"><?= sanitize($cliente['direccion']) ?></span>
             </div>
             <?php endif; ?>
         </div>
@@ -133,10 +133,10 @@ include __DIR__ . '/includes/header.php';
 <div id="negocioPanelWrap" style="display:none;margin-bottom:4px"></div>
 
 <!-- ── Contenido principal ───────────────────────────────────────────────────── -->
-<div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start">
 
     <!-- Columna principal -->
-    <div style="display:grid;gap:10px">
+    <div style="display:grid;gap:10px;min-width:0;overflow:hidden">
         <!-- Resumen Financiero del Cliente -->
         <div id="clientFinanceSummary" class="cf-summary-grid">
             <!-- Card: Ingreso Bruto -->
@@ -558,7 +558,7 @@ include __DIR__ . '/includes/header.php';
     </div><!-- /columna principal -->
 
     <!-- Sidebar derecho -->
-    <div style="display:grid;gap:16px;align-self:start;position:sticky;top:20px">
+    <div style="display:grid;gap:16px;align-self:start;position:sticky;top:20px;min-width:0;width:100%;overflow:hidden">
 
         <!-- Disparadores -->
         <div class="card animate-fade-up stagger-2">
