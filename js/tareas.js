@@ -491,9 +491,11 @@ let _historialLoaded = false;
 function toggleHistorial() {
     const body  = document.getElementById('historialBody');
     const arrow = document.getElementById('historialArrow');
+    const btn   = document.getElementById('btnVaciarHistorial');
     const open  = body.style.display !== 'none';
     body.style.display  = open ? 'none' : 'block';
     arrow.style.transform = open ? '' : 'rotate(180deg)';
+    if (btn) btn.style.display = open ? 'none' : '';
     if (!open && !_historialLoaded) cargarHistorial();
 }
 
@@ -548,7 +550,7 @@ function renderHistorial(rows) {
             ? new Date(t.updated_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})
             : '—';
 
-        return `<tr style="border-bottom:1px solid #F5F4F1;opacity:${esCancelado ? '.75' : '1'};transition:background .1s"
+        return `<tr data-id="${t.id}" style="border-bottom:1px solid #F5F4F1;opacity:${esCancelado ? '.75' : '1'};transition:background .1s"
                     onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             <td style="padding:10px 16px">
                 <span style="background:${estadoBg};color:${estadoClr};padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;white-space:nowrap">${estadoLabel}</span>
@@ -574,6 +576,32 @@ function renderHistorial(rows) {
             </td>
         </tr>`;
     }).join('');
+}
+
+async function vaciarHistorial() {
+    const badge = document.getElementById('historialBadge');
+    const total = badge && badge.style.display !== 'none' ? badge.textContent : '';
+    const ok = await confirmAction(
+        `Se eliminarán permanentemente todas las tareas del historial${total ? ' (' + total + ')' : ''}.`,
+        { title: '¿Vaciar historial?', confirmText: 'Vaciar todo', danger: true }
+    );
+    if (!ok) return;
+    try {
+        const rows = document.querySelectorAll('#historialTbody tr[data-id]');
+        const ids  = [...rows].map(r => r.dataset.id).filter(Boolean);
+        if (!ids.length) {
+            showToast('El historial ya está vacío', 'info');
+            return;
+        }
+        await Promise.all(ids.map(id =>
+            fetch(`api/tareas.php?id=${id}&permanente=1`, { method: 'DELETE' })
+        ));
+        showToast('Historial vaciado', 'success');
+        _historialLoaded = false;
+        cargarHistorial();
+    } catch(err) {
+        showToast(err.message || 'Error al vaciar historial', 'error');
+    }
 }
 
 async function eliminarTareaPermanente(id, titulo) {

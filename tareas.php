@@ -364,7 +364,10 @@ include __DIR__ . '/includes/header.php';
             <span style="font-size:11px;color:#8A867C">Completadas y eliminadas</span>
             <span id="historialBadge" style="display:none;background:#EFECE5;color:#57544D;font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px"></span>
         </div>
-        <svg id="historialArrow" width="14" height="14" fill="none" stroke="#8A867C" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .2s"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        <div style="display:flex;align-items:center;gap:10px">
+            <button id="btnVaciarHistorial" onclick="event.stopPropagation();vaciarHistorial()" style="display:none;background:none;border:1px solid #E8E5DD;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;color:#8A867C;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#FEE2E2';this.style.color='#B0382F';this.style.borderColor='#FECACA'" onmouseleave="this.style.background='none';this.style.color='#8A867C';this.style.borderColor='#E8E5DD'">Vaciar historial</button>
+            <svg id="historialArrow" width="14" height="14" fill="none" stroke="#8A867C" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .2s"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
     </div>
     <div id="historialBody" style="display:none;border-top:1px solid #E8E5DD">
         <div style="overflow-x:auto">
