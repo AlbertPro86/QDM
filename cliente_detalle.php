@@ -698,6 +698,47 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Modal Enviar Adjunto por Correo -->
+<div class="modal-overlay" id="enviarAdjuntoModal">
+    <div class="modal" style="max-width:440px">
+        <div class="modal-header">
+            <h3 class="modal-title">Enviar por correo</h3>
+            <button class="modal-close" onclick="document.getElementById('enviarAdjuntoModal').classList.remove('show')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="modal-body" style="display:grid;gap:14px">
+            <!-- Archivo -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0EFEB;border-radius:var(--radius-sm)">
+                <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                <span id="enviarAdjNombre" style="font-size:12px;font-weight:600;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span>
+            </div>
+            <!-- Correo destino -->
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-muted)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span>Para: <strong id="enviarAdjEmail" style="color:var(--color-text)"></strong></span>
+            </div>
+            <!-- Asunto -->
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Asunto</label>
+                <input type="text" id="enviarAdjAsunto" class="form-input" placeholder="Ej: Documento adjunto" style="font-size:13px">
+            </div>
+            <!-- Mensaje -->
+            <div class="form-group" style="margin:0">
+                <label class="form-label">Mensaje <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
+                <textarea id="enviarAdjMensaje" class="form-input" rows="4" placeholder="Escribe un mensaje personalizado para el cliente…" style="font-size:13px;resize:vertical;min-height:90px"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="document.getElementById('enviarAdjuntoModal').classList.remove('show')">Cancelar</button>
+            <button class="btn btn-primary" id="enviarAdjBtn" onclick="enviarAdjunto()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Enviar
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Nuevo / Editar Trabajo Adicional -->
 <div class="modal-overlay" id="trabajoAdModal">
     <div class="modal" style="max-width:480px">
@@ -2128,12 +2169,16 @@ function renderMedia(media) {
             ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
             : '';
 
+        const nombreEsc = m.nombre_archivo.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
                 ${descLine}
             </div>
+            <button onclick="openEnviarAdjuntoModal(${m.id},'${nombreEsc}')" title="Enviar por correo" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:4px;transition:all .12s" onmouseenter="this.style.color='var(--color-primary)';this.style.background='rgba(var(--color-primary-rgb),.08)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </button>
             <button onclick="deleteMedia(${m.id})" title="Eliminar" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:4px;transition:all .12s" onmouseenter="this.style.color='var(--color-danger)';this.style.background='#FEF2F2'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
@@ -2182,6 +2227,57 @@ async function confirmarSubirAdjunto() {
         else showToast(d.error || 'Error al subir', 'error');
     } catch(e) { showToast('Error al subir', 'error'); }
     _pendingMediaFile = null;
+}
+
+/* ── ENVIAR ADJUNTO POR CORREO ─────────────────────────────────────────── */
+let _enviarAdjArchivoId = null;
+
+function openEnviarAdjuntoModal(archivoId, nombreArchivo) {
+    _enviarAdjArchivoId = archivoId;
+
+    document.getElementById('enviarAdjNombre').textContent  = nombreArchivo;
+    document.getElementById('enviarAdjEmail').textContent   = clienteEmails.facturacion || '(sin correo registrado)';
+    document.getElementById('enviarAdjAsunto').value        = nombreArchivo;
+    document.getElementById('enviarAdjMensaje').value       = '';
+
+    const btn = document.getElementById('enviarAdjBtn');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Enviar`;
+
+    document.getElementById('enviarAdjuntoModal').classList.add('show');
+    setTimeout(() => document.getElementById('enviarAdjAsunto').focus(), 120);
+}
+
+async function enviarAdjunto() {
+    if (!_enviarAdjArchivoId) return;
+    const asunto  = document.getElementById('enviarAdjAsunto').value.trim();
+    const mensaje = document.getElementById('enviarAdjMensaje').value.trim();
+    if (!asunto) { showToast('El asunto es requerido.', 'warning'); document.getElementById('enviarAdjAsunto').focus(); return; }
+
+    const btn = document.getElementById('enviarAdjBtn');
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Enviando…`;
+
+    try {
+        const r = await fetch('api/enviar_adjunto.php', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ archivo_id: _enviarAdjArchivoId, asunto, mensaje_texto: mensaje })
+        });
+        const d = await r.json();
+        if (d.success) {
+            document.getElementById('enviarAdjuntoModal').classList.remove('show');
+            showToast(d.message, 'success');
+        } else {
+            showToast(d.error || 'Error al enviar', 'error');
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Enviar`;
+        }
+    } catch(e) {
+        showToast('Error de conexión al enviar', 'error');
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Enviar`;
+    }
 }
 
 /* ── TRABAJOS ADICIONALES (pagos únicos del cliente) ───────────────────── */
