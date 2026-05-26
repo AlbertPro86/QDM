@@ -246,7 +246,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Totales leads hero -->
-        <div class="dash-card-indigo" style="margin-bottom:14px;display:flex;align-items:center;gap:20px">
+        <a href="leads.php" class="dash-card-indigo" style="margin-bottom:14px;display:flex;align-items:center;gap:20px;text-decoration:none;display:flex;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div>
                 <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Total leads mes</div>
                 <div style="font-size:28px;font-weight:900;color:#0E0E0C;line-height:1;margin-bottom:4px"><?=$lTotal?></div>
@@ -262,7 +262,7 @@ include __DIR__ . '/includes/header.php';
                 <div style="font-size:28px;font-weight:900;color:#0E0E0C;line-height:1"><?=$tasaConv?>%</div>
                 <div style="font-size:11px;color:#8A867C;margin-top:4px"><?=$lGanado?> ganados</div>
             </div>
-        </div>
+        </a>
 
         <!-- Pipeline funnel bars -->
         <div class="dash-card" style="padding:18px 20px">
@@ -303,7 +303,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Totales tareas hero -->
-        <div class="dash-card-dark" style="margin-bottom:14px;display:flex;align-items:center;gap:16px">
+        <a href="tareas.php" class="dash-card-dark" style="margin-bottom:14px;display:flex;align-items:center;gap:16px;text-decoration:none;transition:box-shadow .15s" onmouseenter="this.style.boxShadow='0 3px 12px rgba(0,0,0,.25)'" onmouseleave="this.style.boxShadow='none'">
             <div>
                 <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Tareas activas</div>
                 <div style="font-size:28px;font-weight:900;color:#fff;line-height:1;margin-bottom:4px"><?=$tPend+$tProg+$tRev?></div>
@@ -323,23 +323,23 @@ include __DIR__ . '/includes/header.php';
                 <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px">Urgentes activas</div>
             </div>
             <?php endif; ?>
-        </div>
+        </a>
 
         <!-- Status grid tareas -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
             <?php
             $tStatCards = [
-                ['Pendiente',   $tPend,    '#FAFAF7','#0E0E0C','#E8E5DD','#57544D'],
-                ['En Progreso', $tProg,    '#FAFAF7','#0E0E0C','#E8E5DD','#57544D'],
-                ['Revisión',    $tRev,     '#F5EBD3','#6E4A12','#D6D2C7','#B47A1E'],
-                ['Completadas', $tCompMes, '#E3F1E8','#1B5A39','#E8E5DD','#2D8F5A'],
+                ['Pendiente',   $tPend,    '#FAFAF7','#0E0E0C','#E8E5DD','#57544D', 'tareas.php'],
+                ['En Progreso', $tProg,    '#FAFAF7','#0E0E0C','#E8E5DD','#57544D', 'tareas.php'],
+                ['Revisión',    $tRev,     '#F5EBD3','#6E4A12','#D6D2C7','#B47A1E', 'tareas.php'],
+                ['Completadas', $tCompMes, '#E3F1E8','#1B5A39','#E8E5DD','#2D8F5A', 'tareas.php'],
             ];
-            foreach($tStatCards as [$lbl,$val,$bg,$num,$pbg,$pcol]): ?>
-            <div style="background:<?=$bg?>;border-radius:3px;padding:12px;text-align:center;border:1.5px solid <?=$pbg?>;transition:box-shadow .15s"
+            foreach($tStatCards as [$lbl,$val,$bg,$num,$pbg,$pcol,$href]): ?>
+            <a href="<?=$href?>" style="background:<?=$bg?>;border-radius:3px;padding:12px;text-align:center;border:1.5px solid <?=$pbg?>;transition:box-shadow .15s;text-decoration:none;display:block"
                 onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
                 <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1"><?=$val?></div>
                 <div style="font-size:10px;font-weight:700;color:<?=$pcol?>;margin-top:5px;text-transform:uppercase;letter-spacing:.07em"><?=$lbl?></div>
-            </div>
+            </a>
             <?php endforeach; ?>
         </div>
 
