@@ -530,8 +530,55 @@ function renderCatalogo(filtro) {
     const pkgFiltrados = _catalogoPaquetes.filter(p => !f || p.nombre.toLowerCase().includes(f));
     const pkgHtml = pkgFiltrados.length === 0
         ? '<div style="text-align:center;padding:40px 0;color:var(--color-text-light);font-size:12px">Sin suscripciones</div>'
-        : pkgFiltrados.map(p => catalogItemHtml('paquete', p.id, p.nombre, p.descripcion, p.frecuencia||'mes', p.precio_venta||p.precio||0)).join('');
+        : pkgFiltrados.map(p => paqueteCardHtml(p)).join('');
     document.getElementById('catPaquetes').innerHTML = pkgHtml;
+}
+
+function paqueteCardHtml(p) {
+    const precio   = p.precio_venta || p.precio || 0;
+    const freq     = p.frecuencia || 'mes';
+    const items    = p.items    || [];
+    const features = p.features || [];
+    const fmt = v => Number(v).toLocaleString('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 });
+
+    const itemsHtml = items.map(it => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--color-border)">
+            <div>
+                <span style="font-size:11px;font-weight:700;color:var(--color-text)">${hesc(it.svc_nombre)}</span>
+                <span style="font-size:10px;color:var(--color-text-muted);margin-left:4px">· ${hesc(it.ss_nombre)}</span>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--color-primary);flex-shrink:0;margin-left:8px">${fmt(it.precio)}</span>
+        </div>`).join('');
+
+    const featHtml = features.map(f => `
+        <div style="display:flex;align-items:flex-start;gap:5px;padding:2px 0">
+            <svg width="11" height="11" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.5" style="flex-shrink:0;margin-top:1px"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span style="font-size:10px;color:var(--color-text-muted)">${hesc(f.texto)}</span>
+        </div>`).join('');
+
+    return `
+    <div style="border:1.5px solid var(--color-border);border-radius:var(--radius-sm);overflow:hidden;background:#fff;transition:border-color .15s"
+         onmouseenter="this.style.borderColor='var(--color-primary)'"
+         onmouseleave="this.style.borderColor='var(--color-border)'">
+        <!-- Cabecera clickeable -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;gap:8px"
+             onclick="addItemCatalogo('paquete',${p.id},'${esc(p.nombre)}','${esc(p.descripcion||'')}','${esc(freq)}',${precio})">
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:12px;color:var(--color-text)">${hesc(p.nombre)}</div>
+                <div style="margin-top:3px;display:flex;align-items:center;gap:6px">
+                    <span style="font-size:12px;font-weight:800;color:var(--color-primary)">${fmt(precio)}</span>
+                    <span class="freq-badge">${labelFrecuencia(freq)}</span>
+                </div>
+            </div>
+            <button class="cat-add-btn" onclick="event.stopPropagation();addItemCatalogo('paquete',${p.id},'${esc(p.nombre)}','${esc(p.descripcion||'')}','${esc(freq)}',${precio})">+</button>
+        </div>
+        ${(itemsHtml || featHtml) ? `
+        <!-- Composición -->
+        <div style="background:var(--color-surface,#FAFAF7);border-top:1px solid var(--color-border);padding:8px 12px">
+            ${itemsHtml ? `<div style="margin-bottom:${featHtml ? '8px' : '0'}">${itemsHtml}</div>` : ''}
+            ${featHtml  ? `<div style="padding-top:${itemsHtml ? '6px' : '0'}">${featHtml}</div>` : ''}
+        </div>` : ''}
+    </div>`;
 }
 
 function catalogItemHtml(tipo, id, nombre, desc, frecuencia, precio) {

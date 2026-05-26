@@ -1339,16 +1339,21 @@ function onCatalogSelect(sel) {
 
 function renderSvcPreview(pkgId) {
     const wrap = document.getElementById('svcPreviewWrap');
+    if (!wrap) return;
     if (!pkgId) { wrap.style.display = 'none'; return; }
 
-    const pkg = (window._pkgCatalog || []).find(p => String(p.id) === String(pkgId));
-    if (!pkg)  { wrap.style.display = 'none'; return; }
+    const catalog = window._pkgCatalog || [];
+    const pkg = catalog.find(p => String(p.id) === String(pkgId));
+    if (!pkg) { wrap.style.display = 'none'; return; }
 
-    const fmt = v => Number(v).toLocaleString('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 });
+    const fmt = v => Number(v || 0).toLocaleString('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 });
     const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+    const items    = Array.isArray(pkg.items)    ? pkg.items    : [];
+    const features = Array.isArray(pkg.features) ? pkg.features : [];
+
     // Servicios que componen la suscripción
-    const itemsHtml = (pkg.items || []).map(item => `
+    const itemsHtml = items.map(item => `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #EAE8E2">
             <div style="min-width:0">
                 <div style="font-size:12px;font-weight:700;color:#0E0E0C">${esc(item.svc_nombre)}</div>
@@ -1356,12 +1361,12 @@ function renderSvcPreview(pkgId) {
             </div>
             <div style="text-align:right;flex-shrink:0;margin-left:12px">
                 <span style="font-size:12px;font-weight:700;color:#0E0E0C">${fmt(item.precio)}</span>
-                <span style="font-size:10px;color:#8A867C">/${esc(item.frecuencia)}</span>
+                <span style="font-size:10px;color:#8A867C">/${esc(item.frecuencia||'mes')}</span>
             </div>
         </div>`).join('');
 
     // Características del paquete
-    const featHtml = (pkg.features || []).map(f => `
+    const featHtml = features.map(f => `
         <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0">
             <svg width="12" height="12" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.5" style="flex-shrink:0;margin-top:1px">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -1369,17 +1374,18 @@ function renderSvcPreview(pkgId) {
             <span style="font-size:11px;color:#57544D;line-height:1.4">${esc(f.texto)}</span>
         </div>`).join('');
 
+    // Siempre mostrar, incluso si está vacío
     document.getElementById('svcPreviewContent').innerHTML = `
         ${pkg.descripcion ? `<p style="font-size:12px;color:#57544D;margin:0 0 10px;font-style:italic">${esc(pkg.descripcion)}</p>` : ''}
-        ${itemsHtml
-            ? `<div style="margin-bottom:${featHtml ? '12px' : '0'}">${itemsHtml}
-               <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px">
-                   <span style="font-size:11px;color:#8A867C;font-weight:600">Total suscripción</span>
-                   <span style="font-size:14px;font-weight:800;color:#0E0E0C">${fmt(pkg.precio_venta)}<span style="font-size:10px;font-weight:500;color:#8A867C">/${esc(pkg.frecuencia)}</span></span>
+        ${items.length
+            ? `<div>${itemsHtml}
+               <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;margin-top:2px">
+                   <span style="font-size:11px;color:#8A867C;font-weight:600">Total</span>
+                   <span style="font-size:14px;font-weight:800;color:#0E0E0C">${fmt(pkg.precio_venta)}<span style="font-size:10px;font-weight:500;color:#8A867C"> / ${esc(pkg.frecuencia||'mes')}</span></span>
                </div></div>`
-            : `<div style="font-size:12px;color:#8A867C;text-align:center;padding:8px 0">Sin ítems registrados</div>`}
-        ${featHtml
-            ? `<div style="border-top:1px solid #EAE8E2;padding-top:10px;margin-top:4px">
+            : `<div style="font-size:12px;color:#8A867C;padding:4px 0">Este paquete no tiene servicios configurados aún.</div>`}
+        ${features.length
+            ? `<div style="border-top:1px solid #EAE8E2;padding-top:10px;margin-top:8px">
                    <div style="font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Características incluidas</div>
                    ${featHtml}
                </div>`
