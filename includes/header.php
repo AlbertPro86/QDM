@@ -88,10 +88,7 @@ $flash = getFlash();
                         </div>
                     </div>
 
-                    <!-- Avatar -->
-                    <div class="topbar-avatar" title="<?= $user ? sanitize($user['nombre']) : 'Usuario' ?>" onclick="window.location.href='perfil.php'" id="topbarAvatar">
-                        <?= $user ? $user['initials'] : 'Q' ?>
-                    </div>
+
                 </div>
             </header>
 
