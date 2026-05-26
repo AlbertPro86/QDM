@@ -115,10 +115,19 @@ include __DIR__ . '/includes/header.php';
             </div>
             <?php endif; ?>
         </div>
+        <!-- Valor mensual destacado -->
+        <span id="totalIngreso" style="font-size:28px;font-weight:800;color:#0E0E0C;font-family:var(--font-secondary);line-height:1;letter-spacing:-.02em;white-space:nowrap;flex-shrink:0">$ 0</span>
+        <!-- IDs ocultos que el JS necesita -->
+        <span id="totalEgreso"   style="display:none">0</span>
+        <span id="totalGanancia" style="display:none">0</span>
+
+        <!-- Separador -->
+        <div style="width:1px;height:44px;background:#E8E5DD;flex-shrink:0"></div>
+
         <!-- Botones acción -->
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
             <!-- Botón RUT -->
-            <button id="btnRut" onclick="openRutModal()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='#94a3b8';this.style.background='#f8fafc';if(this.dataset.purl)showMediaPreview(event,this)" onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff';hideMediaPreview()">
+            <button id="btnRut" class="btn btn-outline sm" onclick="openRutModal()" style="flex-shrink:0" onmouseenter="if(this.dataset.purl)showMediaPreview(event,this)" onmouseleave="hideMediaPreview()">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span id="btnRutLabel">RUT</span>
                 <span id="btnRutDot" style="display:none;width:7px;height:7px;background:#22c55e;border-radius:50%;flex-shrink:0"></span>
@@ -137,181 +146,6 @@ include __DIR__ . '/includes/header.php';
 
     <!-- Columna principal -->
     <div style="display:grid;gap:10px;min-width:0;overflow:hidden">
-        <!-- Resumen Financiero del Cliente -->
-        <div id="clientFinanceSummary" class="cf-summary-grid">
-            <!-- Card visible: Costo de Venta -->
-            <div class="cf-card cf-card--income">
-                <div class="cf-card__body">
-                    <div class="cf-card__header">
-                        <span class="cf-card__label">Costo de Venta</span>
-                        <span class="cf-pill cf-pill--income">Mensual</span>
-                    </div>
-                    <p class="cf-card__value" id="totalIngreso">$ 0</p>
-                    <p class="cf-card__currency">COP</p>
-                </div>
-            </div>
-
-            <!-- Cards ocultas: IDs necesarios para el JS -->
-            <p id="totalEgreso"   style="display:none">0</p>
-            <p id="totalGanancia" style="display:none">0</p>
-        </div>
-
-        <style>
-        .cf-summary-grid {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-        .cf-summary-grid .cf-card {
-            width: 220px;
-            flex-shrink: 0;
-        }
-
-        .cf-card {
-            border-radius: 6px;
-            padding: 0;
-            display: flex;
-            align-items: stretch;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            min-height: 96px;
-        }
-
-        .cf-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 1px 3px rgba(0,0,0,.03);
-        }
-
-        /* Fondos de cada card */
-        .cf-card--income { background: #ffffff; border: 1px solid #E8E5DD; }
-        .cf-card--expense { background: #ffffff; border: 1px solid #E8E5DD; }
-        .cf-card--profit  { background: #FAFAF7; border: 1px solid #E8E5DD; }
-
-        .cf-card__body {
-            flex: 1;
-            padding: 20px 22px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .cf-card__header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        /* Label */
-        .cf-card__label {
-            font-size: 12px;
-            font-weight: 600;
-            font-family: var(--font-secondary);
-            letter-spacing: 0.01em;
-        }
-
-        .cf-card--income .cf-card__value { color: #0E0E0C; }
-        .cf-card--expense .cf-card__value { color: #0E0E0C; }
-        .cf-card--profit  .cf-card__value { color: #0E0E0C; }
-
-        .cf-card--income .cf-card__label { color: #57544D; }
-        .cf-card--expense .cf-card__label { color: #57544D; }
-        .cf-card--profit  .cf-card__label { color: #57544D; }
-
-        /* Pill badges */
-        .cf-pill {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-family: var(--font-secondary);
-            white-space: nowrap;
-        }
-
-        .cf-pill--income {
-            background: #E3F1E8;
-            color: #1B5A39;
-        }
-
-        .cf-pill--expense {
-            background: #F4DEDB;
-            color: #6E211B;
-        }
-
-        .cf-pill--profit {
-            background: #E3F1E8;
-            color: #1B5A39;
-        }
-
-        /* Value */
-        .cf-card__value {
-            font-size: 30px;
-            font-weight: 700;
-            font-family: var(--font-primary);
-            line-height: 1;
-            margin: 0;
-            white-space: nowrap;
-        }
-        .cf-card__currency {
-            font-size: 12px;
-            font-weight: 600;
-            color: #94a3b8;
-            margin: 4px 0 0;
-            letter-spacing: 0.04em;
-        }
-
-        /* Icon */
-        .cf-card__icon {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-
-        .cf-card:hover .cf-card__icon {
-            opacity: 0.8;
-        }
-
-        .cf-card--income .cf-card__icon { color: #2D8F5A; background: #E3F1E8; opacity: 0.7; }
-        .cf-card--expense .cf-card__icon { color: #B0382F; background: #F4DEDB; opacity: 0.7; }
-        .cf-card--profit .cf-card__icon { color: #0E0E0C; background: #EFECE5; opacity: 0.7; }
-
-        /* Card destacada: Ganancia */
-        .cf-card--profit {
-            background: #FAFAF7;
-            border-color: #D6D2C7;
-        }
-
-        .cf-card--profit:hover {
-            border-color: #8A867C;
-            box-shadow: 0 1px 3px rgba(0,0,0,.03);
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .cf-summary-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        @media (min-width: 901px) and (max-width: 1200px) {
-            .cf-summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .cf-card:last-child {
-                grid-column: 1 / -1;
-            }
-        }
-        </style>
-
         <!-- Servicios Activos -->
         <div class="card animate-fade-up stagger-1">
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
