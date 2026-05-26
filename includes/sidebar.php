@@ -10,6 +10,11 @@ try {
 } catch (Exception $e) {
     $newLeadsCount = 0;
 }
+try {
+    $mejorasPendientes = db()->query("SELECT COUNT(*) FROM mejoras_plataforma WHERE completada = 0")->fetchColumn();
+} catch (Exception $e) {
+    $mejorasPendientes = 0;
+}
 ?>
 
 <!-- Mobile Backdrop -->
@@ -139,21 +144,24 @@ try {
             <span class="nav-link-text">Servicios</span>
         </a>
 
-        <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.45' ?>;font-size:12px;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.45' ?>'">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 11h.01"/>
-            </svg>
-            <span class="nav-link-text">Mejoras</span>
-        </a>
-
-        <div style="height:1px;background:var(--color-border);margin:6px 14px 6px"></div>
-
         <a href="configuraciones.php" class="nav-link <?= $currentPage === 'configuraciones' ? 'active' : '' ?>" id="nav-configuraciones" title="Configuraciones">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
             <span class="nav-link-text">Configuraciones</span>
+        </a>
+
+        <div style="height:1px;background:var(--color-border);margin:6px 14px"></div>
+
+        <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.5' ?>;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.5' ?>'">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 11h.01"/>
+            </svg>
+            <span class="nav-link-text">Mejoras</span>
+            <?php if ($mejorasPendientes > 0): ?>
+                <span class="nav-badge" style="background:#ef4444"><?= $mejorasPendientes ?></span>
+            <?php endif; ?>
         </a>
     </nav>
 
