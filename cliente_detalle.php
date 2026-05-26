@@ -3318,17 +3318,17 @@ document.getElementById('renovarModal').addEventListener('click', function(e) {
 
 // Editar Datos del Cliente
 function openEditModal() {
-    // Cargar datos actuales en el formulario
-    const cliente = {
-        nombre_comercial: "<?= sanitize($cliente['nombre_comercial']) ?>",
-        estado: "<?= $cliente['estado'] ?>",
-        persona_contacto: "<?= sanitize($cliente['persona_contacto'] ?? '') ?>",
-        nit_cedula: "<?= sanitize($cliente['nit_cedula'] ?? '') ?>",
-        telefono: "<?= sanitize($cliente['telefono'] ?? '') ?>",
-        email_facturacion: "<?= sanitize($cliente['email_facturacion'] ?? '') ?>",
-        email_contacto: "<?= sanitize($cliente['email_contacto'] ?? '') ?>",
-        direccion: "<?= sanitize($cliente['direccion'] ?? '') ?>"
-    };
+    // json_encode garantiza escape correcto de comillas, backslashes, saltos de línea, etc.
+    const cliente = <?= json_encode([
+        'nombre_comercial'  => $cliente['nombre_comercial']       ?? '',
+        'estado'            => $cliente['estado']                 ?? 'activo',
+        'persona_contacto'  => $cliente['persona_contacto']       ?? '',
+        'nit_cedula'        => $cliente['nit_cedula']             ?? '',
+        'telefono'          => $cliente['telefono']               ?? '',
+        'email_facturacion' => $cliente['email_facturacion']      ?? '',
+        'email_contacto'    => $cliente['email_contacto']         ?? '',
+        'direccion'         => $cliente['direccion']              ?? '',
+    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 
     document.getElementById('editNombreComercial').value = cliente.nombre_comercial;
     document.getElementById('editEstado').value = cliente.estado;
