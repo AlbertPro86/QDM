@@ -700,43 +700,99 @@ include __DIR__ . '/includes/header.php';
 
 <!-- Modal Enviar Adjunto por Correo -->
 <div class="modal-overlay" id="enviarAdjuntoModal">
-    <div class="modal" style="max-width:440px">
+    <div class="modal" style="max-width:480px">
         <div class="modal-header">
-            <h3 class="modal-title">Enviar por correo</h3>
+            <h3 class="modal-title" id="enviarAdjModalTitle">Enviar por correo</h3>
             <button class="modal-close" onclick="document.getElementById('enviarAdjuntoModal').classList.remove('show')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div class="modal-body" style="display:grid;gap:14px">
-            <!-- Archivo -->
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0EFEB;border-radius:var(--radius-sm)">
-                <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                <span id="enviarAdjNombre" style="font-size:12px;font-weight:600;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span>
+
+        <!-- ── PANEL 1: Redactar ──────────────────────────────────────── -->
+        <div id="adjPanelCompose">
+            <div class="modal-body" style="display:grid;gap:14px">
+                <!-- Archivo -->
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0EFEB;border-radius:var(--radius-sm)">
+                    <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    <span id="enviarAdjNombre" style="font-size:12px;font-weight:600;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0"></span>
+                </div>
+                <!-- Para + botón plantillas -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-muted);min-width:0;flex:1;overflow:hidden">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Para: <strong id="enviarAdjEmail" style="color:var(--color-text)"></strong></span>
+                    </div>
+                    <button onclick="adjShowPlantillas()" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:#F0EFEB;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:#57544D;cursor:pointer;transition:background .12s" onmouseenter="this.style.background='#E4E2DD'" onmouseleave="this.style.background='#F0EFEB'">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Plantillas
+                    </button>
+                </div>
+                <!-- Indicador plantilla seleccionada -->
+                <div id="adjPlantillaSelTag" style="display:none;align-items:center;gap:7px;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;font-size:11px;color:#15803d">
+                    <svg width="11" height="11" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    <span id="adjPlantillaSelNombre" style="font-weight:600"></span>
+                    <button onclick="adjQuitarPlantilla()" style="margin-left:auto;background:none;border:none;color:#15803d;cursor:pointer;padding:0 2px;font-size:13px;line-height:1" title="Quitar plantilla">×</button>
+                </div>
+                <!-- Asunto -->
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Asunto</label>
+                    <input type="text" id="enviarAdjAsunto" class="form-input" placeholder="Ej: Documento adjunto" style="font-size:13px">
+                </div>
+                <!-- Mensaje -->
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Mensaje <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
+                    <textarea id="enviarAdjMensaje" class="form-input" rows="4" placeholder="Escribe un mensaje personalizado para el cliente…" style="font-size:13px;resize:vertical;min-height:90px"></textarea>
+                </div>
             </div>
-            <!-- Correo destino -->
-            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-muted)">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span>Para: <strong id="enviarAdjEmail" style="color:var(--color-text)"></strong></span>
-            </div>
-            <!-- Asunto -->
-            <div class="form-group" style="margin:0">
-                <label class="form-label">Asunto</label>
-                <input type="text" id="enviarAdjAsunto" class="form-input" placeholder="Ej: Documento adjunto" style="font-size:13px">
-            </div>
-            <!-- Mensaje -->
-            <div class="form-group" style="margin:0">
-                <label class="form-label">Mensaje <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
-                <textarea id="enviarAdjMensaje" class="form-input" rows="4" placeholder="Escribe un mensaje personalizado para el cliente…" style="font-size:13px;resize:vertical;min-height:90px"></textarea>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="document.getElementById('enviarAdjuntoModal').classList.remove('show')">Cancelar</button>
+                <button class="btn btn-primary" id="enviarAdjBtn" onclick="enviarAdjunto()">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Enviar
+                </button>
             </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="document.getElementById('enviarAdjuntoModal').classList.remove('show')">Cancelar</button>
-            <button class="btn btn-primary" id="enviarAdjBtn" onclick="enviarAdjunto()">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                Enviar
-            </button>
+
+        <!-- ── PANEL 2: Galería de plantillas ─────────────────────────── -->
+        <div id="adjPanelPlantillas" style="display:none">
+            <div style="padding:14px 20px 10px;border-bottom:1px solid var(--color-border)">
+                <input type="search" id="adjPlantillaBuscar" class="form-input" placeholder="Buscar plantilla…"
+                    style="font-size:12px;height:34px"
+                    oninput="adjFiltrarPlantillas(this.value)">
+            </div>
+            <div id="adjPlantillasList" style="overflow-y:auto;max-height:340px;padding:10px 12px;display:grid;gap:6px">
+                <div style="text-align:center;padding:24px;color:var(--color-text-light);font-size:12px">Cargando…</div>
+            </div>
+            <div style="padding:12px 20px;border-top:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <button onclick="adjShowCompose()" class="btn btn-ghost" style="font-size:12px">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                    Volver
+                </button>
+                <button onclick="adjUsarSinPlantilla()" style="background:none;border:none;font-size:11px;color:var(--color-text-muted);cursor:pointer;text-decoration:underline">Continuar sin plantilla</button>
+            </div>
         </div>
     </div>
+</div>
+
+<!-- Menú flotante de adjunto (kebab) -->
+<div id="mediaDropdown" style="display:none;position:fixed;z-index:9000;background:var(--color-card);border:1px solid var(--color-border);border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.13);min-width:170px;overflow:hidden;padding:4px 0">
+    <button onclick="mediaAccion('correo')"    class="media-menu-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Enviar a correo
+    </button>
+    <button onclick="mediaAccion('descargar')" class="media-menu-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar
+    </button>
+    <button onclick="mediaAccion('ver')"       class="media-menu-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        Ver
+    </button>
+    <div style="height:1px;background:var(--color-border);margin:4px 0"></div>
+    <button onclick="mediaAccion('eliminar')"  class="media-menu-item" style="color:#dc2626">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Eliminar
+    </button>
 </div>
 
 <!-- Modal Nuevo / Editar Trabajo Adicional -->
@@ -2169,18 +2225,14 @@ function renderMedia(media) {
             ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
             : '';
 
-        const nombreEsc = m.nombre_archivo.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
                 ${descLine}
             </div>
-            <button onclick="openEnviarAdjuntoModal(${m.id},'${nombreEsc}')" title="Enviar por correo" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:4px;transition:all .12s" onmouseenter="this.style.color='var(--color-primary)';this.style.background='rgba(var(--color-primary-rgb),.08)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </button>
-            <button onclick="deleteMedia(${m.id})" title="Eliminar" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:4px;transition:all .12s" onmouseenter="this.style.color='var(--color-danger)';this.style.background='#FEF2F2'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <button onclick="openMediaMenu(event,${m.id},${JSON.stringify(m.nombre_archivo)},${JSON.stringify(m.archivo_url)})" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
             </button>
         </div>`;
     }).join('');
@@ -2230,22 +2282,161 @@ async function confirmarSubirAdjunto() {
 }
 
 /* ── ENVIAR ADJUNTO POR CORREO ─────────────────────────────────────────── */
+/* ── KEBAB MENÚ ADJUNTOS ────────────────────────────────────────────────── */
+let _mediaMenu = { id: null, nombre: null, url: null };
+
+function openMediaMenu(e, id, nombre, url) {
+    e.stopPropagation();
+    _mediaMenu = { id, nombre, url };
+    const dd = document.getElementById('mediaDropdown');
+    dd.style.display = 'block';
+    // Posicionar cerca del botón
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ddW = 174, ddH = 160;
+    let top  = rect.bottom + 4;
+    let left = rect.right  - ddW;
+    if (top + ddH > window.innerHeight)  top  = rect.top - ddH - 4;
+    if (left < 8)                         left = 8;
+    dd.style.top  = top  + 'px';
+    dd.style.left = left + 'px';
+}
+
+function closeMediaMenu() {
+    document.getElementById('mediaDropdown').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+    const dd = document.getElementById('mediaDropdown');
+    if (dd && !dd.contains(e.target)) closeMediaMenu();
+});
+
+function mediaAccion(accion) {
+    closeMediaMenu();
+    const { id, nombre, url } = _mediaMenu;
+    if (accion === 'correo')    { openEnviarAdjuntoModal(id, nombre); }
+    else if (accion === 'ver')  { window.open(url, '_blank'); }
+    else if (accion === 'descargar') {
+        const a = document.createElement('a');
+        a.href = url; a.download = nombre; a.target = '_blank';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    else if (accion === 'eliminar') { deleteMedia(id); }
+}
+
+/* ── ENVIAR ADJUNTO POR CORREO ─────────────────────────────────────────── */
 let _enviarAdjArchivoId = null;
+let _adjPlantillas      = [];   // caché de plantillas cargadas
+let _adjPlantillaActiva = null; // plantilla seleccionada
 
 function openEnviarAdjuntoModal(archivoId, nombreArchivo) {
-    _enviarAdjArchivoId = archivoId;
+    _enviarAdjArchivoId  = archivoId;
+    _adjPlantillaActiva  = null;
 
-    document.getElementById('enviarAdjNombre').textContent  = nombreArchivo;
-    document.getElementById('enviarAdjEmail').textContent   = clienteEmails.facturacion || '(sin correo registrado)';
-    document.getElementById('enviarAdjAsunto').value        = nombreArchivo;
-    document.getElementById('enviarAdjMensaje').value       = '';
+    document.getElementById('enviarAdjNombre').textContent = nombreArchivo;
+    document.getElementById('enviarAdjEmail').textContent  = clienteEmails.facturacion || '(sin correo registrado)';
+    document.getElementById('enviarAdjAsunto').value       = nombreArchivo;
+    document.getElementById('enviarAdjMensaje').value      = '';
+    document.getElementById('adjPlantillaSelTag').style.display = 'none';
 
     const btn = document.getElementById('enviarAdjBtn');
     btn.disabled = false;
     btn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Enviar`;
 
+    adjShowCompose();
     document.getElementById('enviarAdjuntoModal').classList.add('show');
     setTimeout(() => document.getElementById('enviarAdjAsunto').focus(), 120);
+}
+
+function adjShowCompose() {
+    document.getElementById('adjPanelCompose').style.display = '';
+    document.getElementById('adjPanelPlantillas').style.display = 'none';
+    document.getElementById('enviarAdjModalTitle').textContent = 'Enviar por correo';
+}
+
+async function adjShowPlantillas() {
+    document.getElementById('adjPanelCompose').style.display = 'none';
+    document.getElementById('adjPanelPlantillas').style.display = '';
+    document.getElementById('enviarAdjModalTitle').textContent = 'Elegir plantilla';
+    document.getElementById('adjPlantillaBuscar').value = '';
+    await adjCargarPlantillas();
+}
+
+async function adjCargarPlantillas() {
+    if (_adjPlantillas.length) { adjRenderPlantillas(_adjPlantillas); return; }
+    document.getElementById('adjPlantillasList').innerHTML =
+        '<div style="text-align:center;padding:24px;color:var(--color-text-light);font-size:12px">Cargando…</div>';
+    try {
+        const r = await fetch('api/mensajes_plantillas.php?filtro=todas');
+        const d = await r.json();
+        _adjPlantillas = (d.data || []).filter(p => p.activa != 0);
+        adjRenderPlantillas(_adjPlantillas);
+    } catch(e) {
+        document.getElementById('adjPlantillasList').innerHTML =
+            '<div style="text-align:center;padding:24px;color:var(--color-danger);font-size:12px">Error al cargar</div>';
+    }
+}
+
+function adjRenderPlantillas(lista) {
+    const cont = document.getElementById('adjPlantillasList');
+    if (!lista.length) {
+        cont.innerHTML = '<div style="text-align:center;padding:24px;color:var(--color-text-light);font-size:12px">Sin plantillas disponibles</div>';
+        return;
+    }
+    cont.innerHTML = lista.map(p => {
+        const badge = p.es_predefinida == 1
+            ? `<span style="font-size:10px;background:#f1f5f9;color:#64748b;padding:2px 6px;border-radius:10px;font-weight:600;flex-shrink:0">Base</span>`
+            : '';
+        const preview = (p.contenido || '').substring(0, 80) + (p.contenido?.length > 80 ? '…' : '');
+        return `<div onclick="adjUsarPlantilla(${p.id})"
+            style="padding:10px 12px;border:1.5px solid var(--color-border);border-radius:8px;cursor:pointer;transition:all .12s"
+            onmouseenter="this.style.borderColor='#94a3b8';this.style.background='#f8fafc'"
+            onmouseleave="this.style.borderColor='var(--color-border)';this.style.background=''">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                <span style="font-size:12px;font-weight:700;color:var(--color-text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(p.nombre)}</span>
+                ${badge}
+            </div>
+            <div style="font-size:11px;color:var(--color-text-muted);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${escapeHtml(preview)}</div>
+        </div>`;
+    }).join('');
+}
+
+function adjFiltrarPlantillas(q) {
+    const lower = q.toLowerCase().trim();
+    const filtradas = lower ? _adjPlantillas.filter(p =>
+        (p.nombre || '').toLowerCase().includes(lower) ||
+        (p.contenido || '').toLowerCase().includes(lower) ||
+        (p.categoria || '').toLowerCase().includes(lower)
+    ) : _adjPlantillas;
+    adjRenderPlantillas(filtradas);
+}
+
+function adjUsarPlantilla(id) {
+    const p = _adjPlantillas.find(x => x.id == id);
+    if (!p) return;
+    _adjPlantillaActiva = p;
+    const nombreCliente = <?= json_encode(sanitize($cliente['nombre_comercial'] ?? '')) ?>;
+    const texto = (p.contenido || '')
+        .replace(/\{\{cliente_nombre\}\}/g, nombreCliente)
+        .replace(/\{\{empresa\}\}/g, nombreCliente);
+
+    document.getElementById('enviarAdjAsunto').value    = p.nombre + ' — QUANTUN Digital';
+    document.getElementById('enviarAdjMensaje').value   = texto;
+    document.getElementById('adjPlantillaSelNombre').textContent = p.nombre;
+    document.getElementById('adjPlantillaSelTag').style.display  = 'flex';
+    adjShowCompose();
+    setTimeout(() => document.getElementById('enviarAdjMensaje').focus(), 80);
+}
+
+function adjUsarSinPlantilla() {
+    _adjPlantillaActiva = null;
+    document.getElementById('adjPlantillaSelTag').style.display = 'none';
+    adjShowCompose();
+}
+
+function adjQuitarPlantilla() {
+    _adjPlantillaActiva = null;
+    document.getElementById('adjPlantillaSelTag').style.display = 'none';
+    document.getElementById('enviarAdjMensaje').value = '';
 }
 
 async function enviarAdjunto() {

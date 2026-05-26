@@ -2102,6 +2102,27 @@ img {
     }
 }
 
+/* ─── Menú kebab adjuntos ─── */
+.media-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    text-align: left;
+    transition: background .1s;
+    font-family: var(--font-primary);
+}
+.media-menu-item:hover {
+    background: var(--color-surface);
+}
+
 /* ─── Print ─── */
 @media print {
     .sidebar, .topbar, .mobile-menu-btn {
