@@ -1029,11 +1029,27 @@ function renderServices(svcs) {
                     ? `<div style="font-size:10px;color:#f59e0b;font-weight:700">en ${Math.round(diff)} días</div>`
                     : '';
 
+        // Composición del paquete (si aplica)
+        const pkg = getPkgByName(s.servicio_nombre);
+        const pkgItemsHtml = pkg && (pkg.items||[]).length
+            ? `<div style="margin-top:6px;border-top:1px solid #EAE8E2;padding-top:5px">
+                ${(pkg.items||[]).map(it=>`
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:2px 0">
+                        <span style="font-size:10px;color:#8A867C"><span style="font-weight:600;color:#57544D">${escapeHtml(it.svc_nombre)}</span> · ${escapeHtml(it.ss_nombre)}</span>
+                        <span style="font-size:10px;color:#8A867C;white-space:nowrap;flex-shrink:0">$${Number(it.precio).toLocaleString('es-CO')}/${escapeHtml(it.frecuencia||'mes')}</span>
+                    </div>`).join('')}
+                ${(pkg.features||[]).length ? `<div style="margin-top:4px;padding-top:4px;border-top:1px dashed #EAE8E2">
+                    ${(pkg.features||[]).map(f=>`<span style="font-size:10px;color:#8A867C">✓ ${escapeHtml(f.texto)} &nbsp;</span>`).join('')}
+                </div>` : ''}
+               </div>`
+            : '';
+
         return `<tr style="${rowStyle}">
             <td><input type="checkbox" class="svc-check" value="${s.id}"></td>
             <td style="font-weight:700">
                 ${escapeHtml(s.servicio_nombre)}
                 <div style="font-size:10px;color:var(--color-text-muted)">${{mes:'Mensual',trimestre:'Trimestral',semestre:'Semestral',año:'Anual',unico:'Pago Único',ninguna:'Ninguna'}[s.frecuencia] || s.frecuencia || 'Anual'}</div>
+                ${pkgItemsHtml}
             </td>
             <td style="font-weight:700;color:var(--color-success)">
                 ${formatMoney(subtotal)}
@@ -4672,8 +4688,22 @@ function escapeHtmlClient(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Paquetes globales (para mostrar composición en tabla de servicios) ──────
+window._pkgCatalogGlobal = [];
+async function loadPkgCatalogGlobal() {
+    try {
+        const r = await fetch('api/paquetes.php');
+        const d = await r.json();
+        if (d.success) window._pkgCatalogGlobal = d.data || [];
+    } catch(e) {}
+}
+function getPkgByName(name) {
+    return (window._pkgCatalogGlobal || []).find(p => p.nombre === name) || null;
+}
+
 // Inicializar al cargar
 document.addEventListener('DOMContentLoaded', () => {
+    loadPkgCatalogGlobal();
     loadEditor();
     loadCredenciales();
     loadNotifConfig();

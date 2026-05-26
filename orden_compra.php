@@ -126,19 +126,31 @@ $fmtCOP = function($n) {
     return 'COP ' . number_format($n, 0, ',', '.');
 };
 
-function generarTablaServicios($servicios, $fmtCOP) {
-    $html = '';
-    foreach($servicios as $svc) {
-        $subtotal = $svc['monto_renovacion'] - ($svc['descuento'] ?? 0);
-        $html .= '<tr style="border-bottom:1px solid #E8E5DD">
-            <td style="padding:11px 14px;font-size:12px;color:#57544D">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
-            <td style="padding:11px 14px;font-size:12px;color:#57544D;text-align:center">1</td>
-            <td style="padding:11px 14px;font-size:12px;color:#57544D;text-align:right">$ ' . number_format($svc['monto_renovacion'], 0, ',', '.') . '</td>
-            <td style="padding:11px 14px;font-size:12px;font-weight:700;color:#0E0E0C;text-align:right">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
-        </tr>';
+// ── Enriquecer servicios con datos del paquete (si aplica) ────────────────
+function enrichWithPaquete(array &$servicios, PDO $pdo): void {
+    foreach ($servicios as &$svc) {
+        $nombre = trim($svc['nombre_display'] ?? $svc['servicio_nombre'] ?? '');
+        if (!$nombre) continue;
+        $ps = $pdo->prepare("SELECT id FROM paquetes WHERE nombre = ? AND activo = 1 LIMIT 1");
+        $ps->execute([$nombre]);
+        $pkg = $ps->fetch();
+        if (!$pkg) continue;
+        $pid = $pkg['id'];
+        $is = $pdo->prepare("
+            SELECT ss.nombre AS ss_nombre, ss.precio, ss.frecuencia, s.nombre AS svc_nombre
+            FROM paquete_items pi
+            JOIN sub_servicios ss ON ss.id = pi.sub_servicio_id
+            JOIN servicios     s  ON s.id  = ss.servicio_id
+            WHERE pi.paquete_id = ? ORDER BY pi.id ASC");
+        $is->execute([$pid]);
+        $svc['_pkg_items'] = $is->fetchAll();
+        $fs = $pdo->prepare("SELECT texto FROM servicio_features WHERE paquete_id = ? ORDER BY orden ASC, id ASC");
+        $fs->execute([$pid]);
+        $svc['_pkg_features'] = array_column($fs->fetchAll(), 'texto');
     }
-    return $html;
+    unset($svc);
 }
+enrichWithPaquete($servicios, $pdo);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -253,9 +265,35 @@ function generarTablaServicios($servicios, $fmtCOP) {
                         $qty      = $svc['_qty'] ?? 1;
                         $precioU  = $svc['_precio_unit'] ?? $svc['monto_renovacion'];
                         $subtotal = ($svc['monto_renovacion'] ?? 0) - ($svc['descuento'] ?? 0);
+                        $pkgItems = $svc['_pkg_items']    ?? [];
+                        $pkgFeats = $svc['_pkg_features'] ?? [];
                     ?>
                     <tr>
-                        <td><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></td>
+                        <td>
+                            <strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong>
+                            <?php if (!empty($pkgItems)): ?>
+                            <table style="width:100%;margin-top:7px;border-collapse:collapse">
+                                <?php foreach ($pkgItems as $item): ?>
+                                <tr>
+                                    <td style="padding:3px 0 3px 10px;font-size:11px;color:#8A867C;border-left:2px solid #E8E5DD;line-height:1.3">
+                                        <span style="font-weight:600;color:#57544D"><?= htmlspecialchars($item['svc_nombre']) ?></span>
+                                        <span style="color:#B0AB9F"> — </span><?= htmlspecialchars($item['ss_nombre']) ?>
+                                    </td>
+                                    <td style="padding:3px 0 3px 8px;font-size:11px;color:#8A867C;text-align:right;white-space:nowrap">
+                                        $ <?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </table>
+                            <?php endif; ?>
+                            <?php if (!empty($pkgFeats)): ?>
+                            <div style="margin-top:6px;padding-top:5px;border-top:1px dashed #E8E5DD">
+                                <?php foreach ($pkgFeats as $feat): ?>
+                                <div style="font-size:10px;color:#8A867C;padding:1px 0">&#10003; <?= htmlspecialchars($feat) ?></div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
+                        </td>
                         <td style="text-align:center"><?= $qty ?></td>
                         <td style="text-align:right">$ <?= number_format($precioU, 0, ',', '.') ?></td>
                         <td class="amount">$ <?= number_format($subtotal, 0, ',', '.') ?></td>
