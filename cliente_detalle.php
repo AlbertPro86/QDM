@@ -780,6 +780,17 @@ include __DIR__ . '/includes/header.php';
                     </select>
                 </div>
 
+                <!-- Preview suscripción seleccionada -->
+                <div id="svcPreviewWrap" style="display:none;margin-bottom:20px">
+                    <div style="background:#F8F7F4;border:1.5px solid #E8E5DD;border-radius:8px;overflow:hidden">
+                        <div style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-bottom:1px solid #E8E5DD;background:#EFECE5">
+                            <svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.05em">Composición de la suscripción</span>
+                        </div>
+                        <div id="svcPreviewContent" style="padding:12px 14px"></div>
+                    </div>
+                </div>
+
                 <!-- Modo editar: nombre fijo -->
                 <div id="newSvcReadonly" style="display:none;margin-bottom:20px">
                     <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Servicio</label>
@@ -1316,13 +1327,65 @@ function setSvcModeEdit(show) {
 // Cuando el usuario elige del catálogo, auto-rellena precio y costo
 function onCatalogSelect(sel) {
     const opt = sel.options[sel.selectedIndex];
-    if (!opt || !opt.value) return;
+    if (!opt || !opt.value) { renderSvcPreview(null); return; }
     const precio = parseFloat(opt.dataset.precio) || 0;
-    const costo  = parseFloat(opt.dataset.costo)  || 0;
     const freq   = opt.dataset.freq || 'año';
     if (precio) document.getElementById('newSvcMonto').value = precio;
     if (freq)   document.getElementById('newSvcFreq').value  = freq;
     calculateNet();
+    // Mostrar preview solo si es suscripción (paquete)
+    renderSvcPreview(opt.dataset.pkgId || null);
+}
+
+function renderSvcPreview(pkgId) {
+    const wrap = document.getElementById('svcPreviewWrap');
+    if (!pkgId) { wrap.style.display = 'none'; return; }
+
+    const pkg = (window._pkgCatalog || []).find(p => String(p.id) === String(pkgId));
+    if (!pkg)  { wrap.style.display = 'none'; return; }
+
+    const fmt = v => Number(v).toLocaleString('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 });
+    const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    // Servicios que componen la suscripción
+    const itemsHtml = (pkg.items || []).map(item => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #EAE8E2">
+            <div style="min-width:0">
+                <div style="font-size:12px;font-weight:700;color:#0E0E0C">${esc(item.svc_nombre)}</div>
+                <div style="font-size:11px;color:#8A867C;margin-top:1px">${esc(item.ss_nombre)}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-left:12px">
+                <span style="font-size:12px;font-weight:700;color:#0E0E0C">${fmt(item.precio)}</span>
+                <span style="font-size:10px;color:#8A867C">/${esc(item.frecuencia)}</span>
+            </div>
+        </div>`).join('');
+
+    // Características del paquete
+    const featHtml = (pkg.features || []).map(f => `
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0">
+            <svg width="12" height="12" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.5" style="flex-shrink:0;margin-top:1px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span style="font-size:11px;color:#57544D;line-height:1.4">${esc(f.texto)}</span>
+        </div>`).join('');
+
+    document.getElementById('svcPreviewContent').innerHTML = `
+        ${pkg.descripcion ? `<p style="font-size:12px;color:#57544D;margin:0 0 10px;font-style:italic">${esc(pkg.descripcion)}</p>` : ''}
+        ${itemsHtml
+            ? `<div style="margin-bottom:${featHtml ? '12px' : '0'}">${itemsHtml}
+               <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px">
+                   <span style="font-size:11px;color:#8A867C;font-weight:600">Total suscripción</span>
+                   <span style="font-size:14px;font-weight:800;color:#0E0E0C">${fmt(pkg.precio_venta)}<span style="font-size:10px;font-weight:500;color:#8A867C">/${esc(pkg.frecuencia)}</span></span>
+               </div></div>`
+            : `<div style="font-size:12px;color:#8A867C;text-align:center;padding:8px 0">Sin ítems registrados</div>`}
+        ${featHtml
+            ? `<div style="border-top:1px solid #EAE8E2;padding-top:10px;margin-top:4px">
+                   <div style="font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Características incluidas</div>
+                   ${featHtml}
+               </div>`
+            : ''}`;
+
+    wrap.style.display = 'block';
 }
 
 // Carga el catálogo completo (servicios + sub-servicios + paquetes) en el select
@@ -1378,6 +1441,10 @@ async function loadCatalogo() {
             });
         }
 
+        // Guardar catálogo completo para preview
+        window._pkgCatalog = (rPkg.success && rPkg.data) ? rPkg.data : [];
+        window._svcCatalog = (rSvc.success && rSvc.data) ? rSvc.data : [];
+
         // Paquetes - obtener primer servicio válido como fallback
         if (rPkg.success && rPkg.data?.length) {
             const grpPkg = document.createElement('optgroup');
@@ -1399,6 +1466,7 @@ async function loadCatalogo() {
                 opt.dataset.costo   = pkg.costo_total  || 0;
                 opt.dataset.freq    = pkg.frecuencia   || 'año';
                 opt.dataset.display = pkg.nombre;
+                opt.dataset.pkgId   = pkg.id;           // ← identifica como suscripción
                 grpPkg.appendChild(opt);
             });
             if (grpPkg.children.length) sel.appendChild(grpPkg);
@@ -1430,6 +1498,7 @@ function openAddSvcModal() {
     document.getElementById('newSvcIdHidden').value    = '';
     document.getElementById('newSvcNombreDisplay').value = '';
     document.getElementById('newSvcDesc').value        = 0;
+    renderSvcPreview(null); // ocultar preview al abrir
 
     // Pre-llenar fechas
     const hoy = new Date();
@@ -1447,6 +1516,7 @@ function openAddSvcModal() {
 function closeAddSvcModal() {
     document.getElementById('addSvcModal').classList.remove('show');
     setSvcModeEdit(false);
+    renderSvcPreview(null); // ocultar preview al cerrar
 }
 
 let savingSvc = false;
