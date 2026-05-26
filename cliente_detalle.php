@@ -635,8 +635,8 @@ include __DIR__ . '/includes/header.php';
 </div><!-- /grid principal -->
 
 <!-- ── Modal RUT ──────────────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="rutModal">
-    <div class="modal" style="max-width:520px">
+<div class="modal-overlay" id="rutModal" style="padding:24px">
+    <div class="modal" style="max-width:920px;max-height:calc(100vh - 48px)">
         <div class="modal-header">
             <div style="display:flex;align-items:center;gap:10px">
                 <div style="width:32px;height:32px;background:#eff6ff;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -651,7 +651,7 @@ include __DIR__ . '/includes/header.php';
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div class="modal-body" id="rutModalBody" style="min-height:120px">
+        <div class="modal-body" id="rutModalBody" style="min-height:120px;max-height:calc(100vh - 170px);padding:16px 20px">
             <!-- contenido dinámico -->
         </div>
         <div class="modal-footer" id="rutModalFooter" style="flex-wrap:wrap;gap:8px">
@@ -4933,15 +4933,16 @@ function openRutModal() {
 
     if (_rutUrl) {
         const isPdf = _rutUrl.toLowerCase().endsWith('.pdf');
+        const previewH = 'calc(100vh - 230px)';
         body.innerHTML = `
-            <div style="margin-bottom:12px">
-                <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:12px">
+            <div>
+                <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:12px">
                     <svg width="14" height="14" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     <span style="font-size:12px;color:#15803d;font-weight:600">RUT cargado</span>
                 </div>
                 ${isPdf
-                    ? `<iframe src="${_rutUrl}#toolbar=0" style="width:100%;height:340px;border:1.5px solid #e2e8f0;border-radius:8px" title="Vista previa RUT"></iframe>`
-                    : `<img src="${_rutUrl}" alt="RUT" style="width:100%;max-height:340px;object-fit:contain;border:1.5px solid #e2e8f0;border-radius:8px">`
+                    ? `<iframe src="${_rutUrl}" style="width:100%;height:${previewH};min-height:420px;border:1.5px solid #e2e8f0;border-radius:8px;display:block" title="Vista previa RUT"></iframe>`
+                    : `<img src="${_rutUrl}" alt="RUT" style="width:100%;height:${previewH};min-height:420px;object-fit:contain;border:1.5px solid #e2e8f0;border-radius:8px;display:block;background:#f8fafc">`
                 }
             </div>`;
         footer.innerHTML = `
