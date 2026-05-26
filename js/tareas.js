@@ -112,8 +112,13 @@ function renderLista(rows) {
             ? `<div style="font-size:11px;color:#57544D;margin-top:3px">${t.lead_nombre}</div>`
             : '';
 
+        const rowDest = t.cliente_id
+            ? `window.location.href='cliente_detalle.php?id=${t.cliente_id}'`
+            : `editarTarea(${t.id})`;
+
         return `
-        <tr style="border-bottom:1px solid #f1f5f9;transition:background .1s"
+        <tr style="border-bottom:1px solid #f1f5f9;transition:background .1s;cursor:pointer"
+            onclick="${rowDest}"
             onmouseenter="this.style.background='#fafafa'"
             onmouseleave="this.style.background='transparent'">
 
@@ -148,15 +153,6 @@ function renderLista(rows) {
 
             <td style="padding:12px;text-align:center">
                 <div style="display:flex;align-items:center;justify-content:center;gap:4px">
-                    <button onclick="verDetallesTarea(${t.id}); event.stopPropagation();" title="Ver detalles"
-                        style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8"
-                        onmouseenter="this.style.background='#FAFAF7';this.style.color='#0E0E0C'"
-                        onmouseleave="this.style.background='none';this.style.color='#94a3b8'">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                    </button>
                     <button onclick="editarTarea(${t.id}); event.stopPropagation();" title="Editar"
                         style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8"
                         onmouseenter="this.style.background='#f1f5f9';this.style.color='#0f172a'"
@@ -165,7 +161,7 @@ function renderLista(rows) {
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                         </svg>
                     </button>
-                    <button onclick="confirmarEliminarTarea(${t.id},'${escapeHtml(t.titulo).replace(/'/g,"&#39;")}'); event.stopPropagation();" title="Cancelar tarea"
+                    <button onclick="confirmarEliminarTarea(${t.id},'${escapeHtml(t.titulo).replace(/'/g,"&#39;")}'); event.stopPropagation();" title="Eliminar tarea"
                         style="background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:#94a3b8"
                         onmouseenter="this.style.background='#fee2e2';this.style.color='#ef4444'"
                         onmouseleave="this.style.background='none';this.style.color='#94a3b8'">
