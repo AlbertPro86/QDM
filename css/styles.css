@@ -2120,7 +2120,7 @@ img {
     font-family: var(--font-primary);
 }
 .media-menu-item:hover {
-    background: var(--color-surface);
+    background: #f1f5f9;
 }
 
 /* ─── Print ─── */

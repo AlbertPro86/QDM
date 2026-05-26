@@ -775,7 +775,7 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <!-- Menú flotante de adjunto (kebab) -->
-<div id="mediaDropdown" style="display:none;position:fixed;z-index:9000;background:var(--color-card);border:1px solid var(--color-border);border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.13);min-width:170px;overflow:hidden;padding:4px 0">
+<div id="mediaDropdown" style="display:none;position:fixed;z-index:9000;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15),0 2px 6px rgba(0,0,0,.08);min-width:170px;overflow:hidden;padding:4px 0">
     <button onclick="mediaAccion('correo')"    class="media-menu-item">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         Enviar a correo
