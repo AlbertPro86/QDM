@@ -12,7 +12,7 @@ if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
 $pdo    = db();
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Auto-migración
+// Auto-migración: tabla base
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS mejoras_plataforma (
         id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -24,9 +24,31 @@ try {
     )");
 } catch (PDOException $e) {}
 
+// Auto-migración: columnas nuevas
+foreach ([
+    "ALTER TABLE mejoras_plataforma ADD COLUMN prioridad   VARCHAR(10)  NOT NULL DEFAULT 'media'",
+    "ALTER TABLE mejoras_plataforma ADD COLUMN estado      VARCHAR(20)  NOT NULL DEFAULT 'idea'",
+    "ALTER TABLE mejoras_plataforma ADD COLUMN notas       TEXT         DEFAULT NULL",
+    "ALTER TABLE mejoras_plataforma ADD COLUMN complejidad VARCHAR(10)  NOT NULL DEFAULT 'media'",
+] as $ddl) {
+    try { $pdo->exec($ddl); } catch (PDOException $e) {}
+}
+
+// Sincronizar campo legado `completada` con `estado`
+// (por si hay registros viejos con completada=1 pero estado='idea')
+try {
+    $pdo->exec("UPDATE mejoras_plataforma SET estado='completado' WHERE completada=1 AND estado='idea'");
+} catch (PDOException $e) {}
+
 switch ($method) {
     case 'GET':
-        $rows = $pdo->query("SELECT * FROM mejoras_plataforma ORDER BY completada ASC, created_at DESC")->fetchAll();
+        $rows = $pdo->query("
+            SELECT * FROM mejoras_plataforma
+            ORDER BY
+                FIELD(estado,'en_progreso','planeado','idea','completado'),
+                FIELD(prioridad,'alta','media','baja'),
+                created_at DESC
+        ")->fetchAll();
         jsonResponse(['success' => true, 'data' => $rows]);
         break;
 
@@ -34,10 +56,17 @@ switch ($method) {
         $input = json_decode(file_get_contents('php://input'), true);
         if (empty($input['texto'])) jsonResponse(['error' => 'Texto requerido'], 400);
 
-        $stmt = $pdo->prepare("INSERT INTO mejoras_plataforma (texto, categoria) VALUES (?, ?)");
+        $stmt = $pdo->prepare("
+            INSERT INTO mejoras_plataforma (texto, categoria, prioridad, estado, notas, complejidad)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
         $stmt->execute([
             substr(trim($input['texto']), 0, 600),
-            $input['categoria'] ?? 'otro'
+            $input['categoria']   ?? 'otro',
+            $input['prioridad']   ?? 'media',
+            $input['estado']      ?? 'idea',
+            $input['notas']       ?? null,
+            $input['complejidad'] ?? 'media',
         ]);
         jsonResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
         break;
@@ -47,20 +76,36 @@ switch ($method) {
         $id = $input['id'] ?? null;
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
 
-        $completada = isset($input['completada']) ? (int)$input['completada'] : null;
-
-        if ($completada !== null) {
-            $at = $completada ? date('Y-m-d H:i:s') : null;
-            $pdo->prepare("UPDATE mejoras_plataforma SET completada=?, completada_at=? WHERE id=?")
-                ->execute([$completada, $at, $id]);
+        $fields = ['texto', 'categoria', 'prioridad', 'estado', 'notas', 'complejidad', 'completada'];
+        $set = []; $vals = [];
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $input)) {
+                $set[]  = "$f = ?";
+                $vals[] = $input[$f];
+            }
         }
+        // Sincronizar completada ↔ estado
+        if (isset($input['estado'])) {
+            $completada = $input['estado'] === 'completado' ? 1 : 0;
+            $set[]  = "completada = ?";
+            $vals[] = $completada;
+            if ($completada) {
+                $set[]  = "completada_at = ?";
+                $vals[] = date('Y-m-d H:i:s');
+            } else {
+                $set[]  = "completada_at = NULL";
+            }
+        }
+        if (empty($set)) jsonResponse(['success' => true]);
+        $vals[] = $id;
+        $pdo->prepare("UPDATE mejoras_plataforma SET " . implode(', ', $set) . " WHERE id = ?")->execute($vals);
         jsonResponse(['success' => true]);
         break;
 
     case 'DELETE':
         $id = $_GET['id'] ?? null;
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
-        $pdo->prepare("DELETE FROM mejoras_plataforma WHERE id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM mejoras_plataforma WHERE id = ?")->execute([$id]);
         jsonResponse(['success' => true]);
         break;
 }
