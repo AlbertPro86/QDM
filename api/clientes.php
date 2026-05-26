@@ -13,6 +13,17 @@ if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
 $method = $_SERVER['REQUEST_METHOD'];
 $pdo = db();
 
+// Auto-migraciones: columnas que pueden faltar en instalaciones antiguas
+foreach ([
+    "ALTER TABLE clientes ADD COLUMN email_contacto  VARCHAR(150) DEFAULT NULL",
+    "ALTER TABLE clientes ADD COLUMN email_facturacion VARCHAR(150) DEFAULT NULL",
+    "ALTER TABLE clientes ADD COLUMN persona_contacto  VARCHAR(150) DEFAULT NULL",
+    "ALTER TABLE clientes ADD COLUMN nit_cedula        VARCHAR(50)  DEFAULT NULL",
+    "ALTER TABLE clientes ADD COLUMN direccion         VARCHAR(255) DEFAULT NULL",
+] as $ddl) {
+    try { $pdo->exec($ddl); } catch (PDOException $e) { /* columna ya existe */ }
+}
+
 switch ($method) {
     case 'GET':
         $id = $_GET['id'] ?? null;
