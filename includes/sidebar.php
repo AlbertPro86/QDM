@@ -160,7 +160,10 @@ try {
             </svg>
             <span class="nav-link-text">Mejoras</span>
             <?php if ($mejorasPendientes > 0): ?>
-                <span class="nav-badge" style="background:#ef4444"><?= $mejorasPendientes ?></span>
+                <span style="display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0">
+                    <span style="width:5px;height:5px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
+                    <span style="font-size:10px;font-weight:700;color:#ef4444;line-height:1"><?= $mejorasPendientes ?></span>
+                </span>
             <?php endif; ?>
         </a>
     </nav>
