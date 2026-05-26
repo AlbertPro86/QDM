@@ -118,7 +118,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Botones acción -->
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
             <!-- Botón RUT -->
-            <button id="btnRut" onclick="openRutModal()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='#94a3b8';this.style.background='#f8fafc'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
+            <button id="btnRut" onclick="openRutModal()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#fff;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:#475569;cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='#94a3b8';this.style.background='#f8fafc';if(this.dataset.purl)showMediaPreview(event,this)" onmouseleave="this.style.borderColor='#e2e8f0';this.style.background='#fff';hideMediaPreview()">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span id="btnRutLabel">RUT</span>
                 <span id="btnRutDot" style="display:none;width:7px;height:7px;background:#22c55e;border-radius:50%;flex-shrink:0"></span>
@@ -796,7 +796,7 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <!-- Preview flotante de adjunto (hover) -->
-<div id="mediaPreviewFloat" style="display:none;position:fixed;z-index:8998;width:270px;height:350px;border-radius:10px;overflow:hidden;box-shadow:0 10px 36px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);border:1px solid #e2e8f0;background:#f8fafc;pointer-events:none;transition:opacity .15s">
+<div id="mediaPreviewFloat" style="display:none;position:fixed;z-index:8998;width:270px;height:350px;border-radius:10px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.28),0 2px 8px rgba(0,0,0,.14),0 0 0 1.5px rgba(0,0,0,.08);border:1.5px solid #b6c2cc;background:#f8fafc;pointer-events:none;transition:opacity .15s">
     <div id="mediaPreviewInner" style="width:100%;height:100%"></div>
 </div>
 
@@ -4842,14 +4842,22 @@ async function loadRutStatus() {
         const r = await fetch(`api/cliente_rut.php?cliente_id=${clienteId}`);
         const d = await r.json();
         _rutUrl = d.rut_url || null;
-        const dot = document.getElementById('btnRutDot');
+        const dot   = document.getElementById('btnRutDot');
         const label = document.getElementById('btnRutLabel');
+        const btn   = document.getElementById('btnRut');
         if (_rutUrl) {
-            dot.style.display = 'inline-block';
-            label.textContent = 'RUT ✓';
+            dot.style.display   = 'inline-block';
+            label.textContent   = 'RUT ✓';
+            const rutMime = _rutUrl.match(/\.(pdf)$/i) ? 'application/pdf'
+                          : _rutUrl.match(/\.(png|jpg|jpeg|webp|gif)$/i) ? 'image/' + _rutUrl.split('.').pop().toLowerCase()
+                          : '';
+            btn.dataset.purl  = _rutUrl;
+            btn.dataset.pmime = rutMime;
         } else {
-            dot.style.display = 'none';
-            label.textContent = 'RUT';
+            dot.style.display   = 'none';
+            label.textContent   = 'RUT';
+            delete btn.dataset.purl;
+            delete btn.dataset.pmime;
         }
     } catch(e) {}
 }
