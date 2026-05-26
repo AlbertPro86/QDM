@@ -28,8 +28,8 @@ async function loadLeads() {
 function renderKPIs(counts) {
     const total = Object.values(counts||{}).reduce((a,b)=>a+parseInt(b),0);
     const tasa = total ? Math.round((counts?.ganado||0) / total * 100) : 0;
-    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill) =>
-        `<div style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill, action='') =>
+        `<a href="#" onclick="${action}return false;" style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block;cursor:pointer"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">${label}</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1">${value}</div>
@@ -37,17 +37,21 @@ function renderKPIs(counts) {
                 <span style="font-size:11px;color:#57544D">${sub}</span>
                 <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillCol};padding:2px 8px;border-radius:100px;white-space:nowrap">${pill}</span>
             </div>
-        </div>`;
+        </a>`;
 
     document.getElementById('leadsKpiBar').innerHTML =
         kpi('Total Leads',    total,                     'Pipeline completo',
-            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#57544D', 'Total')
+            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#57544D', 'Total',
+            "document.getElementById('filterEstado').value='todos';loadLeads();")
       + kpi('Nuevos',         counts?.nuevo||0,          'Sin contactar aún',
-            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#0E0E0C', 'Nuevos')
+            '#FAFAF7', '#E8E5DD', '#57544D', '#E8E5DD', '#0E0E0C', 'Nuevos',
+            "document.getElementById('filterEstado').value='nuevo';loadLeads();")
       + kpi('En Negociación', counts?.en_negociacion||0, `${counts?.contactado||0} contactados`,
-            '#FEF3C7', '#FDE68A', '#92400E', '#FDE68A', '#92400E', 'Activos')
+            '#FEF3C7', '#FDE68A', '#92400E', '#FDE68A', '#92400E', 'Activos',
+            "document.getElementById('filterEstado').value='en_negociacion';loadLeads();")
       + kpi('Ganados',        counts?.ganado||0,         `${tasa}% tasa de cierre`,
-            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Ganados');
+            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Ganados',
+            "document.getElementById('filterEstado').value='ganado';loadLeads();");
 }
 
 function renderTable(leads) {

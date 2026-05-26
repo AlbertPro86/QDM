@@ -517,7 +517,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
     <!-- KPIs -->
     <div class="em-kpi-row">
         <!-- Total Campañas -->
-        <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+        <a href="#" onclick="switchTab('campanas');return false;" style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Total Campañas</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-campanas"><?= $kpiCampanas ?></div>
@@ -525,9 +525,9 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <span style="font-size:11px;color:#57544D">historial completo</span>
                 <span style="font-size:10px;font-weight:700;background:#E8E5DD;color:#0E0E0C;padding:2px 8px;border-radius:100px">Total</span>
             </div>
-        </div>
+        </a>
         <!-- Emails Enviados -->
-        <div style="background:#C6F24E;border:1.5px solid #A8D87A;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+        <a href="#" onclick="switchTab('historial');return false;" style="background:#C6F24E;border:1.5px solid #A8D87A;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:rgba(0,0,0,.55);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Emails Enviados</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-enviados"><?= number_format($kpiEnviados) ?></div>
@@ -535,9 +535,9 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <span style="font-size:11px;color:rgba(0,0,0,.5)">correos despachados</span>
                 <span style="font-size:10px;font-weight:700;background:rgba(0,0,0,0.12);color:#0E0E0C;padding:2px 8px;border-radius:100px">Enviados</span>
             </div>
-        </div>
+        </a>
         <!-- Plantillas -->
-        <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+        <a href="#" onclick="switchTab('plantillas');return false;" style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Plantillas</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-plantillas"><?= $kpiPlantillas ?></div>
@@ -545,7 +545,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <span style="font-size:11px;color:#57544D">guardadas</span>
                 <span style="font-size:10px;font-weight:700;background:#E8E5DD;color:#0E0E0C;padding:2px 8px;border-radius:100px">Activas</span>
             </div>
-        </div>
+        </a>
         <!-- Tasa de Entrega -->
         <?php
             $tasaBg     = ($kpiTasa < 80 && $kpiTotal > 0) ? '#F4DEDB' : '#E3F1E8';
@@ -554,7 +554,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             $tasaPillBg = ($kpiTasa < 80 && $kpiTotal > 0) ? '#EFCFCC' : '#C8EAD3';
             $tasaPillCol= ($kpiTasa < 80 && $kpiTotal > 0) ? '#6E211B' : '#1B5A39';
         ?>
-        <div style="background:<?= $tasaBg ?>;border:1.5px solid <?= $tasaBorder ?>;border-radius:3px;padding:16px 20px;transition:box-shadow .15s"
+        <a href="#" onclick="switchTab('campanas');return false;" style="background:<?= $tasaBg ?>;border:1.5px solid <?= $tasaBorder ?>;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:<?= $tasaAccent ?>;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Tasa de Entrega</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-tasa"><?= $kpiTasa ?>%</div>
@@ -562,7 +562,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <span style="font-size:11px;color:#57544D">de <?= number_format($kpiTotal) ?> intentos</span>
                 <span style="font-size:10px;font-weight:700;background:<?= $tasaPillBg ?>;color:<?= $tasaPillCol ?>;padding:2px 8px;border-radius:100px"><?= $kpiTasa >= 80 || $kpiTotal === 0 ? 'Óptima' : 'Revisar' ?></span>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Tabs -->

@@ -298,8 +298,8 @@ function renderKpis(r) {
     const balPillCol  = '#0E0E0C';
     const balPill     = balPos ? 'Positivo' : 'Negativo';
 
-    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill) =>
-        `<div style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;position:relative;overflow:hidden;transition:box-shadow .15s"
+    const kpi = (label, value, sub, bg, borderCol, accent, pillBg, pillCol, pill, action='') =>
+        `<a href="#" onclick="${action}return false;" style="background:${bg};border:1.5px solid ${borderCol};border-radius:3px;padding:16px 20px;position:relative;overflow:hidden;transition:box-shadow .15s;text-decoration:none;display:block;cursor:pointer"
             onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
             <div style="font-size:10px;font-weight:700;color:${accent};text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">${label}</div>
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1;font-family:var(--font-secondary)">${value}</div>
@@ -308,19 +308,23 @@ function renderKpis(r) {
                 <span style="font-size:11px;color:#57544D">${sub}</span>
                 <span style="font-size:10px;font-weight:700;background:${pillBg};color:${pillCol};padding:2px 8px;border-radius:100px;white-space:nowrap">${pill}</span>
             </div>
-        </div>`;
+        </a>`;
 
     document.getElementById('fnKpis').innerHTML =
         kpi('Cobrado',    moneyNum(cobrado),       `${r.count_ingresos||0} ingresos pagados`,
-            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Cobrado')
+            '#E3F1E8', '#B8DEC5', '#1B5A39', '#C8EAD3', '#1B5A39', 'Cobrado',
+            "document.getElementById('fnTipo').value='ingreso';document.getElementById('fnEstado').value='pagado';filterTxTable();")
       + kpi('Egresos',    moneyNum(egresos),        `${r.count_egresos||0} gastos registrados`,
-            '#F4DEDB', '#E8BCB8', '#6E211B', '#F4DEDB', '#6E211B', 'Gastos')
+            '#F4DEDB', '#E8BCB8', '#6E211B', '#F4DEDB', '#6E211B', 'Gastos',
+            "document.getElementById('fnTipo').value='egreso';document.getElementById('fnEstado').value='pagado';filterTxTable();")
       + kpi('Por Cobrar', moneyNum(pendienteMonto), `${(r.total_pendientes||0)+(r.total_vencidos||0)} pendientes`,
-            '#FEF3C7', '#FDE68A', '#92400E', '#FEF3C7', '#92400E', 'Pendiente')
+            '#FEF3C7', '#FDE68A', '#92400E', '#FEF3C7', '#92400E', 'Pendiente',
+            "document.getElementById('fnTipo').value='ingreso';document.getElementById('fnEstado').value='pendiente';filterTxTable();")
       + kpi('Balance',    moneyNum(balance),        'Cobrado − Egresos',
             balBg, balPos ? '#A8D87A' : '#E8BCB8', balPos ? '#1B5A39' : '#6E211B',
             balPos ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)',
-            balPos ? '#0E0E0C' : '#ffffff', balPill);
+            balPos ? '#0E0E0C' : '#ffffff', balPill,
+            "document.getElementById('fnTipo').value='todos';document.getElementById('fnEstado').value='todos';filterTxTable();");
 }
 
 function renderTxTable(data) {

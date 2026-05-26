@@ -33,34 +33,34 @@ include __DIR__ . '/includes/header.php';
 
 <!-- ── RESUMEN KPIs ─────────────────────────────────────────────────────── -->
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="tareasKpis">
-    <div style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
+    <a href="#" onclick="document.getElementById('filtroEstado').value='pendiente';cargarTareas();return false;" style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s;text-decoration:none" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
         <div style="flex:1;min-width:0">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Pendientes</div>
             <div style="font-size:22px;font-weight:700;color:#0E0E0C;line-height:1" id="kpi-pendiente">—</div>
         </div>
         <span style="font-size:10px;font-weight:700;background:#EFECE5;color:#57544D;padding:3px 9px;border-radius:3px;white-space:nowrap">Espera</span>
-    </div>
-    <div style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
+    </a>
+    <a href="#" onclick="document.getElementById('filtroEstado').value='en_progreso';cargarTareas();return false;" style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s;text-decoration:none" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
         <div style="flex:1;min-width:0">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">En Proceso</div>
             <div style="font-size:22px;font-weight:700;color:#0E0E0C;line-height:1" id="kpi-en_progreso">—</div>
         </div>
         <span style="font-size:10px;font-weight:700;background:#E1E7F2;color:#3F5E9E;padding:3px 9px;border-radius:3px;white-space:nowrap">Activo</span>
-    </div>
-    <div style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
+    </a>
+    <a href="#" onclick="document.getElementById('filtroEstado').value='revision';cargarTareas();return false;" style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s;text-decoration:none" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
         <div style="flex:1;min-width:0">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Revisión</div>
             <div style="font-size:22px;font-weight:700;color:#0E0E0C;line-height:1" id="kpi-revision">—</div>
         </div>
         <span style="font-size:10px;font-weight:700;background:#EFECE5;color:#57544D;padding:3px 9px;border-radius:3px;white-space:nowrap">Review</span>
-    </div>
-    <div style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
+    </a>
+    <a href="#" onclick="document.getElementById('filtroEstado').value='completado';cargarTareas();return false;" style="background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:filter .15s;text-decoration:none" onmouseenter="this.style.filter='brightness(.97)'" onmouseleave="this.style.filter='brightness(1)'">
         <div style="flex:1;min-width:0">
             <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">Completadas</div>
             <div style="font-size:22px;font-weight:700;color:#2D8F5A;line-height:1" id="kpi-completado">—</div>
         </div>
         <span style="font-size:10px;font-weight:700;background:#E3F1E8;color:#2D8F5A;padding:3px 9px;border-radius:3px;white-space:nowrap">Listo</span>
-    </div>
+    </a>
 </div>
 
 <!-- ── FILTROS ──────────────────────────────────────────────────────────── -->
