@@ -2290,8 +2290,44 @@ async function confirmarSubirAdjunto() {
 
 /* ── ENVIAR ADJUNTO POR CORREO ─────────────────────────────────────────── */
 /* ── PREVIEW FLOTANTE EN HOVER ─────────────────────────────────────────── */
-let _previewTimer = null;
+let _previewTimer  = null;
 let _previewActive = false;
+let _pdfJsReady    = false;
+const _PDFJS_CDN   = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const _PDFJS_WORKER= 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function _ensurePdfJs() {
+    if (_pdfJsReady) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = _PDFJS_CDN;
+        s.onload = () => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = _PDFJS_WORKER;
+            _pdfJsReady = true;
+            resolve();
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+function _positionFloat(float, anchorEl) {
+    const FW = 270, FH = 350;
+    const rect = anchorEl.getBoundingClientRect();
+    let left = rect.left - FW - 12;
+    let top  = Math.round(rect.top + rect.height / 2 - FH / 2);
+    if (left < 8)                          left = rect.right + 12;
+    if (top < 8)                           top  = 8;
+    if (top + FH > window.innerHeight - 8) top  = window.innerHeight - FH - 8;
+    float.style.left = left + 'px';
+    float.style.top  = top  + 'px';
+}
+
+function _showFloat(float) {
+    float.style.opacity = '0';
+    float.style.display = 'block';
+    requestAnimationFrame(() => { float.style.opacity = '1'; });
+}
 
 function showMediaPreview(e, row) {
     const url  = row.dataset.purl;
@@ -2299,52 +2335,77 @@ function showMediaPreview(e, row) {
     if (!url) return;
 
     clearTimeout(_previewTimer);
-    _previewTimer = setTimeout(() => {
+    _previewTimer = setTimeout(async () => {
+        if (!_previewActive) return; // el cursor salió durante el delay
         const float = document.getElementById('mediaPreviewFloat');
         const inner = document.getElementById('mediaPreviewInner');
 
+        _positionFloat(float, row);
+
         if (mime.startsWith('image/')) {
             inner.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;background:#f1f5f9;display:block">`;
+            _showFloat(float);
+
         } else if (mime === 'application/pdf') {
-            // Iframe 20% más grande que el contenedor y recortado → oculta la barra de scroll nativa del viewer
-            inner.innerHTML = `<div style="width:100%;height:100%;overflow:hidden;position:relative"><iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0&view=Fit&zoom=page-fit&page=1" style="position:absolute;top:0;left:0;width:120%;height:120%;border:none;transform:scale(.833);transform-origin:top left" loading="lazy" scrolling="no"></iframe></div>`;
-        } else {
-            // Placeholder para tipos sin preview nativo
-            const ext = (url.split('.').pop() || '').toUpperCase().substring(0,5);
-            inner.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#f8fafc;color:#94a3b8">
-                <svg width="48" height="48" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                <span style="font-size:18px;font-weight:800;color:#94a3b8;font-family:monospace">${ext}</span>
-                <span style="font-size:11px;color:#cbd5e1">Sin vista previa</span>
+            // Spinner mientras carga
+            inner.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f8fafc">
+                <svg width="28" height="28" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="2" style="animation:spin .8s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
             </div>`;
+            _showFloat(float);
+
+            try {
+                await _ensurePdfJs();
+                if (!_previewActive) return; // salió mientras cargaba pdf.js
+
+                const pdf     = await pdfjsLib.getDocument(url).promise;
+                if (!_previewActive) return;
+
+                const page    = await pdf.getPage(1);
+                if (!_previewActive) return;
+
+                const vp0     = page.getViewport({ scale: 1 });
+                const scale   = Math.min(270 / vp0.width, 350 / vp0.height);
+                const vp      = page.getViewport({ scale });
+
+                const canvas  = document.createElement('canvas');
+                canvas.width  = vp.width;
+                canvas.height = vp.height;
+                canvas.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;background:#fff';
+
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                if (!_previewActive) return;
+
+                inner.innerHTML = '';
+                inner.appendChild(canvas);
+            } catch(err) {
+                if (!_previewActive) return;
+                const ext = url.split('.').pop().toUpperCase().substring(0,4);
+                inner.innerHTML = _noPreviewHtml(ext);
+            }
+
+        } else {
+            const ext = (url.split('.').pop() || '').toUpperCase().substring(0,5);
+            inner.innerHTML = _noPreviewHtml(ext);
+            _showFloat(float);
         }
-
-        // Posición: a la izquierda del row; si no cabe, a la derecha
-        const rect = row.getBoundingClientRect();
-        const FW = 270, FH = 350;
-        let left = rect.left - FW - 12;
-        let top  = Math.round(rect.top + rect.height / 2 - FH / 2);
-
-        if (left < 8)                         left = rect.right + 12;
-        if (top < 8)                          top  = 8;
-        if (top + FH > window.innerHeight - 8) top  = window.innerHeight - FH - 8;
-
-        float.style.left    = left + 'px';
-        float.style.top     = top  + 'px';
-        float.style.opacity = '0';
-        float.style.display = 'block';
-        // Pequeño reflow para activar la transición de opacidad
-        requestAnimationFrame(() => { float.style.opacity = '1'; });
-        _previewActive = true;
     }, 380);
+    _previewActive = true;
+}
+
+function _noPreviewHtml(ext) {
+    return `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#f8fafc">
+        <svg width="44" height="44" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span style="font-size:16px;font-weight:800;color:#94a3b8;font-family:monospace">${ext}</span>
+        <span style="font-size:11px;color:#cbd5e1">Sin vista previa</span>
+    </div>`;
 }
 
 function hideMediaPreview() {
     clearTimeout(_previewTimer);
     _previewActive = false;
     const float = document.getElementById('mediaPreviewFloat');
-    float.style.display  = 'none';
-    float.style.opacity  = '0';
-    // Limpiar el contenido para detener la carga del PDF
+    float.style.display = 'none';
+    float.style.opacity = '0';
     setTimeout(() => {
         if (!_previewActive) document.getElementById('mediaPreviewInner').innerHTML = '';
     }, 50);
