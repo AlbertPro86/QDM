@@ -670,14 +670,22 @@ include __DIR__ . '/includes/header.php';
             </button>
         </div>
         <div class="modal-body" style="display:grid;gap:14px">
+            <!-- Nombre del archivo -->
             <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0EFEB;border-radius:var(--radius-sm)">
-                <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                <span id="adjuntoFileName" style="font-size:12px;font-weight:600;color:#0E0E0C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+                <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                <span id="adjuntoFileName" style="font-size:12px;font-weight:600;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0"></span>
             </div>
-            <div class="form-group" style="margin:0">
-                <label class="form-label">Leyenda <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
-                <input type="text" id="adjuntoDesc" class="form-input" placeholder="Ej: Contrato firmado, Comprobante de pago…"
-                    onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarSubirAdjunto();}">
+            <!-- Fecha del documento + Leyenda en fila -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Fecha del documento</label>
+                    <input type="date" id="adjuntoFecha" class="form-input" style="font-size:13px">
+                </div>
+                <div class="form-group" style="margin:0">
+                    <label class="form-label">Leyenda <span style="font-weight:400;color:var(--color-text-muted)">(opcional)</span></label>
+                    <input type="text" id="adjuntoDesc" class="form-input" placeholder="Ej: Contrato, Comprobante…"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();confirmarSubirAdjunto();}">
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -2104,13 +2112,21 @@ function renderMedia(media) {
                    <span style="font-size:9px;font-weight:800;color:${ic.color};font-family:var(--font-secondary)">${ic.label}</span>
                </a>`;
 
-        const added = m.created_at
-            ? new Date(m.created_at).toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
+        // Fecha: preferir fecha_documento, si no created_at
+        const fechaRaw = m.fecha_documento || m.created_at || '';
+        const fechaStr = fechaRaw
+            ? new Date(fechaRaw.includes('T') ? fechaRaw : fechaRaw + 'T12:00:00')
+                .toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
             : '';
 
-        const descLine = m.descripcion
-            ? `<div style="font-size:10px;color:var(--color-text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.descripcion)}</div>`
-            : (added ? `<div style="font-size:10px;color:var(--color-text-light)">${added}</div>` : '');
+        const infoLine = [
+            fechaStr ? `<span>${fechaStr}</span>` : '',
+            m.descripcion ? `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(m.descripcion)}</span>` : ''
+        ].filter(Boolean).join('<span style="margin:0 3px;opacity:.4">·</span>');
+
+        const descLine = infoLine
+            ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
+            : '';
 
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
@@ -2133,21 +2149,29 @@ let _pendingMediaFile = null;
 function uploadMedia(input) {
     if (!input.files.length) return;
     _pendingMediaFile = input.files[0];
-    input.value = ''; // reset so same file can be re-selected
+    input.value = '';
 
     document.getElementById('adjuntoFileName').textContent = _pendingMediaFile.name;
     document.getElementById('adjuntoDesc').value = '';
+    // Fecha por defecto: hoy
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth()+1).padStart(2,'0');
+    const dd = String(hoy.getDate()).padStart(2,'0');
+    document.getElementById('adjuntoFecha').value = `${yyyy}-${mm}-${dd}`;
     document.getElementById('adjuntoUploadModal').classList.add('show');
-    setTimeout(() => document.getElementById('adjuntoDesc').focus(), 120);
+    setTimeout(() => document.getElementById('adjuntoFecha').focus(), 120);
 }
 
 async function confirmarSubirAdjunto() {
     if (!_pendingMediaFile) return;
-    const desc = document.getElementById('adjuntoDesc').value.trim();
+    const desc  = document.getElementById('adjuntoDesc').value.trim();
+    const fecha = document.getElementById('adjuntoFecha').value;
     const formData = new FormData();
     formData.append('archivo', _pendingMediaFile);
     formData.append('cliente_id', clienteId);
-    if (desc) formData.append('descripcion', desc);
+    if (desc)  formData.append('descripcion', desc);
+    if (fecha) formData.append('fecha_documento', fecha);
 
     document.getElementById('adjuntoUploadModal').classList.remove('show');
     showToast('Subiendo archivo...', 'info');
