@@ -29,7 +29,8 @@ foreach ([
     "ALTER TABLE mejoras_plataforma ADD COLUMN prioridad   VARCHAR(10)  NOT NULL DEFAULT 'media'",
     "ALTER TABLE mejoras_plataforma ADD COLUMN estado      VARCHAR(20)  NOT NULL DEFAULT 'idea'",
     "ALTER TABLE mejoras_plataforma ADD COLUMN notas       TEXT         DEFAULT NULL",
-    "ALTER TABLE mejoras_plataforma ADD COLUMN complejidad VARCHAR(10)  NOT NULL DEFAULT 'media'",
+    "ALTER TABLE mejoras_plataforma ADD COLUMN complejidad    VARCHAR(10)  NOT NULL DEFAULT 'media'",
+    "ALTER TABLE mejoras_plataforma ADD COLUMN fecha_objetivo DATE         DEFAULT NULL",
 ] as $ddl) {
     try { $pdo->exec($ddl); } catch (PDOException $e) {}
 }
@@ -57,16 +58,17 @@ switch ($method) {
         if (empty($input['texto'])) jsonResponse(['error' => 'Texto requerido'], 400);
 
         $stmt = $pdo->prepare("
-            INSERT INTO mejoras_plataforma (texto, categoria, prioridad, estado, notas, complejidad)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO mejoras_plataforma (texto, categoria, prioridad, estado, notas, complejidad, fecha_objetivo)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             substr(trim($input['texto']), 0, 600),
-            $input['categoria']   ?? 'otro',
-            $input['prioridad']   ?? 'media',
-            $input['estado']      ?? 'idea',
-            $input['notas']       ?? null,
-            $input['complejidad'] ?? 'media',
+            $input['categoria']      ?? 'otro',
+            $input['prioridad']      ?? 'media',
+            $input['estado']         ?? 'idea',
+            $input['notas']          ?? null,
+            $input['complejidad']    ?? 'media',
+            $input['fecha_objetivo'] ?? null,
         ]);
         jsonResponse(['success' => true, 'id' => $pdo->lastInsertId()]);
         break;
@@ -76,7 +78,7 @@ switch ($method) {
         $id = $input['id'] ?? null;
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
 
-        $fields = ['texto', 'categoria', 'prioridad', 'estado', 'notas', 'complejidad', 'completada'];
+        $fields = ['texto', 'categoria', 'prioridad', 'estado', 'notas', 'complejidad', 'completada', 'fecha_objetivo'];
         $set = []; $vals = [];
         foreach ($fields as $f) {
             if (array_key_exists($f, $input)) {
