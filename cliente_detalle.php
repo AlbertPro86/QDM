@@ -761,7 +761,7 @@ include __DIR__ . '/includes/header.php';
         <div class="modal-header">
             <div>
                 <h3 id="addSvcModalTitle" class="modal-title">Asignar Servicio</h3>
-                <p style="font-size:12px;color:#94a3b8;margin:4px 0 0">Selecciona del catálogo completo de servicios, sub-servicios y paquetes</p>
+                <p style="font-size:12px;color:#94a3b8;margin:4px 0 0">Selecciona del catálogo completo de servicios, sub-servicios y suscripciones</p>
             </div>
             <button class="modal-close" onclick="closeAddSvcModal()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
@@ -774,7 +774,7 @@ include __DIR__ . '/includes/header.php';
 
                 <!-- Selector del catálogo (modo crear) -->
                 <div id="svcSelectorWrap" style="margin-bottom:20px">
-                    <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Servicio / Sub-servicio / Paquete *</label>
+                    <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Servicio / Sub-servicio / Suscripción *</label>
                     <select id="newSvcId" class="form-select" required onchange="onCatalogSelect(this)" style="font-size:14px">
                         <option value="">Seleccionar del catálogo...</option>
                     </select>
@@ -1381,7 +1381,7 @@ async function loadCatalogo() {
         // Paquetes - obtener primer servicio válido como fallback
         if (rPkg.success && rPkg.data?.length) {
             const grpPkg = document.createElement('optgroup');
-            grpPkg.label = '— Paquetes —';
+            grpPkg.label = '— Suscripciones —';
 
             // Obtener primer servicio válido como fallback para paquetes
             let fallbackSvcId = null;

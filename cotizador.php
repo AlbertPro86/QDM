@@ -118,7 +118,7 @@ include __DIR__ . '/includes/header.php';
             <button class="cat-tab active-tab" onclick="cambiarTab('subservicios',this)" data-tab="subservicios"
                 style="flex:1;padding:10px 8px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;color:var(--color-primary);border-bottom:2px solid var(--color-primary);transition:all .15s;font-family:inherit">Sub-servicios</button>
             <button class="cat-tab" onclick="cambiarTab('paquetes',this)" data-tab="paquetes"
-                style="flex:1;padding:10px 8px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;color:var(--color-text-muted);border-bottom:2px solid transparent;transition:all .15s;font-family:inherit">Paquetes</button>
+                style="flex:1;padding:10px 8px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;color:var(--color-text-muted);border-bottom:2px solid transparent;transition:all .15s;font-family:inherit">Suscripciones</button>
         </div>
 
         <!-- Contenido catálogo -->
@@ -529,7 +529,7 @@ function renderCatalogo(filtro) {
     // Paquetes
     const pkgFiltrados = _catalogoPaquetes.filter(p => !f || p.nombre.toLowerCase().includes(f));
     const pkgHtml = pkgFiltrados.length === 0
-        ? '<div style="text-align:center;padding:40px 0;color:var(--color-text-light);font-size:12px">Sin paquetes</div>'
+        ? '<div style="text-align:center;padding:40px 0;color:var(--color-text-light);font-size:12px">Sin suscripciones</div>'
         : pkgFiltrados.map(p => catalogItemHtml('paquete', p.id, p.nombre, p.descripcion, p.frecuencia||'mes', p.precio_venta||p.precio||0)).join('');
     document.getElementById('catPaquetes').innerHTML = pkgHtml;
 }

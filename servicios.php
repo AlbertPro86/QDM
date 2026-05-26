@@ -18,7 +18,7 @@ include __DIR__ . '/includes/header.php';
     <div class="page-header-right">
         <button class="btn btn-secondary" onclick="openPkgModal()">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V11"/></svg>
-            Crear Paquete
+            Crear Suscripción
         </button>
         <button class="btn btn-accent" onclick="openSvcModal()">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
@@ -31,13 +31,13 @@ include __DIR__ . '/includes/header.php';
     <div style="text-align:center;padding:60px;color:var(--color-text-light);grid-column:1/-1">Cargando...</div>
 </div>
 
-<!-- ── Sección Paquetes ──────────────────────────────────────── -->
+<!-- ── Sección Suscripciones ──────────────────────────────────────── -->
 <div style="display:flex;align-items:center;gap:12px;margin:36px 0 20px">
     <div style="flex:1;height:1px;background:var(--color-border)"></div>
-    <span style="font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">Paquetes</span>
+    <span style="font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">Suscripciones</span>
     <div style="flex:1;height:1px;background:var(--color-border)"></div>
 </div>
-<p style="font-size:13px;color:var(--color-text-muted);margin:0 0 20px">Combina sub-servicios en un paquete con precio calculado automáticamente</p>
+<p style="font-size:13px;color:var(--color-text-muted);margin:0 0 20px">Combina sub-servicios en una suscripción con precio calculado automáticamente</p>
 <div id="pkgsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
     <div style="text-align:center;padding:40px;color:var(--color-text-light);grid-column:1/-1">Cargando...</div>
 </div>
@@ -200,11 +200,11 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<!-- ── Modal Paquete ──────────────────────────────────────── -->
+<!-- ── Modal Suscripción ──────────────────────────────────────── -->
 <div class="modal-overlay" id="pkgModal" onclick="if(event.target===this)closePkgModal()">
     <div class="modal" style="max-width:960px">
         <div class="modal-header">
-            <h3 class="modal-title" id="pkgModalTitle">Nuevo Paquete</h3>
+            <h3 class="modal-title" id="pkgModalTitle">Nueva Suscripción</h3>
             <button class="modal-close" onclick="closePkgModal()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
         <div class="modal-body modal-body-lg">
@@ -213,8 +213,8 @@ include __DIR__ . '/includes/header.php';
                 <div style="display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start">
                     <!-- Columna izquierda: formulario -->
                     <div>
-                        <div class="form-group"><label class="form-label">Nombre del paquete *</label><input type="text" class="form-input" id="pkgNombre" required placeholder="Ej: Landing Page Completa, Plan Empresarial..."></div>
-                        <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pkgDesc" rows="2" placeholder="Descripción del paquete..."></textarea></div>
+                        <div class="form-group"><label class="form-label">Nombre de la suscripción *</label><input type="text" class="form-input" id="pkgNombre" required placeholder="Ej: Landing Page Completa, Plan Empresarial..."></div>
+                        <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pkgDesc" rows="2" placeholder="Descripción de la suscripción..."></textarea></div>
 
                         <!-- Selector de sub-servicios -->
                         <div class="form-group">
@@ -273,7 +273,7 @@ include __DIR__ . '/includes/header.php';
                     <!-- Columna derecha: imagen + enlace -->
                     <div style="display:flex;flex-direction:column;gap:16px">
                         <div>
-                            <label class="form-label" style="margin-bottom:8px">Imagen del paquete</label>
+                            <label class="form-label" style="margin-bottom:8px">Imagen de la suscripción</label>
                             <!-- Zona de imagen -->
                             <div id="pkgImgZone" style="width:100%;aspect-ratio:4/3;border-radius:6px;border:2px dashed #E8E5DD;background:#FAFAF7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;overflow:hidden;position:relative;transition:border-color .2s"
                                 onclick="document.getElementById('pkgImgInput').click()"
@@ -294,7 +294,7 @@ include __DIR__ . '/includes/header.php';
                         <div>
                             <label class="form-label" style="margin-bottom:8px">
                                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                                Enlace del paquete
+                                Enlace de la suscripción
                             </label>
                             <input type="url" class="form-input" id="pkgEnlace" placeholder="https://..." style="font-size:13px">
                             <p style="font-size:11px;color:#8A867C;margin:6px 0 0">Se mostrará como botón en la vista previa</p>
@@ -305,16 +305,16 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closePkgModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="document.getElementById('pkgForm').requestSubmit()">Guardar Paquete</button>
+            <button class="btn btn-primary" onclick="document.getElementById('pkgForm').requestSubmit()">Guardar Suscripción</button>
         </div>
     </div>
 </div>
 
-<!-- ── Modal Vista Previa Paquete ────────────────────────── -->
+<!-- ── Modal Vista Previa Suscripción ────────────────────────── -->
 <div class="modal-overlay" id="previewPkgModal" onclick="if(event.target===this)closePreviewPkg()">
     <div class="modal" style="max-width:980px">
         <div class="modal-header">
-            <h3 class="modal-title" id="previewPkgTitle">Detalle del Paquete</h3>
+            <h3 class="modal-title" id="previewPkgTitle">Detalle de la Suscripción</h3>
             <button class="modal-close" onclick="closePreviewPkg()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
         <div class="modal-body modal-body-lg" id="previewPkgBody"></div>
@@ -892,7 +892,7 @@ function previewPkg(p) {
                           font-size:13px;font-weight:700"
                    onmouseenter="this.style.background='#333'" onmouseleave="this.style.background='#0E0E0C'">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    Ver paquete
+                    Ver suscripción
                 </a>` : ''}
             </div>
         </div>`;
@@ -901,7 +901,7 @@ function previewPkg(p) {
 }
 function closePreviewPkg() { document.getElementById('previewPkgModal').classList.remove('show'); }
 
-/* ── PAQUETES ───────────────────────────────────────────────── */
+/* ── SUSCRIPCIONES ───────────────────────────────────────────────── */
 let allPkgs = [];
 
 async function loadPkgs() {
@@ -909,13 +909,13 @@ async function loadPkgs() {
         const r = await fetch('api/paquetes.php');
         const d = await r.json();
         if (d.success) { allPkgs = d.data; renderPkgs(d.data); }
-    } catch(e) { showToast('Error al cargar paquetes','error'); }
+    } catch(e) { showToast('Error al cargar suscripciones','error'); }
 }
 
 function renderPkgs(pkgs) {
     const grid = document.getElementById('pkgsGrid');
     if (!pkgs.length) {
-        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-state-title">Sin paquetes</p><p class="empty-state-text">Crea tu primer paquete combinando sub-servicios.</p></div>`;
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p class="empty-state-title">Sin suscripciones</p><p class="empty-state-text">Crea tu primera suscripción combinando sub-servicios.</p></div>`;
         return;
     }
     const FREQ = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Pago Único', ninguna:'Ninguna' };
@@ -941,7 +941,7 @@ function renderPkgs(pkgs) {
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
                     <div>
                         <div>
-                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C">Paquete</span>
+                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C">Suscripción</span>
                             <h3 style="font-size:16px;font-weight:800;color:#0E0E0C;margin:2px 0 0">${escapeHtml(p.nombre)}</h3>
                         </div>
                     </div>
@@ -1117,7 +1117,7 @@ function openPkgModal(pkg = null) {
 
     const selectedIds = pkg ? (pkg.items || []).map(i => parseInt(i.sub_servicio_id)) : [];
     if (pkg) {
-        document.getElementById('pkgModalTitle').textContent   = 'Editar Paquete';
+        document.getElementById('pkgModalTitle').textContent   = 'Editar Suscripción';
         document.getElementById('pkgId').value                 = pkg.id;
         document.getElementById('pkgNombre').value             = pkg.nombre;
         document.getElementById('pkgDesc').value               = pkg.descripcion || '';
@@ -1127,7 +1127,7 @@ function openPkgModal(pkg = null) {
         pkgFeatures = Array.isArray(pkg.features) ? pkg.features.map(f => f.texto) : [];
         if (pkg.imagen) setPkgImgUI(pkg.imagen);
     } else {
-        document.getElementById('pkgModalTitle').textContent = 'Nuevo Paquete';
+        document.getElementById('pkgModalTitle').textContent = 'Nueva Suscripción';
         document.getElementById('pkgEnlace').value = '';
         pkgFeatures = [];
     }
@@ -1177,12 +1177,12 @@ async function savePkg(e) {
 }
 
 async function deletePkg(id) {
-    const ok = await confirmAction('El paquete será eliminado permanentemente.', { title: '¿Eliminar paquete?' });
+    const ok = await confirmAction('La suscripción será eliminada permanentemente.', { title: '¿Eliminar suscripción?' });
     if (!ok) return;
     try {
         const r = await fetch(`api/paquetes.php?id=${id}`, { method:'DELETE' });
         const d = await r.json();
-        if (d.success) { showToast('Paquete eliminado','success'); await Promise.all([loadSvcs(), loadPkgs()]); }
+        if (d.success) { showToast('Suscripción eliminada','success'); await Promise.all([loadSvcs(), loadPkgs()]); }
     } catch(e) { showToast('Error','error'); }
 }
 

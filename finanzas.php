@@ -356,11 +356,11 @@ include __DIR__ . '/includes/header.php';
 
       <!-- 3. Catálogo de Servicios -->
       <div id="txCatalogoSection">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#57544D;margin-bottom:8px">Servicios / Paquetes <span style="font-weight:500;text-transform:none;letter-spacing:0">(opcional)</span></div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#57544D;margin-bottom:8px">Servicios / Suscripciones <span style="font-weight:500;text-transform:none;letter-spacing:0">(opcional)</span></div>
         <!-- Tabs -->
         <div style="display:flex;border-bottom:1.5px solid #E8E5DD;margin-bottom:12px">
           <button class="tx-cat-tab active-cat" onclick="setTxCatTab('subservicios',this)" style="padding:7px 14px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid #0E0E0C;color:#0E0E0C;transition:all .15s">Sub-servicios</button>
-          <button class="tx-cat-tab" onclick="setTxCatTab('paquetes',this)" style="padding:7px 14px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid transparent;color:#8A867C;transition:all .15s">Paquetes</button>
+          <button class="tx-cat-tab" onclick="setTxCatTab('paquetes',this)" style="padding:7px 14px;border:none;background:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid transparent;color:#8A867C;transition:all .15s">Suscripciones</button>
         </div>
         <!-- Buscador catálogo -->
         <div style="position:relative;margin-bottom:10px">

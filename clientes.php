@@ -63,7 +63,7 @@ $leadsToConvert = $stmt->fetchAll();
         </div>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Servicio / Sub Servicio / Paquete</label>
+                <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Servicio / Sub Servicio / Suscripción</label>
                 <select class="form-select" id="filterSvcType" style="width: 320px; padding: 8px 12px;">
                     <option value="todos">Todos</option>
                     <optgroup label="Servicios">
@@ -76,7 +76,7 @@ $leadsToConvert = $stmt->fetchAll();
                         <option value="<?= sanitize($ss['nombre']) ?>"><?= sanitize($ss['nombre']) ?> (<?= sanitize($ss['servicio_nombre']) ?>)</option>
                         <?php endforeach; ?>
                     </optgroup>
-                    <optgroup label="Paquetes">
+                    <optgroup label="Suscripciones">
                         <?php foreach($paquetes as $paq): ?>
                         <option value="<?= sanitize($paq['nombre']) ?>"><?= sanitize($paq['nombre']) ?></option>
                         <?php endforeach; ?>
