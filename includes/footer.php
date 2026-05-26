@@ -10,104 +10,57 @@
     <!-- Toast System JS -->
     <script>
     (function() {
-        // Crear overlay singleton
-        const overlay = document.createElement('div');
-        overlay.id = 'alertOverlay';
-        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-        document.body.appendChild(overlay);
+        // Contenedor de toasts — esquina inferior derecha, sin backdrop
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+        document.body.appendChild(container);
 
-        let _dismissTimer = null;
-        let _barTimer     = null;
+        const cfg = {
+            success: { bg:'#E3F1E8', border:'#B8DEC5', dot:'#2D8F5A',
+                svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>' },
+            error:   { bg:'#F4DEDB', border:'#E8BCB8', dot:'#B0382F',
+                svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>' },
+            warning: { bg:'#FEF3C7', border:'#FDE68A', dot:'#92400E',
+                svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/>' },
+            info:    { bg:'#E1E7F2', border:'#B3C3E0', dot:'#3F5E9E',
+                svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01"/>' },
+        };
 
-        function closeAlert() {
-            const box = document.getElementById('alertBox');
-            if (!box) return;
-            clearTimeout(_dismissTimer);
-            cancelAnimationFrame(_barTimer);
-            box.style.opacity = '0';
-            box.style.transform = 'scale(.94) translateY(8px)';
-            overlay.style.background = 'rgba(0,0,0,0)';
-            setTimeout(() => {
-                overlay.style.pointerEvents = 'none';
-                overlay.innerHTML = '';
-            }, 220);
-        }
-
-        window.showToast = function(message, type = 'info', duration = 4000) {
-            clearTimeout(_dismissTimer);
-            cancelAnimationFrame(_barTimer);
-            overlay.innerHTML = '';
-
-            const cfg = {
-                success: { bg:'#f0fdf4', border:'#22c55e', icon_bg:'#dcfce7', icon_color:'#16a34a', title:'¡Hecho!',
-                    svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
-                error:   { bg:'#fff1f2', border:'#ef4444', icon_bg:'#fee2e2', icon_color:'#dc2626', title:'Error',
-                    svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
-                warning: { bg:'#fffbeb', border:'#f59e0b', icon_bg:'#fef3c7', icon_color:'#d97706', title:'Atención',
-                    svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>' },
-                info:    { bg:'#eff6ff', border:'#3b82f6', icon_bg:'#dbeafe', icon_color:'#2563eb', title:'Información',
-                    svg:'<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
-            };
+        window.showToast = function(message, type = 'info', duration = 3000) {
             const c = cfg[type] || cfg.info;
+            const cleanMsg = String(message).replace(/^[\u{1F300}-\u{1FAFF}✅⚠️❌ℹ️✓]+\s*/u, '').trim();
 
-            // Limpiar emoji de prefijo si viene (✅, ⚠️, etc.)
-            const cleanMsg = message.replace(/^[\u{1F300}-\u{1FAFF}✅⚠️❌ℹ️]+\s*/u, '').trim();
-
-            const box = document.createElement('div');
-            box.id = 'alertBox';
-            box.style.cssText = `
-                background:${c.bg};
-                border:1.5px solid ${c.border}33;
-                border-radius:20px;
-                padding:32px 28px 24px;
-                max-width:360px;
-                width:90%;
-                box-shadow:0 24px 60px rgba(0,0,0,0.14),0 0 0 1px ${c.border}22;
-                text-align:center;
-                position:relative;
-                opacity:0;
-                transform:scale(.94) translateY(8px);
-                transition:opacity .22s ease,transform .22s ease;
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                background:${c.bg};border:1px solid ${c.border};border-radius:6px;
+                padding:10px 14px;display:flex;align-items:center;gap:10px;
+                min-width:220px;max-width:320px;pointer-events:auto;cursor:pointer;
+                box-shadow:0 4px 16px rgba(14,14,12,.10);
+                opacity:0;transform:translateY(8px);
+                transition:opacity .18s ease,transform .18s ease;
             `;
-            box.innerHTML = `
-                <button onclick="(function(){var b=document.getElementById('alertBox');if(b){b.style.opacity='0';b.style.transform='scale(.94) translateY(8px)';document.getElementById('alertOverlay').style.background='rgba(0,0,0,0)';setTimeout(function(){var o=document.getElementById('alertOverlay');if(o){o.style.pointerEvents='none';o.innerHTML=''}},220)}})()"
-                    style="position:absolute;top:12px;right:12px;width:28px;height:28px;border:none;background:rgba(0,0,0,0.06);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;transition:background .15s;font-size:16px;line-height:1"
-                    onmouseenter="this.style.background='rgba(0,0,0,0.12)'" onmouseleave="this.style.background='rgba(0,0,0,0.06)'">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-                <div style="width:56px;height:56px;border-radius:50%;background:${c.icon_bg};display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-                    <svg width="28" height="28" fill="none" stroke="${c.icon_color}" viewBox="0 0 24 24" stroke-width="2">${c.svg}</svg>
-                </div>
-                <div style="font-size:15px;font-weight:700;color:#0E0E0C;margin-bottom:8px;letter-spacing:-.01em">${c.title}</div>
-                <div style="font-size:13px;color:#475569;line-height:1.6">${cleanMsg}</div>
-                <div style="margin-top:20px;height:3px;border-radius:99px;background:rgba(0,0,0,0.07);overflow:hidden">
-                    <div id="alertBar" style="height:100%;width:100%;border-radius:99px;background:${c.border};transform-origin:left;transition:none"></div>
-                </div>
+            toast.innerHTML = `
+                <span style="width:20px;height:20px;border-radius:50%;background:${c.dot}22;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="11" height="11" fill="none" stroke="${c.dot}" viewBox="0 0 24 24" stroke-width="2.5">${c.svg}</svg>
+                </span>
+                <span style="font-size:12px;font-weight:600;color:#0E0E0C;line-height:1.4;flex:1">${cleanMsg}</span>
+                <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             `;
-            overlay.appendChild(box);
-            overlay.style.background = 'rgba(0,0,0,0.18)';
-            overlay.style.pointerEvents = 'auto';
-            overlay.onclick = function(e) { if (e.target === overlay) closeAlert(); };
 
-            // Animate in
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                box.style.opacity = '1';
-                box.style.transform = 'scale(1) translateY(0)';
-            }));
-
-            // Progress bar
-            const bar = document.getElementById('alertBar');
-            const start = performance.now();
-            function tick(now) {
-                const elapsed = now - start;
-                const pct = Math.max(0, 1 - elapsed / duration);
-                if (bar) bar.style.transform = 'scaleX(' + pct + ')';
-                if (elapsed < duration) _barTimer = requestAnimationFrame(tick);
+            function dismiss() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 200);
             }
-            _barTimer = requestAnimationFrame(tick);
+            toast.onclick = dismiss;
 
-            // Auto-dismiss
-            _dismissTimer = setTimeout(closeAlert, duration);
+            container.appendChild(toast);
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            }));
+            setTimeout(dismiss, duration);
         };
     })();
 

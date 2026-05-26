@@ -4662,7 +4662,12 @@ function renderTareasCliente() {
     const lista = document.getElementById('tareasClienteLista');
     const filtro = _tareasClienteFiltro;
     let tareas = _tareasClienteData;
-    if (filtro !== 'todos') tareas = tareas.filter(t => t.estado === filtro);
+    if (filtro === 'todos') {
+        // "Todas" excluye canceladas — para verlas usar filtro explícito
+        tareas = tareas.filter(t => t.estado !== 'cancelado');
+    } else {
+        tareas = tareas.filter(t => t.estado === filtro);
+    }
 
     if (!tareas.length) {
         lista.innerHTML = `<div style="text-align:center;padding:32px 20px">
