@@ -50,11 +50,9 @@ $flash = getFlash();
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <div>
-                        <div style="display:flex;align-items:center;gap:8px">
-                            <h1 class="topbar-title"><?= sanitize($pageTitle) ?></h1>
-                            <?php if (!empty($pageTitleSuffix)): ?><?= $pageTitleSuffix ?><?php endif; ?>
-                        </div>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <h1 class="topbar-title"><?= sanitize($pageTitle) ?></h1>
+                        <?php if (!empty($pageTitleSuffix)): ?><?= $pageTitleSuffix ?><?php endif; ?>
                         <?php if (!empty($pageBreadcrumb)): ?>
                             <p class="topbar-subtitle"><?= $pageBreadcrumb ?></p>
                         <?php elseif ($pageSubtitle): ?>
