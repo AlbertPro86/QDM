@@ -795,6 +795,11 @@ include __DIR__ . '/includes/header.php';
     </button>
 </div>
 
+<!-- Preview flotante de adjunto (hover) -->
+<div id="mediaPreviewFloat" style="display:none;position:fixed;z-index:8998;width:270px;height:350px;border-radius:10px;overflow:hidden;box-shadow:0 10px 36px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.1);border:1px solid #e2e8f0;background:#f8fafc;pointer-events:none;transition:opacity .15s">
+    <div id="mediaPreviewInner" style="width:100%;height:100%"></div>
+</div>
+
 <!-- Modal Nuevo / Editar Trabajo Adicional -->
 <div class="modal-overlay" id="trabajoAdModal">
     <div class="modal" style="max-width:480px">
@@ -2225,7 +2230,7 @@ function renderMedia(media) {
             ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
             : '';
 
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
+        return `<div data-purl="${escapeHtml(m.archivo_url)}" data-pmime="${escapeHtml(m.tipo_archivo||'')}" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden;cursor:default" onmouseenter="this.style.background='#FAFAF7';showMediaPreview(event,this)" onmouseleave="this.style.background='';hideMediaPreview()">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
@@ -2282,6 +2287,66 @@ async function confirmarSubirAdjunto() {
 }
 
 /* ── ENVIAR ADJUNTO POR CORREO ─────────────────────────────────────────── */
+/* ── PREVIEW FLOTANTE EN HOVER ─────────────────────────────────────────── */
+let _previewTimer = null;
+let _previewActive = false;
+
+function showMediaPreview(e, row) {
+    const url  = row.dataset.purl;
+    const mime = row.dataset.pmime || '';
+    if (!url) return;
+
+    clearTimeout(_previewTimer);
+    _previewTimer = setTimeout(() => {
+        const float = document.getElementById('mediaPreviewFloat');
+        const inner = document.getElementById('mediaPreviewInner');
+
+        if (mime.startsWith('image/')) {
+            inner.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;background:#f1f5f9;display:block">`;
+        } else if (mime === 'application/pdf') {
+            inner.innerHTML = `<iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" style="width:100%;height:100%;border:none" loading="lazy"></iframe>`;
+        } else {
+            // Placeholder para tipos sin preview nativo
+            const ext = (url.split('.').pop() || '').toUpperCase().substring(0,5);
+            inner.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#f8fafc;color:#94a3b8">
+                <svg width="48" height="48" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="1.5"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                <span style="font-size:18px;font-weight:800;color:#94a3b8;font-family:monospace">${ext}</span>
+                <span style="font-size:11px;color:#cbd5e1">Sin vista previa</span>
+            </div>`;
+        }
+
+        // Posición: a la izquierda del row; si no cabe, a la derecha
+        const rect = row.getBoundingClientRect();
+        const FW = 270, FH = 350;
+        let left = rect.left - FW - 12;
+        let top  = Math.round(rect.top + rect.height / 2 - FH / 2);
+
+        if (left < 8)                         left = rect.right + 12;
+        if (top < 8)                          top  = 8;
+        if (top + FH > window.innerHeight - 8) top  = window.innerHeight - FH - 8;
+
+        float.style.left    = left + 'px';
+        float.style.top     = top  + 'px';
+        float.style.opacity = '0';
+        float.style.display = 'block';
+        // Pequeño reflow para activar la transición de opacidad
+        requestAnimationFrame(() => { float.style.opacity = '1'; });
+        _previewActive = true;
+    }, 380);
+}
+
+function hideMediaPreview() {
+    clearTimeout(_previewTimer);
+    _previewActive = false;
+    const float = document.getElementById('mediaPreviewFloat');
+    float.style.display  = 'none';
+    float.style.opacity  = '0';
+    // Limpiar el contenido para detener la carga del PDF
+    setTimeout(() => {
+        if (!_previewActive) document.getElementById('mediaPreviewInner').innerHTML = '';
+    }, 50);
+}
+
 /* ── KEBAB MENÚ ADJUNTOS ────────────────────────────────────────────────── */
 let _mediaMenu = { id: null, nombre: null, url: null };
 
