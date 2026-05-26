@@ -2206,11 +2206,13 @@ function renderMedia(media) {
         const isImg = m.tipo_archivo && m.tipo_archivo.startsWith('image/');
         const ic   = extIcon(m.tipo_archivo || '', ext);
 
+        const purl  = escapeHtml(m.archivo_url);
+        const pmime = escapeHtml(m.tipo_archivo || '');
         const avatar = isImg
-            ? `<a href="${m.archivo_url}" target="_blank" style="display:block;width:36px;height:36px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;border:1px solid var(--color-border)">
+            ? `<a href="${m.archivo_url}" target="_blank" data-purl="${purl}" data-pmime="${pmime}" style="display:block;width:36px;height:36px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;border:1px solid var(--color-border)" onmouseenter="showMediaPreview(event,this)" onmouseleave="hideMediaPreview()">
                    <img src="${m.archivo_url}" style="width:100%;height:100%;object-fit:cover">
                </a>`
-            : `<a href="${m.archivo_url}" target="_blank" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);background:${ic.bg};flex-shrink:0;text-decoration:none">
+            : `<a href="${m.archivo_url}" target="_blank" data-purl="${purl}" data-pmime="${pmime}" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-sm);background:${ic.bg};flex-shrink:0;text-decoration:none" onmouseenter="showMediaPreview(event,this)" onmouseleave="hideMediaPreview()">
                    <span style="font-size:9px;font-weight:800;color:${ic.color};font-family:var(--font-secondary)">${ic.label}</span>
                </a>`;
 
@@ -2230,7 +2232,7 @@ function renderMedia(media) {
             ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
             : '';
 
-        return `<div data-purl="${escapeHtml(m.archivo_url)}" data-pmime="${escapeHtml(m.tipo_archivo||'')}" style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden;cursor:default" onmouseenter="this.style.background='#FAFAF7';showMediaPreview(event,this)" onmouseleave="this.style.background='';hideMediaPreview()">
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden;cursor:default" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
@@ -2304,7 +2306,8 @@ function showMediaPreview(e, row) {
         if (mime.startsWith('image/')) {
             inner.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;background:#f1f5f9;display:block">`;
         } else if (mime === 'application/pdf') {
-            inner.innerHTML = `<iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH" style="width:100%;height:100%;border:none" loading="lazy"></iframe>`;
+            // Iframe 20% más grande que el contenedor y recortado → oculta la barra de scroll nativa del viewer
+            inner.innerHTML = `<div style="width:100%;height:100%;overflow:hidden;position:relative"><iframe src="${url}#toolbar=0&navpanes=0&scrollbar=0&view=Fit&zoom=page-fit&page=1" style="position:absolute;top:0;left:0;width:120%;height:120%;border:none;transform:scale(.833);transform-origin:top left" loading="lazy" scrolling="no"></iframe></div>`;
         } else {
             // Placeholder para tipos sin preview nativo
             const ext = (url.split('.').pop() || '').toUpperCase().substring(0,5);
@@ -2352,6 +2355,7 @@ let _mediaMenu = { id: null, nombre: null, url: null };
 
 function openMediaMenu(e, btn) {
     e.stopPropagation();
+    hideMediaPreview();
     _mediaMenu = {
         id:     btn.dataset.mid,
         nombre: btn.dataset.mnombre,
