@@ -70,6 +70,22 @@ function actualizarKpis(resumen) {
     });
 }
 
+/* ── PRIORIDAD ICON ──────────────────────────────────────────────────── */
+function prioIcon(p, size = 17) {
+    const cfg = {
+        alta:  { stroke:'#dc2626', title:'Alta',
+                 path:`<polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/>` },
+        media: { stroke:'#d97706', title:'Media',
+                 path:`<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/>` },
+        baja:  { stroke:'#16a34a', title:'Baja',
+                 path:`<polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/>` },
+    };
+    const c = cfg[p] || cfg.media;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"
+                 stroke="${c.stroke}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"
+                 title="${c.title}" style="display:block;flex-shrink:0">${c.path}</svg>`;
+}
+
 /* ── LISTA ────────────────────────────────────────────────────────────── */
 function renderLista(rows) {
     const tbody = document.getElementById('tareasTbody');
@@ -122,11 +138,8 @@ function renderLista(rows) {
             onmouseenter="this.style.background='#fafafa'"
             onmouseleave="this.style.background='transparent'">
 
-            <td style="padding:12px 16px">
-                <span style="display:inline-flex;align-items:center;gap:5px;background:${prioBg[t.prioridad]};color:${prioClr[t.prioridad]};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">
-                    <span style="width:6px;height:6px;border-radius:50%;background:${prioDot[t.prioridad]};display:inline-block"></span>
-                    ${prioLabel[t.prioridad]}
-                </span>
+            <td style="padding:12px 16px;text-align:center">
+                ${prioIcon(t.prioridad)}
             </td>
 
             <td style="padding:12px;max-width:260px">
@@ -213,7 +226,7 @@ function renderKanban(rows, resumen) {
                 <!-- Cabecera: prioridad dot + titulo -->
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
                     <div style="font-size:13px;font-weight:700;color:#0E0E0C;line-height:1.35;flex:1">${escapeHtml(t.titulo)}</div>
-                    <span style="width:8px;height:8px;border-radius:50%;background:${prioDot[t.prioridad]};flex-shrink:0;margin-top:4px" title="${prioLabel[t.prioridad]}"></span>
+                    ${prioIcon(t.prioridad, 15)}
                 </div>
                 <!-- Descripción -->
                 ${t.descripcion ? `<div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(t.descripcion)}</div>` : ''}
@@ -561,7 +574,7 @@ function renderHistorial(rows) {
             </td>
             <td style="padding:10px 12px">${vinculo}</td>
             <td style="padding:10px 12px;text-align:center">
-                <span style="background:${prioBg[t.prioridad]};color:${prioClr[t.prioridad]};padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700">${prioLabel[t.prioridad]||'—'}</span>
+                ${prioIcon(t.prioridad)}
             </td>
             <td style="padding:10px 12px;text-align:center;font-size:11px;color:#8A867C">${fecha}</td>
             <td style="padding:10px 12px;text-align:center">

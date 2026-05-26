@@ -4468,14 +4468,14 @@ function verDetallesTareaCliente(id) {
             document.getElementById('detalleTareaClienteTitulo').textContent = escapeHtmlClient(t.titulo);
 
             // Prioridad
-            const prioBg  = { alta:'#fee2e2', media:'#fef3c7', baja:'#dcfce7' };
-            const prioClr = { alta:'#dc2626', media:'#d97706', baja:'#16a34a' };
-            const prioLabel = { alta:'Alta', media:'Media', baja:'Baja' };
+            const _prioIconCfg = {
+                alta:  { stroke:'#dc2626', title:'Alta',  path:'<polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/>' },
+                media: { stroke:'#d97706', title:'Media', path:'<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/>' },
+                baja:  { stroke:'#16a34a', title:'Baja',  path:'<polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/>' },
+            };
+            const _pc = _prioIconCfg[t.prioridad] || _prioIconCfg.media;
             document.getElementById('detallePrioridadCliente').innerHTML =
-                `<span style="display:inline-flex;align-items:center;gap:5px;background:${prioBg[t.prioridad]};color:${prioClr[t.prioridad]};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">
-                    <span style="width:6px;height:6px;border-radius:50%;background:${prioClr[t.prioridad]};display:inline-block"></span>
-                    ${prioLabel[t.prioridad]}
-                </span>`;
+                `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${_pc.stroke}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" title="${_pc.title}">${_pc.path}</svg>`;
 
             // Estado - Badge de solo lectura
             const estBg  = { pendiente:'#f1f5f9', en_progreso:'#dbeafe', revision:'#fef3c7', completado:'#dcfce7' };
@@ -4679,9 +4679,9 @@ function renderTareasCliente() {
     }
 
     const prioData = {
-        alta:   { bg:'#fee2e2', clr:'#dc2626', label:'Alta' },
-        media:  { bg:'#fef3c7', clr:'#d97706', label:'Media' },
-        baja:   { bg:'#dcfce7', clr:'#16a34a', label:'Baja' },
+        alta:   { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>' },
+        media:  { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>' },
+        baja:   { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/></svg>' },
     };
     const estadoData = {
         pendiente:   { bg:'#fff7ed', clr:'#ea580c', label:'Pendiente', icon:'⏳' },
@@ -4718,7 +4718,7 @@ function renderTareasCliente() {
                 <div style="font-size:12px;font-weight:${completado ? '500' : '700'};color:${completado ? '#94a3b8' : '#0f172a'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${completado ? 'text-decoration:line-through' : ''}">${escapeHtmlClient(t.titulo)}</div>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">
                     <span style="font-size:10px;background:${est.bg};color:${est.clr};padding:2px 7px;border-radius:20px;font-weight:700">${est.icon} ${est.label}</span>
-                    <span style="font-size:10px;background:${prio.bg};color:${prio.clr};padding:2px 7px;border-radius:20px;font-weight:600">${prio.label}</span>
+                    ${prio.icon}
                     <span style="font-size:10px;color:#94a3b8">${fechaStr}</span>
                 </div>
             </div>
