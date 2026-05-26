@@ -1622,10 +1622,8 @@ function crearTarea() {
         if (!res.success) throw new Error(res.error || 'Error al crear la tarea');
         showToast('✓ Tarea creada correctamente', 'success');
         closeTareasModal();
-        // Recargar la página de tareas si está abierta
-        if (typeof cargarTareas === 'function') {
-            cargarTareas();
-        }
+        loadTareasCliente();
+        loadTareasIndicador();
     })
     .catch(err => {
         showToast(err.message, 'error');
@@ -3671,6 +3669,13 @@ async function confirmarEnvioMsgEmail() {
             </div>
         </div>
         <div class="modal-footer">
+            <button id="btnEliminarTareaModal" class="btn btn-outline" style="color:#B0382F;border-color:#FECACA;margin-right:auto"
+                onclick="eliminarTareaClienteDesdeModal()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Eliminar
+            </button>
             <button class="btn btn-outline" onclick="closeDetallesTareaClienteModal()">Cerrar</button>
             <button id="btnIrATasksPage" class="btn btn-secondary" style="background:#4f46e5;color:#fff" onclick="goToTaskPage()">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -4521,6 +4526,31 @@ function closeDetallesTareaClienteModal() {
     document.getElementById('detallesTareaClienteModal').classList.remove('show');
 }
 
+async function eliminarTareaCliente(id, titulo) {
+    const ok = await confirmAction(
+        `La tarea "${titulo}" se moverá al historial de eliminadas.`,
+        { title: '¿Eliminar tarea?' }
+    );
+    if (!ok) return;
+    try {
+        const r = await fetch(`api/tareas.php?id=${id}`, { method: 'DELETE' });
+        const d = await r.json();
+        if (!d.success) throw new Error(d.error || 'Error');
+        showToast('Tarea eliminada', 'success');
+        loadTareasCliente();
+        loadTareasIndicador();
+    } catch(e) { showToast(e.message || 'Error al eliminar', 'error'); }
+}
+
+async function eliminarTareaClienteDesdeModal() {
+    const btn = document.getElementById('btnIrATasksPage');
+    const id  = btn?.dataset.tareaId;
+    const titulo = document.getElementById('detalleTareaClienteTitulo')?.textContent || '';
+    if (!id) return;
+    closeDetallesTareaClienteModal();
+    await eliminarTareaCliente(id, titulo);
+}
+
 function goToTaskPage() {
     const id = document.getElementById('btnIrATasksPage').dataset.tareaId;
     closeDetallesTareaClienteModal();
@@ -4687,6 +4717,15 @@ function renderTareasCliente() {
                     <span style="font-size:10px;color:#94a3b8">${fechaStr}</span>
                 </div>
             </div>
+            <!-- Eliminar -->
+            <button onclick="event.stopPropagation();eliminarTareaCliente(${t.id},'${escapeHtmlClient(t.titulo).replace(/'/g,'&#39;')}')" title="Eliminar tarea"
+                style="width:26px;height:26px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#C6C2BB;flex-shrink:0;transition:all .12s"
+                onmouseenter="this.style.background='#FEE2E2';this.style.color='#B0382F'"
+                onmouseleave="this.style.background='transparent';this.style.color='#C6C2BB'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
         </div>`;
     }).join('');
 }

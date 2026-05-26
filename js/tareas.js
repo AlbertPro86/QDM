@@ -489,6 +489,114 @@ function cambiarEstadoTarea(nuevoEstado, tareaId) {
     });
 }
 
+/* ═══════════════════════════════════════════════════════════ HISTORIAL */
+let _historialLoaded = false;
+
+function toggleHistorial() {
+    const body  = document.getElementById('historialBody');
+    const arrow = document.getElementById('historialArrow');
+    const open  = body.style.display !== 'none';
+    body.style.display  = open ? 'none' : 'block';
+    arrow.style.transform = open ? '' : 'rotate(180deg)';
+    if (!open && !_historialLoaded) cargarHistorial();
+}
+
+function cargarHistorial() {
+    _historialLoaded = true;
+    document.getElementById('historialTbody').innerHTML =
+        `<tr><td colspan="6" style="padding:32px;text-align:center;color:#94a3b8;font-size:12px">Cargando...</td></tr>`;
+
+    fetch('api/tareas.php?historial=1&limite=300')
+        .then(r => r.json())
+        .then(res => {
+            if (!res.success) throw new Error(res.error || 'Error');
+            const badge = document.getElementById('historialBadge');
+            if (res.data.length) {
+                badge.textContent = res.data.length;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+            renderHistorial(res.data);
+        })
+        .catch(err => {
+            document.getElementById('historialTbody').innerHTML =
+                `<tr><td colspan="6" style="padding:32px;text-align:center;color:#ef4444;font-size:12px">${err.message}</td></tr>`;
+        });
+}
+
+function renderHistorial(rows) {
+    const tbody = document.getElementById('historialTbody');
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;color:#94a3b8;font-size:12px">Sin historial aún.</td></tr>`;
+        return;
+    }
+
+    const prioLabel = { alta:'Alta', media:'Media', baja:'Baja' };
+    const prioBg    = { alta:'#fee2e2', media:'#fef3c7', baja:'#dcfce7' };
+    const prioClr   = { alta:'#dc2626', media:'#d97706', baja:'#16a34a' };
+
+    tbody.innerHTML = rows.map(t => {
+        const esCancelado = t.estado === 'cancelado';
+        const estadoBg    = esCancelado ? '#F4DEDB' : '#E3F1E8';
+        const estadoClr   = esCancelado ? '#B0382F' : '#1B5A39';
+        const estadoLabel = esCancelado ? 'Eliminada' : 'Completada';
+
+        const vinculo = t.cliente_nombre
+            ? `<a href="cliente_detalle.php?id=${t.cliente_id}" style="font-size:11px;color:#3F5E9E;text-decoration:none;font-weight:600">${escapeHtml(t.cliente_nombre)}</a>`
+            : t.lead_nombre
+            ? `<span style="font-size:11px;color:#57544D">${escapeHtml(t.lead_nombre)}</span>`
+            : `<span style="color:#cbd5e1">—</span>`;
+
+        const fecha = t.updated_at
+            ? new Date(t.updated_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})
+            : '—';
+
+        return `<tr style="border-bottom:1px solid #F5F4F1;opacity:${esCancelado ? '.75' : '1'};transition:background .1s"
+                    onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
+            <td style="padding:10px 16px">
+                <span style="background:${estadoBg};color:${estadoClr};padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;white-space:nowrap">${estadoLabel}</span>
+            </td>
+            <td style="padding:10px 12px;max-width:260px">
+                <div style="font-weight:600;font-size:12px;color:${esCancelado ? '#94a3b8' : '#0E0E0C'};${esCancelado ? 'text-decoration:line-through' : ''};line-height:1.3">${escapeHtml(t.titulo)}</div>
+                ${t.descripcion ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(t.descripcion)}</div>` : ''}
+            </td>
+            <td style="padding:10px 12px">${vinculo}</td>
+            <td style="padding:10px 12px;text-align:center">
+                <span style="background:${prioBg[t.prioridad]};color:${prioClr[t.prioridad]};padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700">${prioLabel[t.prioridad]||'—'}</span>
+            </td>
+            <td style="padding:10px 12px;text-align:center;font-size:11px;color:#8A867C">${fecha}</td>
+            <td style="padding:10px 12px;text-align:center">
+                <button onclick="eliminarTareaPermanente(${t.id},'${escapeHtml(t.titulo).replace(/'/g,'&#39;')}')" title="Eliminar definitivamente"
+                    style="background:none;border:none;cursor:pointer;padding:5px;border-radius:4px;color:#C6C2BB"
+                    onmouseenter="this.style.background='#FEE2E2';this.style.color='#B0382F'"
+                    onmouseleave="this.style.background='none';this.style.color='#C6C2BB'">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function eliminarTareaPermanente(id, titulo) {
+    const ok = await confirmAction(
+        `"${titulo}" se borrará del historial para siempre.`,
+        { title: '¿Eliminar definitivamente?', confirmText: 'Eliminar', danger: true }
+    );
+    if (!ok) return;
+    try {
+        const res = await fetch(`api/tareas.php?id=${id}&permanente=1`, { method: 'DELETE' }).then(r => r.json());
+        if (!res.success) throw new Error(res.error);
+        if (typeof showToast === 'function') showToast('Tarea eliminada del historial', 'success');
+        _historialLoaded = false;
+        cargarHistorial();
+    } catch(err) {
+        if (typeof showToast === 'function') showToast(err.message, 'error');
+    }
+}
+
 /* ═══════════════════════════════════════════════════════════ UTILS */
 function escapeHtml(str) {
     if (!str) return '';

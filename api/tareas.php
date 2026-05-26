@@ -56,16 +56,21 @@ switch ($method) {
         }
 
         $cliente_id_filter = isset($_GET['cliente_id']) ? intval($_GET['cliente_id']) : null;
-        $limite = isset($_GET['limite']) ? intval($_GET['limite']) : 500;
+        $limite    = isset($_GET['limite'])   ? intval($_GET['limite'])   : 500;
+        $historial = isset($_GET['historial']) && $_GET['historial'] == '1';
 
         $where  = [];
         $params = [];
 
-        // Si viene cliente_id, mostrar todas las tareas (incluso canceladas) de ese cliente
-        if ($cliente_id_filter) {
+        if ($historial) {
+            // Historial: solo completadas y canceladas (eliminadas)
+            $where[] = "t.estado IN ('completado','cancelado')";
+        } elseif ($cliente_id_filter) {
+            // Vista de cliente: todas las tareas del cliente, incluso canceladas
             $where[] = "t.cliente_id = ?";
             $params[] = $cliente_id_filter;
         } else {
+            // Vista general: excluir canceladas
             $where[] = "t.estado != 'cancelado'";
         }
 
@@ -151,12 +156,19 @@ switch ($method) {
 
     /* ── DELETE ──────────────────────────────────────────────────────── */
     case 'DELETE':
-        $id = $_GET['id'] ?? (json_decode(file_get_contents('php://input'), true)['id'] ?? null);
+        $id         = $_GET['id'] ?? (json_decode(file_get_contents('php://input'), true)['id'] ?? null);
+        $permanente = isset($_GET['permanente']) && $_GET['permanente'] == '1';
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
 
-        $pdo->prepare("UPDATE tareas SET estado = 'cancelado' WHERE id = ?")->execute([$id]);
-        logActivity($_SESSION['user_id'], 'eliminar', 'tareas', $id, "Tarea cancelada: ID $id");
-        jsonResponse(['success' => true, 'message' => 'Tarea eliminada']);
+        if ($permanente) {
+            $pdo->prepare("DELETE FROM tareas WHERE id = ?")->execute([$id]);
+            logActivity($_SESSION['user_id'], 'eliminar', 'tareas', $id, "Tarea eliminada permanentemente: ID $id");
+            jsonResponse(['success' => true, 'message' => 'Tarea eliminada permanentemente']);
+        } else {
+            $pdo->prepare("UPDATE tareas SET estado = 'cancelado' WHERE id = ?")->execute([$id]);
+            logActivity($_SESSION['user_id'], 'eliminar', 'tareas', $id, "Tarea cancelada: ID $id");
+            jsonResponse(['success' => true, 'message' => 'Tarea eliminada']);
+        }
 
     default:
         jsonResponse(['error' => 'Método no permitido'], 405);

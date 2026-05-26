@@ -353,17 +353,51 @@ include __DIR__ . '/includes/header.php';
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════
+     HISTORIAL (completadas + eliminadas)
+══════════════════════════════════════════════════════════ -->
+<div style="margin-top:20px;background:#fff;border:1.5px solid #E8E5DD;border-radius:4px;overflow:hidden" id="historialCard">
+    <div onclick="toggleHistorial()" style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;cursor:pointer;user-select:none;transition:background .12s" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
+        <div style="display:flex;align-items:center;gap:10px">
+            <svg width="15" height="15" fill="none" stroke="#8A867C" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span style="font-size:13px;font-weight:700;color:#0E0E0C">Historial</span>
+            <span style="font-size:11px;color:#8A867C">Completadas y eliminadas</span>
+            <span id="historialBadge" style="display:none;background:#EFECE5;color:#57544D;font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px"></span>
+        </div>
+        <svg id="historialArrow" width="14" height="14" fill="none" stroke="#8A867C" viewBox="0 0 24 24" stroke-width="2.5" style="transition:transform .2s"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div id="historialBody" style="display:none;border-top:1px solid #E8E5DD">
+        <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead>
+                    <tr style="background:#FAFAF7;border-bottom:1.5px solid #E8E5DD">
+                        <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em;width:100px">Estado</th>
+                        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em">Título</th>
+                        <th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em;width:130px">Cliente / Lead</th>
+                        <th style="padding:9px 12px;text-align:center;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em;width:100px">Prioridad</th>
+                        <th style="padding:9px 12px;text-align:center;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em;width:110px">Actualizada</th>
+                        <th style="padding:9px 12px;text-align:center;font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.06em;width:60px"></th>
+                    </tr>
+                </thead>
+                <tbody id="historialTbody">
+                    <tr><td colspan="6" style="padding:32px;text-align:center;color:#94a3b8;font-size:12px">Cargando historial...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <!-- Modal confirmar eliminar tarea -->
 <div id="modalEliminarTarea" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1200;display:none;align-items:center;justify-content:center;padding:16px">
   <div style="background:#fff;border-radius:6px;width:100%;max-width:400px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.06);text-align:center">
     <div style="width:52px;height:52px;background:#F4DEDB;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
       <svg width="24" height="24" fill="none" stroke="#B0382F" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
     </div>
-    <h3 style="font-size:16px;font-weight:700;color:#0E0E0C;margin:0 0 8px">¿Cancelar tarea?</h3>
+    <h3 style="font-size:16px;font-weight:700;color:#0E0E0C;margin:0 0 8px">¿Eliminar tarea?</h3>
     <p id="modalElimTareaNombre" style="font-size:13px;color:#57544D;margin:0 0 24px"></p>
     <div style="display:flex;gap:10px;justify-content:center">
       <button onclick="document.getElementById('modalEliminarTarea').style.display='none'" style="padding:10px 20px;background:transparent;border:1.5px solid #E8E5DD;border-radius:4px;font-weight:700;cursor:pointer;font-size:13px;color:#57544D">Conservar</button>
-      <button id="btnConfirmarElimTarea" style="padding:10px 20px;background:#B0382F;color:#fff;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-size:13px">Sí, cancelar</button>
+      <button id="btnConfirmarElimTarea" style="padding:10px 20px;background:#B0382F;color:#fff;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-size:13px">Sí, eliminar</button>
     </div>
   </div>
 </div>
