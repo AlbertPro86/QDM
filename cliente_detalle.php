@@ -2231,7 +2231,7 @@ function renderMedia(media) {
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
                 ${descLine}
             </div>
-            <button onclick="openMediaMenu(event,${m.id},${JSON.stringify(m.nombre_archivo)},${JSON.stringify(m.archivo_url)})" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
+            <button onclick="openMediaMenu(event,this)" data-mid="${m.id}" data-mnombre="${escapeHtml(m.nombre_archivo)}" data-murl="${escapeHtml(m.archivo_url)}" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
                 <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
             </button>
         </div>`;
@@ -2285,9 +2285,13 @@ async function confirmarSubirAdjunto() {
 /* ── KEBAB MENÚ ADJUNTOS ────────────────────────────────────────────────── */
 let _mediaMenu = { id: null, nombre: null, url: null };
 
-function openMediaMenu(e, id, nombre, url) {
+function openMediaMenu(e, btn) {
     e.stopPropagation();
-    _mediaMenu = { id, nombre, url };
+    _mediaMenu = {
+        id:     btn.dataset.mid,
+        nombre: btn.dataset.mnombre,
+        url:    btn.dataset.murl,
+    };
     const dd = document.getElementById('mediaDropdown');
     dd.style.display = 'block';
     // Posicionar cerca del botón
