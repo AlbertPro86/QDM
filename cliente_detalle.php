@@ -139,49 +139,32 @@ include __DIR__ . '/includes/header.php';
     <div style="display:grid;gap:10px;min-width:0;overflow:hidden">
         <!-- Resumen Financiero del Cliente -->
         <div id="clientFinanceSummary" class="cf-summary-grid">
-            <!-- Card: Ingreso Bruto -->
+            <!-- Card visible: Costo de Venta -->
             <div class="cf-card cf-card--income">
                 <div class="cf-card__body">
                     <div class="cf-card__header">
-                        <span class="cf-card__label">Ingreso Bruto</span>
-                        <span class="cf-pill cf-pill--income">Ingresos</span>
+                        <span class="cf-card__label">Costo de Venta</span>
+                        <span class="cf-pill cf-pill--income">Mensual</span>
                     </div>
                     <p class="cf-card__value" id="totalIngreso">$ 0</p>
                     <p class="cf-card__currency">COP</p>
                 </div>
             </div>
 
-            <!-- Card: Descuentos -->
-            <div class="cf-card cf-card--expense">
-                <div class="cf-card__body">
-                    <div class="cf-card__header">
-                        <span class="cf-card__label">Descuentos</span>
-                        <span class="cf-pill cf-pill--expense">Desc.</span>
-                    </div>
-                    <p class="cf-card__value" id="totalEgreso">$ 0</p>
-                    <p class="cf-card__currency">COP</p>
-                </div>
-            </div>
-
-            <!-- Card: Ingreso Neto -->
-            <div class="cf-card cf-card--profit">
-                <div class="cf-card__body">
-                    <div class="cf-card__header">
-                        <span class="cf-card__label">Ingreso Neto</span>
-                        <span class="cf-pill cf-pill--profit">Neto</span>
-                    </div>
-                    <p class="cf-card__value" id="totalGanancia">$ 0</p>
-                    <p class="cf-card__currency">COP</p>
-                </div>
-            </div>
+            <!-- Cards ocultas: IDs necesarios para el JS -->
+            <p id="totalEgreso"   style="display:none">0</p>
+            <p id="totalGanancia" style="display:none">0</p>
         </div>
 
         <style>
         .cf-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
             gap: 12px;
             margin-bottom: 28px;
+        }
+        .cf-summary-grid .cf-card {
+            width: 220px;
+            flex-shrink: 0;
         }
 
         .cf-card {
