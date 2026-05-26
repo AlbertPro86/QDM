@@ -155,16 +155,15 @@ try {
         </a>
 
         <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.5' ?>;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.5' ?>'">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 11h.01"/>
-            </svg>
+            <span style="position:relative;display:inline-flex;flex-shrink:0">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 11h.01"/>
+                </svg>
+                <?php if ($mejorasPendientes > 0): ?>
+                    <span style="position:absolute;top:-5px;right:-6px;min-width:15px;height:15px;border-radius:100px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;letter-spacing:0;font-family:inherit;border:1.5px solid var(--sidebar-bg,#0E0E0C)"><?= $mejorasPendientes ?></span>
+                <?php endif; ?>
+            </span>
             <span class="nav-link-text">Mejoras</span>
-            <?php if ($mejorasPendientes > 0): ?>
-                <span style="display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0">
-                    <span style="width:5px;height:5px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
-                    <span style="font-size:10px;font-weight:700;color:#ef4444;line-height:1"><?= $mejorasPendientes ?></span>
-                </span>
-            <?php endif; ?>
         </a>
     </nav>
 
