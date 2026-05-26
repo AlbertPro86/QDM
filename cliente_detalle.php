@@ -4468,14 +4468,19 @@ function verDetallesTareaCliente(id) {
             document.getElementById('detalleTareaClienteTitulo').textContent = escapeHtmlClient(t.titulo);
 
             // Prioridad
-            const _prioIconCfg = {
-                alta:  { stroke:'#dc2626', title:'Alta',  path:'<polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/>' },
-                media: { stroke:'#d97706', title:'Media', path:'<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/>' },
-                baja:  { stroke:'#16a34a', title:'Baja',  path:'<polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/>' },
+            const _prioCfg = {
+                alta:  { bg:'#fee2e2', clr:'#dc2626', label:'Alta',  op:['1','1','1']        },
+                media: { bg:'#fef3c7', clr:'#d97706', label:'Media', op:['1','1','.3']       },
+                baja:  { bg:'#dcfce7', clr:'#16a34a', label:'Baja',  op:['1','.3','.3']      },
             };
-            const _pc = _prioIconCfg[t.prioridad] || _prioIconCfg.media;
+            const _pc = _prioCfg[t.prioridad] || _prioCfg.media;
+            const _bars = (op) => `<svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" style="flex-shrink:0">
+                <rect x="0" y="5" width="2.5" height="5" rx="1" opacity="${op[0]}"/>
+                <rect x="4.5" y="2.5" width="2.5" height="7.5" rx="1" opacity="${op[1]}"/>
+                <rect x="9" y="0" width="2.5" height="10" rx="1" opacity="${op[2]}"/>
+            </svg>`;
             document.getElementById('detallePrioridadCliente').innerHTML =
-                `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${_pc.stroke}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" title="${_pc.title}">${_pc.path}</svg>`;
+                `<span style="display:inline-flex;align-items:center;gap:5px;background:${_pc.bg};color:${_pc.clr};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${_bars(_pc.op)}${_pc.label}</span>`;
 
             // Estado - Badge de solo lectura
             const estBg  = { pendiente:'#f1f5f9', en_progreso:'#dbeafe', revision:'#fef3c7', completado:'#dcfce7' };
@@ -4678,10 +4683,16 @@ function renderTareasCliente() {
         return;
     }
 
+    const _mkPrioBars = (clr, op) =>
+        `<svg width="10" height="9" viewBox="0 0 12 10" fill="${clr}">` +
+        `<rect x="0" y="5" width="2.5" height="5" rx="1" opacity="${op[0]}"/>` +
+        `<rect x="4.5" y="2.5" width="2.5" height="7.5" rx="1" opacity="${op[1]}"/>` +
+        `<rect x="9" y="0" width="2.5" height="10" rx="1" opacity="${op[2]}"/>` +
+        `</svg>`;
     const prioData = {
-        alta:   { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>' },
-        media:  { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>' },
-        baja:   { icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/></svg>' },
+        alta:  { bg:'#fee2e2', clr:'#dc2626', label:'Alta',  icon: _mkPrioBars('#dc2626',['1','1','1'])       },
+        media: { bg:'#fef3c7', clr:'#d97706', label:'Media', icon: _mkPrioBars('#d97706',['1','1','.3'])      },
+        baja:  { bg:'#dcfce7', clr:'#16a34a', label:'Baja',  icon: _mkPrioBars('#16a34a',['1','.3','.3'])     },
     };
     const estadoData = {
         pendiente:   { bg:'#fff7ed', clr:'#ea580c', label:'Pendiente', icon:'⏳' },
@@ -4718,7 +4729,7 @@ function renderTareasCliente() {
                 <div style="font-size:12px;font-weight:${completado ? '500' : '700'};color:${completado ? '#94a3b8' : '#0f172a'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${completado ? 'text-decoration:line-through' : ''}">${escapeHtmlClient(t.titulo)}</div>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap">
                     <span style="font-size:10px;background:${est.bg};color:${est.clr};padding:2px 7px;border-radius:20px;font-weight:700">${est.icon} ${est.label}</span>
-                    ${prio.icon}
+                    <span style="display:inline-flex;align-items:center;gap:4px;background:${prio.bg};color:${prio.clr};padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700">${prio.icon}${prio.label}</span>
                     <span style="font-size:10px;color:#94a3b8">${fechaStr}</span>
                 </div>
             </div>

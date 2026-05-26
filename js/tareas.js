@@ -70,20 +70,22 @@ function actualizarKpis(resumen) {
     });
 }
 
-/* ── PRIORIDAD ICON ──────────────────────────────────────────────────── */
-function prioIcon(p, size = 17) {
+/* ── PRIORIDAD BADGE ─────────────────────────────────────────────────── */
+function prioIcon(p) {
+    // Barras de señal: alta=3 llenas, media=2 llenas+1 tenue, baja=1 llena+2 tenues
+    const bars = (a, b, c) =>
+        `<svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor" style="flex-shrink:0">
+            <rect x="0"   y="5"   width="2.5" height="5"   rx="1" opacity="${a}"/>
+            <rect x="4.5" y="2.5" width="2.5" height="7.5" rx="1" opacity="${b}"/>
+            <rect x="9"   y="0"   width="2.5" height="10"  rx="1" opacity="${c}"/>
+        </svg>`;
     const cfg = {
-        alta:  { stroke:'#dc2626', title:'Alta',
-                 path:`<polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/>` },
-        media: { stroke:'#d97706', title:'Media',
-                 path:`<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/>` },
-        baja:  { stroke:'#16a34a', title:'Baja',
-                 path:`<polyline points="7 7 12 12 17 7"/><polyline points="7 13 12 18 17 13"/>` },
+        alta:  { bg:'#fee2e2', clr:'#dc2626', label:'Alta',  svg: bars(1, 1, 1)    },
+        media: { bg:'#fef3c7', clr:'#d97706', label:'Media', svg: bars(1, 1, '.3') },
+        baja:  { bg:'#dcfce7', clr:'#16a34a', label:'Baja',  svg: bars(1, '.3', '.3') },
     };
     const c = cfg[p] || cfg.media;
-    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"
-                 stroke="${c.stroke}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"
-                 title="${c.title}" style="display:block;flex-shrink:0">${c.path}</svg>`;
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${c.bg};color:${c.clr};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap">${c.svg}${c.label}</span>`;
 }
 
 /* ── LISTA ────────────────────────────────────────────────────────────── */
@@ -226,7 +228,7 @@ function renderKanban(rows, resumen) {
                 <!-- Cabecera: prioridad dot + titulo -->
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
                     <div style="font-size:13px;font-weight:700;color:#0E0E0C;line-height:1.35;flex:1">${escapeHtml(t.titulo)}</div>
-                    ${prioIcon(t.prioridad, 15)}
+                    ${prioIcon(t.prioridad)}
                 </div>
                 <!-- Descripción -->
                 ${t.descripcion ? `<div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(t.descripcion)}</div>` : ''}
