@@ -246,8 +246,8 @@ switch ($method) {
         }
 
         $stmt = $pdo->prepare("
-            INSERT INTO transacciones (tipo, monto, concepto, descripcion, fecha_vencimiento, estado, lead_id, cliente_id, servicio_id, factura_id, frecuencia, descuento, proveedor, titulo, factura_path, documento_path, imagen_path, registrado_por, negocio_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO transacciones (tipo, monto, concepto, descripcion, fecha_vencimiento, fecha_pago, estado, lead_id, cliente_id, servicio_id, factura_id, frecuencia, descuento, proveedor, titulo, factura_path, documento_path, imagen_path, registrado_por, negocio_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $frecuenciasValidas = ['unico','mensual','trimestral','semestral','anual'];
@@ -260,6 +260,7 @@ switch ($method) {
             $input['concepto'],
             $input['descripcion'] ?? null,
             $input['fecha_vencimiento'] ?? null,
+            !empty($input['fecha_pago']) ? $input['fecha_pago'] : null,
             $input['estado'] ?? 'pendiente',
             $input['lead_id'] ?: null,
             $input['cliente_id'] ?: null,

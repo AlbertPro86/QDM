@@ -100,11 +100,13 @@ if ($method === 'GET') {
 
     // default: preview renovación
     $preview = array_map(fn($s) => [
-        'id'              => $s['id'],
-        'servicio_nombre' => $s['servicio_nombre'],
-        'frecuencia'      => $s['frecuencia'],
-        'fecha_actual'    => $s['fecha_vencimiento'],
-        'nueva_fecha_fin' => sumarFrecuencia($s['fecha_vencimiento'], $s['frecuencia']),
+        'id'               => $s['id'],
+        'servicio_id'      => $s['servicio_id'],
+        'servicio_nombre'  => $s['servicio_nombre'],
+        'frecuencia'       => $s['frecuencia'],
+        'monto_renovacion' => (float)($s['monto_renovacion'] ?? 0),
+        'fecha_actual'     => $s['fecha_vencimiento'],
+        'nueva_fecha_fin'  => sumarFrecuencia($s['fecha_vencimiento'], $s['frecuencia']),
     ], $svcs);
     jsonResponse(['success' => true, 'preview' => $preview]);
 }
@@ -152,7 +154,6 @@ if ($method === 'POST') {
                     $concepto,
                     $descr,
                     $hoy,          // fecha_vencimiento = hoy
-                    'pagado',      // estado (ya pagó al renovar)
                     $hoy,          // fecha_pago = hoy
                     $clienteId,
                     $s['servicio_id'] ?: null,

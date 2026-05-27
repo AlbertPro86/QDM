@@ -155,6 +155,10 @@ include __DIR__ . '/includes/header.php';
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Facturar Seleccionados
                     </button>
+                    <button onclick="openRegistrarPagoModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Registrar Pago
+                    </button>
                     <button class="btn btn-outline sm" onclick="openRenovarModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #e2e8f0;color:#3F5E9E;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#E1E7F2';this.style.borderColor='#3F5E9E'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         Renovar
@@ -678,6 +682,61 @@ include __DIR__ . '/includes/header.php';
         <div id="detalleTxBody" class="modal-body"></div>
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="document.getElementById('detalleTxModal').classList.remove('show')">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal Registrar Pago ─────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="registrarPagoModal">
+    <div class="modal" style="max-width:480px">
+        <div class="modal-header">
+            <h3 class="modal-title" style="display:flex;align-items:center;gap:8px">
+                <svg width="18" height="18" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Registrar Pago
+            </h3>
+            <button class="modal-close" onclick="closeRegistrarPagoModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+            <!-- Servicio -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Servicio *</label>
+                <select id="rpServicioSelect"
+                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;outline:none"
+                    onchange="rpOnServicioChange()">
+                    <option value="">— Seleccionar servicio —</option>
+                </select>
+            </div>
+            <!-- Monto -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Monto *</label>
+                <div style="position:relative">
+                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#64748b">$</span>
+                    <input type="number" id="rpMonto" min="0" step="1"
+                        style="width:100%;padding:9px 12px 9px 26px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
+                        placeholder="0">
+                </div>
+            </div>
+            <!-- Fecha pago -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Fecha de pago *</label>
+                <input type="date" id="rpFechaPago"
+                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
+            </div>
+            <!-- Concepto libre -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Concepto / Nota (opcional)</label>
+                <input type="text" id="rpConcepto" maxlength="200"
+                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
+                    placeholder="Ej: Pago renovación mayo 2026">
+            </div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;gap:8px">
+            <button class="btn btn-outline" onclick="closeRegistrarPagoModal()">Cancelar</button>
+            <button id="rpConfirmBtn" onclick="confirmarRegistrarPago()"
+                style="display:inline-flex;align-items:center;gap:8px;padding:9px 20px;background:#16a34a;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                Registrar Pago
+            </button>
         </div>
     </div>
 </div>
@@ -3339,6 +3398,132 @@ async function ejecutarReversion() {
 
 document.getElementById('renovarModal').addEventListener('click', function(e) {
     if (e.target === this) closeRenovarModal();
+});
+
+/* ── REGISTRAR PAGO ─────────────────────────────────────────────────────────── */
+let _rpServicios = []; // cache de servicios activos del cliente
+
+async function openRegistrarPagoModal() {
+    // Pre-cargar fecha de hoy
+    document.getElementById('rpFechaPago').value = new Date().toISOString().split('T')[0];
+    document.getElementById('rpConcepto').value = '';
+    document.getElementById('rpMonto').value = '';
+
+    // Cargar servicios activos del cliente
+    const sel = document.getElementById('rpServicioSelect');
+    sel.innerHTML = '<option value="">Cargando...</option>';
+    sel.disabled = true;
+
+    try {
+        const r = await fetch(`api/renovar_servicios.php?cliente_id=${clienteId}&action=preview`);
+        const d = await r.json();
+        _rpServicios = d.preview || [];
+
+        // También incluir pagos únicos (frecuencia unico)
+        const r2 = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}&estado=activo`);
+        const d2 = await r2.json();
+        const unicos = (d2.data || []).filter(s => s.frecuencia === 'unico');
+        // Combinar: recurrentes del preview + únicos
+        const recurrentes = _rpServicios.map(s => ({
+            cs_id:          s.id,
+            servicio_id:    s.servicio_id,
+            servicio_nombre:s.servicio_nombre,
+            frecuencia:     s.frecuencia,
+            monto:          s.monto_renovacion || 0
+        }));
+        const unicosMap = unicos.map(s => ({
+            cs_id:          s.id,
+            servicio_id:    s.servicio_id,
+            servicio_nombre:s.servicio_nombre || s.nombre,
+            frecuencia:     'unico',
+            monto:          s.monto_renovacion || 0
+        }));
+        _rpServicios = [...recurrentes, ...unicosMap];
+    } catch(e) { _rpServicios = []; }
+
+    sel.innerHTML = '<option value="">— Seleccionar servicio —</option>';
+    _rpServicios.forEach((s, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = s.servicio_nombre + (s.frecuencia && s.frecuencia !== 'unico' ? ` (${s.frecuencia})` : '');
+        sel.appendChild(opt);
+    });
+    // Si solo hay uno, seleccionarlo
+    if (_rpServicios.length === 1) {
+        sel.value = 0;
+        rpOnServicioChange();
+    }
+    sel.disabled = false;
+
+    document.getElementById('registrarPagoModal').classList.add('show');
+}
+
+function rpOnServicioChange() {
+    const idx = document.getElementById('rpServicioSelect').value;
+    if (idx === '' || !_rpServicios[idx]) return;
+    const svc = _rpServicios[idx];
+    if (!document.getElementById('rpMonto').value) {
+        document.getElementById('rpMonto').value = svc.monto || '';
+    }
+    if (!document.getElementById('rpConcepto').value) {
+        document.getElementById('rpConcepto').value = 'Pago – ' + svc.servicio_nombre;
+    }
+}
+
+function closeRegistrarPagoModal() {
+    document.getElementById('registrarPagoModal').classList.remove('show');
+}
+
+async function confirmarRegistrarPago() {
+    const idx     = document.getElementById('rpServicioSelect').value;
+    const monto   = parseFloat(document.getElementById('rpMonto').value);
+    const fecha   = document.getElementById('rpFechaPago').value;
+    const concepto = document.getElementById('rpConcepto').value.trim();
+
+    if (idx === '' || !_rpServicios[idx]) { showToast('Selecciona un servicio', 'error'); return; }
+    if (!monto || monto <= 0)             { showToast('Ingresa un monto válido', 'error'); return; }
+    if (!fecha)                           { showToast('Selecciona la fecha de pago', 'error'); return; }
+
+    const svc = _rpServicios[idx];
+    const btn = document.getElementById('rpConfirmBtn');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Registrando...';
+
+    try {
+        const payload = {
+            tipo:        'ingreso',
+            monto,
+            concepto:    concepto || ('Pago – ' + svc.servicio_nombre),
+            titulo:      'Pago de servicio',
+            descripcion: 'Registrado manualmente desde ficha de cliente.',
+            fecha_pago:  fecha,
+            fecha_vencimiento: fecha,
+            estado:      'pagado',
+            cliente_id:  clienteId,
+            servicio_id: svc.servicio_id || null,
+            frecuencia:  svc.frecuencia === 'unico' ? 'unico' : svc.frecuencia,
+        };
+        const r = await fetch('api/transacciones.php', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success || d.id) {
+            showToast('✓ Pago registrado en Núcleo Financiero', 'success');
+            closeRegistrarPagoModal();
+        } else {
+            showToast(d.error || 'Error al registrar el pago', 'error');
+        }
+    } catch(e) { showToast('Error de conexión', 'error'); }
+
+    btn.disabled = false;
+    btn.innerHTML = orig;
+}
+
+document.getElementById('registrarPagoModal').addEventListener('click', function(e) {
+    if (e.target === this) closeRegistrarPagoModal();
 });
 
 // Editar Datos del Cliente
