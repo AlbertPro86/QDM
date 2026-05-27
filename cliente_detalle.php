@@ -1078,7 +1078,12 @@ function renderServices(svcs) {
             ? `<div style="font-size:10px;color:var(--color-danger)">- ${formatMoney(descuento)} DESC.</div>`
             : '';
 
-        // Celda de fecha con alerta roja
+        // ¿Fue renovado recientemente? (fecha_inicio en los últimos 45 días)
+        const fechaInicioD = s.fecha_inicio ? new Date(s.fecha_inicio + 'T12:00:00') : null;
+        const diasDesdeInicio = fechaInicioD ? (hoy - fechaInicioD) / (1000 * 60 * 60 * 24) : 9999;
+        const recienRenovado  = !vencido && diasDesdeInicio >= 0 && diasDesdeInicio <= 45;
+
+        // Celda de fecha con alerta roja o badge verde
         const diasAbs = Math.abs(Math.round(diff));
         const fechaLabel = vencido
             ? `<div style="font-size:10px;font-weight:800;color:#ef4444">⚠ Vencido hace ${diasAbs}d</div>`
@@ -1086,7 +1091,9 @@ function renderServices(svcs) {
                 ? `<div style="font-size:10px;font-weight:800;color:#ef4444"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;margin-right:4px;vertical-align:middle"></span>Vence este mes${diff <= 7 ? ' (en ' + Math.round(diff) + 'd)' : ''}</div>`
                 : diff <= 30
                     ? `<div style="font-size:10px;color:#f59e0b;font-weight:700">en ${Math.round(diff)} días</div>`
-                    : '';
+                    : recienRenovado
+                        ? `<div style="font-size:10px;font-weight:800;color:#16a34a">✓ Renovado</div>`
+                        : `<div style="font-size:10px;font-weight:700;color:#16a34a">✓ Al día</div>`;
 
         // Composición del paquete (si aplica)
         const pkg = getPkgByName(s.servicio_nombre);
