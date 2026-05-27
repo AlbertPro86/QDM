@@ -184,8 +184,7 @@ enrichWithPaquete($servicios, $pdo);
         .date-value { font-size: 12px; font-weight: 700; color: #0E0E0C; }
         .items-section { padding: 28px 36px; }
         .items-table { width: 100%; border-collapse: collapse; }
-        .items-table thead tr { background: <?= $template['color_primario'] ?>; }
-        .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #ffffff; }
+        .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
         .items-table tbody tr:nth-child(odd) { background: #FFFFFF; }
         .items-table tbody tr:nth-child(even) { background: #FAFAF7; }
@@ -258,11 +257,11 @@ enrichWithPaquete($servicios, $pdo);
         <div class="items-section">
             <table class="items-table">
                 <thead>
-                    <tr>
-                        <th>Descripción</th>
-                        <th style="text-align:center">Cant.</th>
-                        <th style="text-align:right">Precio</th>
-                        <th style="text-align:right">Total</th>
+                    <tr style="background:<?= $template['color_primario'] ?>">
+                        <th style="color:#ffffff">Descripción</th>
+                        <th style="text-align:center;color:#ffffff">Cant.</th>
+                        <th style="text-align:right;color:#ffffff">Precio</th>
+                        <th style="text-align:right;color:#ffffff">Total</th>
                     </tr>
                 </thead>
                 <tbody>
