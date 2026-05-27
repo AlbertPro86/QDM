@@ -122,6 +122,20 @@ if (!$template) {
         'notas_pie' => 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.'
     ];
 }
+// Rellenar campos de empresa vacíos desde crm_configuraciones
+try {
+    $cfgRows = $pdo->query("SELECT clave, valor FROM crm_configuraciones")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $empresaFields = ['empresa_nombre', 'empresa_nit', 'empresa_email', 'empresa_tel', 'empresa_dir'];
+    foreach ($empresaFields as $f) {
+        if (empty($template[$f]) && !empty($cfgRows[$f])) {
+            $template[$f] = $cfgRows[$f];
+        }
+    }
+    if (empty($template['logo_url']) && !empty($cfgRows['logo_url'])) {
+        $template['logo_url'] = $cfgRows['logo_url'];
+    }
+} catch (Exception $e) {}
+
 // Aplicar override de notas_pie DESPUÉS de obtener la plantilla
 if (!empty($_POST['notas_pie_override'])) {
     $template['notas_pie'] = $_POST['notas_pie_override'];
