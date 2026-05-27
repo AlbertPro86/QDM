@@ -90,7 +90,7 @@ $docTipoLabels = [
     'factura'          => 'Factura',
 ];
 $docTipoLabel = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
-$orderNumber  = 'QD-' . str_pad($id, 3, '0', STR_PAD_LEFT) . '-' . date('Y-m-d');
+$orderNumber  = 'QD-' . date('Ymd');
 
 // Fetch template (by ID if provided, else default)
 if ($plantillaIdOverride > 0) {
