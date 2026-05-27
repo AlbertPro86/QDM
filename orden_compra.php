@@ -379,37 +379,36 @@ enrichWithPaquete($servicios, $pdo);
         <!-- Datos Bancarios -->
         <?php
         $bancFields = [
-            'titular' => 'Titular',
-            'cedula'  => 'Cédula / NIT',
-            'banco'   => 'Banco',
-            'cuenta'  => 'N° de Cuenta',
-            'tipo'    => 'Tipo de Cuenta',
-            'llave'   => 'Nequi / Daviplata / QR',
+            'titular' => ['label'=>'Titular',             'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>'],
+            'cedula'  => ['label'=>'Cédula / NIT',        'icon'=>'<rect x="3" y="4" width="18" height="16" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h4M8 14h8"/>'],
+            'banco'   => ['label'=>'Banco',               'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/>'],
+            'cuenta'  => ['label'=>'N° de Cuenta',        'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
+            'tipo'    => ['label'=>'Tipo de Cuenta',      'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>'],
+            'llave'   => ['label'=>'Nequi / Daviplata',   'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
         ];
-        $anyBanc = !empty(array_filter($bancarios));
-        if ($anyBanc):
+        $bancFiltered = array_filter($bancarios, fn($v) => !empty($v));
+        if (!empty($bancFiltered)):
         ?>
-        <div style="padding:0 36px 28px">
-            <div style="border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
-                <!-- Header compacto -->
-                <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:<?= $template['color_primario'] ?>">
-                    <svg width="13" height="13" fill="none" stroke="<?= $template['color_secundario'] ?>" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:<?= $template['color_secundario'] ?>">Datos para el pago</span>
-                </div>
-                <!-- Grilla de campos -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;background:#fff">
-                    <?php
-                    $idx = 0;
-                    foreach($bancFields as $key => $label):
-                        if(empty($bancarios[$key])) continue;
-                        $bg = $idx % 2 === 0 ? '#FAFAF7' : '#fff';
-                    ?>
-                    <div style="padding:10px 16px;background:<?= $bg ?>;display:flex;flex-direction:column;gap:2px">
-                        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F"><?= $label ?></span>
-                        <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($bancarios[$key] ?? '') ?></span>
+        <div style="margin-bottom:28px">
+            <!-- Header -->
+            <div style="display:flex;align-items:center;gap:10px;padding:13px 36px;background:<?= $template['color_primario'] ?>">
+                <svg width="15" height="15" fill="none" stroke="<?= $template['color_secundario'] ?>" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span style="font-size:12px;font-weight:700;color:<?= $template['color_secundario'] ?>">Datos para el pago</span>
+            </div>
+            <!-- Grid de campos -->
+            <div style="background:#fff;padding:20px 36px;display:grid;grid-template-columns:1fr 1fr;gap:16px 40px">
+                <?php foreach($bancFields as $key => $cfg):
+                    if (empty($bancarios[$key])) continue; ?>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#F3F2EE;display:flex;align-items:center;justify-content:center">
+                        <svg width="16" height="16" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="1.8"><?= $cfg['icon'] ?></svg>
                     </div>
-                    <?php $idx++; endforeach; ?>
+                    <div>
+                        <div style="font-size:10px;color:#8A867C;margin-bottom:3px"><?= $cfg['label'] ?></div>
+                        <div style="font-size:13px;font-weight:700;color:#0E0E0C;line-height:1.2"><?= htmlspecialchars($bancarios[$key]) ?></div>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
         </div>
         <?php endif; ?>
