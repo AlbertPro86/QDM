@@ -46,6 +46,11 @@ include __DIR__ . '/includes/header.php';
         <button onclick="setPeriodo('custom')"
             style="padding:6px 14px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;font-weight:700;background:#FAFAF7;color:#57544D;cursor:pointer;transition:all .15s"
             onmouseenter="this.style.background='#EFECE5'" onmouseleave="this.style.background='#FAFAF7'">Filtrar</button>
+        <button onclick="resetearPeriodo()"
+            style="padding:6px 12px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;font-weight:600;background:none;color:#8A867C;cursor:pointer;transition:all .15s"
+            title="Restablecer al mes actual"
+            onmouseenter="this.style.borderColor='#D6D2C7';this.style.color='#2A2926'"
+            onmouseleave="this.style.borderColor='#E8E5DD';this.style.color='#8A867C'">× Limpiar</button>
     </div>
     <button class="btn btn-accent" onclick="abrirModalTransaccion()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></svg>
@@ -100,6 +105,12 @@ include __DIR__ . '/includes/header.php';
             <option value="pendiente">Pendiente</option>
             <option value="vencido">Vencido</option>
         </select>
+        <button onclick="limpiarFiltrosMovimientos()"
+            style="padding:8px 12px;background:none;border:1.5px solid #E8E5DD;border-radius:4px;font-size:12px;font-weight:600;color:#57544D;cursor:pointer;transition:all .15s"
+            onmouseenter="this.style.borderColor='#D6D2C7';this.style.color='#2A2926'"
+            onmouseleave="this.style.borderColor='#E8E5DD';this.style.color='#57544D'">
+            × Limpiar
+        </button>
         <button onclick="exportarMovimientosExcel()" title="Exportar a Excel"
             style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:#217346;border:none;border-radius:4px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:filter .15s;white-space:nowrap;margin-left:auto"
             onmouseenter="this.style.filter='brightness(1.15)'" onmouseleave="this.style.filter=''">
@@ -132,6 +143,12 @@ include __DIR__ . '/includes/header.php';
             <option value="pagado">Pagado</option>
             <option value="vencido">Vencido</option>
         </select>
+        <button onclick="limpiarFiltrosPagosUnicos()"
+            style="padding:8px 12px;background:none;border:1.5px solid #E8E5DD;border-radius:4px;font-size:12px;font-weight:600;color:#57544D;cursor:pointer;transition:all .15s"
+            onmouseenter="this.style.borderColor='#D6D2C7';this.style.color='#2A2926'"
+            onmouseleave="this.style.borderColor='#E8E5DD';this.style.color='#57544D'">
+            × Limpiar
+        </button>
         <button onclick="exportarPagosUnicosExcel()" title="Exportar a Excel"
             style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:#217346;border:none;border-radius:4px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:filter .15s;white-space:nowrap;margin-left:auto"
             onmouseenter="this.style.filter='brightness(1.15)'" onmouseleave="this.style.filter=''">

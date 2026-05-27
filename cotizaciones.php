@@ -50,6 +50,32 @@ $fecha_hasta = $_GET['fecha_hasta'] ?? '';
 $busqueda = $_GET['busqueda'] ?? '';
 ?>
 
+<!-- ── Tabs de tipo ──────────────────────────────────────────── -->
+<div style="display:flex;gap:2px;border-bottom:2px solid #E8E5DD;margin-bottom:24px">
+    <?php
+    $tabs_config = [
+        'cotizacion'       => ['label' => 'Cotizaciones',        'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+        'cuenta_cobro'     => ['label' => 'Cuentas de cobro',    'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+        'orden_compra'     => ['label' => 'Órdenes de compra',   'icon' => 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'],
+        'orden_renovacion' => ['label' => 'Órdenes de renovación','icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'],
+    ];
+    foreach ($tabs_config as $tipo_key => $tab):
+        $isActive = $filtro_tipo === $tipo_key;
+    ?>
+    <a href="cotizaciones.php?tipo=<?= $tipo_key ?>"
+       style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;
+              border-bottom:2.5px solid <?= $isActive ? '#0E0E0C' : 'transparent' ?>;
+              color:<?= $isActive ? '#0E0E0C' : '#8A867C' ?>;
+              margin-bottom:-2px;border-radius:4px 4px 0 0;transition:all .15s;white-space:nowrap"
+       onmouseenter="if('<?= $tipo_key ?>'!=='<?= $filtro_tipo ?>'){this.style.color='#2A2926';this.style.background='#F3F2EE'}"
+       onmouseleave="if('<?= $tipo_key ?>'!=='<?= $filtro_tipo ?>'){this.style.color='#8A867C';this.style.background='none'}">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="<?= $tab['icon'] ?>"/>
+        </svg>
+        <?= $tab['label'] ?>
+    </a>
+    <?php endforeach; ?>
+</div>
 
 <!-- ── Acciones + Filtros ───────────────────────────────────── -->
 <div class="page-header" style="flex-wrap:wrap;gap:8px;margin-bottom:20px;align-items:center">

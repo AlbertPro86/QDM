@@ -733,6 +733,27 @@ function limpiarFiltrosClientes() {
     aplicarFiltrosClientes();
 }
 
+function resetearPeriodo() {
+    // Restablece período al mes actual y limpia todos los sub-filtros
+    setPeriodo('mes');
+    limpiarFiltrosMovimientos();
+    limpiarFiltrosPagosUnicos();
+    limpiarFiltrosClientes();
+}
+
+function limpiarFiltrosMovimientos() {
+    document.getElementById('fnBuscar').value = '';
+    document.getElementById('fnTipo').value = 'todos';
+    document.getElementById('fnEstado').value = 'todos';
+    filterTxTable();
+}
+
+function limpiarFiltrosPagosUnicos() {
+    document.getElementById('fnUnicoBuscar').value = '';
+    document.getElementById('fnUnicoEstado').value = 'todos';
+    filterUnicosTable();
+}
+
 /* ─── FINANCIERO REAL (CLIENTES) ──────────────────────────────────────────── */
 
 async function loadClientesFinanzas() {

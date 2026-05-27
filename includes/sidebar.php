@@ -63,37 +63,14 @@ try {
         $facturacion_activa = $currentPage === 'cotizaciones' || $currentPage === 'cotizador';
         $facturacion_tipo_actual = $_GET['tipo'] ?? 'cotizacion';
         ?>
-        <div class="nav-group">
-            <button class="nav-group-btn <?= $facturacion_activa ? 'open' : '' ?>"
-                    onclick="toggleNavGroup(this)"
-                    title="Facturación">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                <span class="nav-link-text">Facturación</span>
-                <svg class="nav-group-arrow" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-            <div class="nav-sub <?= $facturacion_activa ? 'open' : '' ?>">
-                <a href="cotizaciones.php?tipo=cotizacion"
-                   class="nav-sub-link <?= ($currentPage === 'cotizaciones' && $facturacion_tipo_actual === 'cotizacion') ? 'active' : '' ?>">
-                    Cotizaciones
-                </a>
-                <a href="cotizaciones.php?tipo=cuenta_cobro"
-                   class="nav-sub-link <?= ($currentPage === 'cotizaciones' && $facturacion_tipo_actual === 'cuenta_cobro') ? 'active' : '' ?>">
-                    Cuentas de cobro
-                </a>
-                <a href="cotizaciones.php?tipo=orden_compra"
-                   class="nav-sub-link <?= ($currentPage === 'cotizaciones' && $facturacion_tipo_actual === 'orden_compra') ? 'active' : '' ?>">
-                    Órdenes de compra
-                </a>
-                <a href="cotizaciones.php?tipo=orden_renovacion"
-                   class="nav-sub-link <?= ($currentPage === 'cotizaciones' && $facturacion_tipo_actual === 'orden_renovacion') ? 'active' : '' ?>">
-                    Órdenes de renovación
-                </a>
-            </div>
-        </div>
+        <a href="cotizaciones.php?tipo=<?= $facturacion_tipo_actual ?>"
+           class="nav-link <?= $facturacion_activa ? 'active' : '' ?>"
+           title="Facturación">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <span class="nav-link-text">Facturación</span>
+        </a>
 
         <a href="mensajes.php" class="nav-link <?= $currentPage === 'mensajes' ? 'active' : '' ?>" id="nav-mensajes" title="Mensajes">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
