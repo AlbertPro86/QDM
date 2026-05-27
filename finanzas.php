@@ -122,6 +122,16 @@ include __DIR__ . '/includes/header.php';
             Exportar Excel
         </button>
     </div>
+    <!-- Banner modo "Por cobrar" (sin filtro de fecha) -->
+    <div id="fnPorCobrarBanner" style="display:none;background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:6px;padding:10px 16px;margin-bottom:10px;align-items:center;justify-content:space-between;gap:8px">
+        <span style="font-size:12px;font-weight:600;color:#92400E">
+            ⚠ Mostrando <strong>todos los pendientes y vencidos</strong> sin filtro de fecha
+        </span>
+        <button onclick="_fnPorCobrarMode=false;limpiarFiltrosMovimientos()"
+            style="padding:4px 10px;font-size:11px;font-weight:600;background:#92400E;color:#fff;border:none;border-radius:4px;cursor:pointer">
+            × Volver al período
+        </button>
+    </div>
     <!-- Transactions table -->
     <div id="fnTxTable" style="background:#FFFFFF;border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
         <div style="padding:40px;text-align:center;color:#8A867C;font-size:13px">Cargando movimientos...</div>

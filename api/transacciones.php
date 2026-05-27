@@ -67,13 +67,34 @@ switch ($method) {
         $where = [];
         $params = [];
 
-        if ($tipo && $tipo !== 'todos') {
-            $where[] = "t.tipo = ?";
-            $params[] = $tipo;
-        }
-        if ($estado && $estado !== 'todos') {
-            $where[] = "t.estado = ?";
-            $params[] = $estado;
+        // Modo especial: estado=por_cobrar → ingresos pendiente+vencido SIN filtro de fecha
+        $esPorCobrar = ($estado === 'por_cobrar');
+
+        if ($esPorCobrar) {
+            // Forzar tipo ingreso y ambos estados sin restricción de fecha
+            $where[] = "t.tipo = 'ingreso'";
+            $where[] = "t.estado IN ('pendiente', 'vencido')";
+        } else {
+            if ($tipo && $tipo !== 'todos') {
+                $where[] = "t.tipo = ?";
+                $params[] = $tipo;
+            }
+            if ($estado && $estado !== 'todos') {
+                $where[] = "t.estado = ?";
+                $params[] = $estado;
+            }
+            if ($mes) {
+                $where[] = "DATE_FORMAT(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at), '%Y-%m') = ?";
+                $params[] = $mes;
+            }
+            if ($desde && !$mes) {
+                $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) >= ?";
+                $params[] = $desde;
+            }
+            if ($hasta && !$mes) {
+                $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) <= ?";
+                $params[] = $hasta;
+            }
         }
         if ($frecuenciaFiltro) {
             $where[] = "t.frecuencia = ?";
@@ -86,18 +107,6 @@ switch ($method) {
         if ($negocioIdFiltro) {
             $where[] = "t.negocio_id = ?";
             $params[] = $negocioIdFiltro;
-        }
-        if ($mes) {
-            $where[] = "DATE_FORMAT(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at), '%Y-%m') = ?";
-            $params[] = $mes;
-        }
-        if ($desde && !$mes) {
-            $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) >= ?";
-            $params[] = $desde;
-        }
-        if ($hasta && !$mes) {
-            $where[] = "DATE(COALESCE(t.fecha_pago, t.fecha_vencimiento, t.created_at)) <= ?";
-            $params[] = $hasta;
         }
         if ($buscar) {
             $where[] = "(t.concepto LIKE ? OR t.titulo LIKE ? OR l.nombre LIKE ? OR c.nombre_comercial LIKE ? OR t.proveedor LIKE ?)";

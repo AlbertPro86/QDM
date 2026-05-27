@@ -261,6 +261,28 @@ async function loadTransacciones() {
     } catch(e) { console.error('Error cargando transacciones:', e); }
 }
 
+/* Carga TODOS los ingresos pendiente+vencido sin restricción de fecha */
+async function mostrarPorCobrar() {
+    document.getElementById('fnTipo').value   = 'ingreso';
+    document.getElementById('fnEstado').value = 'por_cobrar';
+
+    // Banner informativo en la tabla
+    const wrap = document.getElementById('fnTxTable');
+    if (wrap) wrap.innerHTML = '<div style="padding:24px;text-align:center;color:#92400E;font-size:13px">Cargando por cobrar…</div>';
+
+    try {
+        const r = await fetch('api/transacciones.php?estado=por_cobrar&limite=500');
+        const d = await r.json();
+        if (d.success) {
+            fnTxDataFull = d.data || [];
+            // Mostrar banner sobre la tabla
+            _fnPorCobrarMode = true;
+            filterTxTable();
+        }
+    } catch(e) { console.error('Error cargando por cobrar:', e); }
+}
+let _fnPorCobrarMode = false;
+
 function filterTxTable() {
     const buscar = (document.getElementById('fnBuscar')?.value || '').toLowerCase();
     const tipo   = document.getElementById('fnTipo')?.value || 'todos';
@@ -324,7 +346,7 @@ function renderKpis(r) {
             "document.getElementById('fnTipo').value='egreso';document.getElementById('fnEstado').value='pagado';filterTxTable();")
       + kpi('Por Cobrar', moneyNum(pendienteMonto), pendienteLabel,
             '#FEF3C7', '#FDE68A', '#92400E', '#FEF3C7', '#92400E', 'Pendiente',
-            "document.getElementById('fnTipo').value='ingreso';document.getElementById('fnEstado').value='por_cobrar';filterTxTable();")
+            'mostrarPorCobrar()')
       + kpi('Balance',    moneyNum(balance),        'Cobrado − Egresos',
             balBg, balPos ? '#A8D87A' : '#E8BCB8', balPos ? '#1B5A39' : '#6E211B',
             balPos ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)',
@@ -335,6 +357,10 @@ function renderKpis(r) {
 function renderTxTable(data) {
     const wrap = document.getElementById('fnTxTable');
     if (!wrap) return;
+
+    // Banner modo "por cobrar" (sin filtro de fecha)
+    const banner = document.getElementById('fnPorCobrarBanner');
+    if (banner) banner.style.display = _fnPorCobrarMode ? 'flex' : 'none';
 
     if (!data || data.length === 0) {
         wrap.innerHTML = `<div style="padding:60px 20px;text-align:center;color:#8A867C;font-size:13px;font-style:italic">
@@ -747,10 +773,11 @@ function resetearPeriodo() {
 }
 
 function limpiarFiltrosMovimientos() {
+    _fnPorCobrarMode = false;
     document.getElementById('fnBuscar').value = '';
     document.getElementById('fnTipo').value = 'todos';
     document.getElementById('fnEstado').value = 'todos';
-    filterTxTable();
+    loadTransacciones(); // recarga con el período actual
 }
 
 function limpiarFiltrosPagosUnicos() {
