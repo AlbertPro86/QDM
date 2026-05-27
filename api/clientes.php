@@ -30,14 +30,20 @@ switch ($method) {
         if($id) {
             $stmt = $pdo->prepare("SELECT * FROM clientes WHERE id = ?"); $stmt->execute([$id]);
             $cliente = $stmt->fetch();
-            $stmt = $pdo->prepare("SELECT cs.*, s.nombre as servicio_nombre FROM cliente_servicios cs JOIN servicios s ON cs.servicio_id = s.id WHERE cs.cliente_id = ?"); 
+            $stmt = $pdo->prepare("SELECT cs.*, CASE WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display ELSE s.nombre END AS servicio_nombre, s.enlace_pago FROM cliente_servicios cs JOIN servicios s ON cs.servicio_id = s.id LEFT JOIN paquetes p ON cs.paquete_id = p.id WHERE cs.cliente_id = ?");
             $stmt->execute([$id]);
             $cliente['servicios_activos'] = $stmt->fetchAll();
             jsonResponse(['success' => true, 'data' => $cliente]);
         }
         $stmt = $pdo->query("
             SELECT c.*,
-                   GROUP_CONCAT(DISTINCT COALESCE(cs.nombre_display, s.nombre) SEPARATOR ', ') as servicios_nombres,
+                   GROUP_CONCAT(DISTINCT
+                       CASE
+                           WHEN cs.paquete_id IS NOT NULL AND pkg.nombre IS NOT NULL THEN pkg.nombre
+                           WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                           ELSE s.nombre
+                       END
+                   SEPARATOR ', ') as servicios_nombres,
                    GROUP_CONCAT(DISTINCT CASE WHEN cs.estado='activo' THEN cs.frecuencia END SEPARATOR ', ') as frecuencias_activas,
                    MIN(CASE WHEN cs.estado='activo' AND LOWER(COALESCE(cs.frecuencia,'')) != 'unico' THEN cs.fecha_vencimiento END) as proxima_renovacion,
                    COUNT(DISTINCT CASE WHEN cs.estado='activo' THEN cs.id END) as num_servicios_activos,
@@ -56,6 +62,7 @@ switch ($method) {
             FROM clientes c
             LEFT JOIN cliente_servicios cs ON c.id = cs.cliente_id
             LEFT JOIN servicios s ON cs.servicio_id = s.id
+            LEFT JOIN paquetes pkg ON cs.paquete_id = pkg.id
             LEFT JOIN (
                 SELECT cliente_id, SUM(monto) as total
                 FROM transacciones

@@ -16,9 +16,9 @@ $pdo = db();
 // Migraciones automáticas
 try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN nombre_display VARCHAR(255) NULL DEFAULT NULL"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN frecuencia VARCHAR(20) NOT NULL DEFAULT 'año'"); } catch (PDOException $e) {}
-// Si la columna es ENUM (legado), convertir a VARCHAR para soportar 'unico', etc.
 try { $pdo->exec("ALTER TABLE cliente_servicios MODIFY COLUMN frecuencia VARCHAR(20) NOT NULL DEFAULT 'año'"); } catch (PDOException $e) {}
-// Normalizar solo registros sin frecuencia (null o vacío), sin tocar los que ya tienen valor
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN paquete_id INT NULL DEFAULT NULL"); } catch (PDOException $e) {}
+// Normalizar registros sin frecuencia
 $pdo->exec("UPDATE cliente_servicios SET frecuencia = 'año' WHERE frecuencia IS NULL OR TRIM(frecuencia) = ''");
 
 switch ($method) {
@@ -28,10 +28,15 @@ switch ($method) {
 
         $stmt = $pdo->prepare("
             SELECT cs.*,
-                   COALESCE(cs.nombre_display, s.nombre) AS servicio_nombre,
+                   CASE
+                       WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+                       WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                       ELSE s.nombre
+                   END AS servicio_nombre,
                    s.enlace_pago
             FROM cliente_servicios cs
             JOIN servicios s ON cs.servicio_id = s.id
+            LEFT JOIN paquetes p ON cs.paquete_id = p.id
             WHERE cs.cliente_id = ?
             ORDER BY cs.fecha_vencimiento ASC
         ");
@@ -48,10 +53,12 @@ switch ($method) {
 
             $nombreDisplay = $input['nombre_display'] ?? null;
 
-            $stmt = $pdo->prepare("INSERT INTO cliente_servicios (cliente_id, servicio_id, nombre_display, monto_renovacion, descuento, costo_servicio, fecha_inicio, fecha_vencimiento, frecuencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $paqueteId = !empty($input['paquete_id']) ? (int)$input['paquete_id'] : null;
+            $stmt = $pdo->prepare("INSERT INTO cliente_servicios (cliente_id, servicio_id, paquete_id, nombre_display, monto_renovacion, descuento, costo_servicio, fecha_inicio, fecha_vencimiento, frecuencia, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $input['cliente_id'],
                 $input['servicio_id'],
+                $paqueteId,
                 $nombreDisplay,
                 $input['monto_renovacion'] ?? 0,
                 $input['descuento'] ?? 0,

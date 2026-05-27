@@ -15,6 +15,12 @@ if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
 $pdo    = db();
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Auto-migraciones para columnas que necesitamos en transacciones
+try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN frecuencia VARCHAR(20) NOT NULL DEFAULT 'unico'"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN titulo VARCHAR(255) DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN cliente_id INT DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN servicio_id INT DEFAULT NULL"); } catch(PDOException $e){}
+
 function sumarFrecuencia(string $fecha, string $frecuencia): string {
     $d = new DateTime($fecha);
     switch (strtolower(trim($frecuencia))) {
@@ -48,7 +54,8 @@ function getServicios(PDO $pdo, int $clienteId, array $ids = []): array {
         $params = array_merge($params, $ids);
     }
     $stmt = $pdo->prepare("
-        SELECT cs.id, cs.frecuencia, cs.fecha_vencimiento, cs.fecha_inicio,
+        SELECT cs.id, cs.servicio_id, cs.frecuencia, cs.fecha_vencimiento, cs.fecha_inicio,
+               cs.monto_renovacion,
                s.nombre AS servicio_nombre
         FROM cliente_servicios cs
         JOIN servicios s ON cs.servicio_id = s.id
@@ -57,6 +64,16 @@ function getServicios(PDO $pdo, int $clienteId, array $ids = []): array {
     ");
     $stmt->execute($params);
     return $stmt->fetchAll();
+}
+
+function frecuenciaToTx(string $f): string {
+    switch (strtolower(trim($f))) {
+        case 'mes':       return 'mensual';
+        case 'trimestre': return 'trimestral';
+        case 'semestre':  return 'semestral';
+        case 'año':       return 'anual';
+        default:          return 'unico';
+    }
 }
 
 /* ──────────── GET ──────────── */
@@ -104,6 +121,12 @@ if ($method === 'POST') {
     if (!$svcs) jsonResponse(['error' => 'Sin servicios elegibles'], 400);
 
     $stmt = $pdo->prepare("UPDATE cliente_servicios SET fecha_inicio = ?, fecha_vencimiento = ? WHERE id = ?");
+    $txStmt = $pdo->prepare("
+        INSERT INTO transacciones
+            (tipo, monto, concepto, titulo, descripcion, fecha_vencimiento, estado, fecha_pago,
+             cliente_id, servicio_id, frecuencia, registrado_por)
+        VALUES ('ingreso', ?, ?, 'Renovación de servicio', ?, ?, 'pagado', ?, ?, ?, ?, ?)
+    ");
     $count = 0;
 
     foreach ($svcs as $s) {
@@ -115,6 +138,33 @@ if ($method === 'POST') {
             $nuevoFin    = sumarFrecuencia($s['fecha_vencimiento'], $s['frecuencia']);
         }
         $stmt->execute([$nuevoInicio, $nuevoFin, $s['id']]);
+
+        // Registrar movimiento en núcleo financiero solo al renovar
+        if ($action !== 'revertir') {
+            $monto        = max(0, (float)($s['monto_renovacion'] ?? 0));
+            $concepto     = 'Renovación – ' . $s['servicio_nombre'];
+            $descr        = 'Renovación automática desde CRM. Período: ' . $nuevoInicio . ' al ' . $nuevoFin;
+            $txFrecuencia = frecuenciaToTx($s['frecuencia']);
+            $hoy          = date('Y-m-d');
+            try {
+                $txStmt->execute([
+                    $monto,
+                    $concepto,
+                    $descr,
+                    $hoy,          // fecha_vencimiento = hoy
+                    'pagado',      // estado (ya pagó al renovar)
+                    $hoy,          // fecha_pago = hoy
+                    $clienteId,
+                    $s['servicio_id'] ?: null,
+                    $txFrecuencia,
+                    $_SESSION['user_id'],
+                ]);
+            } catch (PDOException $e) {
+                // El error no cancela la renovación, pero lo incluimos en la respuesta
+                error_log('[renovar_servicios] Error al registrar transacción: ' . $e->getMessage());
+            }
+        }
+
         $count++;
     }
 

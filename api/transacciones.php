@@ -160,7 +160,20 @@ switch ($method) {
                        c.telefono AS cliente_telefono,
                        c.email_facturacion AS cliente_email,
                        COALESCE(l.nombre, c.nombre_comercial) AS destinatario_nombre,
-                       s.nombre AS servicio_nombre,
+                       COALESCE(
+                           (SELECT CASE
+                               WHEN cs.paquete_id IS NOT NULL AND pkg.nombre IS NOT NULL THEN pkg.nombre
+                               WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                               ELSE s.nombre
+                            END
+                            FROM cliente_servicios cs
+                            LEFT JOIN paquetes pkg ON cs.paquete_id = pkg.id
+                            WHERE cs.cliente_id = t.cliente_id
+                              AND cs.servicio_id = t.servicio_id
+                            ORDER BY cs.id DESC
+                            LIMIT 1),
+                           s.nombre
+                       ) AS servicio_nombre,
                        f.nombre_archivo AS factura_nombre,
                        f.archivo_url AS factura_url,
                        f.tipo AS factura_tipo

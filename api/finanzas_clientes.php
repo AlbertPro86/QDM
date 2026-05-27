@@ -41,10 +41,15 @@ $stmt = $pdo->query("
         cs.estado         AS cs_estado,
         c.nombre_comercial,
         c.estado          AS cliente_estado,
-        s.nombre          AS servicio_nombre
+        CASE
+            WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+            WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+            ELSE s.nombre
+        END AS servicio_nombre
     FROM cliente_servicios cs
     JOIN clientes c ON cs.cliente_id = c.id
     JOIN servicios s ON cs.servicio_id = s.id
+    LEFT JOIN paquetes p ON cs.paquete_id = p.id
     WHERE cs.estado = 'activo'
       AND c.estado  = 'activo'
     ORDER BY cs.fecha_vencimiento ASC

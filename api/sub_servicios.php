@@ -74,6 +74,17 @@ switch ($method) {
         if ($old && $newNombre !== $old['nombre']) {
             $pdo->prepare("UPDATE leads SET servicio_interes = ? WHERE servicio_interes = ?")
                 ->execute([$newNombre, $old['nombre']]);
+
+            // Obtener nombre del servicio padre para construir el display compuesto
+            $parentStmt = $pdo->prepare("SELECT nombre FROM servicios WHERE id = ?");
+            $parentStmt->execute([$old['servicio_id']]);
+            $parentNombre = $parentStmt->fetchColumn() ?: '';
+
+            // Caso 1: display compuesto "ParentNombre — OldSub" → "ParentNombre — NewSub"
+            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
+                ->execute([$parentNombre . ' — ' . $newNombre, $old['servicio_id'], $parentNombre . ' — ' . $old['nombre']]);
+
+            // Caso 2: display simple (solo el nombre del sub-servicio sin prefijo)
             $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
                 ->execute([$newNombre, $old['servicio_id'], $old['nombre']]);
         }

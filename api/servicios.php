@@ -15,6 +15,7 @@ if (!isAuthenticated()) {
 $method = $_SERVER['REQUEST_METHOD'];
 $pdo = db();
 try { $pdo->exec("ALTER TABLE servicios ADD COLUMN orden INT NOT NULL DEFAULT 0"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE servicios ADD COLUMN icono VARCHAR(50) NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE sub_servicios ADD COLUMN orden INT NOT NULL DEFAULT 0"); } catch(PDOException $e){}
 
 switch ($method) {
@@ -68,7 +69,7 @@ switch ($method) {
             jsonResponse(['error' => 'Nombre del servicio es requerido.'], 400);
         }
 
-        $stmt = $pdo->prepare("INSERT INTO servicios (nombre, descripcion, precio_base, costo, frecuencia, categoria, enlace_pago) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO servicios (nombre, descripcion, precio_base, costo, frecuencia, categoria, enlace_pago, icono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $input['nombre'],
             $input['descripcion'] ?? null,
@@ -76,7 +77,8 @@ switch ($method) {
             $input['costo'] ?? 0,
             $input['frecuencia'] ?? 'mes',
             $input['categoria'] ?? null,
-            $input['enlace_pago'] ?? null
+            $input['enlace_pago'] ?? null,
+            $input['icono'] ?? null
         ]);
 
         $id = $pdo->lastInsertId();
@@ -102,7 +104,7 @@ switch ($method) {
 
         $fields = [];
         $values = [];
-        foreach (['nombre', 'descripcion', 'precio_base', 'costo', 'frecuencia', 'categoria', 'activo', 'enlace_pago'] as $f) {
+        foreach (['nombre', 'descripcion', 'precio_base', 'costo', 'frecuencia', 'categoria', 'activo', 'enlace_pago', 'icono'] as $f) {
             if (array_key_exists($f, $input)) {
                 $fields[] = "{$f} = ?";
                 $values[] = $input[$f];
@@ -120,15 +122,24 @@ switch ($method) {
         logActivity($_SESSION['user_id'], 'actualizar', 'servicios', $id, "Servicio actualizado");
 
         // ── Sincronización cruzada ──
-        // Si cambió el nombre, propagar a leads y cliente_servicios
-        if (isset($input['nombre']) && $input['nombre'] !== $oldNombre) {
+        if (isset($input['nombre']) && $input['nombre'] !== $oldNombre && $oldNombre) {
             $newNombre = $input['nombre'];
-            // Actualizar leads que tengan el nombre anterior en servicio_interes
+            // Actualizar leads
             $pdo->prepare("UPDATE leads SET servicio_interes = ? WHERE servicio_interes = ?")
                 ->execute([$newNombre, $oldNombre]);
-            // Actualizar cliente_servicios donde nombre_display coincide con el anterior
-            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND (nombre_display = ? OR nombre_display IS NULL)")
-                ->execute([$newNombre, $id, $oldNombre]);
+            // Caso 1: asignaciones directas del servicio (sin paquete, sin patrón "Svc — Sub").
+            // Actualiza TODOS los registros para este servicio_id sin importar el nombre anterior
+            // (cubre registros con nombres desactualizados de cambios previos).
+            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ?
+                           WHERE servicio_id = ?
+                           AND paquete_id IS NULL
+                           AND (nombre_display IS NULL OR nombre_display NOT LIKE '% — %')")
+                ->execute([$newNombre, $id]);
+            // Caso 2: patrón "NombreServicio — NombreSub" → reemplazar solo el prefijo
+            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = CONCAT(?, SUBSTR(nombre_display, ?))
+                           WHERE servicio_id = ?
+                           AND nombre_display LIKE ?")
+                ->execute([$newNombre, strlen($oldNombre) + 1, $id, $oldNombre . ' — %']);
         }
 
         // Reemplazar features

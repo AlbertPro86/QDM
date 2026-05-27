@@ -350,7 +350,8 @@ function renderTxTable(data) {
             : '—';
 
         const titulo   = escapeHtml(tx.titulo || tx.concepto || '—');
-        const concepto = tx.titulo && tx.concepto && tx.concepto !== tx.titulo ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px">${escapeHtml(tx.concepto)}</div>` : '';
+        const _ct = _fixConcepto(tx);
+        const concepto = tx.titulo && _ct && _ct !== tx.titulo ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px">${escapeHtml(_ct)}</div>` : '';
 
         // Para egresos mostrar proveedor; para ingresos mostrar cliente/lead
         const dest = tx.tipo === 'egreso'
@@ -428,14 +429,43 @@ function renderTxTable(data) {
                 </thead>
                 <tbody>${rows}</tbody>
                 <tfoot>
-                    <tr style="background:#F5F3EE;border-top:2px solid #E8E5DD">
-                        <td colspan="4" style="padding:10px 14px;font-size:11px;font-weight:700;color:#8A867C">${data.length} movimiento${data.length!==1?'s':''}</td>
-                        <td style="padding:10px 14px;text-align:right;font-family:var(--font-secondary)">
-                            <div style="font-size:12px;font-weight:800;color:#1B5A39">+ ${formatMoney(totalIng)}</div>
-                            <div style="font-size:12px;font-weight:800;color:#6E211B">− ${formatMoney(totalEgr)}</div>
-                        </td>
-                        <td colspan="2" style="padding:10px 14px;font-family:var(--font-secondary)">
-                            <div style="font-size:12px;font-weight:900;color:${totalBal>=0?'#1B5A39':'#6E211B'}">= ${totalBal>=0?'+':''}${formatMoney(totalBal)}</div>
+                    <tr style="border-top:2px solid #E8E5DD">
+                        <td colspan="7" style="padding:0">
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#FAFAF7">
+                                <!-- Ingresos -->
+                                <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-right:1px solid #E8E5DD">
+                                    <div style="width:34px;height:34px;background:#E3F1E8;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                        <svg width="15" height="15" fill="none" stroke="#1B5A39" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M5 12l7-7 7 7"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#8A867C;margin-bottom:2px">Ingresos</div>
+                                        <div style="font-size:15px;font-weight:900;color:#1B5A39;letter-spacing:-.4px;font-family:var(--font-secondary)">+ ${formatMoney(totalIng)}</div>
+                                        <div style="font-size:10px;color:#8A867C;margin-top:1px">${data.filter(t=>t.tipo==='ingreso').length} movimiento${data.filter(t=>t.tipo==='ingreso').length!==1?'s':''}</div>
+                                    </div>
+                                </div>
+                                <!-- Egresos -->
+                                <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-right:1px solid #E8E5DD">
+                                    <div style="width:34px;height:34px;background:#F4DEDB;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                        <svg width="15" height="15" fill="none" stroke="#6E211B" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12l7 7 7-7"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#8A867C;margin-bottom:2px">Egresos</div>
+                                        <div style="font-size:15px;font-weight:900;color:#6E211B;letter-spacing:-.4px;font-family:var(--font-secondary)">− ${formatMoney(totalEgr)}</div>
+                                        <div style="font-size:10px;color:#8A867C;margin-top:1px">${data.filter(t=>t.tipo==='egreso').length} movimiento${data.filter(t=>t.tipo==='egreso').length!==1?'s':''}</div>
+                                    </div>
+                                </div>
+                                <!-- Balance -->
+                                <div style="padding:14px 20px;display:flex;align-items:center;gap:12px;background:${totalBal>=0?'#E3F1E8':'#F4DEDB'}">
+                                    <div style="width:34px;height:34px;background:${totalBal>=0?'rgba(27,90,57,.15)':'rgba(110,33,27,.15)'};border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                        <svg width="15" height="15" fill="none" stroke="${totalBal>=0?'#1B5A39':'#6E211B'}" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:${totalBal>=0?'#1B5A39':'#6E211B'};opacity:.7;margin-bottom:2px">Balance</div>
+                                        <div style="font-size:15px;font-weight:900;color:${totalBal>=0?'#1B5A39':'#6E211B'};letter-spacing:-.4px;font-family:var(--font-secondary)">${totalBal>=0?'+':''}${formatMoney(totalBal)}</div>
+                                        <div style="font-size:10px;color:${totalBal>=0?'#1B5A39':'#6E211B'};opacity:.7;margin-top:1px">${data.length} movimiento${data.length!==1?'s':''} en total</div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tfoot>
@@ -1960,14 +1990,14 @@ ${topSvcsHtml ? `<h2>Top Servicios</h2><div style="font-size:13px">${topSvcsHtml
     showToast('Informe descargado', 'success');
 }
 
-/* ─── COMPROBANTE (ojito) ─────────────────────────────────────────────────── */
+/* ─── DETALLE MOVIMIENTO (ojito) ──────────────────────────────────────────── */
 
 let _cmpTxActual = null;
 
 async function verComprobante(id) {
-    document.getElementById('cmpPreview').innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8">Cargando...</div>';
+    document.getElementById('cmpPreview').innerHTML = '<div style="text-align:center;padding:40px;color:#8A867C;font-size:13px">Cargando...</div>';
+    document.getElementById('cmpFooter').innerHTML  = '<button onclick="cerrarComprobante()" style="padding:9px 18px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-weight:600;color:#57544D;background:#FFFFFF;cursor:pointer" onmouseenter="this.style.background=\'#FAFAF7\'" onmouseleave="this.style.background=\'#FFFFFF\'">Cerrar</button>';
     document.getElementById('modalComprobante').style.display = 'flex';
-
     try {
         const r = await fetch(`api/transacciones.php?id=${id}`);
         const d = await r.json();
@@ -1975,69 +2005,94 @@ async function verComprobante(id) {
         _cmpTxActual = d.data;
         renderComprobante();
     } catch(e) {
-        document.getElementById('cmpPreview').innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444">Error al cargar el comprobante</div>';
+        document.getElementById('cmpPreview').innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;font-size:13px">Error al cargar el movimiento</div>';
     }
 }
 
-function _txToCmpData(tx) {
-    // Construir items: desde transaccion_items si existen, o uno genérico
-    const items = tx.items && tx.items.length
-        ? tx.items.map(i => ({ desc: i.nombre, qty: i.cantidad || 1, price: parseFloat(i.precio_unitario || 0) }))
-        : [{ desc: tx.titulo || tx.concepto || 'Servicio', qty: 1, price: parseFloat(tx.monto || 0) }];
-
-    const fechaObj   = tx.fecha_vencimiento ? new Date(tx.fecha_vencimiento + 'T12:00:00') : new Date(tx.created_at);
-    const fmtDate    = d => d.toLocaleDateString('es-CO', {day:'2-digit', month:'long', year:'numeric'});
-
-    return {
-        numero:     `TRX-${String(tx.id).padStart(4,'0')}`,
-        fecha:      fmtDate(new Date(tx.created_at)),
-        vence:      fmtDate(fechaObj),
-        cliente:    tx.cliente_nombre || tx.lead_nombre || tx.proveedor || 'Sin asignar',
-        clienteNit: '',
-        clienteDir: '',
-        items,
-        descuento:  parseFloat(tx.descuento || 0),
-    };
-}
-
-function _getCmpCfg() {
-    const layout = document.getElementById('cmpPlantilla')?.value || 'clasica';
-    // Reutilizar cfg guardada en plantillas si existe, o usar defaults
-    if (typeof getCfg === 'function') {
-        try {
-            const c = getCfg();
-            c.layout = layout;
-            return c;
-        } catch(e) {}
+/* Reemplaza el nombre viejo de servicio en el concepto por el actual del catálogo */
+function _fixConcepto(tx) {
+    let c = tx.concepto || '';
+    if (tx.servicio_nombre && tx.servicio_id && c) {
+        const i = c.search(/\s*[–—\-]\s/);
+        if (i > 0) c = c.substring(0, i) + ' – ' + tx.servicio_nombre;
     }
-    return {
-        layout,
-        colorPrimario:   '#0f172a',
-        colorSecundario: '#c9f31d',
-        fuente:          'Poppins',
-        empresaNombre:   'QUANTUN Digital S.A.S',
-        empresaNit:      '900.000.000-0',
-        empresaEmail:    'contacto@quantundigital.com',
-        empresaTel:      '+57 333 274 7801',
-        empresaDir:      'Bogotá, Colombia',
-        logoUrl:         '',
-        notasPie:        _cmpTxActual?.tipo === 'egreso' ? 'Comprobante de egreso registrado.' : 'Gracias por su preferencia.',
-    };
+    return c;
 }
 
 function renderComprobante() {
     if (!_cmpTxActual) return;
-    const tx   = _cmpTxActual;
-    const data = _txToCmpData(tx);
-    const cfg  = _getCmpCfg();
-    const tipoLabel = tx.tipo === 'ingreso' ? 'Comprobante de Ingreso' : 'Comprobante de Egreso';
-    const estadoLabel = { pagado:'✓ Pagado', pendiente:'◷ Pendiente', vencido:'⚠ Vencido' }[tx.estado] || tx.estado;
+    const tx = _cmpTxActual;
 
-    document.getElementById('cmpTitle').textContent  = `${tipoLabel} #${data.numero}`;
-    document.getElementById('cmpSubtitle').textContent = `${data.cliente} · ${estadoLabel}`;
+    const fmt = s => {
+        if (!s) return null;
+        // Normalizar: "2026-05-22 14:30:00" → "2026-05-22T14:30:00", "2026-05-22" → "2026-05-22T12:00:00"
+        const iso = s.includes('T') ? s : s.includes(' ') ? s.replace(' ', 'T') : s + 'T12:00:00';
+        const d = new Date(iso);
+        if (isNaN(d)) return s; // fallback: mostrar string original
+        return d.toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' });
+    };
+    const fmtMoney = v => '$ ' + Number(v || 0).toLocaleString('es-CO');
 
-    const html = generarFacturaConDatos(cfg, data);
-    document.getElementById('cmpPreview').innerHTML  = html;
+    const esIngreso  = tx.tipo === 'ingreso';
+    const tipoBg     = esIngreso ? '#E3F1E8' : '#F4DEDB';
+    const tipoColor  = esIngreso ? '#1B5A39' : '#6E211B';
+    const tipoLabel  = esIngreso ? '↑ Ingreso' : '↓ Egreso';
+    const estadoMap  = { pagado:['#E3F1E8','#1B5A39','✓ Pagado'], pendiente:['#F5EBD3','#6E4A12','◷ Pendiente'], vencido:['#F4DEDB','#6E211B','⚠ Vencido'] };
+    const [eBg, eColor, eLabel] = estadoMap[tx.estado] || ['#F3F2EE','#57544D', tx.estado];
+
+    const nombre = tx.cliente_nombre || tx.lead_nombre || tx.proveedor || null;
+    const clienteId = tx.cliente_id || null;
+
+    // Header del modal
+    document.getElementById('cmpTitle').textContent   = tx.titulo || tx.concepto || 'Movimiento';
+    document.getElementById('cmpSubtitle').textContent = `TRX-${String(tx.id).padStart(4,'0')} · ${nombre || 'Sin asignar'}`;
+
+    const campo = (iconPath, label, value, extra='') => !value ? '' : `
+        <div style="display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid #F3F2EE">
+            <div style="flex-shrink:0;width:32px;height:32px;background:#F3F2EE;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                <svg width="15" height="15" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="${iconPath}"/></svg>
+            </div>
+            <div>
+                <div style="font-size:10px;color:#8A867C;margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">${label}</div>
+                <div style="font-size:13px;font-weight:600;color:#0E0E0C;word-break:break-word">${value}</div>
+                ${extra ? `<div style="font-size:11px;color:#8A867C;margin-top:2px">${extra}</div>` : ''}
+            </div>
+        </div>`;
+
+    const html = `
+        <!-- Monto grande -->
+        <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;padding:20px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C;margin-bottom:4px">Monto</div>
+                <div style="font-size:28px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;line-height:1">${fmtMoney(tx.monto)}</div>
+                <div style="font-size:10px;color:#8A867C;margin-top:4px">COP</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                <span style="font-size:11px;font-weight:700;background:${tipoBg};color:${tipoColor};padding:4px 12px;border-radius:4px">${tipoLabel}</span>
+                <span style="font-size:11px;font-weight:700;background:${eBg};color:${eColor};padding:4px 12px;border-radius:4px">${eLabel}</span>
+            </div>
+        </div>
+        <!-- Campos -->
+        <div>
+            ${campo('9 5l7 7-7 7', 'Concepto', _fixConcepto(tx))}
+            ${tx.descripcion ? campo('M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'Descripción', tx.descripcion) : ''}
+            ${nombre ? campo('M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', esIngreso ? 'Cliente' : 'Proveedor', nombre) : ''}
+            ${campo('M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'Fecha de registro', fmt(tx.created_at))}
+            ${tx.fecha_pago ? campo('M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'Fecha de pago', fmt(tx.fecha_pago)) : ''}
+            ${tx.fecha_vencimiento ? campo('M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'Fecha de vencimiento', fmt(tx.fecha_vencimiento)) : ''}
+            ${tx.frecuencia && tx.frecuencia !== 'unico' ? campo('M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'Frecuencia', tx.frecuencia.charAt(0).toUpperCase()+tx.frecuencia.slice(1)) : ''}
+        </div>`;
+
+    document.getElementById('cmpPreview').innerHTML = html;
+
+    // Footer con botón ir al cliente
+    const footer = document.getElementById('cmpFooter');
+    footer.innerHTML = `
+        <button onclick="cerrarComprobante()" style="padding:9px 18px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-weight:600;color:#57544D;background:#FFFFFF;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='#FFFFFF'">Cerrar</button>
+        ${clienteId ? `<a href="cliente_detalle.php?id=${clienteId}" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#0E0E0C;color:#C6F24E;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:filter .15s" onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Ir al cliente
+        </a>` : ''}`;
 }
 
 function cerrarComprobante() {
@@ -2047,31 +2102,13 @@ function cerrarComprobante() {
 
 function editarDesdeComprobante() {
     if (!_cmpTxActual) return;
-    const id = _cmpTxActual.id;   // guardar antes de cerrar (cerrar limpia _cmpTxActual)
+    const id = _cmpTxActual.id;
     cerrarComprobante();
     abrirModalTransaccion(id);
 }
 
 function descargarComprobante() {
-    if (!_cmpTxActual) return;
-    const tx   = _cmpTxActual;
-    const data = _txToCmpData(tx);
-    const cfg  = _getCmpCfg();
-    const html = generarFacturaConDatos(cfg, data);
-
-    const w = window.open('', '_blank');
-    const numero = data.numero;
-    const tipoLabel = tx.tipo === 'ingreso' ? 'Comprobante de Ingreso' : 'Comprobante de Egreso';
-    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-        <title>${tipoLabel} ${numero}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#f1f5f9;padding:30px}@media print{body{background:#fff;padding:0}}</style>
-    </head><body>
-        ${html}
-        <script>window.onload=function(){window.print()}<\/script>
-    </body></html>`);
-    w.document.close();
+    // Función legacy — ya no se usa desde el modal info
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2133,7 +2170,7 @@ function exportarMovimientosExcel() {
         return {
             'Fecha':              fechaRef,
             'Título':             tx.titulo    || '',
-            'Concepto':           tx.concepto  || '',
+            'Concepto':           _fixConcepto(tx),
             'Cliente / Proveedor':dest,
             'Tipo':               tx.tipo === 'ingreso' ? 'Ingreso' : 'Egreso',
             'Monto (COP)':        parseFloat(tx.monto || 0),
@@ -2172,7 +2209,7 @@ function exportarPagosUnicosExcel() {
     const rows = data.map(tx => ({
         'Cliente':            tx.cliente_nombre || tx.lead_nombre || '',
         'Título':             tx.titulo         || '',
-        'Concepto':           tx.concepto       || '',
+        'Concepto':           _fixConcepto(tx),
         'Monto (COP)':        parseFloat(tx.monto || 0),
         'Estado':             tx.estado         || '',
         'Fecha Vencimiento':  tx.fecha_vencimiento || '',

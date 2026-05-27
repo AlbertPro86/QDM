@@ -176,8 +176,7 @@ function calcTotales() {
     const sub = SAMPLE.items.reduce((s, i) => s + i.qty * i.price, 0);
     const desc = SAMPLE.descuento;
     const total = sub - desc;
-    const iva = Math.round(total * 0.19);
-    return { sub, desc, total: total + iva, iva };
+    return { sub, desc, total };
 }
 
 /* ── TABLA ITEMS ────────────────────────────────────────────────────── */
@@ -195,7 +194,7 @@ function itemsRows(bg, clrText, borderColor, boldColor) {
 
 /* ── CLÁSICA ────────────────────────────────────────────────────────── */
 function layoutClasica(cfg) {
-    const { sub, desc, total, iva } = calcTotales();
+    const { sub, desc, total } = calcTotales();
     const logoUrl = cfg.logoUrl && cfg.logoUrl.trim() ? cfg.logoUrl : 'Assets/logo_quantun_digital_negro.png';
     const logoTag = `<img src="${logoUrl}" alt="Logo" style="max-height:44px;max-width:140px;object-fit:contain;filter:brightness(0)">`;
 
@@ -258,7 +257,7 @@ function layoutClasica(cfg) {
             <div style="min-width:230px">
                 <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#8A867C;border-bottom:1px solid #F0EFEB"><span>Subtotal</span><span>${fmtCOP(sub)}</span></div>
                 <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#8A867C;border-bottom:1px solid #F0EFEB"><span>Descuento</span><span>– ${fmtCOP(desc)}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;color:#8A867C;border-bottom:1px solid #F0EFEB"><span>IVA (19%)</span><span>${fmtCOP(iva)}</span></div>
+
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${cfg.colorPrimario};border-radius:3px;margin-top:10px">
                     <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${cfg.colorSecundario}">Total</span>
                     <span style="font-size:18px;font-weight:900;color:${cfg.colorSecundario}">${fmtCOP(total)}</span>

@@ -52,6 +52,7 @@ include __DIR__ . '/includes/header.php';
         <div class="modal-body modal-body-lg">
             <form id="svcForm" onsubmit="saveSvc(event)">
                 <input type="hidden" id="svcId">
+                <input type="hidden" id="svcIcono">
                 <div class="form-group"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="svcNombre" required placeholder="Ej: Dominios, Hosting, Diseño Web..."></div>
                 <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="svcDesc" rows="2" placeholder="Descripción breve del servicio..."></textarea></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -81,6 +82,16 @@ include __DIR__ . '/includes/header.php';
                         <option value="ninguna">Ninguna</option>
                     </select>
                 </div>
+                <!-- Icono -->
+                <div class="form-group">
+                    <label class="form-label" style="margin-bottom:8px">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="vertical-align:middle;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Icono del servicio
+                    </label>
+                    <div id="svcIconGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;padding:8px;max-height:145px;overflow-y:auto"></div>
+                    <p style="font-size:11px;color:#8A867C;margin:5px 0 0">Opcional — identifica visualmente este servicio</p>
+                </div>
+
                 <div class="form-group">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
                         <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--color-text)">
@@ -210,6 +221,7 @@ include __DIR__ . '/includes/header.php';
         <div class="modal-body modal-body-lg">
             <form id="pkgForm" onsubmit="savePkg(event)">
                 <input type="hidden" id="pkgId">
+                <input type="hidden" id="pkgIcono">
                 <div style="display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start">
                     <!-- Columna izquierda: formulario -->
                     <div>
@@ -289,6 +301,15 @@ include __DIR__ . '/includes/header.php';
                                 <button type="button" class="btn btn-outline" style="flex:1;font-size:12px;padding:6px 10px" onclick="document.getElementById('pkgImgInput').click()">Cambiar</button>
                                 <button type="button" class="btn btn-outline" style="font-size:12px;padding:6px 10px;color:#ef4444;border-color:#ef4444" onclick="removePkgImg()">Quitar</button>
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label" style="margin-bottom:8px">
+                                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="vertical-align:middle;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                Icono de la suscripción
+                            </label>
+                            <div id="pkgIconGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;padding:8px;max-height:185px;overflow-y:auto"></div>
+                            <p style="font-size:11px;color:#8A867C;margin:5px 0 0">Selecciona un icono para identificar esta suscripción</p>
                         </div>
 
                         <div>
@@ -443,7 +464,8 @@ function renderSvcs(svcs) {
 
             <div style="padding:12px 14px 10px">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
-                    <div style="min-width:0;flex:1">
+                    <div style="min-width:0;flex:1;display:flex;align-items:flex-start;gap:8px">
+                        ${s.icono ? `<div style="width:30px;height:30px;border-radius:6px;background:#0E0E0C;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${_iconSvg(s.icono, 16, '#C6F24E')}</div>` : ''}
                         <div style="min-width:0;flex:1">
                             <h3 style="font-size:14px;font-weight:700;font-family:var(--font-primary);margin:0 0 2px;color:#0E0E0C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.nombre)}</h3>
                             ${s.descripcion ? `<p style="font-size:11px;color:#57544D;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.descripcion)}</p>` : ""}
@@ -516,7 +538,8 @@ function setSvcEnlaceToggle(active) {
 /* ── MODAL SERVICIO ─────────────────────────────────────────── */
 function openSvcModal(svc = null) {
     document.getElementById('svcForm').reset();
-    document.getElementById('svcId').value = '';
+    document.getElementById('svcId').value   = '';
+    document.getElementById('svcIcono').value = '';
     if(svc) {
         document.getElementById('svcModalTitle').textContent  = 'Editar Servicio';
         document.getElementById('svcId').value         = svc.id;
@@ -525,6 +548,7 @@ function openSvcModal(svc = null) {
         document.getElementById('svcPrecio').value     = svc.precio_base || '';
         document.getElementById('svcCosto').value      = svc.costo || '';
         document.getElementById('svcFrecuencia').value = svc.frecuencia || 'mes';
+        document.getElementById('svcIcono').value      = svc.icono || '';
         setSvcEnlaceToggle(!!svc.enlace_pago);
         document.getElementById('svcEnlace').value     = svc.enlace_pago || '';
         svcFeatures = Array.isArray(svc.features) ? svc.features.map(f => f.texto) : [];
@@ -535,6 +559,7 @@ function openSvcModal(svc = null) {
         setSvcEnlaceToggle(false);
         svcFeatures = [];
     }
+    renderSvcIconPicker(document.getElementById('svcIcono').value);
     document.getElementById('svcFeatureInput').value = '';
     renderFeatures(svcFeatures, 'svcFeaturesList', 'removeSvcFeature');
     calcSvcGanancia();
@@ -552,6 +577,7 @@ async function saveSvc(e) {
         precio_base: parseFloat(document.getElementById('svcPrecio').value) || 0,
         costo:       parseFloat(document.getElementById('svcCosto').value)  || 0,
         frecuencia:  document.getElementById('svcFrecuencia').value,
+        icono:       document.getElementById('svcIcono').value || null,
         enlace_pago: document.getElementById('svcEnlaceToggle').checked ? (document.getElementById('svcEnlace').value || null) : null,
         features:    svcFeatures,
     };
@@ -904,6 +930,77 @@ function closePreviewPkg() { document.getElementById('previewPkgModal').classLis
 /* ── SUSCRIPCIONES ───────────────────────────────────────────────── */
 let allPkgs = [];
 
+/* ── ICON SET ────────────────────────────────────────────────── */
+const PKG_ICONS = {
+    globe:    '<path d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3M3 12h18"/>',
+    store:    '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+    mail:     '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+    phone:    '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 0110 1.18 2 2 0 0112 3v3a2 2 0 01-1.44 1.93 16 16 0 006.29 6.29A2 2 0 0119 16.92z"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    chart:    '<path d="M18 20V10M12 20V4M6 20v-6"/>',
+    star:     '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    shield:   '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    zap:      '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.657-4.03 3-9 3S3 13.657 3 12"/><path d="M3 5v14c0 1.657 4.03 3 9 3s9-1.343 9-3V5"/>',
+    code:     '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    camera:   '<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>',
+    video:    '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
+    file:     '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+    cloud:    '<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+    users:    '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+    message:  '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
+    rocket:   '<path d="M12 2c0 0 4 2 4 8s-4 12-4 12-4-6-4-12 4-8 4-8z"/><circle cx="12" cy="10" r="2"/><path d="M9 21c0-1.5-1-2-2-3M15 21c0-1.5 1-2 2-3"/>',
+    brush:    '<path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1 1 2.48 1.02 3.5 1.02 2.76 0 5-2.23 5-5.02 0-.54-.09-1.08-.26-1.59"/>',
+    wifi:     '<path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+    lock:     '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+    tag:      '<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    diamond:  '<polygon points="12 2 22 12 12 22 2 12 12 2"/>',
+    link:     '<path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>',
+};
+
+function _iconSvg(key, size = 18, color = '#57544D') {
+    const path = PKG_ICONS[key] || PKG_ICONS.star;
+    return `<svg width="${size}" height="${size}" fill="none" stroke="${color}" viewBox="0 0 24 24" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
+
+function renderIconPicker(selectedKey) {
+    document.getElementById('pkgIconGrid').innerHTML = Object.entries(PKG_ICONS).map(([key]) => {
+        const sel = key === selectedKey;
+        return `<button type="button" title="${key}" onclick="selectPkgIcon('${key}')"
+            style="border:2px solid ${sel?'#C6F24E':'#E8E5DD'};background:${sel?'#0E0E0C':'#fff'};border-radius:6px;padding:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;aspect-ratio:1"
+            onmouseenter="if(document.getElementById('pkgIcono').value!=='${key}'){this.style.borderColor='#0E0E0C';this.style.background='#FAFAF7'}"
+            onmouseleave="if(document.getElementById('pkgIcono').value!=='${key}'){this.style.borderColor='#E8E5DD';this.style.background='#fff'}">
+            ${_iconSvg(key, 18, sel ? '#C6F24E' : '#57544D')}
+        </button>`;
+    }).join('');
+}
+
+function selectPkgIcon(key) {
+    document.getElementById('pkgIcono').value = key;
+    renderIconPicker(key);
+}
+
+/* ── ICON PICKER — SERVICIOS ─────────────────────────────────── */
+function renderSvcIconPicker(selectedKey) {
+    const grid = document.getElementById('svcIconGrid');
+    if (!grid) return;
+    grid.innerHTML = Object.entries(PKG_ICONS).map(([key]) => {
+        const sel = key === selectedKey;
+        return `<button type="button" title="${key}" onclick="selectSvcIcon('${key}')"
+            style="border:2px solid ${sel?'#C6F24E':'#E8E5DD'};background:${sel?'#0E0E0C':'#fff'};border-radius:6px;padding:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;aspect-ratio:1"
+            onmouseenter="if(document.getElementById('svcIcono').value!=='${key}'){this.style.borderColor='#0E0E0C';this.style.background='#FAFAF7'}"
+            onmouseleave="if(document.getElementById('svcIcono').value!=='${key}'){this.style.borderColor='#E8E5DD';this.style.background='#fff'}">
+            ${_iconSvg(key, 16, sel ? '#C6F24E' : '#57544D')}
+        </button>`;
+    }).join('');
+}
+
+function selectSvcIcon(key) {
+    document.getElementById('svcIcono').value = key;
+    renderSvcIconPicker(key);
+}
+
 async function loadPkgs() {
     try {
         const r = await fetch('api/paquetes.php');
@@ -939,7 +1036,10 @@ function renderPkgs(pkgs) {
              onmouseleave="this.style.transform='';this.style.boxShadow='0 4px 24px rgba(0,0,0,0.07)'">
             <div style="padding:18px 20px 0">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-                    <div>
+                    <div style="display:flex;align-items:flex-start;gap:10px">
+                        <div style="width:38px;height:38px;border-radius:8px;background:#0E0E0C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            ${_iconSvg(p.icono || 'star', 20, '#C6F24E')}
+                        </div>
                         <div>
                             <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C">Suscripción</span>
                             <h3 style="font-size:16px;font-weight:800;color:#0E0E0C;margin:2px 0 0">${escapeHtml(p.nombre)}</h3>
@@ -1110,6 +1210,7 @@ function removePkgImg() {
 function openPkgModal(pkg = null) {
     document.getElementById('pkgForm').reset();
     document.getElementById('pkgId').value = '';
+    document.getElementById('pkgIcono').value = '';
     document.getElementById('pkgResumen').style.display = 'none';
     pkgImgPendiente = null;
     document.getElementById('pkgImgInput').value = '';
@@ -1124,6 +1225,7 @@ function openPkgModal(pkg = null) {
         document.getElementById('pkgPrecioVenta').value        = pkg.precio_venta || '';
         document.getElementById('pkgFrecuencia').value         = pkg.frecuencia || 'mes';
         document.getElementById('pkgEnlace').value             = pkg.enlace || '';
+        document.getElementById('pkgIcono').value              = pkg.icono || '';
         pkgFeatures = Array.isArray(pkg.features) ? pkg.features.map(f => f.texto) : [];
         if (pkg.imagen) setPkgImgUI(pkg.imagen);
     } else {
@@ -1131,6 +1233,7 @@ function openPkgModal(pkg = null) {
         document.getElementById('pkgEnlace').value = '';
         pkgFeatures = [];
     }
+    renderIconPicker(document.getElementById('pkgIcono').value);
     document.getElementById('pkgFeatureInput').value = '';
     renderFeatures(pkgFeatures, 'pkgFeaturesList', 'removePkgFeature');
     buildPkgSubsList(selectedIds);
@@ -1151,6 +1254,7 @@ async function savePkg(e) {
         precio_venta: parseFloat(document.getElementById('pkgPrecioVenta').value) || 0,
         frecuencia:   document.getElementById('pkgFrecuencia').value,
         enlace:       document.getElementById('pkgEnlace').value || null,
+        icono:        document.getElementById('pkgIcono').value || null,
         features:     pkgFeatures,
         items,
     };

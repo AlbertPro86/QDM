@@ -514,43 +514,31 @@ document.addEventListener('click', function(e) {
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
-     MODAL COMPROBANTE (ojito)
+     MODAL DETALLE MOVIMIENTO (ojito)
      ══════════════════════════════════════════════════════════ -->
-<div id="modalComprobante" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1300;display:none;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#FFFFFF;border-radius:6px;width:100%;max-width:820px;max-height:94vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(14,14,12,.06)">
+<div id="modalComprobante" onclick="if(event.target===this)cerrarComprobante()"
+     style="position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:1300;display:none;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#FFFFFF;border-radius:6px;width:100%;max-width:560px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 32px rgba(14,14,12,.14)">
     <!-- Header -->
-    <div style="padding:16px 20px;border-bottom:1.5px solid #EFECE5;display:flex;align-items:center;gap:12px;flex-shrink:0">
-      <div style="flex:1;min-width:0">
-        <h2 style="font-size:15px;font-weight:700;color:#0E0E0C;margin:0" id="cmpTitle">Comprobante</h2>
+    <div style="padding:16px 20px;border-bottom:1.5px solid #EFECE5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <h2 style="font-size:15px;font-weight:700;color:#0E0E0C;margin:0" id="cmpTitle">Detalle del movimiento</h2>
         <p style="font-size:11px;color:#8A867C;margin:3px 0 0" id="cmpSubtitle"></p>
       </div>
-      <!-- Selector plantilla -->
-      <select id="cmpPlantilla" onchange="renderComprobante()"
-        style="padding:7px 10px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:12px;font-family:inherit;background:#FFFFFF;outline:none;color:#0E0E0C">
-        <option value="clasica">Clásica</option>
-        <option value="moderna">Moderna</option>
-        <option value="minimalista">Minimalista</option>
-        <option value="ejecutiva">Ejecutiva</option>
-      </select>
-      <button onclick="editarDesdeComprobante()" title="Editar"
-        style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:12px;font-weight:700;color:#57544D;background:#FFFFFF;cursor:pointer;transition:all .15s"
-        onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='#FFFFFF'">
-        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-        Editar
-      </button>
-      <button onclick="descargarComprobante()" title="Descargar"
-        style="display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:none;border-radius:4px;font-size:12px;font-weight:700;color:#0E0E0C;background:#C6F24E;cursor:pointer;transition:all .15s"
-        onmouseenter="this.style.filter='brightness(.93)'" onmouseleave="this.style.filter=''">
-        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        Descargar
-      </button>
-      <button onclick="cerrarComprobante()" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:4px;color:#8A867C;transition:all .15s;flex-shrink:0" onmouseenter="this.style.background='#EFECE5';this.style.color='#0E0E0C'" onmouseleave="this.style.background='none';this.style.color='#8A867C'">
+      <button onclick="cerrarComprobante()" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:4px;color:#8A867C;transition:all .15s"
+        onmouseenter="this.style.background='#EFECE5';this.style.color='#0E0E0C'"
+        onmouseleave="this.style.background='none';this.style.color='#8A867C'">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <!-- Preview del comprobante -->
-    <div id="cmpPreview" style="flex:1;overflow-y:auto;padding:20px;background:#EFECE5">
-      <div style="text-align:center;padding:60px;color:#8A867C">Cargando comprobante...</div>
+    <!-- Body -->
+    <div id="cmpPreview" style="flex:1;overflow-y:auto;padding:20px">
+      <div style="text-align:center;padding:40px;color:#8A867C;font-size:13px">Cargando...</div>
+    </div>
+    <!-- Footer -->
+    <div id="cmpFooter" style="padding:12px 20px;border-top:1.5px solid #EFECE5;display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
+      <button onclick="cerrarComprobante()" style="padding:9px 18px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-weight:600;color:#57544D;background:#FFFFFF;cursor:pointer;transition:all .15s"
+        onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='#FFFFFF'">Cerrar</button>
     </div>
   </div>
 </div>

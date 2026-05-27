@@ -1594,15 +1594,16 @@ async function saveSvc(e) {
     const id     = document.getElementById('svcEditId').value;
     const isEdit = !!id;
 
-    let servicioId, nombreDisplay;
+    let servicioId, nombreDisplay, paqueteId = null;
     if (isEdit) {
-        servicioId   = document.getElementById('newSvcIdHidden').value;
+        servicioId    = document.getElementById('newSvcIdHidden').value;
         nombreDisplay = document.getElementById('newSvcNombreDisplay').value;
     } else {
         const sel = document.getElementById('newSvcId');
         const opt = sel.options[sel.selectedIndex];
         servicioId    = sel.value;
         nombreDisplay = opt?.dataset.display || opt?.textContent || '';
+        paqueteId     = opt?.dataset.pkgId ? parseInt(opt.dataset.pkgId) : null;
     }
 
     // Validar que servicio_id no esté vacío
@@ -1615,6 +1616,7 @@ async function saveSvc(e) {
     const payload = {
         cliente_id:       clienteId,
         servicio_id:      servicioId,
+        paquete_id:       paqueteId,
         nombre_display:   nombreDisplay,
         monto_renovacion: parseFloat(document.getElementById('newSvcMonto').value) || 0,
         descuento:        parseFloat(document.getElementById('newSvcDesc').value)  || 0,
