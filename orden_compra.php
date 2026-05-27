@@ -122,19 +122,37 @@ if (!$template) {
         'notas_pie' => 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.'
     ];
 }
-// Rellenar campos de empresa vacíos desde crm_configuraciones
-try {
-    $cfgRows = $pdo->query("SELECT clave, valor FROM crm_configuraciones")->fetchAll(PDO::FETCH_KEY_PAIR);
-    $empresaFields = ['empresa_nombre', 'empresa_nit', 'empresa_email', 'empresa_tel', 'empresa_dir'];
-    foreach ($empresaFields as $f) {
-        if (empty($template[$f]) && !empty($cfgRows[$f])) {
-            $template[$f] = $cfgRows[$f];
+// Rellenar campos de empresa vacíos: primero crm_configuraciones, luego cualquier plantilla activa que los tenga
+$empresaFields = ['empresa_nombre', 'empresa_nit', 'empresa_email', 'empresa_tel', 'empresa_dir'];
+$needsFill = false;
+foreach ($empresaFields as $f) { if (empty($template[$f])) { $needsFill = true; break; } }
+
+if ($needsFill) {
+    // 1) Desde crm_configuraciones
+    try {
+        $cfgRows = $pdo->query("SELECT clave, valor FROM crm_configuraciones")->fetchAll(PDO::FETCH_KEY_PAIR);
+        foreach ($empresaFields as $f) {
+            if (empty($template[$f]) && !empty($cfgRows[$f])) $template[$f] = $cfgRows[$f];
         }
+        if (empty($template['logo_url']) && !empty($cfgRows['logo_url'])) $template['logo_url'] = $cfgRows['logo_url'];
+    } catch (Exception $e) {}
+
+    // 2) Desde cualquier otra plantilla activa que tenga los datos
+    $stillNeeds = false;
+    foreach ($empresaFields as $f) { if (empty($template[$f])) { $stillNeeds = true; break; } }
+    if ($stillNeeds) {
+        try {
+            $stmtE = $pdo->query("SELECT empresa_nombre, empresa_nit, empresa_email, empresa_tel, empresa_dir, logo_url FROM plantillas_factura WHERE activo = 1 AND (empresa_email <> '' OR empresa_tel <> '') ORDER BY es_default DESC, id ASC LIMIT 1");
+            $donor = $stmtE->fetch();
+            if ($donor) {
+                foreach ($empresaFields as $f) {
+                    if (empty($template[$f]) && !empty($donor[$f])) $template[$f] = $donor[$f];
+                }
+                if (empty($template['logo_url']) && !empty($donor['logo_url'])) $template['logo_url'] = $donor['logo_url'];
+            }
+        } catch (Exception $e) {}
     }
-    if (empty($template['logo_url']) && !empty($cfgRows['logo_url'])) {
-        $template['logo_url'] = $cfgRows['logo_url'];
-    }
-} catch (Exception $e) {}
+}
 
 // Aplicar override de notas_pie DESPUÉS de obtener la plantilla
 if (!empty($_POST['notas_pie_override'])) {
