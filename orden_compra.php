@@ -183,11 +183,16 @@ enrichWithPaquete($servicios, $pdo);
         .date-item { text-align: center; }
         .date-value { font-size: 12px; font-weight: 700; color: #0E0E0C; }
         .items-section { padding: 28px 0; }
-        .items-table { width: 100%; border-collapse: collapse; }
+        .items-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .items-table col.col-desc  { width: auto; }
+        .items-table col.col-qty   { width: 60px; }
+        .items-table col.col-price { width: 110px; }
+        .items-table col.col-total { width: 110px; }
         .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
         .items-table th:first-child, .items-table td:first-child { padding-left: 36px; }
         .items-table th:last-child,  .items-table td:last-child  { padding-right: 36px; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
+        .items-table td.col-qty, .items-table td.col-price, .items-table td.col-total { white-space: nowrap; }
         .items-table tbody tr:nth-child(odd) { background: #FFFFFF; }
         .items-table tbody tr:nth-child(even) { background: #FAFAF7; }
         .amount { text-align: right; font-weight: 700; color: #0E0E0C; }
@@ -258,12 +263,18 @@ enrichWithPaquete($servicios, $pdo);
         <!-- Items -->
         <div class="items-section">
             <table class="items-table">
+                <colgroup>
+                    <col class="col-desc">
+                    <col class="col-qty">
+                    <col class="col-price">
+                    <col class="col-total">
+                </colgroup>
                 <thead>
                     <tr style="background:<?= $template['color_primario'] ?>">
                         <th style="color:#ffffff">Descripción</th>
-                        <th style="text-align:center;color:#ffffff">Cant.</th>
-                        <th style="text-align:right;color:#ffffff">Precio</th>
-                        <th style="text-align:right;color:#ffffff">Total</th>
+                        <th style="text-align:center;color:#ffffff;white-space:nowrap">Cant.</th>
+                        <th style="text-align:right;color:#ffffff;white-space:nowrap">Precio</th>
+                        <th style="text-align:right;color:#ffffff;white-space:nowrap">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -300,9 +311,9 @@ enrichWithPaquete($servicios, $pdo);
                             </div>
                             <?php endif; ?>
                         </td>
-                        <td style="text-align:center"><?= $qty ?></td>
-                        <td style="text-align:right">$ <?= number_format($precioU, 0, ',', '.') ?></td>
-                        <td class="amount">$ <?= number_format($subtotal, 0, ',', '.') ?></td>
+                        <td class="col-qty" style="text-align:center"><?= $qty ?></td>
+                        <td class="col-price" style="text-align:right">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
+                        <td class="col-total amount">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
