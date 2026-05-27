@@ -236,7 +236,7 @@ enrichWithPaquete($servicios, $pdo);
         /* Columna 4 (Total) — todas las filas */
         .items-table td:nth-child(4) { text-align: right; white-space: nowrap; vertical-align: middle; font-weight: 700; color: #0E0E0C; }
         .totals { display: flex; justify-content: flex-end; margin-top: 20px; padding: 0 36px; }
-        .totals-box { min-width: 250px; }
+        .totals-box { width: 260px; }
         .total-row { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 12px; color: #57544D; }
         .total-final { display: flex; justify-content: space-between; align-items: center; padding: 14px 12px; background: <?= $template['color_primario'] ?>; border-radius: 4px; margin-top: 10px; }
         .total-final span:first-child { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: <?= $template['color_secundario'] ?>; }
