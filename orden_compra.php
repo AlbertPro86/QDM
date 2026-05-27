@@ -229,10 +229,12 @@ enrichWithPaquete($servicios, $pdo);
         .items-table th:first-child, .items-table td:first-child { padding-left: 36px; }
         .items-table th:last-child,  .items-table td:last-child  { padding-right: 36px; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
-        .items-table td.col-qty, .items-table td.col-price, .items-table td.col-total { white-space: nowrap; }
-        .items-table tbody tr:nth-child(odd) { background: #FFFFFF; }
-        .items-table tbody tr:nth-child(even) { background: #FAFAF7; }
-        .amount { text-align: right; font-weight: 700; color: #0E0E0C; }
+        /* Columna 2 (Cant.) — todas las filas */
+        .items-table td:nth-child(2) { text-align: center; white-space: nowrap; vertical-align: middle; }
+        /* Columna 3 (Precio) — todas las filas */
+        .items-table td:nth-child(3) { text-align: right; white-space: nowrap; vertical-align: middle; }
+        /* Columna 4 (Total) — todas las filas */
+        .items-table td:nth-child(4) { text-align: right; white-space: nowrap; vertical-align: middle; font-weight: 700; color: #0E0E0C; }
         .totals { display: flex; justify-content: flex-end; margin-top: 20px; padding: 0 36px; }
         .totals-box { min-width: 250px; }
         .total-row { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 12px; color: #57544D; }
@@ -329,9 +331,9 @@ enrichWithPaquete($servicios, $pdo);
                         <td style="padding:12px 14px 12px 36px">
                             <span style="font-size:13px;font-weight:700;color:#0E0E0C"><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></span>
                         </td>
-                        <td class="col-qty" style="text-align:center;font-weight:700;color:#0E0E0C"><?= $qty ?></td>
-                        <td class="col-price" style="text-align:right;font-weight:700;color:#0E0E0C">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
-                        <td class="col-total" style="text-align:right;font-weight:700;color:#0E0E0C;padding-right:36px">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
+                        <td style="font-weight:700;color:#0E0E0C"><?= $qty ?></td>
+                        <td style="font-weight:700;color:#0E0E0C">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
+                        <td style="font-weight:700;color:#0E0E0C">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
                     <!-- Filas de sub-servicios -->
                     <?php foreach ($pkgItems as $item): ?>
@@ -345,8 +347,8 @@ enrichWithPaquete($servicios, $pdo);
                             </div>
                         </td>
                         <td style="border-bottom:1px solid #F3F2EE"></td>
-                        <td style="text-align:right;font-size:11px;color:#8A867C;white-space:nowrap;border-bottom:1px solid #F3F2EE">$&nbsp;<?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6;font-size:10px"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span></td>
-                        <td style="border-bottom:1px solid #F3F2EE;padding-right:36px"></td>
+                        <td style="font-size:11px;color:#8A867C;border-bottom:1px solid #F3F2EE">$&nbsp;<?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6;font-size:10px"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span></td>
+                        <td style="border-bottom:1px solid #F3F2EE"></td>
                     </tr>
                     <?php endforeach; ?>
                     <!-- Fila de features -->
@@ -368,9 +370,9 @@ enrichWithPaquete($servicios, $pdo);
                     <!-- Fila de servicio simple -->
                     <tr>
                         <td><strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong></td>
-                        <td class="col-qty" style="text-align:center"><?= $qty ?></td>
-                        <td class="col-price" style="text-align:right">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
-                        <td class="col-total amount">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
+                        <td><?= $qty ?></td>
+                        <td>$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
+                        <td>$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
                     <?php endif; ?>
                     <?php endforeach; ?>
