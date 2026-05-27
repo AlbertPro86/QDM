@@ -321,37 +321,58 @@ enrichWithPaquete($servicios, $pdo);
                         $subtotal = ($svc['monto_renovacion'] ?? 0) - ($svc['descuento'] ?? 0);
                         $pkgItems = $svc['_pkg_items']    ?? [];
                         $pkgFeats = $svc['_pkg_features'] ?? [];
+                        $hasPkg   = !empty($pkgItems);
                     ?>
-                    <tr>
-                        <td>
-                            <strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong>
-                            <?php if (!empty($pkgItems)): ?>
-                            <table style="width:100%;margin-top:7px;border-collapse:collapse">
-                                <?php foreach ($pkgItems as $item): ?>
-                                <tr>
-                                    <td style="padding:3px 0 3px 10px;font-size:11px;color:#8A867C;border-left:2px solid #E8E5DD;line-height:1.3">
-                                        <span style="font-weight:600;color:#57544D"><?= htmlspecialchars($item['svc_nombre']) ?></span>
-                                        <span style="color:#B0AB9F"> — </span><?= htmlspecialchars($item['ss_nombre']) ?>
-                                    </td>
-                                    <td style="padding:3px 0 3px 8px;font-size:11px;color:#8A867C;text-align:right;white-space:nowrap">
-                                        $ <?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </table>
-                            <?php endif; ?>
-                            <?php if (!empty($pkgFeats)): ?>
-                            <div style="margin-top:6px;padding-top:5px;border-top:1px dashed #E8E5DD">
+                    <?php if ($hasPkg): ?>
+                    <!-- Fila cabecera del paquete -->
+                    <tr style="background:#F3F2EE">
+                        <td style="padding:12px 14px 12px 36px">
+                            <span style="font-size:13px;font-weight:700;color:#0E0E0C"><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></span>
+                        </td>
+                        <td class="col-qty" style="text-align:center;font-weight:700;color:#0E0E0C"><?= $qty ?></td>
+                        <td class="col-price" style="text-align:right;font-weight:700;color:#0E0E0C">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
+                        <td class="col-total" style="text-align:right;font-weight:700;color:#0E0E0C;padding-right:36px">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
+                    </tr>
+                    <!-- Filas de sub-servicios -->
+                    <?php foreach ($pkgItems as $item): ?>
+                    <tr style="background:#fff">
+                        <td style="padding:8px 14px 8px 48px;border-bottom:1px solid #F3F2EE">
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <span style="width:4px;height:4px;border-radius:50%;background:#C6C2BB;flex-shrink:0;display:inline-block"></span>
+                                <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($item['svc_nombre']) ?></span>
+                                <span style="font-size:11px;color:#B0AB9F">—</span>
+                                <span style="font-size:11px;color:#8A867C"><?= htmlspecialchars($item['ss_nombre']) ?></span>
+                            </div>
+                        </td>
+                        <td style="border-bottom:1px solid #F3F2EE"></td>
+                        <td style="text-align:right;font-size:11px;color:#8A867C;white-space:nowrap;border-bottom:1px solid #F3F2EE">$&nbsp;<?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6;font-size:10px"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span></td>
+                        <td style="border-bottom:1px solid #F3F2EE;padding-right:36px"></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <!-- Fila de features -->
+                    <?php if (!empty($pkgFeats)): ?>
+                    <tr style="background:#FAFAF7">
+                        <td colspan="4" style="padding:8px 14px 10px 48px;border-bottom:1px solid #E8E5DD">
+                            <div style="display:flex;flex-wrap:wrap;gap:6px 16px">
                                 <?php foreach ($pkgFeats as $feat): ?>
-                                <div style="font-size:10px;color:#8A867C;padding:1px 0">&#10003; <?= htmlspecialchars($feat) ?></div>
+                                <span style="font-size:10px;color:#57544D;display:flex;align-items:center;gap:4px">
+                                    <svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    <?= htmlspecialchars($feat) ?>
+                                </span>
                                 <?php endforeach; ?>
                             </div>
-                            <?php endif; ?>
                         </td>
+                    </tr>
+                    <?php endif; ?>
+                    <?php else: ?>
+                    <!-- Fila de servicio simple -->
+                    <tr>
+                        <td><strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong></td>
                         <td class="col-qty" style="text-align:center"><?= $qty ?></td>
                         <td class="col-price" style="text-align:right">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
                         <td class="col-total amount">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
