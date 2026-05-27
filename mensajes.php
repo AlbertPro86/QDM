@@ -11,6 +11,10 @@ $pageSubtitle = '';
 $pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
     . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
     . '<span style="font-weight:700;color:var(--color-text)">Mensajes</span>';
+
+// Logo de empresa configurado (para autocompletar el campo URL)
+$logoConfig = getCfg($pdo, 'notif_logo_url', '');
+
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -156,13 +160,37 @@ include __DIR__ . '/includes/header.php';
 
             <!-- Logo URL -->
             <div class="form-group" style="margin:0">
-                <label class="form-label">URL del Logo <span style="font-weight:400;color:#8A867C">(opcional · URL de imagen externa)</span></label>
+                <label class="form-label">Logo <span style="font-weight:400;color:#8A867C">(opcional · URL de imagen)</span></label>
                 <input type="text" id="inputLogoUrl" class="form-input"
                     placeholder="https://tudominio.com/logo.png"
                     oninput="previewLogoMensaje(this.value)"
                     style="font-size:12px">
+                <!-- Atajos: logos de empresa -->
+                <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center">
+                    <span style="font-size:10px;font-weight:700;color:#8A867C;text-transform:uppercase;letter-spacing:.05em">Logo empresa:</span>
+                    <button type="button" onclick="usarLogoEmpresa('negro')"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#0E0E0C;color:#fff;border:none;border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s"
+                        onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+                        <img src="assets/logo_quantun_digital_negro.png" alt="" style="height:14px;filter:invert(1);object-fit:contain"> Negro
+                    </button>
+                    <button type="button" onclick="usarLogoEmpresa('blanco')"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#EFECE5;color:#0E0E0C;border:1px solid #E8E5DD;border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s"
+                        onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+                        <img src="assets/logo_quantun_digital_negro.png" alt="" style="height:14px;object-fit:contain"> Claro
+                    </button>
+                    <?php if($logoConfig): ?>
+                    <button type="button" onclick="usarLogoEmpresa('config')"
+                        style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:#E3F1E8;color:#1B5A39;border:none;border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s"
+                        onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">
+                        ★ Configurado
+                    </button>
+                    <?php endif; ?>
+                    <button type="button" onclick="usarLogoEmpresa('limpiar')"
+                        style="padding:4px 8px;background:none;border:1px solid #E8E5DD;border-radius:3px;font-size:11px;color:#8A867C;cursor:pointer"
+                        onmouseenter="this.style.color='#B0382F'" onmouseleave="this.style.color='#8A867C'">× Quitar</button>
+                </div>
                 <!-- Preview del logo -->
-                <div id="logoMensajePreviewBox" style="display:none;margin-top:8px;padding:10px 14px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:4px;display:none;align-items:center;gap:12px">
+                <div id="logoMensajePreviewBox" style="display:none;margin-top:8px;padding:10px 14px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:4px;align-items:center;gap:12px">
                     <img id="logoMensajePreviewImg" src="" alt="Logo preview"
                         style="max-height:44px;max-width:140px;object-fit:contain;border-radius:4px"
                         onload="document.getElementById('logoMensajeStatus').textContent='✓ Logo cargado';document.getElementById('logoMensajeStatus').style.color='#2D8F5A'"
@@ -203,6 +231,13 @@ include __DIR__ . '/includes/header.php';
             </button>
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+
+            <!-- Logo si existe -->
+            <div id="waLogoBox" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:4px">
+                <img id="waLogoImg" src="" alt="Logo"
+                    style="max-height:36px;max-width:130px;object-fit:contain;flex-shrink:0">
+                <span style="font-size:10px;color:#8A867C;font-style:italic">Logo de la plantilla</span>
+            </div>
 
             <!-- Variables dinámicas -->
             <div id="waVariablesBox" style="display:none">
@@ -508,6 +543,15 @@ function enviarWA(id) {
         box.style.display = 'none';
     }
 
+    // Logo
+    const waLogoBox = document.getElementById('waLogoBox');
+    if (p.logo_url) {
+        document.getElementById('waLogoImg').src = p.logo_url;
+        waLogoBox.style.display = 'flex';
+    } else {
+        waLogoBox.style.display = 'none';
+    }
+
     // Imagen
     const imgBox  = document.getElementById('waImagenBox');
     if (p.imagen) {
@@ -627,6 +671,26 @@ function soltar(e) {
     }
 }
 
+// ── Logos de empresa disponibles ─────────────────────────────────────────────
+const LOGOS_EMPRESA = {
+    negro:  'assets/logo_quantun_digital_negro.png',
+    blanco: 'assets/logo_quantun_digital_blanco.png',
+    config: <?= json_encode($logoConfig ?: '') ?>,
+};
+
+function usarLogoEmpresa(tipo) {
+    const input = document.getElementById('inputLogoUrl');
+    if (tipo === 'limpiar') {
+        input.value = '';
+        previewLogoMensaje('');
+        return;
+    }
+    const url = LOGOS_EMPRESA[tipo] || '';
+    if (!url) return;
+    input.value = url;
+    previewLogoMensaje(url);
+}
+
 // ── Preview logo mensajes ─────────────────────────────────────────────────────
 function previewLogoMensaje(url) {
     const box    = document.getElementById('logoMensajePreviewBox');
@@ -650,8 +714,10 @@ function abrirModalCrear() {
     document.getElementById('inputCategoria').value = 'general';
     document.getElementById('inputDescripcion').value = '';
     document.getElementById('inputContenido').value = '';
-    document.getElementById('inputLogoUrl').value = '';
-    previewLogoMensaje('');
+    // Pre-llenar con logo de empresa si está configurado
+    const logoDefault = LOGOS_EMPRESA.config || LOGOS_EMPRESA.negro;
+    document.getElementById('inputLogoUrl').value = logoDefault;
+    previewLogoMensaje(logoDefault);
     limpiarZonaImagen();
     document.getElementById('modalPlantilla').classList.add('show');
 }
@@ -830,7 +896,7 @@ function previsualizarPlantilla(id) {
     const logoBox = document.getElementById('previewLogoBox');
     if (p.logo_url) {
         document.getElementById('previewLogoImg').src = p.logo_url;
-        logoBox.style.display = '';
+        logoBox.style.display = 'block';   // 'block' no '' — '' revierte al display:none del HTML
     } else {
         logoBox.style.display = 'none';
     }
