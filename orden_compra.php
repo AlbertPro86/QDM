@@ -338,7 +338,7 @@ enrichWithPaquete($servicios, $pdo);
                     <!-- Filas de sub-servicios -->
                     <?php foreach ($pkgItems as $item): ?>
                     <tr style="background:#fff">
-                        <td style="padding:8px 14px 8px 48px;border-bottom:1px solid #F3F2EE">
+                        <td colspan="3" style="padding:8px 14px 8px 48px;border-bottom:1px solid #F3F2EE">
                             <div style="display:flex;align-items:center;gap:8px">
                                 <span style="width:4px;height:4px;border-radius:50%;background:#C6C2BB;flex-shrink:0;display:inline-block"></span>
                                 <span style="font-size:12px;font-weight:600;color:#2D2B28"><?= htmlspecialchars($item['svc_nombre']) ?></span>
@@ -346,9 +346,7 @@ enrichWithPaquete($servicios, $pdo);
                                 <span style="font-size:11px;color:#8A867C"><?= htmlspecialchars($item['ss_nombre']) ?></span>
                             </div>
                         </td>
-                        <td style="border-bottom:1px solid #F3F2EE"></td>
-                        <td style="font-size:11px;color:#8A867C;border-bottom:1px solid #F3F2EE">$&nbsp;<?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6;font-size:10px"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span></td>
-                        <td style="border-bottom:1px solid #F3F2EE"></td>
+                        <td style="font-size:11px;color:#8A867C;border-bottom:1px solid #F3F2EE;text-align:right;white-space:nowrap;padding-right:36px">$&nbsp;<?= number_format($item['precio'], 0, ',', '.') ?><span style="opacity:.6;font-size:10px"> /<?= htmlspecialchars($item['frecuencia'] ?? 'mes') ?></span></td>
                     </tr>
                     <?php endforeach; ?>
                     <!-- Fila de features -->
