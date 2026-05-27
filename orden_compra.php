@@ -89,15 +89,8 @@ $docTipoLabels = [
     'cotizacion'       => 'Cotización',
     'factura'          => 'Factura',
 ];
-$docTipoPrefixes = [
-    'orden_renovacion' => 'QD-OR-',
-    'orden_compra'     => 'QD-OC-',
-    'cotizacion'       => 'QD-COT-',
-    'factura'          => 'QD-FAC-',
-];
-$docTipoLabel = $docTipoLabels[$docTipo]   ?? 'Orden de Compra';
-$orderPrefix  = $docTipoPrefixes[$docTipo] ?? (($cs_id || $cs_ids) ? 'S-' : 'OC-');
-$orderNumber  = $orderPrefix . str_pad($id, 4, '0', STR_PAD_LEFT) . "-" . date('Ymd');
+$docTipoLabel = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
+$orderNumber  = 'QD-' . str_pad($id, 3, '0', STR_PAD_LEFT) . '-' . date('Y-m-d');
 
 // Fetch template (by ID if provided, else default)
 if ($plantillaIdOverride > 0) {

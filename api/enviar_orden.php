@@ -92,11 +92,9 @@ if (!$smtpUser || $smtpUser === 'tu_correo@gmail.com' || !$smtpPass || $smtpPass
 }
 
 // Generar número de orden
-$docTipoLabels   = ['orden_renovacion'=>'Orden de Renovación','orden_compra'=>'Orden de Compra','cotizacion'=>'Cotización','factura'=>'Factura'];
-$docTipoPrefixes = ['orden_renovacion'=>'QD-OR','orden_compra'=>'QD-OC','cotizacion'=>'QD-COT','factura'=>'QD-FAC'];
-$docTipoLabel = $docTipoLabels[$docTipo]   ?? 'Orden de Compra';
-$orderPrefix  = $docTipoPrefixes[$docTipo] ?? 'QD-OC';
-$orderNumber  = $orderPrefix . '-' . str_pad($clienteId, 4, '0', STR_PAD_LEFT) . '-' . date('Ymd');
+$docTipoLabels = ['orden_renovacion'=>'Orden de Renovación','orden_compra'=>'Orden de Compra','cotizacion'=>'Cotización','factura'=>'Factura'];
+$docTipoLabel  = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
+$orderNumber   = 'QD-' . str_pad($clienteId, 3, '0', STR_PAD_LEFT) . '-' . date('Y-m-d');
 
 // Fetch template (by ID or default)
 if ($plantillaIdOver > 0) {
