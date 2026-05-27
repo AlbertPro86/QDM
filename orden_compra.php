@@ -90,10 +90,10 @@ $docTipoLabels = [
     'factura'          => 'Factura',
 ];
 $docTipoPrefixes = [
-    'orden_renovacion' => 'OR-',
-    'orden_compra'     => 'OC-',
-    'cotizacion'       => 'COT-',
-    'factura'          => 'FAC-',
+    'orden_renovacion' => 'QD-OR-',
+    'orden_compra'     => 'QD-OC-',
+    'cotizacion'       => 'QD-COT-',
+    'factura'          => 'QD-FAC-',
 ];
 $docTipoLabel = $docTipoLabels[$docTipo]   ?? 'Orden de Compra';
 $orderPrefix  = $docTipoPrefixes[$docTipo] ?? (($cs_id || $cs_ids) ? 'S-' : 'OC-');
