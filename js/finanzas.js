@@ -268,7 +268,8 @@ function filterTxTable() {
 
     let data = fnTxDataFull;
     if (tipo !== 'todos') data = data.filter(t => t.tipo === tipo);
-    if (estado !== 'todos') data = data.filter(t => t.estado === estado);
+    if (estado === 'por_cobrar') data = data.filter(t => t.estado === 'pendiente' || t.estado === 'vencido');
+    else if (estado !== 'todos') data = data.filter(t => t.estado === estado);
     if (buscar) {
         data = data.filter(t =>
             (t.concepto || '').toLowerCase().includes(buscar) ||
@@ -287,9 +288,13 @@ function renderKpis(r) {
     const balance    = cobrado - egresos;
     const balPos     = balance >= 0;
 
-    const pendienteMonto = fnTxDataFull
-        .filter(t => t.tipo === 'ingreso' && (t.estado === 'pendiente' || t.estado === 'vencido'))
-        .reduce((s, t) => s + parseFloat(t.monto || 0), 0);
+    // Por cobrar: viene del API sin filtro de fecha (incluye vencidos con fecha pasada)
+    const pendienteMonto = parseFloat(r.total_por_cobrar) || 0;
+    const pendienteCount = r.count_por_cobrar || 0;
+    const vencidosCount  = r.count_vencidos_pc || 0;
+    const pendienteLabel = vencidosCount > 0
+        ? `${pendienteCount} por cobrar (${vencidosCount} vencido${vencidosCount !== 1 ? 's' : ''})`
+        : `${pendienteCount} por cobrar`;
 
     const balBg       = balPos ? '#C6F24E' : '#F4DEDB';
     const balTextMain = '#0E0E0C';
@@ -317,9 +322,9 @@ function renderKpis(r) {
       + kpi('Egresos',    moneyNum(egresos),        `${r.count_egresos||0} gastos registrados`,
             '#F4DEDB', '#E8BCB8', '#6E211B', '#F4DEDB', '#6E211B', 'Gastos',
             "document.getElementById('fnTipo').value='egreso';document.getElementById('fnEstado').value='pagado';filterTxTable();")
-      + kpi('Por Cobrar', moneyNum(pendienteMonto), `${(r.total_pendientes||0)+(r.total_vencidos||0)} pendientes`,
+      + kpi('Por Cobrar', moneyNum(pendienteMonto), pendienteLabel,
             '#FEF3C7', '#FDE68A', '#92400E', '#FEF3C7', '#92400E', 'Pendiente',
-            "document.getElementById('fnTipo').value='ingreso';document.getElementById('fnEstado').value='pendiente';filterTxTable();")
+            "document.getElementById('fnTipo').value='ingreso';document.getElementById('fnEstado').value='por_cobrar';filterTxTable();")
       + kpi('Balance',    moneyNum(balance),        'Cobrado − Egresos',
             balBg, balPos ? '#A8D87A' : '#E8BCB8', balPos ? '#1B5A39' : '#6E211B',
             balPos ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)',
@@ -2174,7 +2179,8 @@ function exportarMovimientosExcel() {
 
     let data = fnTxDataFull;
     if (tipo   !== 'todos') data = data.filter(t => t.tipo   === tipo);
-    if (estado !== 'todos') data = data.filter(t => t.estado === estado);
+    if (estado === 'por_cobrar') data = data.filter(t => t.estado === 'pendiente' || t.estado === 'vencido');
+    else if (estado !== 'todos') data = data.filter(t => t.estado === estado);
     if (buscar) data = data.filter(t =>
         (t.concepto      || '').toLowerCase().includes(buscar) ||
         (t.titulo        || '').toLowerCase().includes(buscar) ||

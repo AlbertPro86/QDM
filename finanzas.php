@@ -104,6 +104,7 @@ include __DIR__ . '/includes/header.php';
             <option value="pagado">Pagado</option>
             <option value="pendiente">Pendiente</option>
             <option value="vencido">Vencido</option>
+            <option value="por_cobrar">Por cobrar (pend. + venc.)</option>
         </select>
         <button onclick="limpiarFiltrosMovimientos()"
             style="padding:8px 12px;background:none;border:1.5px solid #E8E5DD;border-radius:4px;font-size:12px;font-weight:600;color:#57544D;cursor:pointer;transition:all .15s"

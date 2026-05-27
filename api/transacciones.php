@@ -137,6 +137,19 @@ switch ($method) {
         $resumenStmt->execute($resumenParams);
         $resumen = $resumenStmt->fetch();
 
+        // Por cobrar: TODOS los ingresos pendientes/vencidos sin filtro de fecha
+        // (los vencidos tienen fecha_vencimiento pasada y quedan fuera del rango del período)
+        $stmtPorCobrar = $pdo->query("
+            SELECT
+                COALESCE(SUM(monto), 0)  AS total_por_cobrar,
+                COUNT(*)                  AS count_por_cobrar,
+                COUNT(CASE WHEN estado='vencido'  THEN 1 END) AS count_vencidos,
+                COUNT(CASE WHEN estado='pendiente' THEN 1 END) AS count_pendientes
+            FROM transacciones
+            WHERE tipo = 'ingreso' AND estado IN ('pendiente', 'vencido')
+        ");
+        $porCobrar = $stmtPorCobrar->fetch();
+
         // Obtener meses disponibles
         $mesesStmt = $pdo->query("
             SELECT DISTINCT DATE_FORMAT(fecha_vencimiento, '%Y-%m') as mes
@@ -200,6 +213,12 @@ switch ($method) {
             foreach ($allItems as $item) { $itemMap[$item['transaccion_id']][] = $item; }
             foreach ($txData as &$tx) { $tx['items'] = $itemMap[$tx['id']] ?? []; }
         }
+
+        // Enriquecer resumen con datos de "por cobrar" sin restricción de fecha
+        $resumen['total_por_cobrar']    = round((float)$porCobrar['total_por_cobrar'], 2);
+        $resumen['count_por_cobrar']    = (int)$porCobrar['count_por_cobrar'];
+        $resumen['count_vencidos_pc']   = (int)$porCobrar['count_vencidos'];
+        $resumen['count_pendientes_pc'] = (int)$porCobrar['count_pendientes'];
 
         jsonResponse([
             'success' => true,
