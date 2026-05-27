@@ -1064,7 +1064,7 @@ function renderServices(svcs) {
             <td><span class="badge ${badgeClass}">${s.estado.toUpperCase()}</span></td>
             <td>
                 <div style="display:flex;gap:4px">
-                    <button class="btn btn-ghost btn-icon sm" onclick="verOrdenModal(${s.id})" title="Ver Orden">
+                    <button class="btn btn-ghost btn-icon sm" onclick="verOrdenModal(${JSON.stringify(s).replace(/"/g,'&quot;')})" title="Ver Detalles">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </button>
                     ${s.enlace_pago
@@ -1899,15 +1899,71 @@ function refreshOrdenPreview() {
     document.getElementById('ordenPreviewForm').submit();
 }
 
-function verOrdenModal(csId) {
-    const iframe = document.getElementById('verOrdenIframe');
-    if (iframe) iframe.src = 'orden_compra.php?cs_id=' + csId;
+function verOrdenModal(s) {
+    if (typeof s === 'string') s = JSON.parse(s);
+    const freqMap = {mes:'Mensual',trimestre:'Trimestral',semestre:'Semestral',año:'Anual',unico:'Pago Único',ninguna:'Ninguna'};
+    const monto    = parseFloat(s.monto_renovacion)||0;
+    const descuento= parseFloat(s.descuento)||0;
+    const subtotal = monto - descuento;
+    const vence    = s.fecha_vencimiento ? new Date(s.fecha_vencimiento).toLocaleDateString('es-CO') : '—';
+    const inicio   = s.fecha_inicio      ? new Date(s.fecha_inicio).toLocaleDateString('es-CO')      : '—';
+    const estadoColor = {activo:'#16a34a',inactivo:'#dc2626',pausado:'#d97706'}[s.estado] || '#64748b';
+
+    const campo = (icon, label, value, color='#0E0E0C') => value ? `
+        <div style="display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid #F3F2EE">
+            <div style="flex-shrink:0;width:32px;height:32px;background:#F3F2EE;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                ${icon}
+            </div>
+            <div style="min-width:0">
+                <div style="font-size:10px;color:#8A867C;margin-bottom:2px">${label}</div>
+                <div style="font-size:13px;font-weight:600;color:${color};word-break:break-word">${value}</div>
+            </div>
+        </div>` : '';
+
+    const iconSvg = (path, size=15) => `<svg width="${size}" height="${size}" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="1.8">${path}</svg>`;
+
+    const pkg = getPkgByName(s.servicio_nombre);
+    const pkgHtml = pkg && (pkg.items||[]).length ? `
+        <div style="padding:11px 0;border-bottom:1px solid #F3F2EE">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:8px">
+                <div style="flex-shrink:0;width:32px;height:32px;background:#F3F2EE;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                    ${iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h8m-8 4h8"/>')}
+                </div>
+                <div style="font-size:10px;color:#8A867C">Composición del paquete</div>
+            </div>
+            <div style="padding-left:43px;display:flex;flex-direction:column;gap:4px">
+                ${(pkg.items||[]).map(it=>`
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                        <span style="font-size:12px;color:#57544D"><span style="font-weight:600">${escapeHtml(it.svc_nombre)}</span> · <span style="color:#8A867C">${escapeHtml(it.ss_nombre)}</span></span>
+                        <span style="font-size:11px;color:#8A867C;white-space:nowrap;flex-shrink:0">$${Number(it.precio).toLocaleString('es-CO')}/${it.frecuencia||'mes'}</span>
+                    </div>`).join('')}
+                ${(pkg.features||[]).length ? `<div style="margin-top:6px;padding-top:5px;border-top:1px dashed #E8E5DD;display:flex;flex-wrap:wrap;gap:4px 12px">
+                    ${(pkg.features||[]).map(f=>`<span style="font-size:10px;color:#57544D">✓ ${escapeHtml(f.texto)}</span>`).join('')}
+                </div>` : ''}
+            </div>
+        </div>` : '';
+
+    document.getElementById('verOrdenBody').innerHTML = `
+        <div style="padding:20px 24px">
+            <div style="margin-bottom:16px">
+                <div style="font-size:17px;font-weight:800;color:#0E0E0C;line-height:1.2">${escapeHtml(s.servicio_nombre)}</div>
+                <div style="font-size:11px;color:#8A867C;margin-top:3px">${freqMap[s.frecuencia]||s.frecuencia||'—'}</div>
+            </div>
+            <div style="display:flex;flex-direction:column">
+                ${campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'),'Valor del servicio','$'+subtotal.toLocaleString('es-CO'),'#16a34a')}
+                ${descuento>0 ? campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M17 17h.01M7 17L17 7m-5-5a10 10 0 110 20 10 10 0 010-20z"/>'),'Descuento aplicado','-$'+descuento.toLocaleString('es-CO'),'#dc2626') : ''}
+                ${campo(iconSvg('<circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>'),'Estado',s.estado ? s.estado.charAt(0).toUpperCase()+s.estado.slice(1) : '—',estadoColor)}
+                ${campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>'),'Fecha de inicio',inicio)}
+                ${campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>'),'Fecha de vencimiento',vence)}
+                ${pkgHtml}
+                ${s.notas ? campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>'),'Notas',escapeHtml(s.notas)) : ''}
+                ${s.enlace_pago ? campo(iconSvg('<path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>'),'Enlace de pago',`<a href="${escapeHtml(s.enlace_pago)}" target="_blank" style="color:#4f46e5">${escapeHtml(s.enlace_pago)}</a>`) : ''}
+            </div>
+        </div>`;
     document.getElementById('verOrdenModal').classList.add('show');
 }
 function cerrarVerOrden() {
     document.getElementById('verOrdenModal').classList.remove('show');
-    const iframe = document.getElementById('verOrdenIframe');
-    if (iframe) iframe.src = '';
 }
 
 function openOrdenModal(csId) {
@@ -3595,19 +3651,22 @@ async function confirmarEnvioMsgEmail() {
     </div>
 </div>
 
-<!-- Modal Ver Orden (solo lectura) -->
+<!-- Modal Ver Detalles Servicio (solo lectura) -->
 <div class="modal-overlay" id="verOrdenModal" onclick="if(event.target===this)cerrarVerOrden()">
-    <div class="modal" style="max-width:960px;width:94vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
-        <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1.5px solid #E8E5DD;flex-shrink:0">
-            <div style="display:flex;align-items:center;gap:10px">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span style="font-size:14px;font-weight:700;color:#0E0E0C">Vista de Orden</span>
+    <div class="modal" style="max-width:480px;width:94vw;display:flex;flex-direction:column;padding:0;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1.5px solid #E8E5DD;flex-shrink:0">
+            <div style="display:flex;align-items:center;gap:8px">
+                <svg width="15" height="15" fill="none" stroke="#0E0E0C" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span style="font-size:14px;font-weight:700;color:#0E0E0C">Detalle del servicio</span>
             </div>
-            <button onclick="cerrarVerOrden()" style="background:none;border:none;cursor:pointer;color:#8A867C;padding:4px;display:flex;align-items:center" title="Cerrar">
+            <button onclick="cerrarVerOrden()" style="background:none;border:none;cursor:pointer;color:#8A867C;padding:4px;line-height:0">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <iframe id="verOrdenIframe" src="" style="flex:1;border:none;width:100%;background:#FAFAF7"></iframe>
+        <div id="verOrdenBody" style="overflow-y:auto;max-height:80vh"></div>
+        <div style="padding:12px 20px;border-top:1.5px solid #E8E5DD;display:flex;justify-content:flex-end">
+            <button onclick="cerrarVerOrden()" class="btn btn-outline">Cerrar</button>
+        </div>
     </div>
 </div>
 
