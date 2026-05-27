@@ -1279,7 +1279,25 @@ function _setBancariosToggle(on) {
 }
 
 function toggleBancariosIncluir() {
-    _setBancariosToggle(!_bancIncluir);
+    const nuevoEstado = !_bancIncluir;
+    _setBancariosToggle(nuevoEstado);
+    if (nuevoEstado) {
+        // Auto-cargar desde configuraciones al activar
+        const cfg = window._ordenCfgCache;
+        if (cfg) {
+            _fillOrdenFromConfig(cfg);
+        } else {
+            fetch('api/configuraciones.php')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success && d.data) {
+                        window._ordenCfgCache = d.data;
+                        _fillOrdenFromConfig(d.data);
+                        scheduleOrdenPreview();
+                    }
+                }).catch(() => {});
+        }
+    }
     scheduleOrdenPreview();
 }
 
@@ -1322,6 +1340,8 @@ function openOrdenModalMultiple(csIds) {
     document.getElementById('ordenMetodoPago').value  = 'Transferencia Bancaria / PSE / QR';
     document.getElementById('ordenNotas').value        = '';
     document.getElementById('ordenFechaUltPago').value = '';
+    var hoy = new Date(); var yy=hoy.getFullYear(), mm=String(hoy.getMonth()+1).padStart(2,'0'), dd=String(hoy.getDate()).padStart(2,'0');
+    var el = document.getElementById('ordenFechaEmision'); if (el) el.value = yy+'-'+mm+'-'+dd;
     document.getElementById('ordenModal').classList.add('show');
     try { _loadOrdenDraftIfExists(); } catch(e) { console.warn('Draft load skipped:', e); }
     try { refreshOrdenPreview(); } catch(e) { console.error('Preview error:', e); }
@@ -1852,6 +1872,7 @@ function refreshOrdenPreview() {
     document.getElementById('ordenFormLinkPago').value    = (document.getElementById('ordenLinkPago') || {value:''}).value;
     document.getElementById('ordenFormPlantillaId').value = (document.getElementById('ordenPlantillaSelect') || {value:''}).value;
     document.getElementById('ordenFormDocTipo').value     = window._ordenModalTipo || 'orden_renovacion';
+    document.getElementById('ordenFormFechaEmision').value = document.getElementById('ordenFechaEmision')?.value || '';
 
     document.getElementById('ordenPreviewForm').submit();
 }
@@ -1871,6 +1892,8 @@ function openOrdenModal(csId) {
     document.getElementById('ordenMetodoPago').value  = 'Transferencia Bancaria / PSE / QR';
     document.getElementById('ordenNotas').value        = '';
     document.getElementById('ordenFechaUltPago').value = '';
+    var hoy2 = new Date(); var yy2=hoy2.getFullYear(), mm2=String(hoy2.getMonth()+1).padStart(2,'0'), dd2=String(hoy2.getDate()).padStart(2,'0');
+    var el2 = document.getElementById('ordenFechaEmision'); if (el2) el2.value = yy2+'-'+mm2+'-'+dd2;
     document.getElementById('ordenModal').classList.add('show');
     try { _loadOrdenDraftIfExists(); } catch(e) { console.warn('Draft load skipped:', e); }
     try { refreshOrdenPreview(); } catch(e) { console.error('Preview error:', e); }
@@ -1977,6 +2000,9 @@ async function _confirmarEnvioOrden() {
         payload.doc_tipo        = window._ordenModalTipo || 'orden_compra';
         payload.link_pago       = document.getElementById('ordenLinkPago')?.value || null;
         payload.plantilla_id    = document.getElementById('ordenPlantillaSelect')?.value || null;
+        payload.fecha_emision   = document.getElementById('ordenFechaEmision')?.value || null;
+        payload.asunto          = document.getElementById('ordenAsunto')?.value.trim() || null;
+        payload.mensaje         = document.getElementById('ordenMensaje')?.value.trim() || null;
 
         const r = await fetch('api/enviar_orden.php', {
             method: 'POST',
@@ -3564,7 +3590,11 @@ async function confirmarEnvioMsgEmail() {
                 </div>
                 <div style="margin:16px 16px 0;height:1px;background:#e2e8f0"></div>
                 <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                        <div>
+                            <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha de Emisión</label>
+                            <input id="ordenFechaEmision" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
+                        </div>
                         <div>
                             <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Método de Pago</label>
                             <input id="ordenMetodoPago" type="text" value="Transferencia Bancaria / PSE / QR" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()">
@@ -3577,6 +3607,18 @@ async function confirmarEnvioMsgEmail() {
                     <div>
                         <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Notas / Pie de página</label>
                         <textarea id="ordenNotas" rows="2" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;resize:vertical" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()"></textarea>
+                    </div>
+                    <!-- Sección correo electrónico -->
+                    <div style="background:#F8F7F4;border:1px solid #E8E5DD;border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C">Correo electrónico</div>
+                        <div>
+                            <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Asunto</label>
+                            <input id="ordenAsunto" type="text" placeholder="Ej: Orden de Compra — Servicios Web" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'">
+                        </div>
+                        <div>
+                            <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Descripción / Mensaje</label>
+                            <textarea id="ordenMensaje" rows="2" placeholder="Ej: Estimado cliente, adjunto encontrará su orden de compra..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;resize:vertical" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                        </div>
                     </div>
                     <!-- Enlace de pago (solo renovación) -->
                     <div id="ordenLinkPagoWrap" style="display:none">
@@ -3671,6 +3713,7 @@ async function confirmarEnvioMsgEmail() {
             <input type="hidden" name="link_pago" id="ordenFormLinkPago">
             <input type="hidden" name="plantilla_id" id="ordenFormPlantillaId">
             <input type="hidden" name="doc_tipo" id="ordenFormDocTipo">
+            <input type="hidden" name="fecha_emision" id="ordenFormFechaEmision">
         </form>
         <div class="modal-footer" style="gap:8px;border-top:1.5px solid #e2e8f0;flex-wrap:wrap;align-items:center">
             <button class="btn btn-outline" onclick="closeOrdenModal()">Cerrar</button>

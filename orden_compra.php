@@ -67,6 +67,11 @@ if (!empty($_POST['fecha_ult_pago'])) {
     $d = DateTime::createFromFormat('Y-m-d', $_POST['fecha_ult_pago']);
     $fechaUltPago = $d ? $d->format('d/m/Y') : '';
 }
+$fechaEmision = date('d/m/Y');
+if (!empty($_POST['fecha_emision'])) {
+    $d = DateTime::createFromFormat('Y-m-d', $_POST['fecha_emision']);
+    if ($d) $fechaEmision = $d->format('d/m/Y');
+}
 $linkPago = trim($_POST['link_pago'] ?? '');
 $docTipo  = $_POST['doc_tipo'] ?? 'orden_compra';
 $plantillaIdOverride = intval($_POST['plantilla_id'] ?? 0);
@@ -180,7 +185,7 @@ enrichWithPaquete($servicios, $pdo);
         .items-section { padding: 28px 36px; }
         .items-table { width: 100%; border-collapse: collapse; }
         .items-table thead tr { background: <?= $template['color_primario'] ?>; }
-        .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: <?= $template['color_secundario'] ?>; }
+        .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #ffffff; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
         .items-table tr:nth-child(odd) { background: #FFFFFF; }
         .items-table tr:nth-child(even) { background: #FAFAF7; }
@@ -216,7 +221,7 @@ enrichWithPaquete($servicios, $pdo);
                 <div class="order-info">
                     <div class="order-label"><?= $docTipoLabel ?></div>
                     <div class="order-number"><?= $orderNumber ?></div>
-                    <div class="order-date"><?= date('d/m/Y') ?></div>
+                    <div class="order-date"><?= $fechaEmision ?></div>
                 </div>
             </div>
         </div>
@@ -234,7 +239,7 @@ enrichWithPaquete($servicios, $pdo);
             <div class="dates-group">
                 <div class="date-item">
                     <div class="label-small">Emisión</div>
-                    <div class="date-value"><?= date('d/m/Y') ?></div>
+                    <div class="date-value"><?= $fechaEmision ?></div>
                 </div>
                 <?php if($fechaUltPago): ?>
                 <div class="date-item">
@@ -255,7 +260,7 @@ enrichWithPaquete($servicios, $pdo);
                 <thead>
                     <tr>
                         <th>Descripción</th>
-                        <th style="text-align:center">Qty</th>
+                        <th style="text-align:center">Cant.</th>
                         <th style="text-align:right">Precio</th>
                         <th style="text-align:right">Total</th>
                     </tr>

@@ -32,6 +32,13 @@ if ($fechaUltPagoRaw) {
     $d = DateTime::createFromFormat('Y-m-d', $fechaUltPagoRaw);
     $fechaUltPago = $d ? $d->format('d/m/Y') : '';
 }
+$fechaEmision = date('d/m/Y');
+if (!empty($input['fecha_emision'])) {
+    $d = DateTime::createFromFormat('Y-m-d', $input['fecha_emision']);
+    if ($d) $fechaEmision = $d->format('d/m/Y');
+}
+$asuntoOver  = trim($input['asunto'] ?? '');
+$mensajeOver = trim($input['mensaje'] ?? '');
 
 if (!$clienteId) jsonResponse(['error' => 'Cliente requerido'], 400);
 if (!$csId && !$csIds) jsonResponse(['error' => 'Servicio(s) requerido(s)'], 400);
@@ -205,7 +212,7 @@ $htmlFinal = '<!DOCTYPE html>
 <td style="padding:24px 36px 24px 36px;width:45%;vertical-align:bottom;text-align:right">
 <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $template['color_secundario'] . '">' . htmlspecialchars($docTipoLabel) . '</div>
 <div style="font-size:24px;font-weight:900;color:#ffffff;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
-<div style="font-size:11px;color:#94a3b8;margin-top:4px">' . date('d/m/Y') . '</div>
+<div style="font-size:11px;color:#94a3b8;margin-top:4px">' . $fechaEmision . '</div>
 </td>
 </tr>
 </table>
@@ -220,7 +227,7 @@ $htmlFinal = '<!DOCTYPE html>
 </td>
 <td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle;text-align:center;white-space:nowrap;width:1%">
 <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:5px">Emisión</span>
-<span style="font-size:12px;font-weight:700;color:#0f172a;display:block">' . date('d/m/Y') . '</span>
+<span style="font-size:12px;font-weight:700;color:#0f172a;display:block">' . $fechaEmision . '</span>
 </td>
 ' . ($fechaUltPago ? '<td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle;text-align:center;white-space:nowrap;width:1%">
 <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:5px">Último Pago</span>
@@ -238,10 +245,10 @@ $htmlFinal = '<!DOCTYPE html>
 <table style="width:100%;border-collapse:collapse">
 <thead>
 <tr style="background:' . $template['color_primario'] . '">
-<th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $template['color_secundario'] . '">Descripción</th>
-<th style="padding:10px 14px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $template['color_secundario'] . '">Qty</th>
-<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $template['color_secundario'] . '">Precio</th>
-<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $template['color_secundario'] . '">Total</th>
+<th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Descripción</th>
+<th style="padding:10px 14px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Cant.</th>
+<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Precio</th>
+<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Total</th>
 </tr>
 </thead>
 <tbody>
@@ -333,11 +340,30 @@ $htmlFinal = '<!DOCTYPE html>
 </body>
 </html>';
 
+// Asunto del correo: personalizado o por defecto
+$emailAsunto = $asuntoOver ?: ($docTipoLabel . ' #' . $orderNumber . ' - QUANTUN Digital');
+
+// Bloque de mensaje personalizado (va antes del documento)
+$mensajeHtml = '';
+if ($mensajeOver) {
+    $mensajeHtml = '<table style="width:100%;max-width:900px;margin:0 auto 0 auto;border-collapse:collapse">'
+        . '<tr><td style="padding:24px 36px 0 36px;font-family:' . $template['fuente'] . ',system-ui,sans-serif">'
+        . '<div style="background:#f8fafc;border-left:4px solid ' . $template['color_primario'] . ';padding:16px 20px;border-radius:0 8px 8px 0;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap">'
+        . htmlspecialchars($mensajeOver)
+        . '</div></td></tr></table>';
+    // Insertar antes de <div style="background:white
+    $htmlFinal = str_replace(
+        '<div style="background:white;max-width:900px;margin:auto">',
+        $mensajeHtml . '<div style="background:white;max-width:900px;margin:auto">',
+        $htmlFinal
+    );
+}
+
 // Enviar correo
 $mailer = new Mailer();
 $result = $mailer->send(
     $data['nombre_comercial'] . ' <' . $emailDest . '>',
-    $docTipoLabel . ' #' . $orderNumber . ' - QUANTUN Digital',
+    $emailAsunto,
     $htmlFinal
 );
 
