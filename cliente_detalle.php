@@ -1314,6 +1314,25 @@ function onOrdenCargarMisDatos() {
 }
 
 function onOrdenPlantillaChange() {
+    const sel = document.getElementById('ordenPlantillaSelect');
+    const pid = sel?.value;
+    if (pid && window._ordenPlantillasCache) {
+        const p = window._ordenPlantillasCache.find(x => String(x.id) === String(pid));
+        if (p && p.categoria) {
+            const catMap = {
+                'orden_compra':     { tipo: 'orden_compra',     label: 'Orden de Compra' },
+                'orden_renovacion': { tipo: 'orden_renovacion', label: 'Orden de Renovación' },
+                'cotizacion':       { tipo: 'cotizacion',       label: 'Cotización' },
+                'factura':          { tipo: 'factura',          label: 'Factura' },
+            };
+            const mapped = catMap[p.categoria];
+            if (mapped) {
+                window._ordenModalTipo = mapped.tipo;
+                const titleEl = document.getElementById('ordenModalTitle');
+                if (titleEl) titleEl.textContent = mapped.label;
+            }
+        }
+    }
     scheduleOrdenPreview();
 }
 

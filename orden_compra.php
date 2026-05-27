@@ -83,8 +83,20 @@ foreach($servicios as $s) {
     $totalDescuento += ($s['descuento'] ?? 0);
 }
 $totalFinal = $totalOriginal - $totalDescuento;
-$docTipoLabel = $docTipo === 'orden_renovacion' ? 'Orden de Renovación' : 'Orden de Compra';
-$orderPrefix  = $docTipo === 'orden_renovacion' ? 'OR-' : (($cs_id || $cs_ids) ? "S-" : "OC-");
+$docTipoLabels = [
+    'orden_renovacion' => 'Orden de Renovación',
+    'orden_compra'     => 'Orden de Compra',
+    'cotizacion'       => 'Cotización',
+    'factura'          => 'Factura',
+];
+$docTipoPrefixes = [
+    'orden_renovacion' => 'OR-',
+    'orden_compra'     => 'OC-',
+    'cotizacion'       => 'COT-',
+    'factura'          => 'FAC-',
+];
+$docTipoLabel = $docTipoLabels[$docTipo]   ?? 'Orden de Compra';
+$orderPrefix  = $docTipoPrefixes[$docTipo] ?? (($cs_id || $cs_ids) ? 'S-' : 'OC-');
 $orderNumber  = $orderPrefix . str_pad($id, 4, '0', STR_PAD_LEFT) . "-" . date('Ymd');
 
 // Fetch template (by ID if provided, else default)
