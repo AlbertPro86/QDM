@@ -1064,7 +1064,7 @@ function renderServices(svcs) {
             <td><span class="badge ${badgeClass}">${s.estado.toUpperCase()}</span></td>
             <td>
                 <div style="display:flex;gap:4px">
-                    <button class="btn btn-ghost btn-icon sm" onclick="openOrdenModal(${s.id})" title="Ver Orden de Compra">
+                    <button class="btn btn-ghost btn-icon sm" onclick="verOrdenModal(${s.id})" title="Ver Orden">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </button>
                     ${s.enlace_pago
@@ -1897,6 +1897,17 @@ function refreshOrdenPreview() {
     document.getElementById('ordenFormFechaEmision').value = document.getElementById('ordenFechaEmision')?.value || '';
 
     document.getElementById('ordenPreviewForm').submit();
+}
+
+function verOrdenModal(csId) {
+    const iframe = document.getElementById('verOrdenIframe');
+    if (iframe) iframe.src = 'orden_compra.php?cs_id=' + csId;
+    document.getElementById('verOrdenModal').classList.add('show');
+}
+function cerrarVerOrden() {
+    document.getElementById('verOrdenModal').classList.remove('show');
+    const iframe = document.getElementById('verOrdenIframe');
+    if (iframe) iframe.src = '';
 }
 
 function openOrdenModal(csId) {
@@ -3581,6 +3592,22 @@ async function confirmarEnvioMsgEmail() {
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Modal Ver Orden (solo lectura) -->
+<div class="modal-overlay" id="verOrdenModal" onclick="if(event.target===this)cerrarVerOrden()">
+    <div class="modal" style="max-width:960px;width:94vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+        <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1.5px solid #E8E5DD;flex-shrink:0">
+            <div style="display:flex;align-items:center;gap:10px">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span style="font-size:14px;font-weight:700;color:#0E0E0C">Vista de Orden</span>
+            </div>
+            <button onclick="cerrarVerOrden()" style="background:none;border:none;cursor:pointer;color:#8A867C;padding:4px;display:flex;align-items:center" title="Cerrar">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <iframe id="verOrdenIframe" src="" style="flex:1;border:none;width:100%;background:#FAFAF7"></iframe>
     </div>
 </div>
 
