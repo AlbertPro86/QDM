@@ -13,6 +13,7 @@ $pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:
     . '<span style="font-weight:700;color:var(--color-text)">Mensajes</span>';
 
 // Logo de empresa configurado (para autocompletar el campo URL)
+$pdo = db();
 $logoConfig = getCfg($pdo, 'notif_logo_url', '');
 
 include __DIR__ . '/includes/header.php';
