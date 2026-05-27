@@ -1159,7 +1159,6 @@ window._ordenModalTipo = 'orden_compra';
 window._ordenPlantillasCache = [];
 
 function _toggleOrdenRenovacionFields(show) {
-    document.getElementById('ordenPlantillaWrap').style.display  = show ? '' : 'none';
     document.getElementById('ordenLinkPagoWrap').style.display   = show ? '' : 'none';
     const btnCfg  = document.getElementById('btnOrdenCargarConfig');
     const btnSave = document.getElementById('btnGuardarEnConfig');
@@ -1215,22 +1214,26 @@ async function guardarBancariosEnConfig() {
 
 async function _loadOrdenPlantillas() {
     const sel = document.getElementById('ordenPlantillaSelect');
-    sel.innerHTML = '<option value="">Cargando...</option>';
+    if (!sel) return;
+    sel.innerHTML = '<option value="" style="color:#0f172a;background:#fff">Cargando...</option>';
     try {
         const [rP, rC] = await Promise.all([
-            fetch('api/plantillas_factura.php?categoria=orden_renovacion'),
+            fetch('api/plantillas_factura.php'),
             fetch('api/configuraciones.php')
         ]);
         const [dP, dC] = await Promise.all([rP.json(), rC.json()]);
 
-        // Plantillas
+        // Plantillas — todas, agrupadas por categoría legible
+        const catLabel = { orden_renovacion:'Renovación', cotizacion:'Cotización', orden_compra:'Compra', factura:'Factura' };
         if (dP.success && dP.data.length) {
             window._ordenPlantillasCache = dP.data;
-            sel.innerHTML = dP.data.map(p =>
-                `<option value="${p.id}" ${p.es_default == 1 ? 'selected' : ''}>${p.nombre}</option>`
-            ).join('');
+            sel.innerHTML = dP.data.map(p => {
+                const cat = catLabel[p.categoria] || p.categoria || '';
+                const label = cat ? `${p.nombre} — ${cat}` : p.nombre;
+                return `<option value="${p.id}" ${p.es_default == 1 ? 'selected' : ''} style="color:#0f172a;background:#fff">${label}</option>`;
+            }).join('');
         } else {
-            sel.innerHTML = '<option value="">Sin plantillas — crea una en Plantillas</option>';
+            sel.innerHTML = '<option value="" style="color:#0f172a;background:#fff">Sin plantillas — crea una en Galería</option>';
         }
 
         // Auto-fill configuraciones → campos del modal
@@ -1241,7 +1244,7 @@ async function _loadOrdenPlantillas() {
 
         scheduleOrdenPreview();
     } catch(e) {
-        sel.innerHTML = '<option value="">Error al cargar</option>';
+        sel.innerHTML = '<option value="" style="color:#0f172a;background:#fff">Error al cargar</option>';
     }
 }
 
@@ -1766,7 +1769,7 @@ function _ordenItemRow(desc, qty, precio, descuento) {
         </div>
         <div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:6px">
             <div>
-                <div style="font-size:10px;font-weight:700;color:#8A867C;margin-bottom:3px">QTY</div>
+                <div style="font-size:10px;font-weight:700;color:#8A867C;margin-bottom:3px">CANT.</div>
                 <input type="number" min="1" value="${qty}" data-field="qty"
                     style="width:100%;box-sizing:border-box;padding:5px 6px;border:1.5px solid #E8E5DD;border-radius:3px;font-size:12px;outline:none"
                     onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
@@ -1881,6 +1884,7 @@ function openOrdenModal(csId) {
     window._ordenModalTipo = 'orden_compra';
     document.getElementById('ordenModalTitle').textContent = 'Orden de Compra';
     _toggleOrdenRenovacionFields(false);
+    _loadOrdenPlantillas();
     document.getElementById('currentCsId').value  = csId;
     document.getElementById('currentCsIds').value = '';
     var svc = (window._ordenSvcMap || {})[csId];
@@ -3573,11 +3577,11 @@ async function confirmarEnvioMsgEmail() {
         <div style="flex:1;overflow:hidden;display:flex;border-top:1.5px solid #e2e8f0">
             <!-- Panel editor -->
             <div style="width:340px;min-width:280px;overflow-y:auto;background:#f8fafc;border-right:1.5px solid #e2e8f0;display:flex;flex-direction:column;gap:0">
-                <!-- Selector de plantilla (solo renovación) -->
-                <div id="ordenPlantillaWrap" style="display:none;padding:12px 16px;border-bottom:1.5px solid #e2e8f0">
+                <!-- Selector de plantilla -->
+                <div id="ordenPlantillaWrap" style="padding:12px 16px;border-bottom:1.5px solid #e2e8f0">
                     <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Plantilla</label>
-                    <select id="ordenPlantillaSelect" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;cursor:pointer" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="onOrdenPlantillaChange()">
-                        <option value="">Cargando plantillas...</option>
+                    <select id="ordenPlantillaSelect" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;color:#0f172a;background:#fff;outline:none;cursor:pointer;appearance:auto;-webkit-appearance:auto" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="onOrdenPlantillaChange()">
+                        <option value="" style="color:#0f172a;background:#fff">Cargando plantillas...</option>
                     </select>
                 </div>
                 <div style="padding:16px 16px 0">
@@ -3590,18 +3594,20 @@ async function confirmarEnvioMsgEmail() {
                 </div>
                 <div style="margin:16px 16px 0;height:1px;background:#e2e8f0"></div>
                 <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px">
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-                        <div>
-                            <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha de Emisión</label>
-                            <input id="ordenFechaEmision" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha de Emisión</label>
+                                <input id="ordenFechaEmision" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha Último Pago</label>
+                                <input id="ordenFechaUltPago" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
+                            </div>
                         </div>
                         <div>
                             <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Método de Pago</label>
                             <input id="ordenMetodoPago" type="text" value="Transferencia Bancaria / PSE / QR" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()">
-                        </div>
-                        <div>
-                            <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha último pago</label>
-                            <input id="ordenFechaUltPago" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
                         </div>
                     </div>
                     <div>
