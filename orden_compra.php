@@ -187,8 +187,8 @@ enrichWithPaquete($servicios, $pdo);
         .items-table thead tr { background: <?= $template['color_primario'] ?>; }
         .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #ffffff; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
-        .items-table tr:nth-child(odd) { background: #FFFFFF; }
-        .items-table tr:nth-child(even) { background: #FAFAF7; }
+        .items-table tbody tr:nth-child(odd) { background: #FFFFFF; }
+        .items-table tbody tr:nth-child(even) { background: #FAFAF7; }
         .amount { text-align: right; font-weight: 700; color: #0E0E0C; }
         .totals { display: flex; justify-content: flex-end; margin-top: 20px; }
         .totals-box { min-width: 250px; }
