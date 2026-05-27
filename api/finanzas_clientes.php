@@ -208,6 +208,21 @@ usort($porServicioArr, fn($a, $b) => $b['ingresos'] <=> $a['ingresos']);
 $balance   = $totalIngresos - $totalEgresos;
 $margenPct = $totalIngresos > 0 ? round(($balance / $totalIngresos) * 100, 1) : 0;
 
+// Suscripciones vencidas (fecha_vencimiento < hoy) → por cobrar desde cliente_servicios
+$stmtVencidas = $pdo->query("
+    SELECT
+        COALESCE(SUM(cs.monto_renovacion - COALESCE(cs.descuento, 0)), 0) AS total_vencidas,
+        COUNT(*) AS count_vencidas
+    FROM cliente_servicios cs
+    JOIN clientes c ON cs.cliente_id = c.id
+    WHERE cs.estado = 'activo'
+      AND c.estado  = 'activo'
+      AND cs.frecuencia != 'unico'
+      AND cs.fecha_vencimiento IS NOT NULL
+      AND cs.fecha_vencimiento < CURDATE()
+");
+$vencidas = $stmtVencidas->fetch();
+
 jsonResponse([
     'success' => true,
     'periodo' => $periodoText,
@@ -219,6 +234,8 @@ jsonResponse([
         'mrr'                   => round($mrr, 2),
         'clientes_activos'      => count($porCliente),
         'renovaciones_proximas' => count($proximas),
+        'total_vencidas_subs'   => round((float)$vencidas['total_vencidas'], 2),
+        'count_vencidas_subs'   => (int)$vencidas['count_vencidas'],
     ],
     'por_cliente'  => $porClienteArr,
     'por_servicio' => $porServicioArr,

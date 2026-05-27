@@ -169,6 +169,10 @@ let fnTxDataFull = [];
 /* ─── INIT ─────────────────────────────────────────────────────────────────── */
 
 let stt;
+// Vencidas de suscripciones (cliente_servicios) para el KPI "Por Cobrar"
+let _fnVencidasSubsMonto = 0;
+let _fnVencidasSubsCount = 0;
+let _fnLastResumen       = null; // último resumen de transacciones para re-renderizar
 
 document.addEventListener('DOMContentLoaded', function() {
     // Filtros tabla clientes
@@ -254,7 +258,8 @@ async function loadTransacciones() {
         const r = await fetch(`api/transacciones.php?${params}`);
         const d = await r.json();
         if (d.success) {
-            fnTxDataFull = d.data || [];
+            fnTxDataFull  = d.data || [];
+            _fnLastResumen = d.resumen;
             renderKpis(d.resumen);
             filterTxTable(); // aplica filtros actuales sobre los datos
         }
@@ -310,10 +315,11 @@ function renderKpis(r) {
     const balance    = cobrado - egresos;
     const balPos     = balance >= 0;
 
-    // Por cobrar: viene del API sin filtro de fecha (incluye vencidos con fecha pasada)
-    const pendienteMonto = parseFloat(r.total_por_cobrar) || 0;
-    const pendienteCount = r.count_por_cobrar || 0;
-    const vencidosCount  = r.count_vencidos_pc || 0;
+    // Por cobrar: transacciones pendientes/vencidas + suscripciones vencidas de cliente_servicios
+    const txPorCobrar    = parseFloat(r.total_por_cobrar) || 0;
+    const pendienteMonto = txPorCobrar + _fnVencidasSubsMonto;
+    const pendienteCount = (r.count_por_cobrar || 0) + _fnVencidasSubsCount;
+    const vencidosCount  = (r.count_vencidos_pc || 0) + _fnVencidasSubsCount;
     const pendienteLabel = vencidosCount > 0
         ? `${pendienteCount} por cobrar (${vencidosCount} vencido${vencidosCount !== 1 ? 's' : ''})`
         : `${pendienteCount} por cobrar`;
@@ -777,7 +783,7 @@ function limpiarFiltrosMovimientos() {
     document.getElementById('fnBuscar').value = '';
     document.getElementById('fnTipo').value = 'todos';
     document.getElementById('fnEstado').value = 'todos';
-    loadTransacciones(); // recarga con el período actual
+    loadAll(); // recarga transacciones + clientes (actualiza KPIs completos)
 }
 
 function limpiarFiltrosPagosUnicos() {
@@ -803,6 +809,10 @@ async function loadClientesFinanzas() {
         if (d.success) {
             renderClientesKpis(d.resumen, d.periodo);
             renderClientesDetalle(d.por_cliente, d.proximas_renovaciones, d.por_servicio);
+            // Actualizar globals de vencidas de suscripciones y re-renderizar KPI Por Cobrar
+            _fnVencidasSubsMonto = parseFloat(d.resumen?.total_vencidas_subs) || 0;
+            _fnVencidasSubsCount = parseInt(d.resumen?.count_vencidas_subs)   || 0;
+            if (_fnLastResumen) renderKpis(_fnLastResumen); // re-renderiza con datos combinados
         } else {
             console.error('Error en API:', d);
         }
