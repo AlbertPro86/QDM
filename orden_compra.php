@@ -182,14 +182,16 @@ enrichWithPaquete($servicios, $pdo);
         .dates-group { display: flex; gap: 28px; }
         .date-item { text-align: center; }
         .date-value { font-size: 12px; font-weight: 700; color: #0E0E0C; }
-        .items-section { padding: 28px 36px; }
+        .items-section { padding: 28px 0; }
         .items-table { width: 100%; border-collapse: collapse; }
         .items-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+        .items-table th:first-child, .items-table td:first-child { padding-left: 36px; }
+        .items-table th:last-child,  .items-table td:last-child  { padding-right: 36px; }
         .items-table td { padding: 11px 14px; font-size: 12px; color: #57544D; border-bottom: 1px solid #E8E5DD; }
         .items-table tbody tr:nth-child(odd) { background: #FFFFFF; }
         .items-table tbody tr:nth-child(even) { background: #FAFAF7; }
         .amount { text-align: right; font-weight: 700; color: #0E0E0C; }
-        .totals { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .totals { display: flex; justify-content: flex-end; margin-top: 20px; padding: 0 36px; }
         .totals-box { min-width: 250px; }
         .total-row { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 12px; color: #57544D; }
         .total-final { display: flex; justify-content: space-between; align-items: center; padding: 14px 12px; background: <?= $template['color_primario'] ?>; border-radius: 4px; margin-top: 10px; }
