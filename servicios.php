@@ -363,6 +363,108 @@ include __DIR__ . '/includes/header.php';
 let allSvcs = [];
 function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
+/* ═══════════════════════════════════════════════════════════════
+   CARD DROPDOWN MENU — helper reutilizable para servicios,
+   sub-servicios y paquetes/suscripciones
+   ═══════════════════════════════════════════════════════════════ */
+
+// Stores para objetos complejos (evita JSON en atributos HTML)
+window._ssStore  = {};   // sub-servicios: { svcId, sub }
+window._pkgStore = {};   // paquetes (alias de allPkgs por id)
+
+// Acciones de sub-servicio via store
+function _ssAction(action, ssId) {
+    const d = window._ssStore[ssId]; if (!d) return;
+    closeCardMenu('cmenu_ss' + ssId);
+    if (action === 'preview') previewSub(d.sub);
+    if (action === 'dup')     dupSub(d.svcId, d.sub);
+    if (action === 'edit')    openSubModal(d.svcId, d.sub);
+    if (action === 'delete')  deleteSubSvc(ssId);
+}
+
+// Acciones de paquete via allPkgs
+function _pkgAction(action, pkgId) {
+    closeCardMenu('cmenu_pkg' + pkgId);
+    if (action === 'preview') { const p = (allPkgs||[]).find(x=>+x.id===+pkgId); if(p) previewPkg(p); }
+    if (action === 'dup')     dupPkg(pkgId);
+    if (action === 'edit')    editPkg(pkgId);
+    if (action === 'delete')  deletePkg(pkgId);
+}
+
+// Toggle / cierre de dropdown
+function toggleCardMenu(menuId, e) {
+    e && e.stopPropagation();
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    const wasOpen = menu.style.display !== 'none';
+    document.querySelectorAll('[id^="cmenu_"]').forEach(m => m.style.display = 'none');
+    if (!wasOpen) {
+        menu.style.display = 'block';
+        // Asegurar que no se salga de pantalla (derecha)
+        const rect = menu.getBoundingClientRect();
+        if (rect.right > window.innerWidth - 8) menu.style.right = '0';
+    }
+}
+function closeCardMenu(menuId) {
+    const m = document.getElementById(menuId); if(m) m.style.display = 'none';
+}
+
+// Cierra al hacer clic fuera
+document.addEventListener('click', () => {
+    document.querySelectorAll('[id^="cmenu_"]').forEach(m => m.style.display = 'none');
+});
+
+/* Genera el botón ⋯ + dropdown.
+   items: [{ label, action, icon, danger }] | [{ divider: true }]
+   compact: true para sub-items (botón más pequeño) */
+function _cardMenu(uid, items, compact = false) {
+    const menuId = 'cmenu_' + uid;
+    const sz = compact ? 12 : 14;
+    const btnSz = compact ? '24px' : '28px';
+    const ICONS = {
+        eye:  `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`,
+        dup:  `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`,
+        edit: `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>`,
+        del:  `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>`,
+        add:  `<svg width="${sz}" height="${sz}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>`,
+    };
+    const itemsHtml = items.map(it => {
+        if (it.divider) return `<div style="height:1px;background:#F0EFE9;margin:3px 4px"></div>`;
+        const color = it.danger ? '#B0382F' : '#0E0E0C';
+        const hover = it.danger ? '#FEF2F1' : '#F3F2EE';
+        return `<button onclick="${it.action}"
+            style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 11px;
+                   background:none;border:none;font-size:12px;font-weight:600;
+                   color:${color};cursor:pointer;text-align:left;white-space:nowrap;
+                   border-radius:4px;transition:background .1s;font-family:inherit"
+            onmouseenter="this.style.background='${hover}'"
+            onmouseleave="this.style.background='none'">
+            <span style="color:${it.danger ? '#B0382F' : '#8A867C'}">${ICONS[it.icon] || ''}</span>
+            ${it.label}
+        </button>`;
+    }).join('');
+    return `<div style="position:relative;flex-shrink:0">
+        <button onclick="toggleCardMenu('${menuId}',event)"
+            style="display:flex;align-items:center;justify-content:center;
+                   width:${btnSz};height:${btnSz};border:1.5px solid #E8E5DD;
+                   border-radius:4px;background:#FAFAF7;cursor:pointer;
+                   color:#8A867C;transition:all .15s;flex-shrink:0"
+            onmouseenter="this.style.background='#EFECE5';this.style.borderColor='#D6D2C7';this.style.color='#0E0E0C'"
+            onmouseleave="this.style.background='#FAFAF7';this.style.borderColor='#E8E5DD';this.style.color='#8A867C'">
+            <svg width="${sz}" height="${sz}" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+            </svg>
+        </button>
+        <div id="${menuId}"
+            style="display:none;position:absolute;right:0;top:calc(100% + 4px);
+                   background:#fff;border:1.5px solid #E8E5DD;border-radius:6px;
+                   box-shadow:0 8px 28px rgba(14,14,12,.13);z-index:300;
+                   min-width:150px;padding:3px">
+            ${itemsHtml}
+        </div>
+    </div>`;
+}
+
 /* ── CARGA ─────────────────────────────────────────────────── */
 async function loadSvcs() {
     try {
@@ -434,6 +536,9 @@ function renderSvcs(svcs) {
         const freqKey   = s.frecuencia || 'mes';
         const freqLabel = FREQ_LABELS[freqKey] || freqKey;
 
+        // Poblar store de sub-servicios para acciones seguras
+        subs.forEach(ss => { window._ssStore[ss.id] = { svcId: s.id, sub: ss }; });
+
         const subItems = subs.map(ss => `
             <div data-id="${ss.id}" data-svc="${s.id}" style="display:flex;justify-content:space-between;align-items:center;
                         padding:6px 10px;border-radius:3px;background:#fff;
@@ -442,20 +547,15 @@ function renderSvcs(svcs) {
                     <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${accent};flex-shrink:0"></span>
                     <span style="font-size:12px;font-weight:700;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(ss.nombre)}</span>
                 </div>
-                <div style="display:flex;align-items:center;gap:3px;flex-shrink:0;margin-left:6px">
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:6px">
                     <span style="font-size:12px;font-weight:700;color:#0E0E0C;font-family:var(--font-primary)">${formatMoney(ss.precio)}</span>
-                    <button class="btn btn-ghost btn-icon sm" onclick='previewSub(${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Ver" style="color:#3b82f6;padding:2px">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    </button>
-                    <button class="btn btn-ghost btn-icon sm" onclick='dupSub(${s.id},${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Duplicar" style="color:#f59e0b;padding:2px">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                    </button>
-                    <button class="btn btn-ghost btn-icon sm" onclick='openSubModal(${s.id},${JSON.stringify(ss).replace(/'/g,"&#39;")})' title="Editar" style="color:#57544D;padding:2px">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    </button>
-                    <button class="btn btn-ghost btn-icon sm" onclick="deleteSubSvc(${ss.id})" title="Eliminar" style="color:var(--color-danger);padding:2px">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
+                    ${_cardMenu('ss' + ss.id, [
+                        { label:'Ver',      icon:'eye',  action:`_ssAction('preview',${ss.id})` },
+                        { label:'Duplicar', icon:'dup',  action:`_ssAction('dup',${ss.id})` },
+                        { label:'Editar',   icon:'edit', action:`_ssAction('edit',${ss.id})` },
+                        { divider: true },
+                        { label:'Eliminar', icon:'del',  action:`_ssAction('delete',${ss.id})`, danger:true },
+                    ], true)}
                 </div>
             </div>`).join('');
 
@@ -471,17 +571,12 @@ function renderSvcs(svcs) {
                             ${s.descripcion ? `<p style="font-size:11px;color:#57544D;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(s.descripcion)}</p>` : ""}
                         </div>
                     </div>
-                    <div style="display:flex;gap:2px;flex-shrink:0">
-                        <button class="btn btn-ghost btn-icon sm" onclick="dupSvc(${s.id})" title="Duplicar" style="color:#f59e0b;padding:3px">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="editSvc(${s.id})" title="Editar" style="color:#57544D;padding:3px">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="deleteSvc(${s.id})" title="Desactivar" style="color:#ef4444;padding:3px">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
-                    </div>
+                    ${_cardMenu('svc' + s.id, [
+                        { label:'Duplicar', icon:'dup',  action:`dupSvc(${s.id})` },
+                        { label:'Editar',   icon:'edit', action:`editSvc(${s.id})` },
+                        { divider: true },
+                        { label:'Eliminar', icon:'del',  action:`deleteSvc(${s.id})`, danger:true },
+                    ])}
                 </div>
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px">
                     ${freqKey !== 'ninguna' ? `<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:${isDark ? "#000" : "#fff"};background:${accent};padding:2px 8px;border-radius:100px">${freqLabel}</span>` : ''}
@@ -1045,20 +1140,13 @@ function renderPkgs(pkgs) {
                             <h3 style="font-size:16px;font-weight:800;color:#0E0E0C;margin:2px 0 0">${escapeHtml(p.nombre)}</h3>
                         </div>
                     </div>
-                    <div style="display:flex;gap:4px">
-                        <button class="btn btn-ghost btn-icon sm" onclick='previewPkg(${JSON.stringify(p).replace(/'/g,"&#39;")})' title="Ver detalle" style="color:#3b82f6">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="dupPkg(${p.id})" title="Duplicar" style="color:#f59e0b">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="editPkg(${p.id})" title="Editar" style="color:#57544D">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-icon sm" onclick="deletePkg(${p.id})" title="Eliminar" style="color:#ef4444">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
-                    </div>
+                    ${_cardMenu('pkg' + p.id, [
+                        { label:'Ver detalle', icon:'eye',  action:`_pkgAction('preview',${p.id})` },
+                        { label:'Duplicar',    icon:'dup',  action:`_pkgAction('dup',${p.id})` },
+                        { label:'Editar',      icon:'edit', action:`_pkgAction('edit',${p.id})` },
+                        { divider: true },
+                        { label:'Eliminar',    icon:'del',  action:`_pkgAction('delete',${p.id})`, danger:true },
+                    ])}
                 </div>
                 ${p.descripcion ? `<p style="font-size:13px;color:#57544D;line-height:1.5;margin:0 0 12px">${escapeHtml(p.descripcion.split(/\n\n|\n/)[0])}</p>` : ''}
                 <!-- Items -->
