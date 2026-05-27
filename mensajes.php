@@ -234,10 +234,11 @@ include __DIR__ . '/includes/header.php';
         <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
 
             <!-- Logo si existe -->
-            <div id="waLogoBox" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:4px">
+            <div id="waLogoBox" style="display:none;align-items:center;justify-content:center;padding:12px 16px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:4px">
                 <img id="waLogoImg" src="" alt="Logo"
-                    style="max-height:36px;max-width:130px;object-fit:contain;flex-shrink:0">
-                <span style="font-size:10px;color:#8A867C;font-style:italic">Logo de la plantilla</span>
+                    style="max-height:40px;max-width:160px;object-fit:contain"
+                    onload="document.getElementById('waLogoBox').style.display='flex'"
+                    onerror="document.getElementById('waLogoBox').style.display='none'">
             </div>
 
             <!-- Variables dinámicas -->
@@ -299,8 +300,11 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
             <!-- Logo si tiene -->
-            <div id="previewLogoBox" style="display:none;margin-bottom:4px">
-                <img id="previewLogoImg" src="" alt="Logo" style="max-height:40px;max-width:160px;object-fit:contain">
+            <div id="previewLogoBox" style="display:none;padding:12px 16px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;align-items:center;justify-content:center">
+                <img id="previewLogoImg" src="" alt="Logo"
+                    style="max-height:48px;max-width:180px;object-fit:contain"
+                    onload="document.getElementById('previewLogoBox').style.display='flex'"
+                    onerror="document.getElementById('previewLogoBox').style.display='none'">
             </div>
             <!-- Burbuja de mensaje -->
             <div>
@@ -715,8 +719,8 @@ function abrirModalCrear() {
     document.getElementById('inputCategoria').value = 'general';
     document.getElementById('inputDescripcion').value = '';
     document.getElementById('inputContenido').value = '';
-    // Pre-llenar con logo de empresa si está configurado
-    const logoDefault = LOGOS_EMPRESA.config || LOGOS_EMPRESA.negro;
+    // Pre-llenar con logo externo si está configurado en sistema (no usar rutas locales por defecto)
+    const logoDefault = LOGOS_EMPRESA.config || '';
     document.getElementById('inputLogoUrl').value = logoDefault;
     previewLogoMensaje(logoDefault);
     limpiarZonaImagen();
