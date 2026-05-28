@@ -30,7 +30,7 @@ switch ($method) {
         if($id) {
             $stmt = $pdo->prepare("SELECT * FROM clientes WHERE id = ?"); $stmt->execute([$id]);
             $cliente = $stmt->fetch();
-            $stmt = $pdo->prepare("SELECT cs.*, CASE WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display ELSE s.nombre END AS servicio_nombre, s.enlace_pago FROM cliente_servicios cs JOIN servicios s ON cs.servicio_id = s.id LEFT JOIN paquetes p ON cs.paquete_id = p.id WHERE cs.cliente_id = ?");
+            $stmt = $pdo->prepare("SELECT cs.*, CASE WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display ELSE s.nombre END AS servicio_nombre, s.enlace_pago FROM cliente_servicios cs JOIN servicios s ON cs.servicio_id = s.id LEFT JOIN paquetes p ON cs.paquete_id = p.id WHERE cs.cliente_id = ?");
             $stmt->execute([$id]);
             $cliente['servicios_activos'] = $stmt->fetchAll();
             jsonResponse(['success' => true, 'data' => $cliente]);
@@ -40,7 +40,7 @@ switch ($method) {
                    GROUP_CONCAT(DISTINCT
                        CASE
                            WHEN cs.paquete_id IS NOT NULL AND pkg.nombre IS NOT NULL THEN pkg.nombre
-                           WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                           WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
                            ELSE s.nombre
                        END
                    SEPARATOR ', ') as servicios_nombres,

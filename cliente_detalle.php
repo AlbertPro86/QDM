@@ -155,7 +155,7 @@ include __DIR__ . '/includes/header.php';
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Facturar Seleccionados
                     </button>
-                    <button onclick="openRegistrarPagoModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
+                    <button id="btnRegistrarPago" onclick="registrarPagoDirecto()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Registrar Pago
                     </button>
@@ -722,13 +722,7 @@ include __DIR__ . '/includes/header.php';
                 <input type="date" id="rpFechaPago"
                     style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
             </div>
-            <!-- Concepto libre -->
-            <div>
-                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Concepto / Nota (opcional)</label>
-                <input type="text" id="rpConcepto" maxlength="200"
-                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
-                    placeholder="Ej: Pago renovación mayo 2026">
-            </div>
+            <input type="hidden" id="rpConcepto">
         </div>
         <div class="modal-footer" style="justify-content:flex-end;gap:8px">
             <button class="btn btn-outline" onclick="closeRegistrarPagoModal()">Cancelar</button>
@@ -3407,7 +3401,80 @@ document.getElementById('renovarModal').addEventListener('click', function(e) {
     if (e.target === this) closeRenovarModal();
 });
 
-/* ── REGISTRAR PAGO ─────────────────────────────────────────────────────────── */
+/* ── REGISTRAR PAGO DIRECTO ─────────────────────────────────────────────────── */
+async function registrarPagoDirecto() {
+    const btn  = document.getElementById('btnRegistrarPago');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Cargando...';
+
+    let servicios = [];
+    try {
+        const r = await fetch(`api/renovar_servicios.php?cliente_id=${clienteId}&action=preview`);
+        const d = await r.json();
+        servicios = (d.preview || []).filter(s => s.frecuencia && s.frecuencia !== 'unico');
+    } catch(e) {
+        showToast('Error al cargar servicios', 'error');
+        btn.disabled = false; btn.innerHTML = orig; return;
+    }
+
+    btn.disabled = false; btn.innerHTML = orig;
+
+    if (!servicios.length) { showToast('No hay servicios recurrentes activos', 'error'); return; }
+
+    const total    = servicios.reduce((sum, s) => sum + (s.monto_renovacion || 0), 0);
+    const n        = servicios.length;
+    const totalFmt = total.toLocaleString('es-CO');
+    const nombres  = servicios.map(s => s.servicio_nombre).join(', ');
+
+    const ok = await confirmAction(
+        `${nombres} — $${totalFmt} COP`,
+        { title: `Registrar pago (${n} servicio${n > 1 ? 's' : ''})`, okText: 'Confirmar pago', okColor: '#16a34a', okHover: '#15803d' }
+    );
+    if (!ok) return;
+
+    const hoy = new Date().toISOString().split('T')[0];
+    let registrados = 0;
+    for (const svc of servicios) {
+        try {
+            const r = await fetch('api/transacciones.php', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({
+                    tipo:              'ingreso',
+                    monto:             svc.monto_renovacion || 0,
+                    concepto:          'Pago – ' + svc.servicio_nombre,
+                    titulo:            'Pago de servicio',
+                    descripcion:       'Registrado manualmente desde ficha de cliente.',
+                    fecha_pago:        hoy,
+                    fecha_vencimiento: hoy,
+                    estado:            'pagado',
+                    cliente_id:        clienteId,
+                    servicio_id:       svc.servicio_id || null,
+                    frecuencia:        svc.frecuencia,
+                })
+            });
+            const d = await r.json();
+            if (d.success || d.id) registrados++;
+        } catch(e) {}
+    }
+
+    // Renovar fechas de todos los servicios pagados
+    const ids = servicios.map(s => s.id);
+    try {
+        await fetch('api/renovar_servicios.php', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ cliente_id: clienteId, ids, action: 'renovar' })
+        });
+    } catch(e) {}
+
+    showToast(`✓ Pago registrado — ${registrados} servicio${registrados > 1 ? 's' : ''} renovado${registrados > 1 ? 's' : ''}`, 'success');
+    loadServices();
+    loadNotes();
+}
+
+/* ── REGISTRAR PAGO (modal legacy — no usado desde botón principal) ──────────── */
 let _rpServicios = []; // cache de servicios activos del cliente
 
 async function openRegistrarPagoModal() {
@@ -3518,8 +3585,18 @@ async function confirmarRegistrarPago() {
         });
         const d = await r.json();
         if (d.success || d.id) {
-            showToast('✓ Pago registrado en Núcleo Financiero', 'success');
+            // Si es servicio recurrente, renovar fechas automáticamente
+            if (svc.frecuencia && svc.frecuencia !== 'unico' && svc.cs_id) {
+                await fetch('api/renovar_servicios.php', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ cliente_id: clienteId, ids: [svc.cs_id], action: 'renovar' })
+                });
+            }
+            showToast('✓ Pago registrado — servicio renovado', 'success');
             closeRegistrarPagoModal();
+            loadServices();
+            loadNotes();
         } else {
             showToast(d.error || 'Error al registrar el pago', 'error');
         }

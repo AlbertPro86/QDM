@@ -58,6 +58,8 @@ $kpiEnviados    = (int) ($pdo->query("SELECT COALESCE(SUM(enviados),0) FROM emai
 $kpiPlantillas  = (int) $pdo->query("SELECT COUNT(*) FROM email_plantillas")->fetchColumn();
 $kpiTotal       = (int) ($pdo->query("SELECT COALESCE(SUM(total),0) FROM email_campanas")->fetchColumn() ?? 0);
 $kpiTasa        = $kpiTotal > 0 ? round(($kpiEnviados / $kpiTotal) * 100, 1) : 0;
+try { $kpiAbiertos = (int) $pdo->query("SELECT COUNT(*) FROM email_envios WHERE abierto = 1")->fetchColumn(); } catch(Exception $e) { $kpiAbiertos = 0; }
+$kpiTasaApertura = $kpiEnviados > 0 ? round(($kpiAbiertos / $kpiEnviados) * 100, 1) : 0;
 
 include __DIR__ . '/includes/header.php';
 ?>
@@ -536,16 +538,6 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <span style="font-size:10px;font-weight:700;background:rgba(0,0,0,0.12);color:#0E0E0C;padding:2px 8px;border-radius:100px">Enviados</span>
             </div>
         </a>
-        <!-- Plantillas -->
-        <a href="#" onclick="switchTab('plantillas');return false;" style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
-            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
-            <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Plantillas</div>
-            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-plantillas"><?= $kpiPlantillas ?></div>
-            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:11px;color:#57544D">guardadas</span>
-                <span style="font-size:10px;font-weight:700;background:#E8E5DD;color:#0E0E0C;padding:2px 8px;border-radius:100px">Activas</span>
-            </div>
-        </a>
         <!-- Tasa de Entrega -->
         <?php
             $tasaBg     = ($kpiTasa < 80 && $kpiTotal > 0) ? '#F4DEDB' : '#E3F1E8';
@@ -561,6 +553,16 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
                 <span style="font-size:11px;color:#57544D">de <?= number_format($kpiTotal) ?> intentos</span>
                 <span style="font-size:10px;font-weight:700;background:<?= $tasaPillBg ?>;color:<?= $tasaPillCol ?>;padding:2px 8px;border-radius:100px"><?= $kpiTasa >= 80 || $kpiTotal === 0 ? 'Óptima' : 'Revisar' ?></span>
+            </div>
+        </a>
+        <!-- Tasa de Apertura -->
+        <a href="#" onclick="switchTab('historial');return false;" style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:3px;padding:16px 20px;transition:box-shadow .15s;text-decoration:none;display:block"
+            onmouseenter="this.style.boxShadow='0 2px 8px rgba(14,14,12,.08)'" onmouseleave="this.style.boxShadow='none'">
+            <div style="font-size:10px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Tasa de Apertura</div>
+            <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpi-apertura"><?= $kpiTasaApertura ?>%</div>
+            <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11px;color:#57544D"><?= number_format($kpiAbiertos) ?> leídos</span>
+                <span style="font-size:10px;font-weight:700;background:#DBEAFE;color:#1d4ed8;padding:2px 8px;border-radius:100px" id="kpi-apertura-pill">Tracking</span>
             </div>
         </a>
     </div>
@@ -607,6 +609,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                             <th>Estado</th>
                             <th>Destinatarios</th>
                             <th>Enviados</th>
+                            <th>Abiertos</th>
                             <th>Fallidos</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
@@ -660,12 +663,13 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                             <th>Destinatario</th>
                             <th>Email</th>
                             <th>Estado</th>
+                            <th>Leído</th>
                             <th>Enviado</th>
                             <th>Error</th>
                         </tr>
                     </thead>
                     <tbody id="historial-tbody">
-                        <tr><td colspan="5"><div class="em-empty"><svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>Selecciona una campaña para ver el historial</p></div></td></tr>
+                        <tr><td colspan="6"><div class="em-empty"><svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>Selecciona una campaña para ver el historial</p></div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -704,6 +708,25 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
             <div class="form-group">
                 <label class="form-label">Asunto del email *</label>
                 <input type="text" class="form-control" id="cp-asunto" placeholder="Asunto que verá el destinatario">
+            </div>
+
+            <!-- Selector de correo destino -->
+            <div class="form-group" style="margin-bottom:12px">
+                <label class="form-label">Enviar a</label>
+                <div style="display:flex;gap:6px">
+                    <label id="lbl-modo-fact" style="flex:1;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;border:1.5px solid #C6F24E;background:#C6F24E;cursor:pointer;font-size:12px;font-weight:700;color:#0E0E0C;transition:all .15s">
+                        <input type="radio" name="cp-email-modo" value="facturacion" id="cp-modo-fact" checked style="accent-color:#0E0E0C" onchange="actualizarEstiloModoEmail()">
+                        Facturación
+                    </label>
+                    <label id="lbl-modo-cont" style="flex:1;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;border:1.5px solid #E8E5DD;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:#57544D;transition:all .15s">
+                        <input type="radio" name="cp-email-modo" value="contacto" id="cp-modo-cont" style="accent-color:#0E0E0C" onchange="actualizarEstiloModoEmail()">
+                        Contacto
+                    </label>
+                    <label id="lbl-modo-ambos" style="flex:1;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;border:1.5px solid #E8E5DD;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:#57544D;transition:all .15s">
+                        <input type="radio" name="cp-email-modo" value="ambos" id="cp-modo-ambos" style="accent-color:#0E0E0C" onchange="actualizarEstiloModoEmail()">
+                        Ambos
+                    </label>
+                </div>
             </div>
 
             <div class="form-group" style="margin-bottom:12px">
@@ -1025,7 +1048,9 @@ function renderCampanas() {
                 : `<span style="color:#94a3b8">${fmtDate(c.created_at)}</span>`;
         const canSend = (c.estado === 'borrador' || c.estado === 'error' || c.estado === 'programada');
         const canEdit = (c.estado === 'borrador' || c.estado === 'programada' || c.estado === 'error');
-        const pct = c.total > 0 ? Math.round((c.enviados / c.total) * 100) : 0;
+        const pct      = c.total > 0 ? Math.round((c.enviados / c.total) * 100) : 0;
+        const abiertos = parseInt(c.abiertos) || 0;
+        const pctAb    = c.enviados > 0 ? Math.round((abiertos / c.enviados) * 100) : 0;
         return `<tr>
             <td>
                 <div class="name">${escHtml(c.nombre)}</div>
@@ -1036,6 +1061,11 @@ function renderCampanas() {
             <td>
                 ${c.enviados > 0
                     ? `<span style="color:#15803d;font-weight:700">${c.enviados}</span>${c.total > 0 ? `<span style="color:#94a3b8;font-size:11px;margin-left:4px">(${pct}%)</span>` : ''}`
+                    : '<span style="color:#94a3b8">—</span>'}
+            </td>
+            <td>
+                ${abiertos > 0
+                    ? `<span style="color:#0369a1;font-weight:700">${abiertos}</span><span style="color:#94a3b8;font-size:11px;margin-left:4px">(${pctAb}%)</span>`
                     : '<span style="color:#94a3b8">—</span>'}
             </td>
             <td>${c.fallidos > 0 ? `<span style="color:#dc2626;font-weight:700">${c.fallidos}</span>` : '<span style="color:#94a3b8">—</span>'}</td>
@@ -1132,6 +1162,9 @@ function openNuevaCampana(plantillaId) {
     document.getElementById('cp-programar-wrap').style.display = 'none';
     document.getElementById('btn-enviar-label').textContent = 'Guardar y Enviar ahora';
     document.getElementById('modalCampanaTitulo').textContent = 'Nueva Campaña';
+    // Reset email_modo
+    const factRadio = document.getElementById('cp-modo-fact');
+    if (factRadio) { factRadio.checked = true; actualizarEstiloModoEmail(); }
     // Reset destinatarios mode
     clientesSeleccionados.clear();
     todosClientes = [];
@@ -1167,6 +1200,21 @@ function usarPlantilla(id) {
 
 // ── Modo destinatarios ────────────────────────────────────────────────────
 let modoDestinatarios = 'segmento';
+
+// Estilo visual del selector de email_modo
+function actualizarEstiloModoEmail() {
+    const sel = document.querySelector('input[name="cp-email-modo"]:checked')?.value || 'facturacion';
+    const map = { facturacion: 'lbl-modo-fact', contacto: 'lbl-modo-cont', ambos: 'lbl-modo-ambos' };
+    Object.entries(map).forEach(([val, id]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const active = (val === sel);
+        el.style.borderColor = active ? '#C6F24E' : '#E8E5DD';
+        el.style.background  = active ? '#C6F24E' : '#fff';
+        el.style.color       = active ? '#0E0E0C' : '#57544D';
+    });
+    previewDestinatarios();
+}
 let todosClientes = [];
 let clientesSeleccionados = new Set();
 
@@ -1276,9 +1324,10 @@ function previewDestinatarios() {
 }
 
 async function fetchDestCount() {
-    const estado = document.getElementById('cp-filtro-estado').value;
+    const estado    = document.getElementById('cp-filtro-estado').value;
+    const emailModo = document.querySelector('input[name="cp-email-modo"]:checked')?.value || 'facturacion';
     try {
-        const r = await fetch(`${API}?resource=destinatarios&filtro_estado=${encodeURIComponent(estado)}`);
+        const r = await fetch(`${API}?resource=destinatarios&filtro_estado=${encodeURIComponent(estado)}&email_modo=${encodeURIComponent(emailModo)}`);
         const d = await r.json();
         destCount = d.total || 0;
         const chip = document.getElementById('dest-preview');
@@ -1326,9 +1375,12 @@ async function saveCampana(mode) {
         showToast('Selecciona al menos un cliente', 'warning'); return;
     }
 
+    const emailModo = document.querySelector('input[name="cp-email-modo"]:checked')?.value || 'facturacion';
+
     const payload = {
         action: 'save_campana', nombre, asunto, cuerpo,
         filtro_estado: filtroEstado, filtro_servicio: '',
+        email_modo: emailModo,
         plantilla_id: plantillaId,
         clientes_ids: selectedIds,
         programada_at: programadaAt || null
@@ -1635,6 +1687,11 @@ async function editarCampana(id) {
     document.getElementById('cp-filtro-estado').value = c.filtro_estado || 'todos';
     document.getElementById('modalCampanaTitulo').textContent = 'Editar Campaña';
 
+    // Restaurar email_modo
+    const modo = c.email_modo || 'facturacion';
+    const modoRadio = document.querySelector(`input[name="cp-email-modo"][value="${modo}"]`);
+    if (modoRadio) { modoRadio.checked = true; actualizarEstiloModoEmail(); }
+
     populatePlantillaSelects();
     document.getElementById('cp-plantilla').value = c.plantilla_id || '';
 
@@ -1699,13 +1756,13 @@ async function loadHistorial() {
         tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><p>Selecciona una campaña para ver el historial</p></div></td></tr>';
         return;
     }
-    tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#8A867C;width:24px;height:24px;border-width:3px;"></div><p>Cargando…</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="em-empty"><div class="spinner" style="margin:0 auto 12px;color:#8A867C;width:24px;height:24px;border-width:3px;"></div><p>Cargando…</p></div></td></tr>';
     try {
         const r = await fetch(`${API}?resource=historial&campana_id=${id}`);
         const d = await r.json();
         const rows = d.data || [];
         if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><p>Sin envíos registrados para esta campaña</p></div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6"><div class="em-empty"><p>Sin envíos registrados para esta campaña</p></div></td></tr>';
             return;
         }
         tbody.innerHTML = rows.map(e => {
@@ -1714,18 +1771,54 @@ async function loadHistorial() {
                 enviado:   '<span class="badge badge-green">Enviado</span>',
                 fallido:   '<span class="badge badge-red">Fallido</span>'
             }[e.estado] || '<span class="badge badge-gray">' + e.estado + '</span>';
+            const leidoBadge = parseInt(e.abierto)
+                ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Leído${e.abierto_at ? ' · ' + fmtDate(e.abierto_at) : ''}
+                   </span>`
+                : (e.estado === 'enviado'
+                    ? `<button onclick="marcarLeido(${e.id})" title="Marcar como leído"
+                        style="display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;cursor:pointer;transition:all .15s"
+                        onmouseenter="this.style.background='#dbeafe';this.style.color='#1d4ed8';this.style.borderColor='#93c5fd'"
+                        onmouseleave="this.style.background='#f1f5f9';this.style.color='#64748b';this.style.borderColor='#e2e8f0'">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Marcar leído
+                      </button>`
+                    : '<span style="color:#94a3b8;font-size:12px">—</span>');
             return `<tr>
                 <td>
                     <div class="name">${escHtml(e.nombre_dest || e.nombre_comercial || '—')}</div>
                 </td>
                 <td style="color:#64748b;font-size:13px">${escHtml(e.email)}</td>
                 <td>${badge}</td>
+                <td>${leidoBadge}</td>
                 <td style="color:#64748b;font-size:12px;white-space:nowrap">${e.enviado_at ? fmtDate(e.enviado_at) : '—'}</td>
                 <td style="font-size:11px;color:#ef4444;max-width:200px;word-break:break-word">${e.error_msg ? escHtml(e.error_msg) : '<span style="color:#94a3b8">—</span>'}</td>
             </tr>`;
         }).join('');
     } catch(e) {
-        tbody.innerHTML = '<tr><td colspan="5"><div class="em-empty"><p>Error al cargar historial</p></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6"><div class="em-empty"><p>Error al cargar historial</p></div></td></tr>';
+    }
+}
+
+// ── Marcar email como leído manualmente ───────────────────────────────────
+async function marcarLeido(envioId) {
+    try {
+        const r = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'mark_opened', envio_id: envioId })
+        });
+        const d = await r.json();
+        if (d.ok) {
+            showToast('✓ Marcado como leído', 'success');
+            loadHistorial();
+            loadCampanas(); // refrescar contador de abiertos
+        } else {
+            showToast(d.error || 'Error al marcar', 'error');
+        }
+    } catch(e) {
+        showToast('Error de conexión', 'error');
     }
 }
 
@@ -1738,10 +1831,13 @@ function refreshKpis() {
     const tplCount   = plantillas.length;
 
     const el = id => document.getElementById(id);
+    const totalAb  = campanas.reduce((a, c) => a + (parseInt(c.abiertos) || 0), 0);
+    const tasaAb   = totalEnv > 0 ? (totalAb / totalEnv * 100).toFixed(1) : 0;
     if (el('kpi-campanas'))   el('kpi-campanas').textContent   = totalCamp;
     if (el('kpi-enviados'))   el('kpi-enviados').textContent   = totalEnv.toLocaleString('es-CO');
     if (el('kpi-plantillas')) el('kpi-plantillas').textContent = tplCount;
     if (el('kpi-tasa'))       el('kpi-tasa').textContent       = tasa + '%';
+    if (el('kpi-apertura'))   el('kpi-apertura').textContent   = tasaAb + '%';
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────

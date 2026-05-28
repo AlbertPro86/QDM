@@ -51,10 +51,15 @@ $stmt = $pdo->prepare("
     SELECT cs.id, cs.fecha_vencimiento,
            cs.monto_renovacion, cs.descuento,
            c.id AS cliente_id, c.nombre_comercial AS cliente,
-           s.nombre AS servicio
+           CASE
+               WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+               WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
+               ELSE s.nombre
+           END AS servicio
     FROM cliente_servicios cs
     JOIN clientes c ON cs.cliente_id = c.id
     JOIN servicios s ON cs.servicio_id = s.id
+    LEFT JOIN paquetes p ON cs.paquete_id = p.id
     WHERE cs.estado = 'activo'
       AND c.estado  = 'activo'
       AND LOWER(COALESCE(cs.frecuencia, '')) != 'unico'

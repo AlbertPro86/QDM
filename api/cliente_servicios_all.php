@@ -18,7 +18,7 @@ $stmt = $pdo->query("
            GROUP_CONCAT(DISTINCT
                CASE
                    WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
-                   WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                   WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
                    ELSE s.nombre
                END
            SEPARATOR ', ') as servicio_nombre,

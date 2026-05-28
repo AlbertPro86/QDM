@@ -51,9 +51,14 @@ function getServicios(PDO $pdo, int $clienteId, array $ids = []): array {
     $stmt = $pdo->prepare("
         SELECT cs.id, cs.servicio_id, cs.frecuencia, cs.fecha_vencimiento, cs.fecha_inicio,
                cs.monto_renovacion,
-               s.nombre AS servicio_nombre
+               CASE
+                   WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+                   WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
+                   ELSE s.nombre
+               END AS servicio_nombre
         FROM cliente_servicios cs
         JOIN servicios s ON cs.servicio_id = s.id
+        LEFT JOIN paquetes p ON cs.paquete_id = p.id
         WHERE $where
         ORDER BY cs.fecha_vencimiento ASC
     ");

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS email_campanas (
 try { $pdo->exec("ALTER TABLE email_campanas ADD COLUMN clientes_ids TEXT NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE email_campanas ADD COLUMN programada_at DATETIME NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE email_campanas MODIFY COLUMN estado ENUM('borrador','enviando','enviada','error','programada') DEFAULT 'borrador'"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE email_campanas ADD COLUMN email_modo VARCHAR(20) NOT NULL DEFAULT 'facturacion'"); } catch(PDOException $e){}
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS email_envios (
@@ -62,6 +63,8 @@ CREATE TABLE IF NOT EXISTS email_envios (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ");
+try { $pdo->exec("ALTER TABLE email_envios ADD COLUMN abierto TINYINT(1) NOT NULL DEFAULT 0"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE email_envios ADD COLUMN abierto_at DATETIME NULL"); } catch(PDOException $e){}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -95,7 +98,8 @@ if ($method === 'GET') {
 
         $rows = $pdo->query("
             SELECT c.*,
-                (SELECT COUNT(*) FROM email_envios e WHERE e.campana_id = c.id) AS total_envios
+                (SELECT COUNT(*) FROM email_envios e WHERE e.campana_id = c.id) AS total_envios,
+                (SELECT COUNT(*) FROM email_envios e WHERE e.campana_id = c.id AND e.abierto = 1) AS abiertos
             FROM email_campanas c
             ORDER BY c.created_at DESC
         ")->fetchAll();
@@ -106,8 +110,16 @@ if ($method === 'GET') {
     if ($resource === 'destinatarios') {
         $filtroEstado   = $_GET['filtro_estado']   ?? 'todos';
         $filtroServicio = $_GET['filtro_servicio'] ?? '';
+        $emailModo      = $_GET['email_modo']       ?? 'facturacion';
 
-        $where  = ["c.email_facturacion IS NOT NULL", "c.email_facturacion != ''"];
+        // Condición base según email_modo
+        if ($emailModo === 'contacto') {
+            $where = ["c.email_contacto IS NOT NULL", "c.email_contacto != ''"];
+        } elseif ($emailModo === 'ambos') {
+            $where = ["(c.email_facturacion IS NOT NULL AND c.email_facturacion != '' OR c.email_contacto IS NOT NULL AND c.email_contacto != '')"];
+        } else {
+            $where = ["c.email_facturacion IS NOT NULL", "c.email_facturacion != ''"];
+        }
         $params = [];
 
         if ($filtroEstado !== 'todos') {
@@ -124,7 +136,8 @@ if ($method === 'GET') {
         }
 
         $whereSQL = implode(' AND ', $where);
-        $sql = "SELECT DISTINCT c.id, c.nombre_comercial, c.persona_contacto, c.email_facturacion
+        $sql = "SELECT DISTINCT c.id, c.nombre_comercial, c.persona_contacto,
+                       c.email_facturacion, c.email_contacto
                 FROM clientes c
                 $joins
                 WHERE $whereSQL
@@ -132,8 +145,24 @@ if ($method === 'GET') {
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        $rows = $stmt->fetchAll();
-        jsonResponse(['ok' => true, 'data' => $rows, 'total' => count($rows)]);
+        $clientes = $stmt->fetchAll();
+
+        // En modo 'ambos', contar emails únicos (puede ser el doble si los dos son distintos)
+        $totalEmails = 0;
+        foreach ($clientes as $c) {
+            $ef = trim($c['email_facturacion'] ?? '');
+            $ec = trim($c['email_contacto']    ?? '');
+            if ($emailModo === 'ambos') {
+                $emails = array_unique(array_filter([$ef, $ec]));
+                $totalEmails += count($emails);
+            } elseif ($emailModo === 'contacto') {
+                if ($ec !== '') $totalEmails++;
+            } else {
+                if ($ef !== '') $totalEmails++;
+            }
+        }
+
+        jsonResponse(['ok' => true, 'data' => $clientes, 'total' => $totalEmails]);
     }
 
     // GET historial for a campaign
@@ -192,6 +221,8 @@ if ($method === 'POST') {
         $cuerpo         = trim($body['cuerpo'] ?? '');
         $filtroEstado   = trim($body['filtro_estado']   ?? 'todos');
         $filtroServicio = trim($body['filtro_servicio'] ?? '');
+        $emailModo      = in_array($body['email_modo'] ?? '', ['facturacion','contacto','ambos'])
+                          ? $body['email_modo'] : 'facturacion';
         $plantillaId    = ($body['plantilla_id'] ?? null) ? (int) $body['plantilla_id'] : null;
         // clientes_ids: JSON array of IDs or null for segment mode
         $clientesIds    = isset($body['clientes_ids']) && is_array($body['clientes_ids']) && count($body['clientes_ids'])
@@ -207,16 +238,19 @@ if ($method === 'POST') {
         if ($id) {
             $stmt = $pdo->prepare("
                 UPDATE email_campanas
-                SET nombre=?, asunto=?, cuerpo=?, filtro_estado=?, filtro_servicio=?, plantilla_id=?, clientes_ids=?, programada_at=?, estado=?
+                SET nombre=?, asunto=?, cuerpo=?, filtro_estado=?, filtro_servicio=?,
+                    email_modo=?, plantilla_id=?, clientes_ids=?, programada_at=?, estado=?
                 WHERE id=? AND estado IN ('borrador','programada','error')
             ");
-            $stmt->execute([$nombre, $asunto, $cuerpo, $filtroEstado, $filtroServicio, $plantillaId, $clientesIds, $programadaAt, $estadoFinal, $id]);
+            $stmt->execute([$nombre, $asunto, $cuerpo, $filtroEstado, $filtroServicio,
+                             $emailModo, $plantillaId, $clientesIds, $programadaAt, $estadoFinal, $id]);
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO email_campanas (nombre, asunto, cuerpo, filtro_estado, filtro_servicio, plantilla_id, clientes_ids, programada_at, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO email_campanas (nombre, asunto, cuerpo, filtro_estado, filtro_servicio, email_modo, plantilla_id, clientes_ids, programada_at, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$nombre, $asunto, $cuerpo, $filtroEstado, $filtroServicio, $plantillaId, $clientesIds, $programadaAt, $estadoFinal]);
+            $stmt->execute([$nombre, $asunto, $cuerpo, $filtroEstado, $filtroServicio,
+                             $emailModo, $plantillaId, $clientesIds, $programadaAt, $estadoFinal]);
             $id = (int) $pdo->lastInsertId();
         }
         jsonResponse(['ok' => true, 'id' => $id, 'estado' => $estadoFinal]);
@@ -255,22 +289,31 @@ if ($method === 'POST') {
         }
         $filtroEstado   = $campana['filtro_estado']   ?? 'todos';
         $filtroServicio = $campana['filtro_servicio'] ?? '';
+        $emailModo      = $campana['email_modo']       ?? 'facturacion';
 
         if ($clientesIds && count($clientesIds)) {
             // Manual selection mode — use exact IDs
             $ph2  = implode(',', array_fill(0, count($clientesIds), '?'));
-            $sql  = "SELECT c.id, c.nombre_comercial, c.persona_contacto, c.email_facturacion
+            $sql  = "SELECT c.id, c.nombre_comercial, c.persona_contacto,
+                            c.email_facturacion, c.email_contacto
                      FROM clientes c
                      WHERE c.id IN ($ph2)
-                       AND c.email_facturacion IS NOT NULL AND c.email_facturacion != ''
                      ORDER BY c.nombre_comercial";
             $stmt = $pdo->prepare($sql);
             $stmt->execute($clientesIds);
-            $recipients = $stmt->fetchAll();
+            $clientes = $stmt->fetchAll();
         } else {
             // Segment mode
-            $where  = ["c.email_facturacion IS NOT NULL", "c.email_facturacion != ''"];
+            $where  = [];
             $params = [];
+
+            if ($emailModo === 'contacto') {
+                $where = ["c.email_contacto IS NOT NULL", "c.email_contacto != ''"];
+            } elseif ($emailModo === 'ambos') {
+                $where = ["(c.email_facturacion IS NOT NULL AND c.email_facturacion != '' OR c.email_contacto IS NOT NULL AND c.email_contacto != '')"];
+            } else {
+                $where = ["c.email_facturacion IS NOT NULL", "c.email_facturacion != ''"];
+            }
 
             if ($filtroEstado !== 'todos') {
                 $where[]  = "c.estado = ?";
@@ -286,15 +329,35 @@ if ($method === 'POST') {
             }
 
             $whereSQL = implode(' AND ', $where);
-            $sql = "SELECT DISTINCT c.id, c.nombre_comercial, c.persona_contacto, c.email_facturacion
+            $sql = "SELECT DISTINCT c.id, c.nombre_comercial, c.persona_contacto,
+                           c.email_facturacion, c.email_contacto
                     FROM clientes c $joins WHERE $whereSQL";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
-            $recipients = $stmt->fetchAll();
+            $clientes = $stmt->fetchAll();
         }
 
-        if (empty($recipients)) {
+        // Expandir clientes → lista de envíos individuales por email
+        $enviosList = []; // [{cliente_id, email, nombre_dest}, ...]
+        foreach ($clientes as $c) {
+            $ef = trim($c['email_facturacion'] ?? '');
+            $ec = trim($c['email_contacto']    ?? '');
+            $nombre = $c['nombre_comercial'];
+            $id_c   = $c['id'];
+
+            if ($emailModo === 'contacto') {
+                if ($ec !== '') $enviosList[] = ['cliente_id' => $id_c, 'email' => $ec, 'nombre_dest' => $nombre, 'contacto' => $c['persona_contacto'] ?? ''];
+            } elseif ($emailModo === 'ambos') {
+                $vistos = [];
+                if ($ef !== '') { $enviosList[] = ['cliente_id' => $id_c, 'email' => $ef, 'nombre_dest' => $nombre, 'contacto' => $c['persona_contacto'] ?? '']; $vistos[] = $ef; }
+                if ($ec !== '' && !in_array($ec, $vistos)) { $enviosList[] = ['cliente_id' => $id_c, 'email' => $ec, 'nombre_dest' => $nombre, 'contacto' => $c['persona_contacto'] ?? '']; }
+            } else {
+                if ($ef !== '') $enviosList[] = ['cliente_id' => $id_c, 'email' => $ef, 'nombre_dest' => $nombre, 'contacto' => $c['persona_contacto'] ?? ''];
+            }
+        }
+
+        if (empty($enviosList)) {
             $pdo->prepare("UPDATE email_campanas SET estado='borrador' WHERE id=?")->execute([$campanaId]);
             jsonResponse(['error' => 'No hay destinatarios para esta campaña'], 422);
         }
@@ -302,40 +365,36 @@ if ($method === 'POST') {
         // Delete any previous pending envios for this campaign
         $pdo->prepare("DELETE FROM email_envios WHERE campana_id = ? AND estado = 'pendiente'")->execute([$campanaId]);
 
-        // Insert envio records
-        $insertEnvio = $pdo->prepare("
-            INSERT INTO email_envios (campana_id, cliente_id, email, nombre_dest, estado)
-            VALUES (?, ?, ?, ?, 'pendiente')
-        ");
-        foreach ($recipients as $r) {
-            $insertEnvio->execute([
-                $campanaId,
-                $r['id'],
-                $r['email_facturacion'],
-                $r['nombre_comercial']
-            ]);
-        }
+        // URL base para el pixel de tracking
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $trackBase = defined('APP_URL') ? APP_URL : ($protocol . '://' . $_SERVER['HTTP_HOST'] . '/CRM-QUANTUN-Digital');
+        $trackBase = rtrim($trackBase, '/');
 
-        // Send emails
+        // Send emails  (insert → get ID → inject pixel → send → update)
         set_time_limit(120);
-
         $mailer   = new Mailer();
         $enviados = 0;
         $fallidos = 0;
         $errors   = [];
 
+        $insertEnvio = $pdo->prepare("
+            INSERT INTO email_envios (campana_id, cliente_id, email, nombre_dest, estado)
+            VALUES (?, ?, ?, ?, 'pendiente')
+        ");
         $updateEnvio = $pdo->prepare("
-            UPDATE email_envios
-            SET estado=?, error_msg=?, enviado_at=NOW()
-            WHERE campana_id=? AND cliente_id=?
+            UPDATE email_envios SET estado=?, error_msg=?, enviado_at=NOW() WHERE id=?
         ");
 
-        foreach ($recipients as $r) {
-            $email    = trim($r['email_facturacion']);
-            $nombre   = $r['nombre_comercial'];
-            $contacto = $r['persona_contacto'] ?? '';
+        foreach ($enviosList as $dest) {
+            $email    = $dest['email'];
+            $nombre   = $dest['nombre_dest'];
+            $contacto = $dest['contacto'];
 
-            // Replace template variables
+            // Insertar registro y obtener su ID para el pixel
+            $insertEnvio->execute([$campanaId, $dest['cliente_id'], $email, $nombre]);
+            $envioId = (int) $pdo->lastInsertId();
+
+            // Reemplazar variables de plantilla
             $htmlBody = str_replace(
                 ['{{nombre_comercial}}', '{{persona_contacto}}', '{{email}}'],
                 [htmlspecialchars($nombre, ENT_QUOTES), htmlspecialchars($contacto, ENT_QUOTES), htmlspecialchars($email, ENT_QUOTES)],
@@ -347,16 +406,25 @@ if ($method === 'POST') {
                 $campana['asunto']
             );
 
+            // Inyectar pixel de tracking antes de </body>
+            $pixelUrl  = $trackBase . '/api/email_track.php?eid=' . $envioId;
+            $pixelHtml = '<img src="' . $pixelUrl . '" width="1" height="1" style="display:block;border:0;width:1px;height:1px" alt="">';
+            if (stripos($htmlBody, '</body>') !== false) {
+                $htmlBody = str_ireplace('</body>', $pixelHtml . '</body>', $htmlBody);
+            } else {
+                $htmlBody .= $pixelHtml;
+            }
+
             $result = $mailer->send($email, $asunto, $htmlBody);
 
             if ($result['ok']) {
                 $enviados++;
-                $updateEnvio->execute(['enviado', null, $campanaId, $r['id']]);
+                $updateEnvio->execute(['enviado', null, $envioId]);
             } else {
                 $fallidos++;
                 $errMsg = $result['error'] ?? 'Error desconocido';
                 $errors[] = ['email' => $email, 'error' => $errMsg];
-                $updateEnvio->execute(['fallido', $errMsg, $campanaId, $r['id']]);
+                $updateEnvio->execute(['fallido', $errMsg, $envioId]);
             }
         }
 
@@ -366,15 +434,24 @@ if ($method === 'POST') {
             UPDATE email_campanas
             SET estado=?, total=?, enviados=?, fallidos=?, enviada_at=NOW()
             WHERE id=?
-        ")->execute([$finalEstado, count($recipients), $enviados, $fallidos, $campanaId]);
+        ")->execute([$finalEstado, count($enviosList), $enviados, $fallidos, $campanaId]);
 
         jsonResponse([
             'ok'       => true,
             'enviados' => $enviados,
             'fallidos' => $fallidos,
-            'total'    => count($recipients),
+            'total'    => count($enviosList),
             'errors'   => $errors
         ]);
+    }
+
+    // mark_opened — marcar manualmente un envío como leído
+    if ($action === 'mark_opened') {
+        $envioId = (int) ($body['envio_id'] ?? 0);
+        if (!$envioId) jsonResponse(['error' => 'envio_id requerido'], 422);
+        $pdo->prepare("UPDATE email_envios SET abierto=1, abierto_at=NOW() WHERE id=? AND estado='enviado'")
+            ->execute([$envioId]);
+        jsonResponse(['ok' => true]);
     }
 
     // change_estado

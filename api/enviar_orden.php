@@ -51,10 +51,16 @@ if ($csIds) {
     $placeholders = implode(',', array_fill(0, count($idArray), '?'));
     $stmt = $pdo->prepare("
         SELECT cs.*, c.nombre_comercial, c.nit_cedula, c.direccion, c.email_facturacion,
-               c.telefono, s.nombre as servicio_nombre
+               c.telefono,
+               CASE
+                   WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+                   WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
+                   ELSE s.nombre
+               END AS servicio_nombre
         FROM cliente_servicios cs
         JOIN clientes c ON cs.cliente_id = c.id
         JOIN servicios s ON cs.servicio_id = s.id
+        LEFT JOIN paquetes p ON cs.paquete_id = p.id
         WHERE cs.id IN ($placeholders) AND cs.cliente_id = ?
     ");
     $params = array_merge($idArray, [$clienteId]);
@@ -66,10 +72,16 @@ if ($csIds) {
     // Servicio único
     $stmt = $pdo->prepare("
         SELECT cs.*, c.nombre_comercial, c.nit_cedula, c.direccion, c.email_facturacion,
-               c.telefono, s.nombre as servicio_nombre
+               c.telefono,
+               CASE
+                   WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+                   WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
+                   ELSE s.nombre
+               END AS servicio_nombre
         FROM cliente_servicios cs
         JOIN clientes c ON cs.cliente_id = c.id
         JOIN servicios s ON cs.servicio_id = s.id
+        LEFT JOIN paquetes p ON cs.paquete_id = p.id
         WHERE cs.id = ? AND cs.cliente_id = ?
     ");
     $stmt->execute([$csId, $clienteId]);

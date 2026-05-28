@@ -185,7 +185,7 @@ switch ($method) {
                        COALESCE(
                            (SELECT CASE
                                WHEN cs.paquete_id IS NOT NULL AND pkg.nombre IS NOT NULL THEN pkg.nombre
-                               WHEN cs.nombre_display LIKE '% — %' THEN cs.nombre_display
+                               WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
                                ELSE s.nombre
                             END
                             FROM cliente_servicios cs
