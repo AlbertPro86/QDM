@@ -108,88 +108,117 @@ $docTipoLabels = ['orden_renovacion'=>'Orden de Renovación','orden_compra'=>'Or
 $docTipoLabel  = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
 $orderNumber   = 'QD-' . date('Ymd');
 
-// Fetch template (by ID or default)
+// Fetch template (by ID → default de la categoría → cualquier default)
+$template = null;
 if ($plantillaIdOver > 0) {
     $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE id = ? AND activo = 1 LIMIT 1");
     $stmt->execute([$plantillaIdOver]);
-    $template = $stmt->fetch();
+    $template = $stmt->fetch() ?: null;
 }
-if (empty($template)) {
-    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 LIMIT 1");
+if (!$template) {
+    // Default específico para la categoría del documento
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 AND categoria = ? ORDER BY id DESC LIMIT 1");
+    $stmt->execute([$docTipo]);
+    $template = $stmt->fetch() ?: null;
+}
+if (!$template) {
+    // Cualquier plantilla default (fallback)
+    $stmt = $pdo->prepare("SELECT * FROM plantillas_factura WHERE es_default = 1 AND activo = 1 ORDER BY id DESC LIMIT 1");
     $stmt->execute();
-    $template = $stmt->fetch();
+    $template = $stmt->fetch() ?: null;
 }
 
 if (!$template) {
     $template = [
-        'layout_tipo' => 'ejecutiva',
-        'color_primario' => '#0f172a',
-        'color_secundario' => '#c9f31d',
-        'fuente' => 'Poppins',
-        'empresa_nombre' => 'QUANTUN Digital',
-        'empresa_nit' => '900.567.123-4',
-        'empresa_email' => 'gerencia@ceicar.co',
-        'empresa_tel' => '+57 (314) 597-9983',
-        'empresa_dir' => 'Cra 42 # 43A-12, Montería, Córdoba',
-        'logo_url' => '',
-        'notas_pie' => 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.'
+        'layout_tipo'      => 'clasica',
+        'color_primario'   => '#0E0E0C',
+        'color_secundario' => '#C6F24E',
+        'fuente'           => 'Poppins',
+        'empresa_nombre'   => 'QUANTUN Digital',
+        'empresa_nit'      => '',
+        'empresa_email'    => 'gerencia@ceicar.co',
+        'empresa_tel'      => '+57 (314) 597-9983',
+        'empresa_dir'      => 'Montería, Córdoba',
+        'logo_url'         => '',
+        'notas_pie'        => 'Gracias por su preferencia. El pago debe realizarse en los próximos 30 días.',
+        'mostrar_banco'    => 0,
+        'es_default'       => 0,
     ];
 }
 
-// Logo — CID inline attachment (la única forma que funciona en Gmail, Outlook, iOS Mail, etc.)
-// Los data: URIs son bloqueados por Gmail. Las URLs externas requieren servidor público.
-// CID embebe la imagen como parte MIME del email: siempre visible en todos los clientes.
+// ── Logo para email: CID inline attachment ───────────────────────────────────
+// Gmail bloquea data: URIs y las URLs externas requieren clic del usuario.
+// CID embebe la imagen como parte MIME → visible en TODOS los clientes sin clic.
 $logoFilePath = '';
 $logoMime     = 'image/png';
-$logoCid      = 'logo_quantun_email';
+$logoCid      = 'logo_qd@quantun.digital';   // formato addr para máxima compatibilidad
+$tmpLogo      = '';
 $logoUrlTemplate = !empty($template['logo_url']) ? trim($template['logo_url']) : '';
 
+// Helper: detectar si un color HEX es oscuro (para elegir logo con contraste adecuado)
+$_bgDark = (function(string $hex): bool {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) === 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r = hexdec(substr($hex,0,2)); $g = hexdec(substr($hex,2,2)); $b = hexdec(substr($hex,4,2));
+    return (0.299*$r + 0.587*$g + 0.114*$b) / 255 < 0.5;
+})(trim($template['color_primario'] ?? '#0f172a'));
+
+// 1. Intentar usar el logo configurado en la plantilla
 if ($logoUrlTemplate !== '') {
     if (preg_match('#^https?://#i', $logoUrlTemplate)) {
-        // URL remota: descargar a archivo temporal para usar como CID
+        // URL remota → descargar y escribir en archivo temporal
+        $rawImg = false;
         if (function_exists('curl_init')) {
             $ch = curl_init($logoUrlTemplate);
-            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5,CURLOPT_SSL_VERIFYPEER=>false,CURLOPT_FOLLOWLOCATION=>true]);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 6,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_USERAGENT      => 'CRM-QUANTUN/1.0',
+            ]);
             $rawImg = curl_exec($ch);
             $ctype  = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/png';
             curl_close($ch);
-            if ($rawImg) {
-                $ext = ['image/png'=>'png','image/jpeg'=>'jpg','image/gif'=>'gif','image/webp'=>'webp'][trim(explode(';',$ctype)[0])] ?? 'png';
-                $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.' . $ext;
-                file_put_contents($tmpLogo, $rawImg);
-                $logoFilePath = $tmpLogo;
-                $logoMime     = trim(explode(';', $ctype)[0]);
-            }
-        } else {
-            $rawImg = @file_get_contents($logoUrlTemplate);
-            if ($rawImg !== false) {
-                $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.png';
-                file_put_contents($tmpLogo, $rawImg);
+        }
+        if ($rawImg && strlen($rawImg) > 100) {
+            $logoMime = trim(explode(';', $ctype)[0]);
+            $extMap   = ['image/png'=>'png','image/jpeg'=>'jpg','image/gif'=>'gif','image/webp'=>'webp'];
+            $ext      = $extMap[$logoMime] ?? 'png';
+            $tmpLogo  = tempnam(sys_get_temp_dir(), 'qlogo_') . '.' . $ext;
+            if (file_put_contents($tmpLogo, $rawImg) !== false) {
                 $logoFilePath = $tmpLogo;
             }
         }
     } else {
-        // Ruta local
-        $localPath = BASE_PATH . '/' . ltrim(str_replace('\\', '/', $logoUrlTemplate), '/');
-        if (@file_exists($localPath) && @is_file($localPath)) {
-            $logoFilePath = $localPath;
-        } elseif (@file_exists($logoUrlTemplate) && @is_file($logoUrlTemplate)) {
-            $logoFilePath = $logoUrlTemplate;
-        }
-        if ($logoFilePath) {
-            $ext = strtolower(pathinfo($logoFilePath, PATHINFO_EXTENSION));
-            $logoMime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'][$ext] ?? 'image/png';
+        // Ruta local relativa (p.ej. "uploads/facturas/logo.png" o "/Assets/logo.png")
+        $localPath = BASE_PATH . DIRECTORY_SEPARATOR . ltrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $logoUrlTemplate), DIRECTORY_SEPARATOR);
+        foreach ([$localPath, $logoUrlTemplate] as $_lp) {
+            if ($_lp && @is_file($_lp)) {
+                $logoFilePath = $_lp;
+                $ext = strtolower(pathinfo($_lp, PATHINFO_EXTENSION));
+                $logoMime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'][$ext] ?? 'image/png';
+                break;
+            }
         }
     }
 }
+
+// 2. Fallback: logo propio según contraste del fondo del encabezado
 if (!$logoFilePath) {
-    $defaultLogo = BASE_PATH . '/Assets/logo_quantun_digital_negro.png';
-    if (@file_exists($defaultLogo) && @is_file($defaultLogo)) {
-        $logoFilePath = $defaultLogo;
+    // Encabezado oscuro → logo blanco; encabezado claro → logo negro
+    $logoFile = BASE_PATH . '/Assets/' . ($_bgDark ? 'logo_quantun_digital_blanco.png' : 'logo_quantun_digital_negro.png');
+    if (!@is_file($logoFile)) {
+        // Intentar el otro si no existe
+        $logoFile = BASE_PATH . '/Assets/' . ($_bgDark ? 'logo_quantun_digital_negro.png' : 'logo_quantun_digital_blanco.png');
+    }
+    if (@is_file($logoFile)) {
+        $logoFilePath = $logoFile;
         $logoMime     = 'image/png';
     }
 }
-// En el HTML se referencia como cid:logo_quantun_email
+
+// En el HTML se referencia como cid:logo_qd@quantun.digital
 $logoSrc = $logoFilePath ? 'cid:' . $logoCid : '';
 
 // Obtener WhatsApp de configuración

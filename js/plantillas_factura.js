@@ -192,9 +192,19 @@ function itemsRows(bg, clrText, borderColor, boldColor) {
 
 /* ═══════════════════════════════════════════════════════ LAYOUTS */
 
+/* ── Detectar si un color hex es oscuro ─────────────────────────────── */
+function isHexDark(hex) {
+    hex = hex.replace('#','');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+    return (0.299*r + 0.587*g + 0.114*b)/255 < 0.5;
+}
+
 /* ── CLÁSICA ────────────────────────────────────────────────────────── */
 function layoutClasica(cfg) {
     const { sub, desc, total } = calcTotales();
+    // El logo de muestra en la galería se muestra en fondo claro (preview blanco).
+    // filter:brightness(0) → convierte cualquier logo a negro para fondo claro.
     const logoUrl = cfg.logoUrl && cfg.logoUrl.trim() ? cfg.logoUrl : 'Assets/logo_quantun_digital_negro.png';
     const logoTag = `<img src="${logoUrl}" alt="Logo" style="max-height:44px;max-width:140px;object-fit:contain;filter:brightness(0)">`;
 
