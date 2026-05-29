@@ -136,12 +136,17 @@ if (!$template) {
     ];
 }
 
-// Logo — SIEMPRE Base64 embebido (funciona en todos los clientes de correo; las URLs externas son bloqueadas)
-$logoSrc = '';
+// Logo — CID inline attachment (la única forma que funciona en Gmail, Outlook, iOS Mail, etc.)
+// Los data: URIs son bloqueados por Gmail. Las URLs externas requieren servidor público.
+// CID embebe la imagen como parte MIME del email: siempre visible en todos los clientes.
+$logoFilePath = '';
+$logoMime     = 'image/png';
+$logoCid      = 'logo_quantun_email';
 $logoUrlTemplate = !empty($template['logo_url']) ? trim($template['logo_url']) : '';
+
 if ($logoUrlTemplate !== '') {
     if (preg_match('#^https?://#i', $logoUrlTemplate)) {
-        // URL remota: descargar y convertir a base64
+        // URL remota: descargar a archivo temporal para usar como CID
         if (function_exists('curl_init')) {
             $ch = curl_init($logoUrlTemplate);
             curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5,CURLOPT_SSL_VERIFYPEER=>false,CURLOPT_FOLLOWLOCATION=>true]);
@@ -149,39 +154,43 @@ if ($logoUrlTemplate !== '') {
             $ctype  = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/png';
             curl_close($ch);
             if ($rawImg) {
-                $mime = trim(explode(';', $ctype)[0]);
-                $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($rawImg);
+                $ext = ['image/png'=>'png','image/jpeg'=>'jpg','image/gif'=>'gif','image/webp'=>'webp'][trim(explode(';',$ctype)[0])] ?? 'png';
+                $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.' . $ext;
+                file_put_contents($tmpLogo, $rawImg);
+                $logoFilePath = $tmpLogo;
+                $logoMime     = trim(explode(';', $ctype)[0]);
             }
         } else {
             $rawImg = @file_get_contents($logoUrlTemplate);
-            if ($rawImg !== false) $logoSrc = 'data:image/png;base64,' . base64_encode($rawImg);
+            if ($rawImg !== false) {
+                $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.png';
+                file_put_contents($tmpLogo, $rawImg);
+                $logoFilePath = $tmpLogo;
+            }
         }
     } else {
-        // Ruta local (relativa o absoluta)
+        // Ruta local
         $localPath = BASE_PATH . '/' . ltrim(str_replace('\\', '/', $logoUrlTemplate), '/');
         if (@file_exists($localPath) && @is_file($localPath)) {
-            $ext   = strtolower(pathinfo($localPath, PATHINFO_EXTENSION));
-            $mimes = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'];
-            $mime  = $mimes[$ext] ?? 'image/png';
-            $raw   = @file_get_contents($localPath);
-            if ($raw !== false) $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($raw);
+            $logoFilePath = $localPath;
+        } elseif (@file_exists($logoUrlTemplate) && @is_file($logoUrlTemplate)) {
+            $logoFilePath = $logoUrlTemplate;
         }
-        if (!$logoSrc && @file_exists($logoUrlTemplate) && @is_file($logoUrlTemplate)) {
-            $ext   = strtolower(pathinfo($logoUrlTemplate, PATHINFO_EXTENSION));
-            $mimes = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'];
-            $mime  = $mimes[$ext] ?? 'image/png';
-            $raw   = @file_get_contents($logoUrlTemplate);
-            if ($raw !== false) $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($raw);
+        if ($logoFilePath) {
+            $ext = strtolower(pathinfo($logoFilePath, PATHINFO_EXTENSION));
+            $logoMime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'][$ext] ?? 'image/png';
         }
     }
 }
-if (!$logoSrc) {
+if (!$logoFilePath) {
     $defaultLogo = BASE_PATH . '/Assets/logo_quantun_digital_negro.png';
-    if (@file_exists($defaultLogo)) {
-        $raw = @file_get_contents($defaultLogo);
-        if ($raw !== false) $logoSrc = 'data:image/png;base64,' . base64_encode($raw);
+    if (@file_exists($defaultLogo) && @is_file($defaultLogo)) {
+        $logoFilePath = $defaultLogo;
+        $logoMime     = 'image/png';
     }
 }
+// En el HTML se referencia como cid:logo_quantun_email
+$logoSrc = $logoFilePath ? 'cid:' . $logoCid : '';
 
 // Obtener WhatsApp de configuración
 $whatsappOrg = '';
@@ -427,13 +436,23 @@ if ($mensajeOver) {
     );
 }
 
-// Enviar correo
-$mailer = new Mailer();
+// Enviar correo — logo como CID inline para compatibilidad universal
+$mailer       = new Mailer();
+$inlineImages = [];
+if ($logoFilePath && @file_exists($logoFilePath)) {
+    $inlineImages[] = ['path' => $logoFilePath, 'cid' => $logoCid, 'mime' => $logoMime];
+}
 $result = $mailer->send(
     $data['nombre_comercial'] . ' <' . $emailDest . '>',
     $emailAsunto,
-    $htmlFinal
+    $htmlFinal,
+    [],
+    $inlineImages
 );
+// Limpiar archivo temporal del logo si se creó
+if (!empty($tmpLogo) && @file_exists($tmpLogo)) {
+    @unlink($tmpLogo);
+}
 
 if ($result['ok']) {
     $userId = $_SESSION['user_id'] ?? $_SESSION['usuario_id'] ?? null;

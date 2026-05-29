@@ -31,19 +31,21 @@ class Mailer {
 
     /**
      * Envía un correo HTML.
-     * @param string      $to      Destinatario (email o "Nombre <email>")
-     * @param string      $subject Asunto
-     * @param string      $html    Cuerpo HTML
-     * @param array       $attachments [['path'=>'...','name'=>'...','mime'=>'...']]
+     * @param string $to          Destinatario (email o "Nombre <email>")
+     * @param string $subject     Asunto
+     * @param string $html        Cuerpo HTML
+     * @param array  $attachments [['path'=>'...','name'=>'...','mime'=>'...']]
+     * @param array  $inlineImages Imágenes embebidas CID [['path'=>'...','cid'=>'...','mime'=>'image/png']]
+     *                             Referenciar en HTML como: <img src="cid:NOMBRE_CID">
      * @return array{ok:bool, error:string|null}
      */
-    public function send(string $to, string $subject, string $html, array $attachments = []): array {
+    public function send(string $to, string $subject, string $html, array $attachments = [], array $inlineImages = []): array {
         try {
             $this->conectar();
             $this->ehlo();
             if ($this->encryption === 'tls') $this->starttls();
             $this->autenticar();
-            $this->enviarMensaje($to, $subject, $html, $attachments);
+            $this->enviarMensaje($to, $subject, $html, $attachments, $inlineImages);
             $this->cmd('QUIT');
             @fclose($this->socket);
             return ['ok' => true, 'error' => null];
@@ -91,14 +93,17 @@ class Mailer {
 
     // ── Construcción y envío del mensaje ──────────────────────────────────────
 
-    private function enviarMensaje(string $to, string $subject, string $html, array $attachments): void {
+    private function enviarMensaje(string $to, string $subject, string $html, array $attachments, array $inlineImages = []): void {
         $toEmail = $this->extraerEmail($to);
         $this->cmd('MAIL FROM:<' . $this->fromAddress . '>', 250);
         $this->cmd('RCPT TO:<'  . $toEmail . '>', [250, 251]);
         $this->cmd('DATA', 354);
 
-        $boundary = 'qcrm_' . md5(uniqid());
-        $hasAtt   = !empty($attachments);
+        $uid    = md5(uniqid());
+        $bMix   = 'qcrm_mix_' . $uid;
+        $bRel   = 'qcrm_rel_' . $uid;
+        $hasAtt = !empty($attachments);
+        $hasInl = !empty($inlineImages);
 
         $headers  = "From: =?UTF-8?B?" . base64_encode($this->fromName) . "?= <{$this->fromAddress}>\r\n";
         $headers .= "To: $to\r\n";
@@ -107,27 +112,72 @@ class Mailer {
         $headers .= "Date: " . date('r') . "\r\n";
         $headers .= "Message-ID: <" . uniqid() . "@quantun.digital>\r\n";
 
-        if ($hasAtt) {
-            $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
-            $body     = "--$boundary\r\n";
-            $body    .= "Content-Type: text/html; charset=UTF-8\r\n";
-            $body    .= "Content-Transfer-Encoding: base64\r\n\r\n";
-            $body    .= chunk_split(base64_encode($html)) . "\r\n";
+        // Construye las partes inline (dentro de multipart/related)
+        $buildRelatedParts = function() use ($html, $inlineImages, $bRel): string {
+            $p  = "--$bRel\r\n";
+            $p .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $p .= "Content-Transfer-Encoding: base64\r\n\r\n";
+            $p .= chunk_split(base64_encode($html)) . "\r\n";
+            foreach ($inlineImages as $img) {
+                $raw = @file_get_contents($img['path'] ?? '');
+                if ($raw === false || $raw === '') continue;
+                $p .= "--$bRel\r\n";
+                $p .= "Content-Type: " . ($img['mime'] ?? 'image/png') . "\r\n";
+                $p .= "Content-Transfer-Encoding: base64\r\n";
+                $p .= "Content-ID: <" . $img['cid'] . ">\r\n";
+                $p .= "Content-Disposition: inline\r\n\r\n";
+                $p .= chunk_split(base64_encode($raw)) . "\r\n";
+            }
+            $p .= "--$bRel--\r\n";
+            return $p;
+        };
+
+        if ($hasAtt && $hasInl) {
+            // multipart/mixed > multipart/related + adjuntos
+            $headers .= "Content-Type: multipart/mixed; boundary=\"$bMix\"\r\n";
+            $body  = "--$bMix\r\n";
+            $body .= "Content-Type: multipart/related; boundary=\"$bRel\"\r\n\r\n";
+            $body .= $buildRelatedParts() . "\r\n";
             foreach ($attachments as $att) {
-                $data  = file_get_contents($att['path']);
-                $mime  = $att['mime'] ?? 'application/octet-stream';
-                $name  = $att['name'] ?? basename($att['path']);
-                $body .= "--$boundary\r\n";
+                $raw = @file_get_contents($att['path']);
+                if ($raw === false) continue;
+                $mime = $att['mime'] ?? 'application/octet-stream';
+                $name = $att['name'] ?? basename($att['path']);
+                $body .= "--$bMix\r\n";
                 $body .= "Content-Type: $mime; name=\"$name\"\r\n";
                 $body .= "Content-Transfer-Encoding: base64\r\n";
                 $body .= "Content-Disposition: attachment; filename=\"$name\"\r\n\r\n";
-                $body .= chunk_split(base64_encode($data)) . "\r\n";
+                $body .= chunk_split(base64_encode($raw)) . "\r\n";
             }
-            $body .= "--$boundary--\r\n";
+            $body .= "--$bMix--\r\n";
+        } elseif ($hasInl) {
+            // multipart/related (html + imágenes inline)
+            $headers .= "Content-Type: multipart/related; boundary=\"$bRel\"\r\n";
+            $body = $buildRelatedParts();
+        } elseif ($hasAtt) {
+            // multipart/mixed (html + adjuntos)
+            $headers .= "Content-Type: multipart/mixed; boundary=\"$bMix\"\r\n";
+            $body  = "--$bMix\r\n";
+            $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $body .= "Content-Transfer-Encoding: base64\r\n\r\n";
+            $body .= chunk_split(base64_encode($html)) . "\r\n";
+            foreach ($attachments as $att) {
+                $raw = @file_get_contents($att['path']);
+                if ($raw === false) continue;
+                $mime = $att['mime'] ?? 'application/octet-stream';
+                $name = $att['name'] ?? basename($att['path']);
+                $body .= "--$bMix\r\n";
+                $body .= "Content-Type: $mime; name=\"$name\"\r\n";
+                $body .= "Content-Transfer-Encoding: base64\r\n";
+                $body .= "Content-Disposition: attachment; filename=\"$name\"\r\n\r\n";
+                $body .= chunk_split(base64_encode($raw)) . "\r\n";
+            }
+            $body .= "--$bMix--\r\n";
         } else {
+            // HTML plano
             $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
             $headers .= "Content-Transfer-Encoding: base64\r\n";
-            $body     = chunk_split(base64_encode($html));
+            $body = chunk_split(base64_encode($html));
         }
 
         $this->escribir($headers . "\r\n" . $body . "\r\n.");
