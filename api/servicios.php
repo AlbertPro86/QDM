@@ -166,7 +166,7 @@ switch ($method) {
                            WHERE servicio_id = ?
                              AND paquete_id IS NULL
                              AND estado = 'activo'
-                             AND monto_renovacion = ?")
+                             AND ROUND(monto_renovacion, 2) = ROUND(?, 2)")
                 ->execute([$nuevoPrecio, $id, $oldPrecio]);
         }
 

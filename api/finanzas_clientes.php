@@ -26,7 +26,20 @@ $mrrFactor = [
     'ninguna'   => 0,
 ];
 
-// Auto-sincronizar costo_servicio NULL/0 desde catálogo de servicios
+// Auto-sincronizar costo_servicio NULL/0 desde sub-servicios (display compuesto "Padre — Sub")
+$pdo->exec("
+    UPDATE cliente_servicios cs
+    JOIN servicios s  ON cs.servicio_id = s.id
+    JOIN sub_servicios ss ON ss.servicio_id = s.id
+        AND cs.nombre_display = CONCAT(s.nombre, ' — ', ss.nombre)
+    SET cs.costo_servicio = ss.costo
+    WHERE cs.estado = 'activo'
+      AND cs.paquete_id IS NULL
+      AND (cs.costo_servicio IS NULL OR cs.costo_servicio = 0)
+      AND ss.costo > 0
+");
+
+// Auto-sincronizar costo_servicio NULL/0 desde catálogo de servicios (asignaciones directas sin sub-servicio)
 $pdo->exec("
     UPDATE cliente_servicios cs
     JOIN servicios s ON cs.servicio_id = s.id
@@ -34,6 +47,7 @@ $pdo->exec("
     WHERE cs.estado = 'activo'
       AND cs.paquete_id IS NULL
       AND (cs.costo_servicio IS NULL OR cs.costo_servicio = 0)
+      AND (cs.nombre_display IS NULL OR cs.nombre_display NOT LIKE '% — %')
       AND s.costo > 0
 ");
 

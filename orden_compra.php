@@ -168,6 +168,42 @@ $fmtCOP = function($n) {
     return 'COP ' . number_format($n, 0, ',', '.');
 };
 
+// ── Embeber logo en base64 para que siempre cargue en PDF/print ──────────────
+function fileToBase64(string $path): string {
+    if (!@file_exists($path) || !@is_file($path)) return '';
+    $data = @file_get_contents($path);
+    if ($data === false) return '';
+    $ext  = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp','svg'=>'image/svg+xml'][$ext] ?? 'image/png';
+    return 'data:' . $mime . ';base64,' . base64_encode($data);
+}
+
+$logoSrc = '';
+$logoUrl = trim($template['logo_url'] ?? '');
+
+if ($logoUrl !== '') {
+    // URL http/https
+    if (preg_match('#^https?://#i', $logoUrl)) {
+        $ctx  = stream_context_create(['http' => ['timeout' => 3], 'ssl' => ['verify_peer' => false]]);
+        $data = @file_get_contents($logoUrl, false, $ctx);
+        if ($data !== false) {
+            $ext  = strtolower(pathinfo(parse_url($logoUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+            $mime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp','svg'=>'image/svg+xml'][$ext] ?? 'image/png';
+            $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($data);
+        }
+    } else {
+        // Ruta relativa al directorio del proyecto
+        $logoSrc = fileToBase64(__DIR__ . '/' . ltrim($logoUrl, '/\\'));
+        // Si no funcionó, intentar como ruta absoluta del sistema de archivos
+        if (!$logoSrc) $logoSrc = fileToBase64($logoUrl);
+    }
+}
+
+// Fallback: logo local del proyecto
+if (!$logoSrc) {
+    $logoSrc = fileToBase64(__DIR__ . '/Assets/logo_quantun_digital_negro.png');
+}
+
 // ── Enriquecer servicios con datos del paquete (si aplica) ────────────────
 function enrichWithPaquete(array &$servicios, PDO $pdo): void {
     foreach ($servicios as &$svc) {
@@ -244,7 +280,11 @@ enrichWithPaquete($servicios, $pdo);
         .footer-dark { background: <?= $template['color_primario'] ?>; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; }
         .footer-text { font-size: 11px; color: rgba(255,255,255,.5); }
         .footer-accent { width: 40px; height: 4px; background: <?= $template['color_secundario'] ?>; border-radius: 2px; }
-        @media print { body { padding: 0; background: white; } .invoice { box-shadow: none; } }
+        @media print {
+            body { padding: 0; background: white; }
+            .invoice { box-shadow: none; }
+            .logo-section img { filter: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -254,7 +294,11 @@ enrichWithPaquete($servicios, $pdo);
             <div class="header-accent"></div>
             <div class="header-content">
                 <div class="logo-section">
-                    <img src="<?= ($template['logo_url'] && trim($template['logo_url']) !== '') ? $template['logo_url'] : 'Assets/logo_quantun_digital_negro.png' ?>" alt="Logo" style="max-height:48px;object-fit:contain;filter:brightness(0) invert(1)">
+                    <?php if ($logoSrc): ?>
+                    <img src="<?= $logoSrc ?>" alt="Logo" style="max-height:48px;max-width:180px;object-fit:contain;filter:brightness(0) invert(1)">
+                    <?php else: ?>
+                    <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px"><?= htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') ?></div>
+                    <?php endif; ?>
                     <div class="company-details">
                         <?php if(!empty($template['empresa_nit'])): ?>
                             NIT: <?= htmlspecialchars($template['empresa_nit'] ?? '') ?> &nbsp;·&nbsp;

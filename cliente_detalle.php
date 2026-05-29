@@ -1680,11 +1680,17 @@ async function saveSvc(e) {
         nombre_display:   nombreDisplay,
         monto_renovacion: parseFloat(document.getElementById('newSvcMonto').value) || 0,
         descuento:        parseFloat(document.getElementById('newSvcDesc').value)  || 0,
-        costo_servicio:   0,
         frecuencia:       document.getElementById('newSvcFreq').value || 'año',
         fecha_inicio:     document.getElementById('newSvcStart').value,
         fecha_vencimiento: document.getElementById('newSvcEnd').value
     };
+    // En nueva asignación leer el costo del catálogo; en edición NO tocar costo_servicio
+    // (el valor ya está en BD y es mantenido por las sincronizaciones del catálogo)
+    if (!isEdit) {
+        const sel = document.getElementById('newSvcId');
+        const opt = sel?.options[sel?.selectedIndex];
+        payload.costo_servicio = opt?.dataset.costo ? parseFloat(opt.dataset.costo) : 0;
+    }
     if (id) payload.id = id;
 
     try {

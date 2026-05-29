@@ -65,57 +65,87 @@ switch ($method) {
         $pdo->prepare("UPDATE sub_servicios SET nombre = ?, descripcion = ?, precio = ?, costo = ?, enlace_pago = ?, frecuencia = ? WHERE id = ?")
             ->execute([$input['nombre'], $input['descripcion'] ?? null, $input['precio'] ?? 0, $input['costo'] ?? 0, $input['enlace_pago'] ?? null, $input['frecuencia'] ?? 'mes', $id]);
 
-        // ── Sincronización cruzada ──
         $newNombre = $input['nombre'];
         $newPrecio = floatval($input['precio'] ?? 0);
-        $newCosto  = floatval($input['costo'] ?? 0);
+        $newCosto  = floatval($input['costo']  ?? 0);
 
-        // Si cambió el nombre, propagar a leads y cliente_servicios
-        if ($old && $newNombre !== $old['nombre']) {
-            $pdo->prepare("UPDATE leads SET servicio_interes = ? WHERE servicio_interes = ?")
-                ->execute([$newNombre, $old['nombre']]);
+        if ($old) {
+            $oldNombre = $old['nombre'];
+            $oldPrecio = floatval($old['precio']);
+            $oldCosto  = floatval($old['costo']);
 
-            // Obtener nombre del servicio padre para construir el display compuesto
+            // Nombre del servicio padre (necesario para display compuesto y para encontrar filas)
             $parentStmt = $pdo->prepare("SELECT nombre FROM servicios WHERE id = ?");
             $parentStmt->execute([$old['servicio_id']]);
-            $parentNombre = $parentStmt->fetchColumn() ?: '';
+            $parentNombre    = $parentStmt->fetchColumn() ?: '';
+            $compositeOld    = $parentNombre ? $parentNombre . ' — ' . $oldNombre : $oldNombre;
+            $compositeNew    = $parentNombre ? $parentNombre . ' — ' . $newNombre : $newNombre;
 
-            // Caso 1: display compuesto "ParentNombre — OldSub" → "ParentNombre — NewSub"
-            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
-                ->execute([$parentNombre . ' — ' . $newNombre, $old['servicio_id'], $parentNombre . ' — ' . $old['nombre']]);
+            // ── 1. Sync monto_renovacion → cliente_servicios (ANTES del rename para poder hacer match) ──
+            if ($newPrecio !== $oldPrecio) {
+                $pdo->prepare("
+                    UPDATE cliente_servicios
+                    SET monto_renovacion = ?
+                    WHERE servicio_id = ?
+                      AND paquete_id IS NULL
+                      AND estado = 'activo'
+                      AND ROUND(monto_renovacion, 2) = ROUND(?, 2)
+                      AND nombre_display IN (?, ?)
+                ")->execute([$newPrecio, $old['servicio_id'], $oldPrecio, $compositeOld, $oldNombre]);
+            }
 
-            // Caso 2: display simple (solo el nombre del sub-servicio sin prefijo)
-            $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
-                ->execute([$newNombre, $old['servicio_id'], $old['nombre']]);
-        }
+            // ── 2. Sync costo_servicio → cliente_servicios ──
+            if ($newCosto !== $oldCosto) {
+                $pdo->prepare("
+                    UPDATE cliente_servicios
+                    SET costo_servicio = ?
+                    WHERE servicio_id = ?
+                      AND paquete_id IS NULL
+                      AND estado = 'activo'
+                      AND nombre_display IN (?, ?)
+                ")->execute([$newCosto, $old['servicio_id'], $compositeOld, $oldNombre]);
+            }
 
-        // Si cambió precio o costo, recalcular paquetes que incluyan este sub-servicio
-        if ($old && ($newPrecio != floatval($old['precio']) || $newCosto != floatval($old['costo']))) {
-            $pkgStmt = $pdo->prepare("SELECT DISTINCT paquete_id FROM paquete_items WHERE sub_servicio_id = ?");
-            $pkgStmt->execute([$id]);
-            $pkgIds = $pkgStmt->fetchAll(PDO::FETCH_COLUMN);
-            foreach ($pkgIds as $pid) {
-                $totals = $pdo->prepare("SELECT SUM(ss.precio) as total_precio, SUM(ss.costo) as total_costo FROM paquete_items pi JOIN sub_servicios ss ON pi.sub_servicio_id = ss.id WHERE pi.paquete_id = ?");
-                $totals->execute([$pid]);
-                $t = $totals->fetch();
-                $pdo->prepare("UPDATE paquetes SET costo_total = ? WHERE id = ?")
-                    ->execute([$t['total_costo'] ?? 0, $pid]);
-                // Solo actualizar precio_venta si coincide con la suma anterior (no es precio personalizado)
-                $pkg = $pdo->prepare("SELECT precio_venta FROM paquetes WHERE id = ?");
-                $pkg->execute([$pid]);
-                $currentPrecio = floatval($pkg->fetchColumn());
-                $oldSum = $currentPrecio; // Aproximación: si el precio actual es "automático"
-                // Recalcular el precio anterior sumando todos los sub-servicios pero con el precio viejo de este
-                $oldTotalPrecio = floatval($t['total_precio']) - $newPrecio + floatval($old['precio']);
-                if (abs($currentPrecio - $oldTotalPrecio) < 0.01) {
-                    // El precio del paquete coincidía con la suma → es automático, actualizar
-                    $pdo->prepare("UPDATE paquetes SET precio_venta = ? WHERE id = ?")
-                        ->execute([$t['total_precio'] ?? 0, $pid]);
+            // ── 3. Sync nombre → leads y cliente_servicios ──
+            if ($newNombre !== $oldNombre) {
+                $pdo->prepare("UPDATE leads SET servicio_interes = ? WHERE servicio_interes = ?")
+                    ->execute([$newNombre, $oldNombre]);
+
+                // Display compuesto "Padre — OldSub" → "Padre — NewSub"
+                $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
+                    ->execute([$compositeNew, $old['servicio_id'], $compositeOld]);
+
+                // Display simple (solo nombre del sub sin prefijo)
+                $pdo->prepare("UPDATE cliente_servicios SET nombre_display = ? WHERE servicio_id = ? AND nombre_display = ?")
+                    ->execute([$newNombre, $old['servicio_id'], $oldNombre]);
+            }
+
+            // ── 4. Recalcular paquetes que incluyan este sub-servicio ──
+            if ($newPrecio !== $oldPrecio || $newCosto !== $oldCosto) {
+                $pkgStmt = $pdo->prepare("SELECT DISTINCT paquete_id FROM paquete_items WHERE sub_servicio_id = ?");
+                $pkgStmt->execute([$id]);
+                $pkgIds = $pkgStmt->fetchAll(PDO::FETCH_COLUMN);
+                foreach ($pkgIds as $pid) {
+                    $totals = $pdo->prepare("SELECT SUM(ss.precio) as total_precio, SUM(ss.costo) as total_costo FROM paquete_items pi JOIN sub_servicios ss ON pi.sub_servicio_id = ss.id WHERE pi.paquete_id = ?");
+                    $totals->execute([$pid]);
+                    $t = $totals->fetch();
+                    $pdo->prepare("UPDATE paquetes SET costo_total = ? WHERE id = ?")->execute([$t['total_costo'] ?? 0, $pid]);
+                    // Solo actualizar precio_venta si era automático (coincidía con la suma anterior)
+                    $pkg = $pdo->prepare("SELECT precio_venta FROM paquetes WHERE id = ?");
+                    $pkg->execute([$pid]);
+                    $currentPrecio  = floatval($pkg->fetchColumn());
+                    $oldTotalPrecio = floatval($t['total_precio']) - $newPrecio + $oldPrecio;
+                    if (abs($currentPrecio - $oldTotalPrecio) < 0.01) {
+                        $pdo->prepare("UPDATE paquetes SET precio_venta = ? WHERE id = ?")->execute([$t['total_precio'] ?? 0, $pid]);
+                    }
+                    // Propagar costo actualizado del paquete a cliente_servicios activos
+                    $pdo->prepare("UPDATE cliente_servicios SET costo_servicio = ? WHERE paquete_id = ? AND estado = 'activo'")
+                        ->execute([$t['total_costo'] ?? 0, $pid]);
                 }
             }
         }
 
-        // Reemplazar features
+        // ── 5. Reemplazar features ──
         if (array_key_exists('features', $input)) {
             $pdo->prepare("DELETE FROM servicio_features WHERE sub_servicio_id = ?")->execute([$id]);
             if (!empty($input['features']) && is_array($input['features'])) {

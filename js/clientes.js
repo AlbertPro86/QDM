@@ -237,11 +237,35 @@ function renderClients(clients) {
             </a>`
         ).join('');
 
+        // Datos para tooltip del ojito
+        const svcList   = (c.servicios_nombres || '').split(', ').filter(Boolean);
+        const freqList2 = (c.frecuencias_activas || '').split(', ').map(f=>f.trim()).filter(Boolean);
+        const tipData   = JSON.stringify({
+            id: c.id, nombre: c.nombre_comercial, contacto: contacto,
+            svcs: svcList, freqs: freqList2,
+            mrr: parseFloat(c.mrr||0), cobrado: parseFloat(c.total_cobrado||0),
+            porCobrar: parseFloat(c.total_por_cobrar||0),
+            renovacion: c.proxima_renovacion || ''
+        }).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+
         return `
-        <tr class="animate-fade-in" data-id="${c.id}" style="${rowStyle}">
-            <td style="padding-left:16px">
-                <input type="checkbox" class="row-check" value="${c.id}" onchange="onRowCheck()"
-                    style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626">
+        <tr class="animate-fade-in" data-id="${c.id}" style="${rowStyle}cursor:pointer"
+            onclick="if(!event.target.closest('input,button,a'))location.href='cliente_detalle.php?id=${c.id}'"
+            onmouseenter="if(!event.target.closest('input,button,a'))this.style.filter='brightness(.97)'"
+            onmouseleave="this.style.filter=''">
+            <td style="padding-left:12px">
+                <div style="display:flex;align-items:center;gap:7px">
+                    <input type="checkbox" class="row-check" value="${c.id}" onchange="onRowCheck()"
+                        style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626;flex-shrink:0">
+                    <button class="btn btn-ghost btn-icon sm"
+                        data-tip='${tipData}'
+                        onmouseenter="showClientTooltip(this)"
+                        onmouseleave="hideClientTooltip()"
+                        onclick="event.stopPropagation()"
+                            style="color:#8A867C;padding:3px;width:22px;height:22px;flex-shrink:0">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                </div>
             </td>
             <td>
                 <div style="font-weight:700;color:var(--color-primary);font-size:14px">${escapeHtml(c.nombre_comercial)}</div>
@@ -255,8 +279,6 @@ function renderClients(clients) {
                         : ''}
                     <span style="font-weight:600;font-size:13px;color:#0E0E0C">${contacto ? escapeHtml(contacto) : '<span style="color:#8A867C">—</span>'}</span>
                 </div>
-                ${c.responsable && c.persona_contacto && c.responsable !== c.persona_contacto
-                    ? `<div style="font-size:10px;color:#8A867C;margin-top:2px">${escapeHtml(c.responsable)}</div>` : ''}
             </td>
             <td><div style="display:flex;flex-wrap:wrap">${svcs || '<span style="color:var(--color-text-muted);font-size:12px">—</span>'}</div></td>
             <td><span class="badge ${renClass}">${renStr}</span>${renExtra}</td>
@@ -1004,3 +1026,93 @@ function renderMarcasGrid(marcas) {
 document.getElementById('modalMarcas').addEventListener('click', function(e) {
     if (e.target === this) cerrarModalMarcas();
 });
+
+/* ─── TOOLTIP OJITO ──────────────────────────────────────────────────────── */
+(function() {
+    const tip = document.createElement('div');
+    tip.id = '_clientTip';
+    tip.style.cssText = 'position:fixed;z-index:9999;background:#0E0E0C;color:#F0EFEB;border-radius:8px;padding:12px 16px;max-width:680px;width:max-content;box-shadow:0 8px 28px rgba(0,0,0,.45);pointer-events:none;display:none;opacity:0;transition:opacity .15s;font-size:12px;line-height:1.4';
+    document.body.appendChild(tip);
+})();
+
+function showClientTooltip(btn) {
+    const raw = (btn.dataset.tip || '').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    const d   = JSON.parse(raw);
+    const tip = document.getElementById('_clientTip');
+    if (!tip) return;
+
+    const freqLabel = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Único', ninguna:'Ninguna' };
+    const fmtCOP    = n => '$ ' + parseFloat(n || 0).toLocaleString('es-CO', { minimumFractionDigits:0, maximumFractionDigits:0 });
+
+    // Sección izquierda: nombre + servicios apilados
+    const svcsHtml = d.svcs.length
+        ? d.svcs.map((s, i) => {
+            const fl = freqLabel[d.freqs[i]] || d.freqs[i] || '';
+            return `<div style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+                <span style="color:#F0EFEB;font-weight:600;font-size:11px">${s}</span>
+                ${fl ? `<span style="color:#57544D;font-size:10px">${fl}</span>` : ''}
+            </div>`;
+          }).join('')
+        : '<div style="color:#8A867C;font-size:11px;font-style:italic">Sin servicios</div>';
+
+    const renStr = d.renovacion
+        ? new Date(d.renovacion + 'T12:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+        : '—';
+
+    const sep = `<div style="width:1px;background:rgba(255,255,255,.1);align-self:stretch;flex-shrink:0"></div>`;
+
+    const kpi = (label, value, valColor, bg) =>
+        `<div style="display:flex;flex-direction:column;justify-content:center;gap:3px;padding:0 14px;${bg ? 'background:'+bg+';border-radius:6px;padding:6px 12px;' : ''}white-space:nowrap">
+            <div style="font-size:9px;color:#8A867C;text-transform:uppercase;letter-spacing:.06em">${label}</div>
+            <div style="font-weight:800;color:${valColor};font-size:13px">${value}</div>
+        </div>`;
+
+    tip.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0">
+            <div style="padding-right:14px;min-width:0">
+                <div style="font-size:10px;font-weight:800;color:#C6F24E;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;white-space:nowrap">${d.nombre}</div>
+                <div style="display:flex;flex-direction:column;gap:2px">${svcsHtml}</div>
+            </div>
+            ${sep}
+            ${kpi('MRR', fmtCOP(d.mrr), '#C6F24E', 'rgba(198,242,78,.08)')}
+            ${sep}
+            ${kpi('Cobrado', fmtCOP(d.cobrado), '#F0EFEB', '')}
+            ${d.porCobrar > 0 ? sep + kpi('Por cobrar', fmtCOP(d.porCobrar), '#f97316', 'rgba(249,115,22,.1)') : ''}
+            ${sep}
+            ${kpi('Renovación', renStr, '#F0EFEB', '')}
+        </div>
+    `;
+
+    // Posicionar sobre el botón, centrado horizontalmente
+    const rect = btn.getBoundingClientRect();
+    tip.style.display = 'block';
+    tip.style.opacity = '0';
+    tip.style.top     = '0px';
+    tip.style.left    = '0px';
+
+    requestAnimationFrame(() => {
+        const tH   = tip.offsetHeight;
+        const tW   = tip.offsetWidth;
+        const vW   = window.innerWidth;
+        // Aparece a la derecha de la columna "Nombre empresa" (segunda <td> de la fila)
+        const row      = btn.closest('tr');
+        const nameCell = row ? row.cells[1] : null;
+        const anchor   = nameCell ? nameCell.getBoundingClientRect() : rect;
+        let left = anchor.right + 12;
+        if (left + tW > vW - 8) left = vW - tW - 8;
+        if (left < 8) left = 8;
+        let top = anchor.top + (anchor.height / 2) - (tH / 2);
+        if (top + tH > window.innerHeight - 8) top = window.innerHeight - tH - 8;
+        if (top < 8) top = 8;
+        tip.style.left    = left + 'px';
+        tip.style.top     = top  + 'px';
+        tip.style.opacity = '1';
+    });
+}
+
+function hideClientTooltip() {
+    const tip = document.getElementById('_clientTip');
+    if (!tip) return;
+    tip.style.opacity = '0';
+    setTimeout(() => { if (tip.style.opacity === '0') tip.style.display = 'none'; }, 160);
+}
