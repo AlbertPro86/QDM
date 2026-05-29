@@ -146,6 +146,32 @@ if (!$template) {
     ];
 }
 
+// ── Fallbacks de datos de empresa ─────────────────────────────────────────────
+// Si la plantilla tiene los campos vacíos, completar desde crm_configuraciones
+// y, en último caso, con valores por defecto de QUANTUN. Así el bloque de info
+// bajo el logo NUNCA sale vacío (espejo de los fallbacks del preview JS).
+$cfgEmpresa = [];
+try {
+    $sc_cfg = $pdo->query("SELECT clave, valor FROM crm_configuraciones WHERE clave IN ('empresa_nombre','empresa_nit','empresa_email','empresa_tel','empresa_telefono','empresa_direccion','empresa_dir')");
+    foreach ($sc_cfg->fetchAll(PDO::FETCH_KEY_PAIR) as $k => $v) { $cfgEmpresa[$k] = $v; }
+} catch (PDOException $e) {}
+
+$_pick = function(array $keys, string $default) use ($template, $cfgEmpresa): string {
+    foreach ($keys as $k) {
+        if (isset($template[$k]) && trim((string)$template[$k]) !== '') return trim((string)$template[$k]);
+    }
+    foreach ($keys as $k) {
+        if (isset($cfgEmpresa[$k]) && trim((string)$cfgEmpresa[$k]) !== '') return trim((string)$cfgEmpresa[$k]);
+    }
+    return $default;
+};
+
+$template['empresa_nombre'] = $_pick(['empresa_nombre'], 'QUANTUN Digital');
+$template['empresa_nit']    = $_pick(['empresa_nit'], '');
+$template['empresa_email']  = $_pick(['empresa_email'], 'gerencia@ceicar.co');
+$template['empresa_tel']    = $_pick(['empresa_tel','empresa_telefono'], '+57 (314) 597-9983');
+$template['empresa_dir']    = $_pick(['empresa_dir','empresa_direccion'], 'Montería, Córdoba');
+
 // ── Logo para email: CID inline attachment ───────────────────────────────────
 // Gmail bloquea data: URIs y las URLs externas requieren clic del usuario.
 // CID embebe la imagen como parte MIME → visible en TODOS los clientes sin clic.
@@ -292,12 +318,20 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 @media only screen and (max-width:620px){
   body{padding:0 !important}
   .em-wrap,.em-msg{max-width:100% !important;width:100% !important}
-  .hdr-logo{width:100% !important;display:block !important;padding:16px 18px 8px 18px !important}
-  .hdr-info{width:100% !important;display:block !important;text-align:left !important;padding:4px 18px 16px !important}
-  .cli-main{width:100% !important;display:block !important;padding:14px 18px !important}
-  .cli-date{width:100% !important;display:block !important;text-align:left !important;white-space:normal !important;padding:10px 18px !important;border-left:none !important}
-  .banc-cell{width:100% !important;display:block !important}
-  .itm-td{padding:8px 8px !important;font-size:11px !important}
+  /* Una sola columna en móvil: todo apilado al 100% */
+  .hdr-tbl,.hdr-tbl tbody,.hdr-tbl tr{display:block !important;width:100% !important}
+  .hdr-logo{width:100% !important;display:block !important;padding:20px 22px 6px 22px !important;text-align:center !important}
+  .hdr-logo img{margin:0 auto !important}
+  .hdr-info{width:100% !important;display:block !important;text-align:center !important;padding:6px 22px 18px !important}
+  .hdr-meta{text-align:center !important;color:#e2e8f0 !important}
+  .cli-tbl,.cli-tbl tbody,.cli-tbl tr{display:block !important;width:100% !important}
+  .cli-main{width:100% !important;display:block !important;padding:16px 22px 8px !important;box-sizing:border-box !important;border-bottom:none !important}
+  .cli-date{width:100% !important;display:block !important;text-align:left !important;white-space:normal !important;padding:7px 22px !important;border-left:none !important;border-bottom:none !important;box-sizing:border-box !important}
+  .cli-date:last-child{padding-bottom:14px !important}
+  .banc-cell{width:100% !important;display:block !important;box-sizing:border-box !important}
+  .banc-fill{display:none !important}
+  .itm-td{padding:7px 6px !important;font-size:10px !important}
+  .px-sec{padding-left:14px !important;padding-right:14px !important}
   .totals-tbl{width:100% !important}
 }
 </style>
@@ -308,12 +342,12 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 <tr><td>
 
 <!-- Encabezado -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . '">
+<table class="hdr-tbl" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . '">
 <tr><td colspan="2" style="background:' . $csec . ';height:5px;font-size:0;line-height:0">&nbsp;</td></tr>
 <tr>
 <td class="hdr-logo" style="padding:22px 28px;width:55%;vertical-align:bottom">
 ' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" style="display:block;max-width:140px;max-height:46px;height:auto;border:0">' : '') . '
-<div style="margin-top:10px;font-size:10px;color:#94a3b8;line-height:1.8">
+<div class="hdr-meta" style="margin-top:10px;font-size:10px;color:#94a3b8;line-height:1.8">
 ' . (isset($template['empresa_nit']) && $template['empresa_nit'] ? 'NIT: ' . htmlspecialchars($template['empresa_nit']) . ' &nbsp;&middot;&nbsp; ' : '') . htmlspecialchars($template['empresa_email'] ?? '') . '<br>
 ' . htmlspecialchars($template['empresa_tel'] ?? '') . ' &nbsp;&middot;&nbsp; ' . htmlspecialchars($template['empresa_dir'] ?? '') . '
 </div>
@@ -327,7 +361,7 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 </table>
 
 <!-- Datos del cliente -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc">
+<table class="cli-tbl" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc">
 <tr>
 <td class="cli-main" style="padding:16px 28px;border-bottom:2px solid #e2e8f0;vertical-align:top;width:55%">
 <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:5px">Facturado a</div>
@@ -352,7 +386,7 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 
 <!-- Tabla de servicios -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr><td style="padding:22px 28px 10px 28px">
+<tr><td class="px-sec" style="padding:22px 28px 10px 28px">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 <thead>
 <tr style="background:' . $cpri . '">
@@ -369,7 +403,7 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 </td></tr>
 
 <!-- Totales -->
-<tr><td style="padding:0 28px 24px 28px">
+<tr><td class="px-sec" style="padding:0 28px 24px 28px">
 <table class="totals-tbl" cellpadding="0" cellspacing="0" border="0" style="width:280px;margin-left:auto">
 <tr>
 <td style="padding:5px 10px;font-size:12px;color:#64748b">Subtotal</td>
@@ -410,10 +444,10 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
               . '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.htmlspecialchars($allVals[$i+1]['lbl']).'</div>'
               . '<div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i+1]['val']).'</div>'
               . '</td>'
-            : '<td style="width:50%"></td>';
+            : '<td class="banc-fill" style="width:50%"></td>';
         $rows .= '<tr>'.$cell0.$cell1.'</tr>';
     }
-    return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0 28px 24px">
+    return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="px-sec" style="padding:0 28px 24px">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
 <tr><td colspan="2" style="padding:10px 14px;background:'.$cpri.'">
   <table cellpadding="0" cellspacing="0" border="0"><tr>
@@ -463,6 +497,18 @@ if ($mensajeOver) {
         $mensajeHtml . "\n" . '<table class="em-wrap"',
         $htmlFinal
     );
+}
+
+// Previsualización en navegador (no envía): cid: → ruta web del logo
+if (!empty($input['preview_only'])) {
+    $logoWeb = '';
+    if ($logoFilePath && strpos($logoFilePath, BASE_PATH) === 0) {
+        $rel = str_replace('\\', '/', substr($logoFilePath, strlen(BASE_PATH)));
+        $logoWeb = APP_URL . '/' . ltrim($rel, '/');
+    }
+    header('Content-Type: text/html; charset=utf-8');
+    echo str_replace('cid:' . $logoCid, $logoWeb, $htmlFinal);
+    exit;
 }
 
 // Enviar correo — logo como CID inline para compatibilidad universal
