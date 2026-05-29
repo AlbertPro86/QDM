@@ -56,10 +56,15 @@ $leadsToConvert = $stmt->fetchAll();
 
     <!-- Filtros -->
     <div class="card" style="width: 100%; padding: 16px; display: flex; gap: 16px; align-items: center; background: white; flex-wrap: wrap;">
-        <div class="search-bar" style="flex: 1; min-width: 250px; position:relative">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" id="clientSearch" placeholder="Buscar por cliente, contacto, NIT..." style="border: none; outline: none; width: 100%; font-size: 14px;" oninput="onClientSearch()">
-            <button id="clientSearchClear" onclick="limpiarBusqueda()" title="Limpiar" style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:#8A867C;font-size:16px;line-height:1;padding:2px 4px" onmouseenter="this.style.color='var(--color-text)'" onmouseleave="this.style.color='var(--color-text-light)'">&times;</button>
+        <div style="flex:1;min-width:260px;position:relative;display:flex;align-items:center;background:#fff;border:2px solid #0E0E0C;border-radius:6px;padding:0 12px;height:42px;transition:box-shadow .15s;box-shadow:none" onfocus-within="this.style.boxShadow='0 0 0 3px rgba(14,14,12,.08)'">
+            <svg width="17" height="17" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.5" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="clientSearch" placeholder="Buscar cliente, contacto, NIT, servicio…" oninput="onClientSearch()"
+                style="border:none;outline:none;width:100%;font-size:13px;font-weight:500;color:#0E0E0C;background:transparent;padding:0 8px;font-family:inherit"
+                onfocus="this.parentElement.style.boxShadow='0 0 0 3px rgba(14,14,12,.1)'"
+                onblur="this.parentElement.style.boxShadow='none'">
+            <button id="clientSearchClear" onclick="limpiarBusqueda()" title="Limpiar"
+                style="display:none;border:none;background:none;cursor:pointer;color:#8A867C;font-size:18px;line-height:1;padding:0 2px;flex-shrink:0"
+                onmouseenter="this.style.color='#0E0E0C'" onmouseleave="this.style.color='#8A867C'">&times;</button>
         </div>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -137,9 +142,9 @@ $leadsToConvert = $stmt->fetchAll();
                         <th>Servicios Activos</th>
                         <th onclick="sortClients('renovacion')" style="cursor:pointer;user-select:none;white-space:nowrap">Próx. Renovación <span id="sort_renovacion" style="color:#8A867C;font-size:10px"></span></th>
                         <th onclick="sortClients('ingresos')" style="cursor:pointer;user-select:none;white-space:nowrap">Ingresos <span id="sort_ingresos" style="color:#8A867C;font-size:10px"></span></th>
-                        <th>WhatsApp</th>
+                        <th>Estado</th>
                         <th>Frecuencia</th>
-                        <th style="width: 80px;"></th>
+                        <th style="width:50px;"></th>
                     </tr>
                 </thead>
                 <tbody id="clientsTableBody">
