@@ -113,10 +113,13 @@ switch ($method) {
         if (empty($fields)) jsonResponse(['error' => 'No hay campos para actualizar.'], 400);
 
         $values[] = $id;
-        // Obtener nombre anterior para sincronización
-        $oldSvc = $pdo->prepare("SELECT nombre FROM servicios WHERE id = ?");
+        // Obtener valores anteriores para sincronización
+        $oldSvc = $pdo->prepare("SELECT nombre, precio_base, costo FROM servicios WHERE id = ?");
         $oldSvc->execute([$id]);
-        $oldNombre = $oldSvc->fetchColumn();
+        $oldData = $oldSvc->fetch();
+        $oldNombre = $oldData['nombre'] ?? null;
+        $oldPrecio = (float)($oldData['precio_base'] ?? 0);
+        $oldCosto  = (float)($oldData['costo'] ?? 0);
 
         $pdo->prepare("UPDATE servicios SET " . implode(', ', $fields) . " WHERE id = ?")->execute($values);
         logActivity($_SESSION['user_id'], 'actualizar', 'servicios', $id, "Servicio actualizado");
@@ -140,6 +143,31 @@ switch ($method) {
                            WHERE servicio_id = ?
                            AND nombre_display LIKE ?")
                 ->execute([$newNombre, strlen($oldNombre) + 1, $id, $oldNombre . ' — %']);
+        }
+
+        // Sincronizar costo_servicio → cliente_servicios activos (sin paquete)
+        // Cuando el costo del servicio cambia, actualizar los que no fueron personalizados
+        if (isset($input['costo'])) {
+            $nuevoCosto = (float)$input['costo'];
+            $pdo->prepare("UPDATE cliente_servicios
+                           SET costo_servicio = ?
+                           WHERE servicio_id = ?
+                             AND paquete_id IS NULL
+                             AND estado = 'activo'")
+                ->execute([$nuevoCosto, $id]);
+        }
+
+        // Sincronizar precio_base → monto_renovacion en cliente_servicios activos (sin paquete)
+        // Solo actualizar aquellos cuyo monto coincide con el precio anterior (no personalizados)
+        if (isset($input['precio_base']) && (float)$input['precio_base'] !== $oldPrecio) {
+            $nuevoPrecio = (float)$input['precio_base'];
+            $pdo->prepare("UPDATE cliente_servicios
+                           SET monto_renovacion = ?
+                           WHERE servicio_id = ?
+                             AND paquete_id IS NULL
+                             AND estado = 'activo'
+                             AND monto_renovacion = ?")
+                ->execute([$nuevoPrecio, $id, $oldPrecio]);
         }
 
         // Reemplazar features

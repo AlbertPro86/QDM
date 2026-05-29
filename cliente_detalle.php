@@ -3433,10 +3433,14 @@ async function registrarPagoDirecto() {
     );
     if (!ok) return;
 
+    // Mapeo de frecuencias cliente_servicios → transacciones
+    const freqMap = { mes:'mensual', trimestre:'trimestral', semestre:'semestral', año:'anual', unico:'unico' };
+
     const hoy = new Date().toISOString().split('T')[0];
     let registrados = 0;
     for (const svc of servicios) {
         try {
+            const freq = freqMap[svc.frecuencia] || svc.frecuencia || 'mensual';
             const r = await fetch('api/transacciones.php', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3451,7 +3455,7 @@ async function registrarPagoDirecto() {
                     estado:            'pagado',
                     cliente_id:        clienteId,
                     servicio_id:       svc.servicio_id || null,
-                    frecuencia:        svc.frecuencia,
+                    frecuencia:        freq,
                 })
             });
             const d = await r.json();
@@ -3576,7 +3580,7 @@ async function confirmarRegistrarPago() {
             estado:      'pagado',
             cliente_id:  clienteId,
             servicio_id: svc.servicio_id || null,
-            frecuencia:  svc.frecuencia === 'unico' ? 'unico' : svc.frecuencia,
+            frecuencia:  svc.frecuencia === 'unico' ? 'unico' : ({mes:'mensual',trimestre:'trimestral',semestre:'semestral',año:'anual'}[svc.frecuencia] || svc.frecuencia),
         };
         const r = await fetch('api/transacciones.php', {
             method:  'POST',

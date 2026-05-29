@@ -28,6 +28,24 @@ try { $pdo->exec("ALTER TABLE transacciones ADD CONSTRAINT fk_tx_cliente FOREIGN
 try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN negocio_id INT DEFAULT NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE transacciones ADD COLUMN fecha_pago DATE DEFAULT NULL"); } catch(PDOException $e){}
 
+// Fix: corregir transacciones de pagos de servicio que quedaron con frecuencia='unico'
+// porque la frecuencia de cliente_servicios (mes/trimestre/semestre/año) no mapeaba a transacciones
+$pdo->exec("
+    UPDATE transacciones t
+    JOIN cliente_servicios cs ON cs.cliente_id = t.cliente_id AND cs.servicio_id = t.servicio_id
+    SET t.frecuencia = CASE cs.frecuencia
+        WHEN 'mes'       THEN 'mensual'
+        WHEN 'trimestre' THEN 'trimestral'
+        WHEN 'semestre'  THEN 'semestral'
+        WHEN 'año'       THEN 'anual'
+        ELSE t.frecuencia
+    END
+    WHERE t.frecuencia = 'unico'
+      AND t.concepto LIKE 'Pago – %'
+      AND cs.frecuencia IN ('mes','trimestre','semestre','año')
+      AND cs.estado = 'activo'
+");
+
 switch ($method) {
     case 'GET':
         // Si viene un ID específico, retornar solo esa transacción
@@ -250,8 +268,20 @@ switch ($method) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
-        $frecuenciasValidas = ['unico','mensual','trimestral','semestral','anual'];
-        $frecuencia = in_array($input['frecuencia'] ?? '', $frecuenciasValidas) ? $input['frecuencia'] : 'unico';
+        // Mapeo de frecuencias de cliente_servicios → transacciones
+        $freqMap = [
+            'mes'       => 'mensual',
+            'trimestre' => 'trimestral',
+            'semestre'  => 'semestral',
+            'año'       => 'anual',
+            'unico'     => 'unico',
+            'mensual'   => 'mensual',
+            'trimestral'=> 'trimestral',
+            'semestral' => 'semestral',
+            'anual'     => 'anual',
+        ];
+        $rawFreq = strtolower(trim($input['frecuencia'] ?? ''));
+        $frecuencia = $freqMap[$rawFreq] ?? 'unico';
         $descuento  = max(0, (float)($input['descuento'] ?? 0));
 
         $stmt->execute([

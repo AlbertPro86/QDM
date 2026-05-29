@@ -26,6 +26,17 @@ $mrrFactor = [
     'ninguna'   => 0,
 ];
 
+// Auto-sincronizar costo_servicio NULL/0 desde catálogo de servicios
+$pdo->exec("
+    UPDATE cliente_servicios cs
+    JOIN servicios s ON cs.servicio_id = s.id
+    SET cs.costo_servicio = s.costo
+    WHERE cs.estado = 'activo'
+      AND cs.paquete_id IS NULL
+      AND (cs.costo_servicio IS NULL OR cs.costo_servicio = 0)
+      AND s.costo > 0
+");
+
 // Todos los servicios activos de clientes activos
 $stmt = $pdo->query("
     SELECT
@@ -209,6 +220,7 @@ $balance   = $totalIngresos - $totalEgresos;
 $margenPct = $totalIngresos > 0 ? round(($balance / $totalIngresos) * 100, 1) : 0;
 
 // Suscripciones vencidas (fecha_vencimiento < hoy) → por cobrar desde cliente_servicios
+// Excluir las que ya tienen transacción pendiente/vencida (evita doble conteo con transacciones.por_cobrar)
 $stmtVencidas = $pdo->query("
     SELECT
         COALESCE(SUM(cs.monto_renovacion - COALESCE(cs.descuento, 0)), 0) AS total_vencidas,
@@ -220,6 +232,13 @@ $stmtVencidas = $pdo->query("
       AND cs.frecuencia != 'unico'
       AND cs.fecha_vencimiento IS NOT NULL
       AND cs.fecha_vencimiento < CURDATE()
+      AND NOT EXISTS (
+          SELECT 1 FROM transacciones t
+          WHERE t.cliente_id = cs.cliente_id
+            AND t.servicio_id = cs.servicio_id
+            AND t.tipo = 'ingreso'
+            AND t.estado IN ('pendiente', 'vencido')
+      )
 ");
 $vencidas = $stmtVencidas->fetch();
 

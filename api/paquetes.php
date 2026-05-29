@@ -165,6 +165,12 @@ switch ($method) {
             }
         }
 
+        // Sincronizar costo a cliente_servicios con este paquete
+        $pdo->prepare("UPDATE cliente_servicios
+                        SET costo_servicio = ?
+                        WHERE paquete_id = ? AND estado = 'activo'")
+            ->execute([$costo, $id]);
+
         logActivity($_SESSION['user_id'], 'actualizar', 'paquetes', $id, "Paquete actualizado");
         jsonResponse(['success' => true, 'message' => 'Paquete actualizado']);
         break;
