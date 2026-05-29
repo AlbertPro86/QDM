@@ -69,7 +69,7 @@ $leadsToConvert = $stmt->fetchAll();
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <div style="display: flex; flex-direction: column; gap: 4px;">
                 <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Servicio / Sub Servicio / Suscripción</label>
-                <select class="form-select" id="filterSvcType" style="width: 320px; padding: 8px 12px;">
+                <select class="form-select" id="filterSvcType" style="width: 320px;">
                     <option value="todos">Todos</option>
                     <optgroup label="Servicios">
                         <?php foreach($servicios as $svc): ?>
@@ -90,7 +90,7 @@ $leadsToConvert = $stmt->fetchAll();
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px;">
                 <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Frecuencia</label>
-                <select class="form-select" id="filterFrecuencia" style="width: 160px; padding: 8px 12px;">
+                <select class="form-select" id="filterFrecuencia" style="width: 160px;">
                     <option value="todos">Todas</option>
                     <option value="unico">Pago único</option>
                     <option value="mes">Mensual</option>
@@ -101,7 +101,7 @@ $leadsToConvert = $stmt->fetchAll();
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px;">
                 <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Estado</label>
-                <select class="form-select" id="filterStatus" style="width: 150px; padding: 8px 12px;">
+                <select class="form-select" id="filterStatus" style="width: 150px;">
                     <option value="todos">Todos los estados</option>
                     <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
