@@ -102,7 +102,7 @@ $leadsToConvert = $stmt->fetchAll();
             <div style="display: flex; flex-direction: column; gap: 4px;">
                 <label style="font-size: 11px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Estado</label>
                 <select class="form-select" id="filterStatus" style="width: 150px;">
-                    <option value="todos">Todos los estados</option>
+                    <option value="todos">Todos</option>
                     <option value="activo">Activo</option>
                     <option value="inactivo">Inactivo</option>
                 </select>
