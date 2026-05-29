@@ -79,7 +79,11 @@ function renderClients(clients) {
     const svcType = document.getElementById('filterSvcType').value;
     const status = document.getElementById('filterStatus').value;
 
-    const frecuencia = document.getElementById('filterFrecuencia').value;
+    const frecuencia   = document.getElementById('filterFrecuencia').value;
+    const fechaDesde   = document.getElementById('filterFechaDesde')?.value || '';
+    const fechaHasta   = document.getElementById('filterFechaHasta')?.value || '';
+    const tsDesde      = fechaDesde ? new Date(fechaDesde + 'T00:00:00').getTime() : null;
+    const tsHasta      = fechaHasta ? new Date(fechaHasta + 'T23:59:59').getTime() : null;
 
     const filtered = clients.filter(c => {
         const matchSearch = !search || c.nombre_comercial.toLowerCase().includes(search)
@@ -92,7 +96,20 @@ function renderClients(clients) {
         // Excluir clientes cuya ÚNICA frecuencia activa es 'unico' → pertenecen al tab "Pagos únicos"
         const freqs = (c.frecuencias_activas || '').split(',').map(f => f.trim()).filter(Boolean);
         const soloUnico = freqs.length > 0 && freqs.every(f => f === 'unico');
-        return matchSearch && matchSvc && matchStatus && matchFreq && !soloUnico;
+        // Filtro por rango de fecha de renovación
+        let matchFecha = true;
+        if (tsDesde || tsHasta) {
+            const ts = c.proxima_renovacion
+                ? new Date(c.proxima_renovacion + 'T12:00:00').getTime()
+                : null;
+            if (!ts) {
+                matchFecha = false;
+            } else {
+                if (tsDesde && ts < tsDesde) matchFecha = false;
+                if (tsHasta && ts > tsHasta) matchFecha = false;
+            }
+        }
+        return matchSearch && matchSvc && matchStatus && matchFreq && matchFecha && !soloUnico;
     });
 
     if(!filtered.length) {
@@ -912,6 +929,10 @@ function limpiarTodosLosFiltros() {
     document.getElementById('filterSvcType').value = 'todos';
     document.getElementById('filterFrecuencia').value = 'todos';
     document.getElementById('filterStatus').value = 'todos';
+    const d = document.getElementById('filterFechaDesde');
+    const h = document.getElementById('filterFechaHasta');
+    if (d) d.value = '';
+    if (h) h.value = '';
     renderClients(allClients);
 }
 

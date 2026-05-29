@@ -107,6 +107,14 @@ $leadsToConvert = $stmt->fetchAll();
                     <option value="inactivo">Inactivo</option>
                 </select>
             </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase">Renovación desde</label>
+                <input type="date" id="filterFechaDesde" class="form-select" style="width:150px;padding:8px 10px" onchange="renderClients(allClients)">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase">Hasta</label>
+                <input type="date" id="filterFechaHasta" class="form-select" style="width:150px;padding:8px 10px" onchange="renderClients(allClients)">
+            </div>
             <button class="btn btn-ghost btn-sm" onclick="limpiarTodosLosFiltros()" style="align-self:flex-end">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 Limpiar filtros
