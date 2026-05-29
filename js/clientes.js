@@ -101,7 +101,7 @@ function renderClients(clients) {
         return;
     }
 
-    // Ordenamiento por columna
+    // Ordenamiento por columna; si no hay columna activa → orden por renovación del mes
     if (_sortState.col) {
         filtered.sort((a, b) => {
             let va, vb;
@@ -123,6 +123,32 @@ function renderClients(clients) {
                 return _sortState.dir * (va - vb);
             }
             return 0;
+        });
+    } else {
+        // Orden predeterminado: vencidos → mes actual → próximos 30 días → resto (alfabético)
+        const hoyMs   = new Date().setHours(0, 0, 0, 0);
+        const mesMes  = new Date().toISOString().substring(0, 7); // 'YYYY-MM'
+        const ms30    = hoyMs + 30 * 86400000;
+
+        const prioridad = c => {
+            if (!c.proxima_renovacion) return 4; // sin fecha → al final
+            const t  = new Date(c.proxima_renovacion + 'T12:00:00').getTime();
+            const ym = c.proxima_renovacion.substring(0, 7);
+            if (t < hoyMs)       return 0; // vencido
+            if (ym === mesMes)   return 1; // este mes
+            if (t <= ms30)       return 2; // próximos 30 días
+            return 3;
+        };
+
+        filtered.sort((a, b) => {
+            const pa = prioridad(a), pb = prioridad(b);
+            if (pa !== pb) return pa - pb;
+            // Dentro de mismo grupo → por fecha ASC (más próximos primero)
+            const ta = a.proxima_renovacion ? new Date(a.proxima_renovacion + 'T12:00:00').getTime() : Infinity;
+            const tb = b.proxima_renovacion ? new Date(b.proxima_renovacion + 'T12:00:00').getTime() : Infinity;
+            if (ta !== tb) return ta - tb;
+            // Mismo día → alfabético
+            return (a.nombre_comercial || '').localeCompare(b.nombre_comercial || '', 'es');
         });
     }
 
