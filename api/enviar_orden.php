@@ -136,17 +136,50 @@ if (!$template) {
     ];
 }
 
-// Logo — Base64 embebido (visible en TODOS los clientes de correo)
-$logoUrlTemplate = !empty($template['logo_url']) ? trim($template['logo_url']) : '';
-// enviar_orden usa logo negro sobre fondo claro; getLogoEmailSrc usa el blanco,
-// así que lo manejamos manualmente con la misma lógica Base64
+// Logo — SIEMPRE Base64 embebido (funciona en todos los clientes de correo; las URLs externas son bloqueadas)
 $logoSrc = '';
-if ($logoUrlTemplate && stripos($logoUrlTemplate, 'localhost') === false && stripos($logoUrlTemplate, '127.0.0.1') === false) {
-    $logoSrc = $logoUrlTemplate;
-} else {
-    $logoFile = BASE_PATH . '/Assets/logo_quantun_digital_negro.png';
-    if (file_exists($logoFile)) {
-        $logoSrc = 'data:image/png;base64,' . base64_encode(file_get_contents($logoFile));
+$logoUrlTemplate = !empty($template['logo_url']) ? trim($template['logo_url']) : '';
+if ($logoUrlTemplate !== '') {
+    if (preg_match('#^https?://#i', $logoUrlTemplate)) {
+        // URL remota: descargar y convertir a base64
+        if (function_exists('curl_init')) {
+            $ch = curl_init($logoUrlTemplate);
+            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>5,CURLOPT_SSL_VERIFYPEER=>false,CURLOPT_FOLLOWLOCATION=>true]);
+            $rawImg = curl_exec($ch);
+            $ctype  = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/png';
+            curl_close($ch);
+            if ($rawImg) {
+                $mime = trim(explode(';', $ctype)[0]);
+                $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($rawImg);
+            }
+        } else {
+            $rawImg = @file_get_contents($logoUrlTemplate);
+            if ($rawImg !== false) $logoSrc = 'data:image/png;base64,' . base64_encode($rawImg);
+        }
+    } else {
+        // Ruta local (relativa o absoluta)
+        $localPath = BASE_PATH . '/' . ltrim(str_replace('\\', '/', $logoUrlTemplate), '/');
+        if (@file_exists($localPath) && @is_file($localPath)) {
+            $ext   = strtolower(pathinfo($localPath, PATHINFO_EXTENSION));
+            $mimes = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'];
+            $mime  = $mimes[$ext] ?? 'image/png';
+            $raw   = @file_get_contents($localPath);
+            if ($raw !== false) $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($raw);
+        }
+        if (!$logoSrc && @file_exists($logoUrlTemplate) && @is_file($logoUrlTemplate)) {
+            $ext   = strtolower(pathinfo($logoUrlTemplate, PATHINFO_EXTENSION));
+            $mimes = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'];
+            $mime  = $mimes[$ext] ?? 'image/png';
+            $raw   = @file_get_contents($logoUrlTemplate);
+            if ($raw !== false) $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($raw);
+        }
+    }
+}
+if (!$logoSrc) {
+    $defaultLogo = BASE_PATH . '/Assets/logo_quantun_digital_negro.png';
+    if (@file_exists($defaultLogo)) {
+        $raw = @file_get_contents($defaultLogo);
+        if ($raw !== false) $logoSrc = 'data:image/png;base64,' . base64_encode($raw);
     }
 }
 
@@ -194,73 +227,101 @@ foreach ($servicios as $idx => $svc) {
     $descuento = $svc['descuento'] ?? 0;
     $subtotal  = $svc['monto_renovacion'] - $descuento;
     $tablasServicios .= '<tr style="border-bottom:1px solid #f1f5f9">
-        <td style="padding:11px 14px;font-size:12px;color:#475569">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
-        <td style="padding:11px 14px;font-size:12px;color:#475569;text-align:center">' . $qty . '</td>
-        <td style="padding:11px 14px;font-size:12px;color:#475569;text-align:right">$ ' . number_format($precioU, 0, ',', '.') . '</td>
-        <td style="padding:11px 14px;font-size:12px;font-weight:700;color:#0f172a;text-align:right">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
+        <td class="itm-td" style="padding:10px 12px;font-size:12px;color:#475569;word-break:break-word">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
+        <td class="itm-td" style="padding:10px 12px;font-size:12px;color:#475569;text-align:center">' . $qty . '</td>
+        <td class="itm-td" style="padding:10px 12px;font-size:12px;color:#475569;text-align:right;white-space:nowrap">$ ' . number_format($precioU, 0, ',', '.') . '</td>
+        <td class="itm-td" style="padding:10px 12px;font-size:12px;font-weight:700;color:#0f172a;text-align:right;white-space:nowrap">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
     </tr>';
 }
+
+// Atajos para interpolación limpia en el HTML
+$cpri  = $template['color_primario'];
+$csec  = $template['color_secundario'];
+$cfont = $template['fuente'];
 
 $htmlFinal = '<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>' . $docTipoLabel . ' ' . $orderNumber . '</title>
+<title>' . htmlspecialchars($docTipoLabel) . ' ' . htmlspecialchars($orderNumber) . '</title>
+<style type="text/css">
+body{margin:0;padding:0;background:#f3f4f6}
+table{border-spacing:0;mso-table-lspace:0;mso-table-rspace:0}
+img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
+.em-wrap{background:#ffffff;max-width:600px;margin:0 auto}
+.em-msg{max-width:600px;margin:0 auto}
+@media only screen and (max-width:620px){
+  body{padding:0 !important}
+  .em-wrap,.em-msg{max-width:100% !important;width:100% !important}
+  .hdr-logo{width:100% !important;display:block !important;padding:16px 18px 8px 18px !important}
+  .hdr-info{width:100% !important;display:block !important;text-align:left !important;padding:4px 18px 16px !important}
+  .cli-main{width:100% !important;display:block !important;padding:14px 18px !important}
+  .cli-date{width:100% !important;display:block !important;text-align:left !important;white-space:normal !important;padding:10px 18px !important;border-left:none !important}
+  .banc-cell{width:100% !important;display:block !important}
+  .itm-td{padding:8px 8px !important;font-size:11px !important}
+  .totals-tbl{width:100% !important}
+}
+</style>
 </head>
-<body style="font-family:' . $template['fuente'] . ',system-ui,sans-serif;color:#1e293b;line-height:1.5;margin:0;padding:40px;background:#f3f4f6">
-<div style="background:white;max-width:900px;margin:auto">
+<body style="margin:0;padding:20px 10px;background:#f3f4f6;font-family:' . $cfont . ',system-ui,sans-serif;color:#1e293b;line-height:1.5">
 
-<table style="width:100%;border-collapse:collapse;background:' . $template['color_primario'] . '">
-<tr><td colspan="2" style="padding:0;background:' . $template['color_secundario'] . ';height:6px;font-size:0;line-height:0">&nbsp;</td></tr>
-<tr style="vertical-align:bottom">
-<td style="padding:24px 36px 24px 36px;width:55%;vertical-align:bottom">
-' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" width="150" style="display:block;max-height:48px;border:0">' : '') . '
-<div style="margin-top:12px;font-size:11px;color:#94a3b8;line-height:1.8">
-' . (isset($template['empresa_nit']) && $template['empresa_nit'] ? 'NIT: ' . htmlspecialchars($template['empresa_nit']) . ' &nbsp;&middot;&nbsp; ' : '') . htmlspecialchars($template['empresa_email']) . '<br>
+<table class="em-wrap" width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="background:#ffffff;max-width:600px;margin:0 auto;border-radius:4px;overflow:hidden">
+<tr><td>
+
+<!-- Encabezado -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . '">
+<tr><td colspan="2" style="background:' . $csec . ';height:5px;font-size:0;line-height:0">&nbsp;</td></tr>
+<tr>
+<td class="hdr-logo" style="padding:22px 28px;width:55%;vertical-align:bottom">
+' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" style="display:block;max-width:140px;max-height:46px;height:auto;border:0">' : '') . '
+<div style="margin-top:10px;font-size:10px;color:#94a3b8;line-height:1.8">
+' . (isset($template['empresa_nit']) && $template['empresa_nit'] ? 'NIT: ' . htmlspecialchars($template['empresa_nit']) . ' &nbsp;&middot;&nbsp; ' : '') . htmlspecialchars($template['empresa_email'] ?? '') . '<br>
 ' . htmlspecialchars($template['empresa_tel'] ?? '') . ' &nbsp;&middot;&nbsp; ' . htmlspecialchars($template['empresa_dir'] ?? '') . '
 </div>
 </td>
-<td style="padding:24px 36px 24px 36px;width:45%;vertical-align:bottom;text-align:right">
-<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $template['color_secundario'] . '">' . htmlspecialchars($docTipoLabel) . '</div>
-<div style="font-size:24px;font-weight:900;color:#ffffff;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
+<td class="hdr-info" style="padding:22px 28px;width:45%;vertical-align:bottom;text-align:right">
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $csec . '">' . htmlspecialchars($docTipoLabel) . '</div>
+<div style="font-size:22px;font-weight:900;color:#ffffff;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
 <div style="font-size:11px;color:#94a3b8;margin-top:4px">' . $fechaEmision . '</div>
 </td>
 </tr>
 </table>
 
-<table style="width:100%;border-collapse:collapse;background:#f8fafc">
+<!-- Datos del cliente -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc">
 <tr>
-<td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle">
+<td class="cli-main" style="padding:16px 28px;border-bottom:2px solid #e2e8f0;vertical-align:top;width:55%">
 <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:5px">Facturado a</div>
 <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:3px">' . htmlspecialchars($data['nombre_comercial'] ?? '') . '</div>
 ' . (!empty($data['nit_cedula']) ? '<div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:2px">NIT / Cédula: ' . htmlspecialchars($data['nit_cedula']) . '</div>' : '') . '
 <div style="font-size:11px;color:#64748b">' . htmlspecialchars($data['direccion'] ?? '') . '</div>
 </td>
-<td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle;text-align:center;white-space:nowrap;width:1%">
-<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:5px">Emisión</span>
+<td class="cli-date" style="padding:14px 16px;border-bottom:2px solid #e2e8f0;vertical-align:top;text-align:center;width:1%;white-space:nowrap">
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:4px">Emisión</span>
 <span style="font-size:12px;font-weight:700;color:#0f172a;display:block">' . $fechaEmision . '</span>
 </td>
-' . ($fechaUltPago ? '<td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle;text-align:center;white-space:nowrap;width:1%">
-<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:5px">Último Pago</span>
+' . ($fechaUltPago ? '<td class="cli-date" style="padding:14px 16px;border-bottom:2px solid #e2e8f0;vertical-align:top;text-align:center;width:1%;white-space:nowrap">
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:4px">Último Pago</span>
 <span style="font-size:12px;font-weight:700;color:#0f172a;display:block">' . htmlspecialchars($fechaUltPago) . '</span>
 </td>' : '') . '
-<td style="padding:18px 36px;border-bottom:2px solid #e2e8f0;vertical-align:middle;text-align:center;white-space:nowrap;width:1%">
-<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:5px">Método de Pago</span>
+<td class="cli-date" style="padding:14px 16px;border-bottom:2px solid #e2e8f0;vertical-align:top;text-align:center;width:1%;white-space:nowrap">
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:block;margin-bottom:4px">Método</span>
 <span style="font-size:11px;font-weight:700;color:#0f172a;display:block">' . htmlspecialchars($metodoPagoOver ?? '') . '</span>
 </td>
 </tr>
 </table>
 
-<table style="width:100%;border-collapse:collapse">
-<tr><td style="padding:28px 36px 10px 36px">
-<table style="width:100%;border-collapse:collapse">
+<!-- Tabla de servicios -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr><td style="padding:22px 28px 10px 28px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
 <thead>
-<tr style="background:' . $template['color_primario'] . '">
-<th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Descripción</th>
-<th style="padding:10px 14px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Cant.</th>
-<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Precio</th>
-<th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Total</th>
+<tr style="background:' . $cpri . '">
+<th class="itm-td" style="padding:9px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff">Descripción</th>
+<th class="itm-td" style="padding:9px 12px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff;width:36px">Cant.</th>
+<th class="itm-td" style="padding:9px 12px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff;width:80px">Precio</th>
+<th class="itm-td" style="padding:9px 12px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#ffffff;width:80px">Total</th>
 </tr>
 </thead>
 <tbody>
@@ -268,87 +329,82 @@ $htmlFinal = '<!DOCTYPE html>
 </tbody>
 </table>
 </td></tr>
-<tr><td style="padding:0 36px 28px 36px">
-<table style="width:300px;border-collapse:collapse;margin-left:auto">
+
+<!-- Totales -->
+<tr><td style="padding:0 28px 24px 28px">
+<table class="totals-tbl" cellpadding="0" cellspacing="0" border="0" style="width:280px;margin-left:auto">
 <tr>
-<td style="padding:6px 12px;font-size:12px;color:#64748b;text-align:left">Subtotal</td>
-<td style="padding:6px 12px;font-size:12px;color:#64748b;text-align:right">$ ' . number_format($totalOriginal, 0, ',', '.') . '</td>
+<td style="padding:5px 10px;font-size:12px;color:#64748b">Subtotal</td>
+<td style="padding:5px 10px;font-size:12px;color:#64748b;text-align:right">$ ' . number_format($totalOriginal, 0, ',', '.') . '</td>
 </tr>
 ' . ($totalDescuento > 0 ? '<tr>
-<td style="padding:6px 12px;font-size:12px;color:#ea4335;text-align:left">Descuento</td>
-<td style="padding:6px 12px;font-size:12px;color:#ea4335;text-align:right">- $ ' . number_format($totalDescuento, 0, ',', '.') . '</td>
+<td style="padding:5px 10px;font-size:12px;color:#ea4335">Descuento</td>
+<td style="padding:5px 10px;font-size:12px;color:#ea4335;text-align:right">- $ ' . number_format($totalDescuento, 0, ',', '.') . '</td>
 </tr>' : '') . '
+<tr><td colspan="2" style="padding:0;padding-top:8px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . ';border-radius:6px">
 <tr>
-<td colspan="2" style="padding:0;padding-top:10px">
-<table style="width:100%;border-collapse:collapse;background:' . $template['color_primario'] . ';border-radius:8px">
-<tr>
-<td style="padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $template['color_secundario'] . '">Total a pagar</td>
-<td style="padding:14px 16px;font-size:18px;font-weight:900;color:#ffffff;text-align:right">$ ' . number_format($totalFinal, 0, ',', '.') . '</td>
-</tr>
-</table>
-</td>
+<td style="padding:12px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:' . $csec . '">Total a pagar</td>
+<td style="padding:12px 14px;font-size:18px;font-weight:900;color:#ffffff;text-align:right">$ ' . number_format($totalFinal, 0, ',', '.') . '</td>
 </tr>
 </table>
 </td></tr>
 </table>
+</td></tr>
+</table>
 
-' . (function() use ($bancariosOver, $template) {
-    $bancFields = ['titular'=>'Titular','cedula'=>'Cédula / NIT','banco'=>'Banco','cuenta'=>'N° de Cuenta','tipo'=>'Tipo de Cuenta','llave'=>'Nequi / Daviplata / QR'];
-    $cells = '';
-    $idx = 0;
-    foreach ($bancFields as $k => $lbl) {
-        if (!empty($bancariosOver[$k])) {
-            $bg = $idx % 2 === 0 ? '#FAFAF7' : '#ffffff';
-            $cells .= '<td style="padding:10px 16px;background:' . $bg . ';vertical-align:top;width:50%">'
-                    . '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">' . $lbl . '</div>'
-                    . '<div style="font-size:12px;font-weight:600;color:#2D2B28">' . htmlspecialchars($bancariosOver[$k]) . '</div>'
-                    . '</td>';
-            $idx++;
-        }
-    }
-    if (!$cells) return '';
-    // Group into rows of 2
+' . (function() use ($bancariosOver, $cpri, $csec) {
+    $bancFields = ['titular'=>'Titular','cedula'=>'Cédula / NIT','banco'=>'Banco','cuenta'=>'N° de Cuenta','tipo'=>'Tipo de Cuenta','llave'=>'Llave'];
     $allVals = [];
     foreach ($bancFields as $k => $lbl) {
         if (!empty($bancariosOver[$k])) $allVals[] = ['lbl'=>$lbl,'val'=>$bancariosOver[$k]];
     }
+    if (!$allVals) return '';
     $rows = '';
     for ($i = 0; $i < count($allVals); $i += 2) {
-        $bg0 = $i % 4 === 0 ? '#FAFAF7' : '#ffffff';
-        $bg1 = $bg0;
-        $cell0 = '<td style="padding:10px 16px;background:'.$bg0.';vertical-align:top;width:50%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.$allVals[$i]['lbl'].'</div><div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i]['val']).'</div></td>';
+        $bg0 = ($i % 4 === 0) ? '#FAFAF7' : '#ffffff';
+        $cell0 = '<td class="banc-cell" style="padding:10px 14px;background:'.$bg0.';vertical-align:top;width:50%">'
+               . '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.htmlspecialchars($allVals[$i]['lbl']).'</div>'
+               . '<div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i]['val']).'</div>'
+               . '</td>';
         $cell1 = isset($allVals[$i+1])
-            ? '<td style="padding:10px 16px;background:#ffffff;vertical-align:top;width:50%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.$allVals[$i+1]['lbl'].'</div><div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i+1]['val']).'</div></td>'
+            ? '<td class="banc-cell" style="padding:10px 14px;background:#ffffff;vertical-align:top;width:50%">'
+              . '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#B0AB9F;margin-bottom:3px">'.htmlspecialchars($allVals[$i+1]['lbl']).'</div>'
+              . '<div style="font-size:12px;font-weight:600;color:#2D2B28">'.htmlspecialchars($allVals[$i+1]['val']).'</div>'
+              . '</td>'
             : '<td style="width:50%"></td>';
         $rows .= '<tr>'.$cell0.$cell1.'</tr>';
     }
-    return '<table style="width:100%;border-collapse:collapse"><tr><td style="padding:0 36px 28px">
-<table style="width:100%;border-collapse:collapse;border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
-<tr><td colspan="2" style="padding:10px 16px;background:' . $template['color_primario'] . '">
-  <table style="border-collapse:collapse"><tr>
-    <td style="padding:0 8px 0 0;vertical-align:middle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' . $template['color_secundario'] . '" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></td>
-    <td style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:' . $template['color_secundario'] . '">Datos para el pago</td>
+    return '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0 28px 24px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
+<tr><td colspan="2" style="padding:10px 14px;background:'.$cpri.'">
+  <table cellpadding="0" cellspacing="0" border="0"><tr>
+    <td style="padding:0 8px 0 0;vertical-align:middle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="'.$csec.'" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></td>
+    <td style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:'.$csec.'">Datos para el pago</td>
   </tr></table>
 </td></tr>'
 . $rows .
 '</table></td></tr></table>';
 })() . '
 
-' . ($linkPago ? '<table style="width:100%;border-collapse:collapse"><tr><td style="padding:24px 36px;text-align:center">
-<a href="' . htmlspecialchars($linkPago) . '" target="_blank" style="display:inline-block;padding:14px 40px;background:' . $template['color_primario'] . ';color:' . $template['color_secundario'] . ';font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">💳 Pagar Ahora</a>
+' . ($linkPago ? '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:20px 28px;text-align:center">
+<a href="' . htmlspecialchars($linkPago) . '" target="_blank" style="display:inline-block;padding:13px 36px;background:' . $cpri . ';color:' . $csec . ';font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">&#x1F4B3; Pagar Ahora</a>
 <div style="font-size:11px;color:#94a3b8;margin-top:8px">' . htmlspecialchars($linkPago) . '</div>
 </td></tr></table>' : '') . '
 
-<table style="width:100%;border-collapse:collapse;background:' . $template['color_primario'] . '">
+<!-- Pie de página -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . '">
 <tr>
-<td style="padding:14px 36px;font-size:11px;color:rgba(255,255,255,.5);width:100%">' . htmlspecialchars($template['notas_pie'] ?? '') . ($whatsappOrg ? '<br><span style="margin-top:8px;display:block">📱 WhatsApp: ' . htmlspecialchars($whatsappOrg) . '</span>' : '') . '</td>
-<td style="padding:14px 12px;width:40px">
-<div style="width:40px;height:4px;background:' . $template['color_secundario'] . ';border-radius:2px"></div>
+<td style="padding:14px 28px;font-size:11px;color:rgba(255,255,255,.5)">' . htmlspecialchars($template['notas_pie'] ?? '') . ($whatsappOrg ? '<br><span style="margin-top:8px;display:inline-block">&#x1F4F1; WhatsApp: ' . htmlspecialchars($whatsappOrg) . '</span>' : '') . '</td>
+<td style="padding:14px 10px;width:32px">
+<div style="width:32px;height:4px;background:' . $csec . ';border-radius:2px"></div>
 </td>
 </tr>
 </table>
 
-</div>
+</td></tr>
+</table>
+
 </body>
 </html>';
 
@@ -358,15 +414,15 @@ $emailAsunto = $asuntoOver ?: ($docTipoLabel . ' #' . $orderNumber . ' - QUANTUN
 // Bloque de mensaje personalizado (va antes del documento)
 $mensajeHtml = '';
 if ($mensajeOver) {
-    $mensajeHtml = '<table style="width:100%;max-width:900px;margin:0 auto 0 auto;border-collapse:collapse">'
-        . '<tr><td style="padding:24px 36px 0 36px;font-family:' . $template['fuente'] . ',system-ui,sans-serif">'
-        . '<div style="background:#f8fafc;border-left:4px solid ' . $template['color_primario'] . ';padding:16px 20px;border-radius:0 8px 8px 0;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap">'
+    $mensajeHtml = '<table class="em-msg" width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:600px;margin:0 auto">'
+        . '<tr><td style="padding:16px 10px 0 10px;font-family:' . $cfont . ',system-ui,sans-serif">'
+        . '<div style="background:#f8fafc;border-left:4px solid ' . $cpri . ';padding:14px 18px;border-radius:0 6px 6px 0;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap">'
         . htmlspecialchars($mensajeOver)
         . '</div></td></tr></table>';
-    // Insertar antes de <div style="background:white
+    // Insertar antes del bloque principal del email
     $htmlFinal = str_replace(
-        '<div style="background:white;max-width:900px;margin:auto">',
-        $mensajeHtml . '<div style="background:white;max-width:900px;margin:auto">',
+        '<table class="em-wrap"',
+        $mensajeHtml . "\n" . '<table class="em-wrap"',
         $htmlFinal
     );
 }
