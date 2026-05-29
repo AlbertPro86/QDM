@@ -159,14 +159,31 @@ function renderClients(clients) {
     });
 
     tbody.innerHTML = filtered.map(c => {
-        const renDate = c.proxima_renovacion ? new Date(c.proxima_renovacion) : null;
-        const renStr = renDate ? renDate.toLocaleDateString() : '—';
+        const renDate = c.proxima_renovacion ? new Date(c.proxima_renovacion + 'T12:00:00') : null;
+        const renStr  = renDate ? renDate.toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'}) : '—';
+        const hoyD    = new Date(); hoyD.setHours(0,0,0,0);
+        const mesMes  = new Date().toISOString().substring(0, 7);
 
         let renClass = 'badge-success';
-        if(renDate) {
-            const diff = (renDate - new Date()) / (1000 * 60 * 60 * 24);
-            if(diff < 0) renClass = 'badge-danger';
-            else if(diff < 30) renClass = 'badge-warning';
+        let rowStyle = '';
+        let renExtra = '';
+
+        if (renDate) {
+            const diff = (renDate - hoyD) / (1000 * 60 * 60 * 24);
+            const ym   = c.proxima_renovacion.substring(0, 7);
+            if (diff < 0) {
+                renClass = 'badge-danger';
+                rowStyle = 'background:#fef2f2;border-left:3px solid #ef4444;';
+                renExtra = '<div style="font-size:10px;font-weight:700;color:#ef4444;margin-top:2px">⚠ Vencida</div>';
+            } else if (ym === mesMes) {
+                renClass = 'badge-warning';
+                rowStyle = 'background:#fff7ed;border-left:3px solid #f97316;';
+                renExtra = `<div style="font-size:10px;font-weight:700;color:#ea580c;margin-top:2px">Este mes${diff <= 7 ? ' · ' + Math.round(diff) + 'd' : ''}</div>`;
+            } else if (diff <= 30) {
+                renClass = 'badge-warning';
+                rowStyle = 'background:#fffbeb;border-left:3px solid #f59e0b;';
+                renExtra = `<div style="font-size:10px;color:#b45309;margin-top:2px">${Math.round(diff)}d restantes</div>`;
+            }
         }
 
         const svcs = (c.servicios_nombres || '').split(', ').map(s => `<span class="badge" style="background:var(--color-surface);color:var(--color-text);font-size:10px;padding:2px 6px;margin:2px">${s}</span>`).join('');
@@ -204,7 +221,7 @@ function renderClients(clients) {
         ).join('');
 
         return `
-        <tr class="animate-fade-in" data-id="${c.id}">
+        <tr class="animate-fade-in" data-id="${c.id}" style="${rowStyle}">
             <td style="padding-left:16px">
                 <input type="checkbox" class="row-check" value="${c.id}" onchange="onRowCheck()"
                     style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626">
@@ -225,7 +242,7 @@ function renderClients(clients) {
                     ? `<div style="font-size:10px;color:#8A867C;margin-top:2px">${escapeHtml(c.responsable)}</div>` : ''}
             </td>
             <td><div style="display:flex;flex-wrap:wrap">${svcs || '<span style="color:var(--color-text-muted);font-size:12px">—</span>'}</div></td>
-            <td><span class="badge ${renClass}">${renStr}</span></td>
+            <td><span class="badge ${renClass}">${renStr}</span>${renExtra}</td>
             <td style="text-align:right">
                 <div style="font-weight:800;font-size:13px;color:#10b981">${mrr > 0 ? fmtNum(mrr) : '—'}</div>
                 ${cobrado > 0 ? `<div style="font-size:10px;color:#57544D;font-weight:600">${fmtNum(cobrado)} cobrado</div>` : ''}
