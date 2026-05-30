@@ -81,7 +81,7 @@ switch ($method) {
             $descuento = floatval($input['descuento'] ?? 0);
             $descNote = ($descuento > 0) ? " (Descuento: $" . number_format($descuento, 0, '.', ',') . ")" : "";
             $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, ?, ?)")
-                ->execute([$input['cliente_id'], $_SESSION['user_id'] ?? 0, "✅ Nuevo servicio asignado: $sName $descNote"]);
+                ->execute([$input['cliente_id'], $_SESSION['user_id'] ?? 0, "Nuevo servicio asignado: $sName $descNote"]);
 
             jsonResponse(['success' => true, 'message' => 'Servicio asignado correctamente']);
         } catch (Exception $e) {

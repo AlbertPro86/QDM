@@ -1780,6 +1780,10 @@ function _tlIcon(nota) {
     return { bg:'#f1f5f9', c:'#64748b', path:'<path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' };
 }
 
+function _cleanNota(t) {
+    return (t || '').replace(/^[\[📧🔔🔄✅⚠️🔕!\]\s]+/, '').trim();
+}
+
 function renderNotes(notes) {
     const cont = document.getElementById('notesTimelineModal');
     if (!cont) return;
@@ -1797,14 +1801,14 @@ function renderNotes(notes) {
         return `
         <div style="display:flex;gap:12px;position:relative">
             <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:28px">
-                <div style="width:28px;height:28px;border-radius:50%;background:${isFirst ? ic.bg : '#f8fafc'};border:2px solid ${isFirst ? ic.c : '#e2e8f0'};display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1">
-                    <svg width="13" height="13" fill="none" stroke="${isFirst ? ic.c : '#94a3b8'}" viewBox="0 0 24 24" stroke-width="2">${ic.path}</svg>
+                <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1">
+                    <svg width="16" height="16" fill="none" stroke="${isFirst ? ic.c : '#94a3b8'}" viewBox="0 0 24 24" stroke-width="2">${ic.path}</svg>
                 </div>
                 ${!isLast ? `<div style="width:1.5px;background:#e2e8f0;flex:1;min-height:14px;margin:3px 0"></div>` : ''}
             </div>
             <div style="flex:1;min-width:0;padding-bottom:${isLast ? '4px' : '14px'}">
                 ${isFirst ? `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${ic.c};margin-bottom:3px">Última acción</div>` : ''}
-                <div style="font-size:13px;color:#1e293b;line-height:1.45;${isFirst ? 'font-weight:600' : ''}">${escapeHtml(n.nota)}</div>
+                <div style="font-size:13px;color:#1e293b;line-height:1.45;${isFirst ? 'font-weight:600' : ''}">${escapeHtml(_cleanNota(n.nota))}</div>
                 <div style="display:flex;gap:6px;font-size:10px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.04em">
                     <span>${escapeHtml(n.usuario_nombre)}</span>
                     <span>·</span><span>${dateStr}</span>
@@ -1901,7 +1905,7 @@ async function cerrarNotifConExito(svcId, count, svcNombre) {
         await fetch('api/cliente_notas.php', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cliente_id: clienteId,
-                nota: `🔔 Notificaciones cerradas — El cliente pagó tras ${count} de 3 recordatorio${count>1?'s':''} enviado${count>1?'s':''}. No se requirieron más avisos (${svcNombre}).` })
+                nota: `Notificaciones cerradas — El cliente pagó tras ${count} de 3 recordatorio${count>1?'s':''} enviado${count>1?'s':''}. No se requirieron más avisos (${svcNombre}).` })
         });
         // Marcar los 3 tokens como completados (todos verdes)
         await fetch('api/cliente_servicios.php', {
@@ -1925,7 +1929,7 @@ async function resetNotifTokens(svcId, svcNombre) {
         await fetch('api/cliente_notas.php', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cliente_id: clienteId,
-                nota: `🔄 Recordatorios reiniciados — ciclo de notificaciones reseteado (${svcNombre}).` })
+                nota: `Recordatorios reiniciados — ciclo de notificaciones reseteado (${svcNombre}).` })
         });
         await fetch('api/cliente_servicios.php', {
             method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -4026,7 +4030,7 @@ async function confirmarEnvioMsgEmail() {
         const d = await r.json();
         if (d.success) {
             fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ cliente_id: clienteId, nota: '[📧] Correo enviado: ' + _msgPlantilla.nombre })
+                body: JSON.stringify({ cliente_id: clienteId, nota: 'Correo enviado: ' + _msgPlantilla.nombre })
             }).then(() => loadNotes());
             // Incrementar recordatorio del servicio más próximo
             fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`)
