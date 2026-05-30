@@ -4676,6 +4676,7 @@ async function confirmarEnvioMsgEmail() {
                             <span style="font-size:12px;font-weight:600;color:#0f172a;min-width:110px"><?= $row['label'] ?></span>
                             <input id="notif_<?= $row['id'] ?>_fecha" type="datetime-local"
                                 class="form-input" style="flex:1;min-width:200px;font-size:12px;padding:6px;cursor:pointer">
+                            <span id="notif_<?= $row['id'] ?>_estado" style="display:none;flex-shrink:0;font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 8px;white-space:nowrap"></span>
                         </div>
                         <div style="margin-top:8px;padding-left:20px;position:relative">
                             <select id="notif_<?= $row['id'] ?>_plantilla" onchange="aplicarPlantillaNotifRow('<?= $row['id'] ?>')"
@@ -4686,6 +4687,20 @@ async function confirmarEnvioMsgEmail() {
                             <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                         <div id="notif_<?= $row['id'] ?>_preview" style="display:none;margin-top:6px;margin-left:20px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;color:#475569;line-height:1.5;max-height:64px;overflow-y:auto"></div>
+                        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:8px;padding-left:20px">
+                            <button onclick="resetearFilaNotif('<?= $row['id'] ?>')"
+                                style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#fff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:10px;font-weight:600;color:#64748b;cursor:pointer;transition:all .15s"
+                                onmouseenter="this.style.borderColor='#f87171';this.style.color='#ef4444'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                Resetear
+                            </button>
+                            <button id="btnSave_<?= $row['id'] ?>" onclick="guardarFilaNotif('<?= $row['id'] ?>')"
+                                style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;background:#1e293b;border:none;border-radius:6px;font-size:10px;font-weight:700;color:#fff;cursor:pointer;transition:filter .15s"
+                                onmouseenter="this.style.filter='brightness(1.3)'" onmouseleave="this.style.filter=''">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                Guardar
+                            </button>
+                        </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -4714,6 +4729,12 @@ async function confirmarEnvioMsgEmail() {
                     onmouseenter="this.style.background='#dcfce7';this.style.borderColor='#4ade80'" onmouseleave="this.style.background='#f0fdf4';this.style.borderColor='#86efac'">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     Cerrar notificaciones
+                </button>
+                <button onclick="resetearTodasNotif()"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1.5px solid #e2e8f0;color:#64748b;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
+                    onmouseenter="this.style.borderColor='#f87171';this.style.color='#ef4444'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Resetear todo
                 </button>
             </div>
             <div style="display:flex;gap:8px">
@@ -5106,10 +5127,58 @@ function actualizarToggleNotif() {
 function openNotifModal() {
     loadNotifConfig();
     loadPlantillasNotif();
+    cargarEstadoFilasNotif();
     document.getElementById('notifModal').classList.add('show');
 }
 function closeNotifModal() {
     document.getElementById('notifModal').classList.remove('show');
+}
+
+async function cargarEstadoFilasNotif() {
+    try {
+        // Cargar estado de envío (notif_count + fechas reales de envío)
+        const [rsSvc, rsCfg] = await Promise.all([
+            fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`),
+            fetch(`api/cliente_notif_config.php?cliente_id=${clienteId}`)
+        ]);
+        const dsSvc = await rsSvc.json();
+        const dsCfg = await rsCfg.json();
+
+        const activos = (dsSvc.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+        const cfg     = dsCfg.success ? dsCfg.data : {};
+        const now     = new Date();
+
+        let count = 0, sentDates = [null, null, null];
+        if (activos.length) {
+            activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+            const svc  = activos[0];
+            count      = Math.min(3, parseInt(svc.notif_count) || 0);
+            sentDates  = [svc.notif_r1_at, svc.notif_r2_at, svc.notif_r3_at];
+        }
+
+        // Fechas programadas desde la config
+        const progDates = [cfg.r1_fecha, cfg.r2_fecha, cfg.r3_fecha];
+
+        ['r1','r2','r3'].forEach((rid, i) => {
+            const el = document.getElementById(`notif_${rid}_estado`);
+            if (!el) return;
+            const sent      = i < count;
+            const progRaw   = progDates[i];
+            const progFecha = progRaw ? new Date(progRaw.replace(' ', 'T')) : null;
+            const programado = !sent && progFecha && progFecha > now;
+
+            if (sent) {
+                const label = sentDates[i] ? `Enviado el ${_fmtNotifDate(sentDates[i])}` : 'Enviado';
+                el.textContent = '✓ ' + label;
+                el.style.cssText = 'display:inline-block;flex-shrink:0;font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border:1px solid #86efac;border-radius:20px;padding:3px 8px;white-space:nowrap';
+            } else if (programado) {
+                el.textContent = '📅 Programado · ' + _fmtNotifDate(progRaw);
+                el.style.cssText = 'display:inline-block;flex-shrink:0;font-size:10px;font-weight:700;color:#1d4ed8;background:#dbeafe;border:1px solid #93c5fd;border-radius:20px;padding:3px 8px;white-space:nowrap';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+    } catch(e) {}
 }
 
 async function cerrarNotifDesdeModal() {
@@ -5124,7 +5193,89 @@ async function cerrarNotifDesdeModal() {
         closeNotifModal();
         await cerrarNotifConExito(svc.id, count, svc.servicio_nombre);
     } catch(e) { showToast('Error al obtener servicios', 'error'); }
+}
 
+async function guardarFilaNotif(rid) {
+    const btn = document.getElementById(`btnSave_${rid}`);
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    try {
+        const fecha     = document.getElementById(`notif_${rid}_fecha`)?.value?.replace('T', ' ') || null;
+        const plantilla = document.getElementById(`notif_${rid}_plantilla`)?.value || null;
+        const payload   = { cliente_id: clienteId, [`${rid}_fecha`]: fecha, [`${rid}_plantilla_id`]: plantilla };
+        const r = await fetch('api/cliente_notif_config.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            showToast(`✓ ${rid === 'r1' ? '1er' : rid === 'r2' ? '2do' : '3er'} recordatorio guardado`, 'success');
+            cargarEstadoFilasNotif();
+        } else showToast(d.error || 'Error al guardar', 'error');
+    } catch(e) { showToast('Error de conexión', 'error'); }
+    finally { if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Guardar'; } }
+}
+
+async function resetearFilaNotif(rid) {
+    const num = rid === 'r1' ? 1 : rid === 'r2' ? 2 : 3;
+    const label = rid === 'r1' ? '1er' : rid === 'r2' ? '2do' : '3er';
+    const ok = await confirmAction(`¿Resetear el ${label} recordatorio? Se borrará la fecha programada y el estado de envío de este aviso.`,
+        { title: `Resetear ${label} recordatorio`, okText: 'Resetear', okColor: '#ef4444', okHover: '#dc2626' });
+    if (!ok) return;
+    try {
+        // Borrar fecha programada en config
+        const payload = { cliente_id: clienteId, [`${rid}_fecha`]: null, [`${rid}_plantilla_id`]: null };
+        await fetch('api/cliente_notif_config.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        // Resetear estado de envío en el servicio
+        const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
+        const ds = await rs.json();
+        const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+        if (activos.length) {
+            activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+            const svc = activos[0];
+            const newCount = Math.max(0, num - 1);
+            const upd = { id: svc.id, notif_count: newCount };
+            for (let n = num; n <= 3; n++) upd[`notif_r${n}_at`] = null;
+            await fetch('api/cliente_servicios.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(upd) });
+        }
+        // Limpiar campos del modal
+        const fechaEl = document.getElementById(`notif_${rid}_fecha`);
+        if (fechaEl) fechaEl.value = '';
+        const selEl = document.getElementById(`notif_${rid}_plantilla`);
+        if (selEl) { selEl.value = ''; }
+        const prevEl = document.getElementById(`notif_${rid}_preview`);
+        if (prevEl) prevEl.style.display = 'none';
+        showToast(`${label} recordatorio reseteado`, 'success');
+        cargarEstadoFilasNotif();
+        loadServices();
+    } catch(e) { showToast('Error al resetear', 'error'); }
+}
+
+async function resetearTodasNotif() {
+    const ok = await confirmAction('¿Resetear todos los recordatorios? Se borrarán todas las fechas programadas y el historial de envíos.',
+        { title: 'Resetear todo', okText: 'Resetear todo', okColor: '#ef4444', okHover: '#dc2626' });
+    if (!ok) return;
+    try {
+        await fetch('api/cliente_notif_config.php', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId, r1_fecha: null, r2_fecha: null, r3_fecha: null,
+                r1_plantilla_id: null, r2_plantilla_id: null, r3_plantilla_id: null }) });
+        const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
+        const ds = await rs.json();
+        const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+        if (activos.length) {
+            activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+            await fetch('api/cliente_servicios.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: activos[0].id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null }) });
+        }
+        ['r1','r2','r3'].forEach(rid => {
+            const f = document.getElementById(`notif_${rid}_fecha`); if (f) f.value = '';
+            const s = document.getElementById(`notif_${rid}_plantilla`); if (s) s.value = '';
+            const p = document.getElementById(`notif_${rid}_preview`); if (p) p.style.display = 'none';
+        });
+        showToast('Todos los recordatorios reseteados', 'success');
+        cargarEstadoFilasNotif();
+        loadServices();
+        loadNotes();
+    } catch(e) { showToast('Error al resetear', 'error'); }
 }
 
 async function guardarNotifConfig() {

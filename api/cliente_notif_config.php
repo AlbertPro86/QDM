@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * CRM QUANTUN Digital — API Configuración de Notificaciones por Cliente
  * GET  ?cliente_id=X  → obtiene configuración
@@ -85,56 +85,51 @@ switch ($method) {
         $cid = intval($in['cliente_id'] ?? 0);
         if (!$cid) jsonResponse(['error' => 'cliente_id requerido'], 400);
 
-        $activa  = isset($in['activa']) ? (int)(bool)$in['activa'] : 1;
-        $r1_dias = max(1, intval($in['r1_dias'] ?? 15));
-        $r1_hora = $in['r1_hora'] ?? '08:00';
-        $r2_dias = max(1, intval($in['r2_dias'] ?? 7));
-        $r2_hora = $in['r2_hora'] ?? '08:00';
-        $r3_dias = max(1, intval($in['r3_dias'] ?? 2));
-        $r3_hora = $in['r3_hora'] ?? '08:00';
-        $r1_plt  = !empty($in['r1_plantilla_id']) ? (int)$in['r1_plantilla_id'] : null;
-        $r2_plt  = !empty($in['r2_plantilla_id']) ? (int)$in['r2_plantilla_id'] : null;
-        $r3_plt  = !empty($in['r3_plantilla_id']) ? (int)$in['r3_plantilla_id'] : null;
-        $r1_fecha = !empty($in['r1_fecha']) ? $in['r1_fecha'] : null;
-        $r2_fecha = !empty($in['r2_fecha']) ? $in['r2_fecha'] : null;
-        $r3_fecha = !empty($in['r3_fecha']) ? $in['r3_fecha'] : null;
-        $asunto  = trim($in['asunto_personalizado']  ?? '');
-        $mensaje = trim($in['mensaje_personalizado'] ?? '');
+        // Ensure row exists with defaults before partial update
+        $pdo->prepare("
+            INSERT IGNORE INTO crm_cliente_notif_config (cliente_id) VALUES (?)
+        ")->execute([$cid]);
 
-        // Mantener dias_antes / hora_envio con el primer recordatorio (compatibilidad)
-        $s = $pdo->prepare("
-            INSERT INTO crm_cliente_notif_config
-                (cliente_id, activa, dias_antes, hora_envio,
-                 r1_dias, r1_hora, r2_dias, r2_hora, r3_dias, r3_hora,
-                 r1_plantilla_id, r2_plantilla_id, r3_plantilla_id,
-                 r1_fecha, r2_fecha, r3_fecha,
-                 asunto_personalizado, mensaje_personalizado)
-            VALUES (?,?,?,?, ?,?,?,?,?,?, ?,?,?, ?,?,?, ?,?)
-            ON DUPLICATE KEY UPDATE
-                activa                 = VALUES(activa),
-                dias_antes             = VALUES(dias_antes),
-                hora_envio             = VALUES(hora_envio),
-                r1_dias                = VALUES(r1_dias),
-                r1_hora                = VALUES(r1_hora),
-                r2_dias                = VALUES(r2_dias),
-                r2_hora                = VALUES(r2_hora),
-                r3_dias                = VALUES(r3_dias),
-                r3_hora                = VALUES(r3_hora),
-                r1_plantilla_id        = VALUES(r1_plantilla_id),
-                r2_plantilla_id        = VALUES(r2_plantilla_id),
-                r3_plantilla_id        = VALUES(r3_plantilla_id),
-                r1_fecha               = VALUES(r1_fecha),
-                r2_fecha               = VALUES(r2_fecha),
-                r3_fecha               = VALUES(r3_fecha),
-                asunto_personalizado   = VALUES(asunto_personalizado),
-                mensaje_personalizado  = VALUES(mensaje_personalizado),
-                updated_at             = NOW()
-        ");
-        $s->execute([$cid, $activa, $r1_dias, $r1_hora,
-                     $r1_dias, $r1_hora, $r2_dias, $r2_hora, $r3_dias, $r3_hora,
-                     $r1_plt, $r2_plt, $r3_plt,
-                     $r1_fecha, $r2_fecha, $r3_fecha,
-                     $asunto, $mensaje]);
+        // Build partial UPDATE — only fields explicitly present in payload
+        $allowed = [
+            'activa', 'dias_antes', 'hora_envio',
+            'r1_dias', 'r1_hora', 'r2_dias', 'r2_hora', 'r3_dias', 'r3_hora',
+            'r1_plantilla_id', 'r2_plantilla_id', 'r3_plantilla_id',
+            'r1_fecha', 'r2_fecha', 'r3_fecha',
+            'asunto_personalizado', 'mensaje_personalizado',
+        ];
+        $setClauses = [];
+        $vals       = [];
+
+        foreach ($allowed as $field) {
+            if (!array_key_exists($field, $in)) continue;
+            $val = $in[$field];
+            // Sanitize per field type
+            if ($field === 'activa') {
+                $val = (int)(bool)$val;
+            } elseif (in_array($field, ['dias_antes','r1_dias','r2_dias','r3_dias'])) {
+                $val = max(1, intval($val));
+            } elseif (in_array($field, ['r1_plantilla_id','r2_plantilla_id','r3_plantilla_id'])) {
+                $val = !empty($val) ? (int)$val : null;
+            } elseif (in_array($field, ['r1_fecha','r2_fecha','r3_fecha'])) {
+                $val = !empty($val) ? $val : null;
+            } elseif (in_array($field, ['asunto_personalizado','mensaje_personalizado'])) {
+                $val = trim($val);
+            }
+            // Keep dias_antes / hora_envio in sync with r1 (backwards compat)
+            if ($field === 'r1_dias')  { $setClauses[] = 'dias_antes = ?'; $vals[] = $val; }
+            if ($field === 'r1_hora')  { $setClauses[] = 'hora_envio = ?'; $vals[] = $val; }
+            $setClauses[] = "$field = ?";
+            $vals[]       = $val;
+        }
+
+        if (empty($setClauses)) jsonResponse(['error' => 'No hay campos para actualizar'], 400);
+
+        $setClauses[] = 'updated_at = NOW()';
+        $vals[]       = $cid;
+        $pdo->prepare("UPDATE crm_cliente_notif_config SET " . implode(', ', $setClauses) . " WHERE cliente_id = ?")
+            ->execute($vals);
+
         jsonResponse(['success' => true, 'message' => 'Configuración guardada']);
         break;
 
