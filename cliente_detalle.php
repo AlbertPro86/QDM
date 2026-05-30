@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
@@ -155,7 +155,7 @@ include __DIR__ . '/includes/header.php';
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Facturar Seleccionados
                     </button>
-                    <button id="btnRegistrarPago" onclick="registrarPagoDirecto()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
+                    <button id="btnRegistrarPago" onclick="openRegistrarPagoModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Registrar Pago
                     </button>
@@ -399,10 +399,8 @@ include __DIR__ . '/includes/header.php';
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     Chatear con el cliente
                 </button>
-                <button class="btn btn-outline sm" style="justify-content:flex-start;gap:8px;width:100%;font-size:12px" onclick="openMensajesModal()">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    Notificar por Correo
-                </button>
+                <!-- Card progreso de recordatorios -->
+                <div id="notifProgressCard"></div>
             </div>
         </div>
 
@@ -430,7 +428,7 @@ include __DIR__ . '/includes/header.php';
                 <svg width="15" height="15" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             </div>
             <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:#0E0E0C">Notificaciones de renovación</div>
+                <div style="font-size:12px;font-weight:700;color:#0E0E0C">Programar recordatorios</div>
                 <div id="notifStatusLabel" style="font-size:10px;color:#8A867C">Cargando configuración...</div>
             </div>
             <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -722,7 +720,13 @@ include __DIR__ . '/includes/header.php';
                 <input type="date" id="rpFechaPago"
                     style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
             </div>
-            <input type="hidden" id="rpConcepto">
+            <!-- Concepto editable -->
+            <div>
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Concepto (opcional)</label>
+                <input type="text" id="rpConcepto"
+                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
+                    placeholder="Ej: Pago mensualidad julio…">
+            </div>
         </div>
         <div class="modal-footer" style="justify-content:flex-end;gap:8px">
             <button class="btn btn-outline" onclick="closeRegistrarPagoModal()">Cancelar</button>
@@ -1030,7 +1034,7 @@ async function loadServices() {
     try {
         const r = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
         const d = await r.json();
-        if(d.success) renderServices(d.data);
+        if(d.success) { renderServices(d.data); renderNotifProgressCard(d.data); }
     } catch(e) { showToast('Error al cargar servicios','error'); }
 }
 
@@ -1731,7 +1735,26 @@ async function sendPrompt(type) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cliente_id: clienteId, nota: actionLabel })
         });
+        // Si es recordatorio, incrementar notif_count en el servicio con vencimiento más próximo
+        if (type === 'reminder') {
+            const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
+            const ds = await rs.json();
+            const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+            if (activos.length) {
+                activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+                const svc = activos[0];
+                const newCount = Math.min(3, (parseInt(svc.notif_count) || 0) + 1);
+                const dateField = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'][newCount - 1];
+                const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                await fetch('api/cliente_servicios.php', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
+                });
+            }
+        }
         loadNotes();
+        loadServices();
     } catch(e) {}
 }
 
@@ -1746,22 +1769,172 @@ async function loadNotes() {
     } catch(e) { console.error('Error al cargar notas'); }
 }
 
-function renderNotes(notes) {
-    const html = !notes.length
-        ? '<p style="text-align:center;color:var(--color-text-light);font-size:13px;padding:20px">Sin novedades registradas.</p>'
-        : notes.map(n => `
-        <div style="background:var(--color-surface);padding:12px 16px;border-radius:12px">
-            <p style="font-size:14px;margin-bottom:6px">${escapeHtml(n.nota)}</p>
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-muted);font-weight:700;text-transform:uppercase">
-                <span>${n.usuario_nombre}</span>
-                <span>${new Date(n.created_at).toLocaleDateString()}</span>
-            </div>
-        </div>
-    `).join('');
+function _tlIcon(nota) {
+    const n = (nota || '').toLowerCase();
+    if (n.includes('pago') || n.includes('cobr') || n.includes('pagó'))
+        return { bg:'#dcfce7', c:'#16a34a', path:'<path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' };
+    if (n.includes('orden') || n.includes('correo') || n.includes('email') || n.includes('envió') || n.includes('enviado'))
+        return { bg:'#dbeafe', c:'#2563eb', path:'<path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' };
+    if (n.includes('recordatorio') || n.includes('notif') || n.includes('renovar') || n.includes('renovación'))
+        return { bg:'#fef9c3', c:'#ca8a04', path:'<path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>' };
+    return { bg:'#f1f5f9', c:'#64748b', path:'<path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' };
+}
 
-    // Renderizar en el modal si existe
-    const modalCont = document.getElementById('notesTimelineModal');
-    if(modalCont) modalCont.innerHTML = html;
+function renderNotes(notes) {
+    const cont = document.getElementById('notesTimelineModal');
+    if (!cont) return;
+    if (!notes.length) {
+        cont.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:13px;padding:28px 0">Sin novedades registradas.</p>';
+        return;
+    }
+    cont.innerHTML = notes.map((n, idx) => {
+        const ic = _tlIcon(n.nota);
+        const isFirst = idx === 0;
+        const isLast  = idx === notes.length - 1;
+        const d = new Date(n.created_at);
+        const dateStr = d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+        const timeStr = d.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
+        return `
+        <div style="display:flex;gap:12px;position:relative">
+            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:28px">
+                <div style="width:28px;height:28px;border-radius:50%;background:${isFirst ? ic.bg : '#f8fafc'};border:2px solid ${isFirst ? ic.c : '#e2e8f0'};display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1">
+                    <svg width="13" height="13" fill="none" stroke="${isFirst ? ic.c : '#94a3b8'}" viewBox="0 0 24 24" stroke-width="2">${ic.path}</svg>
+                </div>
+                ${!isLast ? `<div style="width:1.5px;background:#e2e8f0;flex:1;min-height:14px;margin:3px 0"></div>` : ''}
+            </div>
+            <div style="flex:1;min-width:0;padding-bottom:${isLast ? '4px' : '14px'}">
+                ${isFirst ? `<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${ic.c};margin-bottom:3px">Última acción</div>` : ''}
+                <div style="font-size:13px;color:#1e293b;line-height:1.45;${isFirst ? 'font-weight:600' : ''}">${escapeHtml(n.nota)}</div>
+                <div style="display:flex;gap:6px;font-size:10px;color:#94a3b8;margin-top:3px;text-transform:uppercase;letter-spacing:.04em">
+                    <span>${escapeHtml(n.usuario_nombre)}</span>
+                    <span>·</span><span>${dateStr}</span>
+                    <span>·</span><span>${timeStr}</span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Card progreso de recordatorios ──────────────────────────────────────── */
+function _fmtNotifDate(dt) {
+    if (!dt) return null;
+    const d = new Date(dt);
+    return d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' }) + ' ' +
+           d.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
+}
+
+function renderNotifProgressCard(svcs) {
+    const card = document.getElementById('notifProgressCard');
+    if (!card) return;
+    const activos = (svcs || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+    if (!activos.length) { card.innerHTML = ''; return; }
+    activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+    const svc   = activos[0];
+    const count = Math.min(3, parseInt(svc.notif_count) || 0);
+    const days  = Math.ceil((new Date(svc.fecha_vencimiento + 'T12:00:00') - new Date()) / 864e5);
+    const daysLabel = days > 0 ? `Vence en ${days}d` : (days === 0 ? 'Vence hoy' : 'Vencido');
+    const dates = [svc.notif_r1_at, svc.notif_r2_at, svc.notif_r3_at];
+    const steps = ['1er aviso', '2do aviso', '3er aviso'];
+    const bell  = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>';
+    const check = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>';
+
+    const dotsHtml = steps.map((lbl, i) => {
+        const done   = i < count;
+        const active = i === count && count < 3;
+        const dateStr = done && dates[i] ? `${lbl} — Enviado el ${_fmtNotifDate(dates[i])}` : (active ? `${lbl} — Pendiente de envío` : `${lbl} — Sin enviar aún`);
+        const sublabel = done ? 'Enviado' : (active ? 'Enviar' : '...');
+        const dot = `
+            <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto;position:relative;cursor:${done?'default':'pointer'}" title="${dateStr}" ${done?'':'onclick="openMensajesModal()"'}>
+                <div style="width:26px;height:26px;border-radius:50%;
+                    background:${done?'#dcfce7':active?'#FEF9C3':'#F1EEE8'};
+                    border:1.5px solid ${done?'#16a34a':active?'#ca8a04':'#D6D2C7'};
+                    display:flex;align-items:center;justify-content:center;
+                    transition:box-shadow .15s"
+                    onmouseenter="this.style.boxShadow='0 0 0 3px ${done?'rgba(22,163,74,.2)':active?'rgba(202,138,4,.2)':'rgba(0,0,0,.06)'}'"
+                    onmouseleave="this.style.boxShadow='none'">
+                    <svg width="11" height="11" fill="none" stroke="${done?'#16a34a':active?'#ca8a04':'#B0AB9F'}" viewBox="0 0 24 24" stroke-width="2.2">${done ? check : bell}</svg>
+                </div>
+                <div style="font-size:9px;color:${done?'#16a34a':active?'#ca8a04':'#B0AB9F'};font-weight:${done?700:400};margin-top:3px;white-space:nowrap">${sublabel}</div>
+            </div>`;
+        const line = i < 2 ? `<div style="height:1.5px;flex:1;min-width:6px;background:${i+1<=count?'#2D8F5A':'#E8E5DD'};margin-bottom:16px"></div>` : '';
+        return dot + line;
+    }).join('');
+
+    const exitoBtn = count === 3
+        ? `<div style="margin-top:6px;text-align:right">
+               <span onclick="resetNotifTokens(${svc.id},'${escapeJs(svc.servicio_nombre)}')"
+                   style="font-size:9px;color:#D6D2C7;cursor:pointer;transition:color .15s"
+                   onmouseenter="this.style.color='#8A867C'" onmouseleave="this.style.color='#D6D2C7'">
+                   reiniciar
+               </span>
+           </div>`
+        : count > 0
+        ? `<button onclick="cerrarNotifConExito(${svc.id},${count},'${escapeJs(svc.servicio_nombre)}')"
+            style="margin-top:8px;width:100%;padding:6px 10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:6px;
+                   font-size:11px;font-weight:700;color:#16a34a;cursor:pointer;text-align:center;transition:all .15s"
+            onmouseenter="this.style.background='#dcfce7';this.style.borderColor='#4ade80'"
+            onmouseleave="this.style.background='#f0fdf4';this.style.borderColor='#86efac'">
+            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="vertical-align:-1px;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Cerrar notificaciones
+        </button>`
+        : '';
+
+    card.innerHTML = `
+    <div style="padding:10px 12px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:8px;margin-top:2px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:10px;font-weight:700;color:#2A2926;text-transform:uppercase;letter-spacing:.06em">Recordatorios</span>
+            <span style="font-size:10px;color:${days<=7&&days>=0?'#ca8a04':'#8A867C'};font-weight:${days<=7&&days>=0?700:400}">${daysLabel}</span>
+        </div>
+        <div style="display:flex;align-items:center">${dotsHtml}</div>
+        ${exitoBtn}
+    </div>`;
+}
+
+async function cerrarNotifConExito(svcId, count, svcNombre) {
+    const ok = await confirmAction(
+        `Se enviaron ${count} de 3 recordatorio${count>1?'s':''} para "${svcNombre}". El cliente pagó — no es necesario enviar más recordatorios. Esto quedará registrado en el historial.`,
+        { title: 'Cerrar notificaciones', okText: 'Cerrar notificaciones', okColor: '#16a34a', okHover: '#15803d' }
+    );
+    if (!ok) return;
+    try {
+        const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        await fetch('api/cliente_notas.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId,
+                nota: `🔔 Notificaciones cerradas — El cliente pagó tras ${count} de 3 recordatorio${count>1?'s':''} enviado${count>1?'s':''}. No se requirieron más avisos (${svcNombre}).` })
+        });
+        // Marcar los 3 tokens como completados (todos verdes)
+        await fetch('api/cliente_servicios.php', {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: svcId, notif_count: 3,
+                notif_r1_at: nowStr, notif_r2_at: nowStr, notif_r3_at: nowStr })
+        });
+        showToast('✓ Notificaciones cerradas — registrado en historial', 'success');
+        loadServices();
+        loadNotes();
+    } catch(e) { showToast('Error al registrar', 'error'); }
+}
+
+async function resetNotifTokens(svcId, svcNombre) {
+    const ok = await confirmAction(
+        `¿Reiniciar los recordatorios de "${svcNombre}"? Se borrarán los tokens enviados y podrás volver a activarlos desde cero.`,
+        { title: 'Reiniciar recordatorios', okText: 'Reiniciar', okColor: '#64748b', okHover: '#475569' }
+    );
+    if (!ok) return;
+    try {
+        await fetch('api/cliente_notas.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId,
+                nota: `🔄 Recordatorios reiniciados — ciclo de notificaciones reseteado (${svcNombre}).` })
+        });
+        await fetch('api/cliente_servicios.php', {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: svcId, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
+        });
+        showToast('Recordatorios reiniciados', 'success');
+        loadServices();
+        loadNotes();
+    } catch(e) { showToast('Error al reiniciar', 'error'); }
 }
 
 function openHistorialModal() {
@@ -3602,7 +3775,20 @@ async function confirmarRegistrarPago() {
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify({ cliente_id: clienteId, ids: [svc.cs_id], action: 'renovar' })
                 });
+                // Resetear contador de recordatorios al renovar
+                await fetch('api/cliente_servicios.php', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: svc.cs_id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
+                });
             }
+            // Registrar en historial
+            const montoFmt = monto.toLocaleString('es-CO');
+            await fetch('api/cliente_notas.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente_id: clienteId, nota: `Pago registrado: $${montoFmt} COP — ${svc.servicio_nombre}` })
+            });
             showToast('✓ Pago registrado — servicio renovado', 'success');
             closeRegistrarPagoModal();
             loadServices();
@@ -3842,6 +4028,22 @@ async function confirmarEnvioMsgEmail() {
             fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ cliente_id: clienteId, nota: '[📧] Correo enviado: ' + _msgPlantilla.nombre })
             }).then(() => loadNotes());
+            // Incrementar recordatorio del servicio más próximo
+            fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`)
+                .then(rs => rs.json())
+                .then(ds => {
+                    const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+                    if (!activos.length) return;
+                    activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+                    const svc = activos[0];
+                    const newCount = Math.min(3, (parseInt(svc.notif_count) || 0) + 1);
+                    const dateField = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'][newCount - 1];
+                    const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                    fetch('api/cliente_servicios.php', {
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
+                    }).then(() => loadServices());
+                });
             closeMensajesModal();
             showToast('✅ ' + d.message, 'success');
         } else {
@@ -4070,7 +4272,7 @@ async function confirmarEnvioMsgEmail() {
                         </div>
                     </div>
                     <div>
-                        <label style="<?= $labelBancStyle ?>">Llave (Nequi / Daviplata / QR)</label>
+                        <label style="<?= $labelBancStyle ?>">Llave</label>
                         <input id="bancLlave" type="text" placeholder="Ej: +57 300 000 0000" style="<?= $inputBancStyle ?>" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" oninput="scheduleOrdenPreview()">
                     </div>
                 </div>
@@ -4417,8 +4619,8 @@ async function confirmarEnvioMsgEmail() {
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
                 </button>
             </form>
-            <div id="notesTimelineModal" style="display:grid;gap:10px;max-height:400px;overflow-y:auto;padding-right:4px">
-                <p style="text-align:center;color:var(--color-text-light);font-size:12px">Cargando...</p>
+            <div id="notesTimelineModal" style="max-height:420px;overflow-y:auto;padding-right:6px">
+                <p style="text-align:center;color:#94a3b8;font-size:12px;padding:20px">Cargando...</p>
             </div>
         </div>
     </div>
@@ -4433,8 +4635,8 @@ async function confirmarEnvioMsgEmail() {
                     <svg width="18" height="18" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 </div>
                 <div>
-                    <h3 class="modal-title" style="font-size:15px">Notificaciones de renovación</h3>
-                    <p style="font-size:11px;color:#94a3b8;margin:2px 0 0">Correo automático al cliente antes del vencimiento</p>
+                    <h3 class="modal-title" style="font-size:15px">Programar recordatorios</h3>
+                    <p style="font-size:11px;color:#94a3b8;margin:2px 0 0">Correos automáticos al cliente antes del vencimiento</p>
                 </div>
             </div>
             <button class="modal-close" onclick="closeNotifModal()">
@@ -4456,49 +4658,40 @@ async function confirmarEnvioMsgEmail() {
             </div>
 
             <div id="notifFormBody" style="display:grid;gap:14px">
-                <!-- Días antes -->
-                <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:12px">Días de anticipación</label>
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <input id="notifDias" type="number" min="1" max="90" value="15" class="form-input" style="width:90px;text-align:center;font-size:15px;font-weight:700;padding:8px">
-                        <span style="font-size:12px;color:#64748b">días antes del vencimiento</span>
+                <!-- 3 recordatorios -->
+                <div style="display:grid;gap:8px">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Programación de envíos automáticos</div>
+                    <?php
+                    $notifRows = [
+                        ['id'=>'r1','label'=>'1er recordatorio','defaultDias'=>15,'iconBg'=>'#dcfce7','iconColor'=>'#16a34a'],
+                        ['id'=>'r2','label'=>'2do recordatorio','defaultDias'=>7, 'iconBg'=>'#fef9c3','iconColor'=>'#ca8a04'],
+                        ['id'=>'r3','label'=>'3er recordatorio','defaultDias'=>2, 'iconBg'=>'#f1f5f9','iconColor'=>'#94a3b8'],
+                    ];
+                    foreach ($notifRows as $row): ?>
+                    <div style="padding:10px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <div style="width:24px;height:24px;border-radius:50%;background:<?= $row['iconBg'] ?>;border:1.5px solid <?= $row['iconColor'] ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <svg width="12" height="12" fill="none" stroke="<?= $row['iconColor'] ?>" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            </div>
+                            <span style="font-size:12px;font-weight:600;color:#0f172a;min-width:110px"><?= $row['label'] ?></span>
+                            <input id="notif_<?= $row['id'] ?>_fecha" type="datetime-local"
+                                class="form-input" style="flex:1;min-width:200px;font-size:12px;padding:6px;cursor:pointer">
+                        </div>
+                        <div style="margin-top:8px;padding-left:20px;position:relative">
+                            <select id="notif_<?= $row['id'] ?>_plantilla" onchange="aplicarPlantillaNotifRow('<?= $row['id'] ?>')"
+                                style="width:100%;padding:6px 32px 6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;color:#0f172a;background:#fff;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .15s"
+                                onfocus="this.style.borderColor='#c9f31d'" onblur="this.style.borderColor='#e2e8f0'">
+                                <option value="">— Plantilla de mensaje (opcional) —</option>
+                            </select>
+                            <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                        <div id="notif_<?= $row['id'] ?>_preview" style="display:none;margin-top:6px;margin-left:20px;padding:8px 10px;background:#ffffff;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;color:#475569;line-height:1.5;max-height:64px;overflow-y:auto"></div>
                     </div>
-                </div>
-
-                <!-- Hora -->
-                <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:12px">Hora de envío</label>
-                    <input id="notifHora" type="time" value="08:00" class="form-input" style="max-width:140px">
-                </div>
-
-                <!-- Asunto personalizado -->
-                <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:12px">Asunto del correo <span style="font-weight:400;color:#94a3b8">(opcional)</span></label>
-                    <input id="notifAsunto" type="text" class="form-input" placeholder="Ej: ¡Tu servicio está por vencer!" style="font-size:13px">
-                    <p style="margin:3px 0 0;font-size:10px;color:#94a3b8">Si está vacío se usa el asunto predeterminado</p>
-                </div>
-
-                <!-- Plantilla de mensaje -->
-                <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:12px">Usar plantilla de mensaje <span style="font-weight:400;color:#94a3b8">(opcional)</span></label>
-                    <div style="position:relative">
-                        <select id="notifPlantillaSelect" onchange="aplicarPlantillaNotif()"
-                            style="width:100%;padding:8px 36px 8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;cursor:pointer;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .15s"
-                            onfocus="this.style.borderColor='#c9f31d'" onblur="this.style.borderColor='#e2e8f0'">
-                            <option value="">— Seleccionar plantilla —</option>
-                        </select>
-                        <svg width="14" height="14" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                    <div id="notifPlantillaPreview" style="display:none;margin-top:8px;padding:10px 12px;background:#f8fafc;border:1.5px solid #cbd5e1;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;line-height:1.5;max-height:80px;overflow-y:auto"></div>
-                </div>
-
-                <!-- Mensaje adicional -->
-                <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:12px">Mensaje personalizado <span style="font-weight:400;color:#94a3b8">(editable)</span></label>
-                    <textarea id="notifMensaje" class="form-input" rows="3" placeholder="Selecciona una plantilla arriba o escribe un mensaje personalizado que aparecerá en el correo..." style="font-size:13px;resize:vertical;min-height:70px"></textarea>
+                    <?php endforeach; ?>
                 </div>
 
                 <!-- Info destino -->
+
                 <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:#eff6ff;border-radius:8px;border:1px solid #dbeafe">
                     <svg width="14" height="14" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <div style="font-size:11px;color:#1d4ed8;line-height:1.5">
@@ -4509,12 +4702,20 @@ async function confirmarEnvioMsgEmail() {
             </div>
         </div>
         <div class="modal-footer" style="justify-content:space-between">
-            <button onclick="enviarNotifPrueba()" id="btnNotifPrueba"
-                style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f8fafc;border:1.5px solid #cbd5e1;color:#0f172a;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
-                onmouseenter="this.style.borderColor='#94a3b8'" onmouseleave="this.style.borderColor='#e2e8f0'">
-                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                Enviar prueba
-            </button>
+            <div style="display:flex;gap:8px">
+                <button onclick="enviarNotifPrueba()" id="btnNotifPrueba"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f8fafc;border:1.5px solid #e2e8f0;color:#0f172a;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
+                    onmouseenter="this.style.borderColor='#94a3b8'" onmouseleave="this.style.borderColor='#e2e8f0'">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    Enviar prueba
+                </button>
+                <button onclick="cerrarNotifDesdeModal()"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f0fdf4;border:1.5px solid #86efac;color:#16a34a;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
+                    onmouseenter="this.style.background='#dcfce7';this.style.borderColor='#4ade80'" onmouseleave="this.style.background='#f0fdf4';this.style.borderColor='#86efac'">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Cerrar notificaciones
+                </button>
+            </div>
             <div style="display:flex;gap:8px">
                 <button class="btn btn-outline" onclick="closeNotifModal()">Cancelar</button>
                 <button onclick="guardarNotifConfig()" id="btnGuardarNotif"
@@ -4815,46 +5016,41 @@ async function loadPlantillasNotif() {
         const lista = Array.isArray(d) ? d : (d.data || []);
         notifPlantillas = lista.filter(p => p.activa != 0);
 
-        const sel = document.getElementById('notifPlantillaSelect');
-        // Agrupar por categoría
         const grupos = {};
         notifPlantillas.forEach(p => {
             const cat = p.categoria || 'General';
             if (!grupos[cat]) grupos[cat] = [];
             grupos[cat].push(p);
         });
-        sel.innerHTML = '<option value="">— Seleccionar plantilla —</option>';
-        Object.entries(grupos).forEach(([cat, items]) => {
-            const grp = document.createElement('optgroup');
-            grp.label = cat;
-            items.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = p.nombre;
-                grp.appendChild(opt);
+        ['r1','r2','r3'].forEach(rid => {
+            const sel = document.getElementById(`notif_${rid}_plantilla`);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">— Plantilla de mensaje (opcional) —</option>';
+            Object.entries(grupos).forEach(([cat, items]) => {
+                const grp = document.createElement('optgroup');
+                grp.label = cat;
+                items.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.nombre;
+                    grp.appendChild(opt);
+                });
+                sel.appendChild(grp);
             });
-            sel.appendChild(grp);
         });
     } catch(e) {}
 }
 
-function aplicarPlantillaNotif() {
-    const sel  = document.getElementById('notifPlantillaSelect');
-    const id   = sel.value;
-    const prev = document.getElementById('notifPlantillaPreview');
-    const txt  = document.getElementById('notifMensaje');
-
+function aplicarPlantillaNotifRow(rid) {
+    const sel  = document.getElementById(`notif_${rid}_plantilla`);
+    const prev = document.getElementById(`notif_${rid}_preview`);
+    const id   = sel ? sel.value : '';
+    if (!prev) return;
     if (!id) { prev.style.display = 'none'; return; }
-
     const p = notifPlantillas.find(x => x.id == id);
     if (!p) return;
-
-    // Mostrar preview
     prev.style.display = 'block';
     prev.textContent   = p.contenido;
-
-    // Copiar contenido al textarea (limpio de variables {{...}})
-    txt.value = p.contenido;
 }
 
 async function loadNotifConfig() {
@@ -4865,16 +5061,31 @@ async function loadNotifConfig() {
         const cfg = d.data;
 
         notifActiva = cfg.activa == 1;
-        document.getElementById('notifDias').value    = cfg.dias_antes || 15;
-        document.getElementById('notifHora').value    = (cfg.hora_envio || '08:00').substring(0,5);
-        document.getElementById('notifAsunto').value  = cfg.asunto_personalizado || '';
-        document.getElementById('notifMensaje').value = cfg.mensaje_personalizado || '';
+        // Cargar fechas programadas
+        ['r1','r2','r3'].forEach(rid => {
+            const fechaEl = document.getElementById(`notif_${rid}_fecha`);
+            if (fechaEl && cfg[`${rid}_fecha`]) {
+                // datetime-local requiere formato YYYY-MM-DDTHH:MM
+                fechaEl.value = cfg[`${rid}_fecha`].substring(0,16).replace(' ','T');
+            } else if (fechaEl) {
+                fechaEl.value = '';
+            }
+            // Restaurar plantilla seleccionada
+            const sel = document.getElementById(`notif_${rid}_plantilla`);
+            if (sel && cfg[`${rid}_plantilla_id`]) {
+                sel.value = cfg[`${rid}_plantilla_id`];
+                aplicarPlantillaNotifRow(rid);
+            }
+        });
         actualizarToggleNotif();
 
         const label = document.getElementById('notifStatusLabel');
-        if (label) label.textContent = notifActiva
-            ? `Activa · ${cfg.dias_antes || 15} días antes`
-            : 'Inactiva';
+        if (label) {
+            const fechas = ['r1','r2','r3'].map(rid => cfg[`${rid}_fecha`] ? cfg[`${rid}_fecha`].substring(0,10) : null).filter(Boolean);
+            label.textContent = notifActiva
+                ? (fechas.length ? `Activa · ${fechas.length} fecha${fechas.length>1?'s':''} programada${fechas.length>1?'s':''}` : 'Activa · sin fechas')
+                : 'Inactiva';
+        }
     } catch(e) {}
 }
 
@@ -4895,12 +5106,25 @@ function actualizarToggleNotif() {
 function openNotifModal() {
     loadNotifConfig();
     loadPlantillasNotif();
-    document.getElementById('notifPlantillaSelect').value = '';
-    document.getElementById('notifPlantillaPreview').style.display = 'none';
     document.getElementById('notifModal').classList.add('show');
 }
 function closeNotifModal() {
     document.getElementById('notifModal').classList.remove('show');
+}
+
+async function cerrarNotifDesdeModal() {
+    try {
+        const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
+        const ds = await rs.json();
+        const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+        if (!activos.length) { showToast('No hay servicios recurrentes activos', 'warning'); return; }
+        activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+        const svc   = activos[0];
+        const count = Math.min(3, parseInt(svc.notif_count) || 0) || 1;
+        closeNotifModal();
+        await cerrarNotifConExito(svc.id, count, svc.servicio_nombre);
+    } catch(e) { showToast('Error al obtener servicios', 'error'); }
+
 }
 
 async function guardarNotifConfig() {
@@ -4913,10 +5137,12 @@ async function guardarNotifConfig() {
             body: JSON.stringify({
                 cliente_id:             clienteId,
                 activa:                 notifActiva,
-                dias_antes:             parseInt(document.getElementById('notifDias').value) || 15,
-                hora_envio:             document.getElementById('notifHora').value,
-                asunto_personalizado:   document.getElementById('notifAsunto').value.trim(),
-                mensaje_personalizado:  document.getElementById('notifMensaje').value.trim(),
+                r1_fecha:               document.getElementById('notif_r1_fecha')?.value?.replace('T',' ') || null,
+                r2_fecha:               document.getElementById('notif_r2_fecha')?.value?.replace('T',' ') || null,
+                r3_fecha:               document.getElementById('notif_r3_fecha')?.value?.replace('T',' ') || null,
+                r1_plantilla_id:        document.getElementById('notif_r1_plantilla')?.value || null,
+                r2_plantilla_id:        document.getElementById('notif_r2_plantilla')?.value || null,
+                r3_plantilla_id:        document.getElementById('notif_r3_plantilla')?.value || null,
             })
         });
         const d = await r.json();

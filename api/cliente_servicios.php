@@ -18,6 +18,10 @@ try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN nombre_display VARCHA
 try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN frecuencia VARCHAR(20) NOT NULL DEFAULT 'año'"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE cliente_servicios MODIFY COLUMN frecuencia VARCHAR(20) NOT NULL DEFAULT 'año'"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN paquete_id INT NULL DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN notif_count TINYINT NOT NULL DEFAULT 0"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN notif_r1_at DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN notif_r2_at DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN notif_r3_at DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
 // Normalizar registros sin frecuencia
 $pdo->exec("UPDATE cliente_servicios SET frecuencia = 'año' WHERE frecuencia IS NULL OR TRIM(frecuencia) = ''");
 
@@ -91,7 +95,7 @@ switch ($method) {
             $id = $input['id'] ?? null;
             if(!$id) jsonResponse(['error' => 'ID es requerido'], 400);
 
-            $fields = ['monto_renovacion', 'descuento', 'costo_servicio', 'fecha_inicio', 'fecha_vencimiento', 'frecuencia', 'estado', 'nombre_display'];
+            $fields = ['monto_renovacion', 'descuento', 'costo_servicio', 'fecha_inicio', 'fecha_vencimiento', 'frecuencia', 'estado', 'nombre_display', 'notif_count', 'notif_r1_at', 'notif_r2_at', 'notif_r3_at'];
             $up = []; $vals = [];
             foreach($fields as $f) { if(isset($input[$f])) { $up[] = "$f = ?"; $vals[] = $input[$f]; } }
             $vals[] = $id;

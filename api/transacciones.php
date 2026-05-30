@@ -292,7 +292,7 @@ switch ($method) {
             $input['fecha_vencimiento'] ?? null,
             !empty($input['fecha_pago']) ? $input['fecha_pago'] : null,
             $input['estado'] ?? 'pendiente',
-            $input['lead_id'] ?: null,
+            ($input['lead_id'] ?? null) ?: null,
             $input['cliente_id'] ?: null,
             $input['servicio_id'] ?: null,
             $input['factura_id'] ?? null,
