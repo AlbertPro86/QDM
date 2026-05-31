@@ -1,4 +1,4 @@
-/* ===== QUANTUN Digital — Landing · Design System v1.0 (light) ===== */
+﻿/* ===== QUANTUN Digital — Landing · Design System v1.0 (light) ===== */
 :root{
   /* Surface */
   --q-bg:#FAFAF7; --q-bg-soft:#F5F4EF; --q-surface:#FFFFFF;
@@ -327,71 +327,106 @@ img{max-width:100%;display:block}
 }
 
 /* ===== PLANES ===== */
-.plans{padding:100px 0;background:var(--q-bg-soft)}
+.plans{padding:96px 0;background:var(--q-bg-soft)}
 .plans-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:20px;
-  margin-top:52px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin-top:48px;
   align-items:stretch;
 }
 .plan-card{
   background:var(--q-surface);
   border:1.5px solid var(--q-border);
-  border-radius:16px;
-  padding:28px 24px 24px;
-  display:flex;flex-direction:column;gap:0;
-  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
-  position:relative;overflow:hidden;
+  border-radius:20px;
+  padding:24px 20px 22px;
+  display:flex;flex-direction:column;
+  transition:transform .22s var(--ease),box-shadow .22s var(--ease);
+  position:relative;
 }
-.plan-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
-.plan-card--popular{
-  border-color:var(--q-ink);
-  background:var(--q-ink);
-  color:#fff;
-}
-.plan-card--popular .plan-card__desc{color:rgba(255,255,255,.6)}
-.plan-card--popular .plan-card__period{color:rgba(255,255,255,.5)}
-.plan-card--popular .plan-card__feat li{color:rgba(255,255,255,.85)}
-.plan-card--popular .plan-card__feat li::before{color:var(--q-lima)}
+.plan-card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(0,0,0,.09)}
+.plan-card--popular{border-color:var(--q-ink);background:var(--q-ink);color:#fff}
 .plan-card--custom{border-style:dashed;background:var(--q-bg)}
 
+/* badge popular */
 .plan-card__badge{
-  position:absolute;top:18px;right:18px;
+  position:absolute;top:16px;right:16px;
   background:var(--q-lima);color:var(--q-ink);
-  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:4px 10px;border-radius:999px;
+  font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;white-space:nowrap;
 }
+
+/* icono */
 .plan-card__icon{
-  width:44px;height:44px;border-radius:12px;
+  width:40px;height:40px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:20px;background:var(--q-bg-soft);flex-shrink:0;
+  margin-bottom:16px;background:var(--q-bg-soft);flex-shrink:0;
 }
-.plan-card--popular .plan-card__icon{background:rgba(255,255,255,.12)}
-.plan-card__icon svg{width:22px;height:22px}
-.plan-card__name{font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
-.plan-card__desc{font-size:13px;color:var(--q-ink-3);line-height:1.55;margin-bottom:22px;min-height:52px}
-.plan-card__price{display:flex;align-items:baseline;gap:6px;margin-bottom:22px}
-.plan-card__amount{font-size:28px;font-weight:800;letter-spacing:-.03em}
-.plan-card__period{font-size:12px;color:var(--q-ink-4);font-family:var(--mono)}
-.plan-card__divider{height:1px;background:var(--q-border);margin-bottom:18px}
-.plan-card--popular .plan-card__divider{background:rgba(255,255,255,.12)}
-.plan-card__feat{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:26px;flex:1}
+.plan-card--popular .plan-card__icon{background:rgba(255,255,255,.1)}
+.plan-card__icon svg{width:20px;height:20px}
+
+/* nombre */
+.plan-card__name{
+  font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
+  margin-bottom:6px;
+}
+
+/* descripción */
+.plan-card__desc{
+  font-size:12.5px;color:var(--q-ink-3);line-height:1.5;
+  margin-bottom:16px;
+}
+.plan-card--popular .plan-card__desc{color:rgba(255,255,255,.55)}
+
+/* precio — layout vertical: número arriba, moneda abajo */
+.plan-card__price{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
+.plan-card__amount{
+  font-family:var(--mono);
+  font-size:26px;font-weight:700;
+  letter-spacing:-.02em;line-height:1;
+}
+.plan-card--custom .plan-card__amount{
+  font-family:var(--sans);
+  font-size:17px;font-weight:700;letter-spacing:-.01em;
+}
+.plan-card__period{
+  font-family:var(--mono);
+  font-size:11px;color:var(--q-ink-4);letter-spacing:.03em;
+}
+.plan-card--popular .plan-card__period{color:rgba(255,255,255,.38)}
+
+/* divisor */
+.plan-card__divider{height:1px;background:var(--q-border);margin-bottom:14px}
+.plan-card--popular .plan-card__divider{background:rgba(255,255,255,.1)}
+
+/* features */
+.plan-card__feat{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px;flex:1}
 .plan-card__feat li{
-  font-size:13px;color:var(--q-ink-2);
-  display:flex;align-items:flex-start;gap:9px;line-height:1.4;
+  font-size:12.5px;color:var(--q-ink-2);
+  display:flex;align-items:flex-start;gap:8px;line-height:1.35;
 }
 .plan-card__feat li::before{
   content:"✓";
   display:inline-flex;align-items:center;justify-content:center;
-  width:18px;height:18px;border-radius:50%;
+  width:16px;height:16px;min-width:16px;border-radius:50%;
   background:var(--q-lima);color:var(--q-ink);
-  font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;
+  font-size:9px;font-weight:800;flex-shrink:0;margin-top:1px;
 }
-.plan-card--custom .plan-card__feat li::before{background:var(--q-border-strong);color:var(--q-ink-3)}
-.plan-card__cta{margin-top:auto;text-align:center;width:100%;justify-content:center}
-.plan-card--popular .plan-card__cta{background:var(--q-lima);color:var(--q-ink)}
-.plan-card--popular .plan-card__cta:hover{background:#d3f76a}
+.plan-card--popular .plan-card__feat li{color:rgba(255,255,255,.82)}
+.plan-card--popular .plan-card__feat li::before{background:var(--q-lima);color:var(--q-ink)}
+.plan-card--custom .plan-card__feat li::before{background:transparent;border:1.5px solid var(--q-border-strong);color:var(--q-ink-3)}
+
+/* cta */
+.plan-card__cta{
+  margin-top:auto;text-align:center;width:100%;
+  justify-content:center;font-size:13px;
+  padding:11px 14px;
+}
+.plan-card--popular .plan-card__cta{
+  background:var(--q-lima);color:var(--q-ink);
+  border-color:var(--q-lima);
+}
+.plan-card--popular .plan-card__cta:hover{background:#d3f76a;border-color:#d3f76a}
 
 /* svc no clickeable */
 .svc{cursor:default!important}
@@ -399,10 +434,12 @@ img{max-width:100%;display:block}
 .svc__more{color:var(--q-ink-4)!important;pointer-events:none}
 .svc__arrow{display:none!important}
 
-@media(max-width:1024px){
-  .plans-grid{grid-template-columns:repeat(2,1fr)}
+/* Responsive planes */
+@media(max-width:1100px){
+  .plans-grid{grid-template-columns:repeat(2,1fr);gap:14px}
 }
-@media(max-width:600px){
-  .plans-grid{grid-template-columns:1fr}
+@media(max-width:640px){
+  .plans-grid{grid-template-columns:1fr;gap:12px}
   .plans{padding:64px 0}
+  .plan-card__amount{font-size:28px}
 }
