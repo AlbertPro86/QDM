@@ -28,6 +28,10 @@
         <a href="blog.html">Blog</a>
       </nav>
       <div class="nav__cta">
+        <button class="nav__client" id="openLogin" aria-label="Área Cliente">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span class="nav__client-text">Área Cliente</span>
+        </button>
         <a href="#contacto" class="btn btn--pill">Cotizar Proyecto</a>
         <button class="nav__burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
       </div>
@@ -498,6 +502,40 @@
     </div>
   </div>
 
+  <!-- ===== MODAL LOGIN ÁREA CLIENTE ===== -->
+  <div class="login-modal" id="loginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="login-modal__backdrop" data-close-login></div>
+    <div class="login-card">
+      <button class="login-card__close" data-close-login aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="login-card__brand">
+        <img src="assets/quantun-logo.png" alt="QUANTUN Digital">
+      </div>
+      <h2 class="login-card__title" id="loginTitle">Área Cliente</h2>
+      <p class="login-card__sub">Accede a tu espacio de trabajo digital</p>
+      <form class="login-form" id="loginForm" novalidate>
+        <label class="field">
+          <span>Correo electrónico</span>
+          <input type="email" name="login_email" placeholder="tucorreo@email.com" required autocomplete="email">
+        </label>
+        <label class="field login-form__pw-wrap">
+          <span>Contraseña</span>
+          <div class="login-form__pw">
+            <input type="password" name="login_pass" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="login-form__eye" id="loginEye" aria-label="Mostrar contraseña">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </label>
+        <div class="login-form__foot">
+          <a href="#" class="login-form__forgot">¿Olvidaste tu contraseña?</a>
+        </div>
+        <button type="submit" class="btn btn--primary login-form__submit">Ingresar <span class="btn__ic">→</span></button>
+        <p class="login-form__note">Próximamente disponible para todos los clientes.</p>
+      </form>
+    </div>
+  </div>
   <script src="script.js"></script>
   <script src="app.js"></script>
 </body>

@@ -462,3 +462,85 @@ img{max-width:100%;display:block}
   .plans-section{padding:64px 0}
   .plan-card__amount{font-size:28px}
 }
+
+/* ===== ÁREA CLIENTE — nav button ===== */
+.nav__client{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--sans);font-size:14px;font-weight:500;color:var(--q-ink-3);
+  background:none;border:1px solid var(--q-border);border-radius:8px;
+  padding:0 14px;height:36px;cursor:pointer;
+  transition:border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease);
+  white-space:nowrap;
+}
+.nav__client:hover{border-color:var(--q-border-strong);color:var(--q-ink);background:var(--q-surface)}
+.nav.scrolled .nav__client{background:rgba(255,255,255,.6)}
+.nav__client svg{width:15px;height:15px;flex-shrink:0}
+
+/* ===== MODAL LOGIN ===== */
+.login-modal{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s var(--ease);
+}
+.login-modal.open{opacity:1;pointer-events:auto}
+.login-modal__backdrop{
+  position:absolute;inset:0;
+  background:rgba(14,14,12,.48);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+.login-card{
+  position:relative;z-index:1;
+  background:var(--q-surface);
+  border:1px solid var(--q-border);
+  border-radius:22px;
+  padding:40px 36px 36px;
+  width:100%;max-width:390px;
+  box-shadow:0 32px 80px rgba(14,14,12,.18);
+  transform:translateY(14px) scale(.98);
+  transition:transform .28s var(--ease);
+}
+.login-modal.open .login-card{transform:none}
+.login-card__close{
+  position:absolute;top:14px;right:14px;
+  width:32px;height:32px;border-radius:8px;
+  background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--q-ink-4);transition:background .15s,color .15s;
+}
+.login-card__close:hover{background:var(--q-bg-soft);color:var(--q-ink)}
+.login-card__close svg{width:16px;height:16px}
+.login-card__brand{margin-bottom:22px}
+.login-card__brand img{height:26px;width:auto}
+.login-card__title{font-size:22px;font-weight:700;letter-spacing:-.025em;margin-bottom:5px}
+.login-card__sub{font-size:13px;color:var(--q-ink-3);margin-bottom:28px}
+
+/* form */
+.login-form{display:flex;flex-direction:column;gap:14px}
+.login-form__pw-wrap .field{margin:0}
+.login-form__pw{position:relative}
+.login-form__pw input{width:100%;padding-right:44px}
+.login-form__eye{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;background:none;border:none;cursor:pointer;
+  color:var(--q-ink-4);display:flex;align-items:center;justify-content:center;
+  transition:color .15s;border-radius:6px;
+}
+.login-form__eye:hover{color:var(--q-ink)}
+.login-form__eye svg{width:16px;height:16px}
+.login-form__foot{display:flex;justify-content:flex-end}
+.login-form__forgot{font-size:12.5px;color:var(--q-ink-4);transition:color .15s}
+.login-form__forgot:hover{color:var(--q-ink)}
+.login-form__submit{
+  width:100%;justify-content:center;
+  margin-top:4px;
+  display:flex!important;
+}
+.login-form__note{font-size:11.5px;color:var(--q-ink-5);text-align:center}
+
+@media(max-width:680px){
+  .nav__client-text{display:none}
+  .nav__client{padding:0 10px;width:36px;justify-content:center}
+  .login-card{padding:32px 22px 28px}
+}

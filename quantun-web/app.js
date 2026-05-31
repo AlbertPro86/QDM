@@ -421,4 +421,65 @@
     if (elSvc) elSvc.value = 'Plan ' + planName;
   };
 
+  /* ============ Modal Área Cliente (Login) ============ */
+  (function() {
+    var loginModal = document.getElementById('loginModal');
+    var openBtn    = document.getElementById('openLogin');
+    if (!loginModal || !openBtn) return;
+
+    function openLogin() {
+      loginModal.classList.add('open');
+      loginModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() {
+        var f = loginModal.querySelector('input[type="email"]');
+        if (f) f.focus();
+      }, 240);
+    }
+    function closeLogin() {
+      loginModal.classList.remove('open');
+      loginModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', openLogin);
+    loginModal.querySelectorAll('[data-close-login]').forEach(function(el) {
+      el.addEventListener('click', closeLogin);
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && loginModal.classList.contains('open')) closeLogin();
+    });
+
+    /* Mostrar / ocultar contraseña */
+    var eyeBtn   = document.getElementById('loginEye');
+    var passInput = document.getElementById('loginPass');
+    var eyeIcon  = document.getElementById('eyeIcon');
+    if (eyeBtn && passInput) {
+      eyeBtn.addEventListener('click', function() {
+        var show = passInput.type === 'password';
+        passInput.type = show ? 'text' : 'password';
+        eyeIcon.innerHTML = show
+          ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+          : '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>';
+      });
+    }
+
+    /* Placeholder — bloquear submit hasta implementar auth real */
+    var loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = loginForm.querySelector('.login-form__submit');
+        btn.disabled = true;
+        btn.innerHTML = 'Verificando&hellip;';
+        setTimeout(function() {
+          btn.disabled = false;
+          btn.innerHTML = 'Ingresar <span class="btn__ic">→</span>';
+          var note = loginForm.querySelector('.login-form__note');
+          if (note) { note.style.color = 'var(--q-lima-deep)'; note.textContent = 'Acceso disponible próximamente. Te avisaremos.'; }
+        }, 1200);
+      });
+    }
+  })();
+
 })();
