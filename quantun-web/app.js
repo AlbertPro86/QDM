@@ -1,4 +1,4 @@
-/* ===== QUANTUN Digital — interacciones avanzadas ===== */
+﻿/* ===== QUANTUN Digital — interacciones avanzadas ===== */
 (function () {
   'use strict';
 
@@ -145,6 +145,9 @@
     }
   }
 
+  // openModal declarado en scope del IIFE para que renderServiceCards pueda accederlo
+  var openModal = function() {};
+
   function renderServiceCards() {
     var grid = document.querySelector('.svc-grid');
     if (!grid) return;
@@ -184,7 +187,7 @@
     var okBox = document.getElementById('leadOk');
     var lastFocus = null;
 
-    function openModal(key) {
+    openModal = function(key) {
       var s = SERVICES[key];
       if (!s) return;
       elIcon.innerHTML = ICONS[key] || ICONS.default || '';
