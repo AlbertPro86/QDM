@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
@@ -25,6 +25,7 @@
         <a href="#servicios">Servicios</a>
         <a href="#trabajos">Trabajos</a>
         <a href="#especialidad">Especialidad</a>
+        <a href="#planes">Planes</a>
         <a href="blog.html">Blog</a>
       </nav>
       <div class="nav__cta">
@@ -121,7 +122,7 @@
           <span class="svc__num">01</span>
           <h3>Diseño Web adaptable</h3>
           <p>Diseño responsive, moderno y funcional que se adapta a móviles, tablets y escritorio. Enfocado en experiencia de usuario (UI/UX) y rendimiento.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
         <button class="svc reveal" data-delay="1" data-service="marketing" type="button">
           <span class="svc__icon" aria-hidden="true">
@@ -130,7 +131,7 @@
           <span class="svc__num">02</span>
           <h3>Marketing de Contenido</h3>
           <p>Estrategias de contenido pensadas para atraer tráfico orgánico, mejorar tu posicionamiento en buscadores y conectar con tus clientes.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
         <button class="svc reveal" data-delay="2" data-service="wordpress" type="button">
           <span class="svc__icon" aria-hidden="true">
@@ -139,7 +140,7 @@
           <span class="svc__num">03</span>
           <h3>Diseño y Maquetado WordPress</h3>
           <p>Diseño personalizado y maquetación profesional con WordPress, optimizado para velocidad, escalabilidad y fácil gestión.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
         <button class="svc reveal" data-delay="3" data-service="hosting" type="button">
           <span class="svc__icon" aria-hidden="true">
@@ -148,7 +149,7 @@
           <span class="svc__num">04</span>
           <h3>Hosting y Dominio</h3>
           <p>Te ayudo a elegir, configurar y mantener el mejor hosting y dominio para tu proyecto, con seguridad y soporte técnico incluido.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
         <button class="svc reveal" data-delay="4" data-service="correos" type="button">
           <span class="svc__icon" aria-hidden="true">
@@ -157,7 +158,7 @@
           <span class="svc__num">05</span>
           <h3>Correos Corporativos</h3>
           <p>Configuración profesional de correos con tu dominio, integrados con Gmail o Outlook, para dar confianza y seriedad a tu marca.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
         <button class="svc reveal" data-delay="5" data-service="mantenimiento" type="button">
           <span class="svc__icon" aria-hidden="true">
@@ -166,16 +167,93 @@
           <span class="svc__num">06</span>
           <h3>Actualizaciones Web</h3>
           <p>Mantengo tu sitio actualizado, optimizado y seguro. Me encargo de ajustes técnicos, mejoras de rendimiento y respaldo constante.</p>
-          <span class="svc__more">Ver planes <span class="svc__arrow">→</span></span>
+          
         </button>
       </div>
       <div class="services__foot reveal">
-        <p class="services__hint">Haz clic en cualquier servicio para ver planes y solicitar tu cotización.</p>
-        <a href="#contacto" class="btn btn--primary fx">Cotizar Proyecto <span class="btn__ic">→</span></a>
+        <a href="#planes" class="btn btn--primary fx">Ver planes y precios <span class="btn__ic">→</span></a>
       </div>
     </div>
   </section>
 
+
+  <!-- ===== PLANES ===== -->
+  <section class="plans" id="planes">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Planes</span>
+        <h2 class="reveal" data-delay="1">Elige el plan para <span class="hl">tu negocio</span></h2>
+        <p class="reveal" data-delay="2">Soluciones pensadas para cada etapa de tu crecimiento digital. Todos los planes son anuales e incluyen soporte.</p>
+      </div>
+      <div class="plans-grid" id="plansGrid">
+        <!-- Cargando desde CRM... -->
+        <div class="plan-card reveal">
+          <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+          <h3 class="plan-card__name">Básico</h3>
+          <p class="plan-card__desc">Presencia digital profesional para emprendedores y pequeñas empresas.</p>
+          <div class="plan-card__price"><span class="plan-card__amount">$309.000</span><span class="plan-card__period">COP / año</span></div>
+          <div class="plan-card__divider"></div>
+          <ul class="plan-card__feat">
+            <li>Dominio .com</li>
+            <li>Hosting 1 GB</li>
+            <li>5 Correos Corporativos Zoho Mail</li>
+            <li>Certificado SSL</li>
+            <li>Soporte Técnico</li>
+          </ul>
+          <a href="#contacto" class="btn btn--ghost plan-card__cta" onclick="preselectPlan('Básico')">Solicitar Plan <span class="btn__ic">→</span></a>
+        </div>
+
+        <div class="plan-card plan-card--popular reveal" data-delay="1">
+          <span class="plan-card__badge">Popular</span>
+          <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+          <h3 class="plan-card__name">Pymes</h3>
+          <p class="plan-card__desc">Para negocios en crecimiento que necesitan web, correos y presencia completa.</p>
+          <div class="plan-card__price"><span class="plan-card__amount">$580.000</span><span class="plan-card__period">COP / año</span></div>
+          <div class="plan-card__divider"></div>
+          <ul class="plan-card__feat">
+            <li>Todo lo del plan Básico</li>
+            <li>Sitio Web Básico</li>
+            <li>Hosting 1 GB</li>
+            <li>5 Correos Zoho Mail 5 GB</li>
+            <li>Certificado SSL incluido</li>
+          </ul>
+          <a href="#contacto" class="btn plan-card__cta" onclick="preselectPlan('Pymes')">Solicitar Plan <span class="btn__ic">→</span></a>
+        </div>
+
+        <div class="plan-card reveal" data-delay="2">
+          <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg></div>
+          <h3 class="plan-card__name">CRM Año</h3>
+          <p class="plan-card__desc">Solución completa con CRM, Google Negocios y hosting de alto rendimiento.</p>
+          <div class="plan-card__price"><span class="plan-card__amount">$989.000</span><span class="plan-card__period">COP / año</span></div>
+          <div class="plan-card__divider"></div>
+          <ul class="plan-card__feat">
+            <li>Dominio .com + Hosting 25 GB</li>
+            <li>Google Analytics y Negocios</li>
+            <li>Certificado SSL</li>
+            <li>Soporte Hosting</li>
+            <li>Motor CRM Inmobiliario</li>
+          </ul>
+          <a href="#contacto" class="btn btn--ghost plan-card__cta" onclick="preselectPlan('CRM Año')">Solicitar Plan <span class="btn__ic">→</span></a>
+        </div>
+
+        <div class="plan-card plan-card--custom reveal" data-delay="3">
+          <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg></div>
+          <h3 class="plan-card__name">Personalizado</h3>
+          <p class="plan-card__desc">¿Necesitas algo diferente? Diseñamos una solución a medida para tu negocio.</p>
+          <div class="plan-card__price"><span class="plan-card__amount" style="font-size:18px;font-weight:700">A tu medida</span></div>
+          <div class="plan-card__divider"></div>
+          <ul class="plan-card__feat">
+            <li>Consultoría inicial gratuita</li>
+            <li>Propuesta personalizada</li>
+            <li>Servicios a la carta</li>
+            <li>Flexibilidad de pago</li>
+            <li>Soporte dedicado</li>
+          </ul>
+          <a href="#contacto" class="btn btn--accent plan-card__cta" onclick="preselectPlan('Personalizado')">Cotizar ahora <span class="btn__ic">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
   <!-- ===== FAQ + MOCKUP ===== -->
   <section class="faq" id="faq">
     <div class="container faq__grid">

@@ -166,7 +166,6 @@
         '<h3>' + svc.title + '</h3>' +
         '<p>' + svc.desc + '</p>' +
         '<span class="svc__more">Solicitar información <span class="svc__arrow">&rarr;</span></span>';
-      btn.addEventListener('click', (function(k) { return function() { openModal(k); }; })(key));
       grid.appendChild(btn);
       idx++;
     }
@@ -230,9 +229,6 @@
       if (lastFocus) lastFocus.focus();
     }
 
-    document.querySelectorAll('.svc[data-service]').forEach(function (btn) {
-      btn.addEventListener('click', function () { openModal(btn.getAttribute('data-service')); });
-    });
     modal.querySelectorAll('[data-close]').forEach(function (el) {
       el.addEventListener('click', closeModal);
     });
@@ -362,5 +358,13 @@
     }
     // Si falla, los servicios estáticos hardcoded funcionan como fallback
   })();
+
+  /* ============ Pre-seleccion de plan desde seccion Planes ============ */
+  window.preselectPlan = function(planName) {
+    var el = document.getElementById('leadPlan');
+    if (el) el.value = planName;
+    var elSvc = document.getElementById('leadService');
+    if (elSvc) elSvc.value = 'Plan ' + planName;
+  };
 
 })();
