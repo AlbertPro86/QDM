@@ -5,8 +5,8 @@
   /* =========================================================
      CONEXIÓN AL CRM QUANTUN Digital
      ========================================================= */
-  var CRM_ENDPOINT       = '../api/solicitudes_web.php';
-  var SERVICIOS_ENDPOINT = '../api/servicios_publico.php';
+  var CRM_ENDPOINT       = '/CRM-QUANTUN-Digital/api/solicitudes_web.php';
+  var SERVICIOS_ENDPOINT = '/CRM-QUANTUN-Digital/api/servicios_publico.php';
 
   async function submitToCRM(payload) {
     payload.submittedAt = new Date().toISOString();
