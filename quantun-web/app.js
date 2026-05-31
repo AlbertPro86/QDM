@@ -112,6 +112,33 @@
     }
   };
 
+  /* ============ Datos estáticos de planes ============ */
+  var PLANS = {
+    basico: {
+      title: 'Plan Básico',
+      eyebrow: 'Suscripción anual · QUANTUN Digital',
+      desc: 'Presencia digital profesional para emprendedores y pequeñas empresas.',
+      price: '$309.000 COP / año',
+      icon: 'web',
+      features: ['Dominio .com', 'Hosting 1 GB', '5 Correos Corporativos Zoho Mail', 'Certificado SSL', 'Soporte Técnico']
+    },
+    pymes: {
+      title: 'Plan Pymes',
+      eyebrow: 'Suscripción anual · QUANTUN Digital',
+      desc: 'Para negocios en crecimiento con web, correos corporativos y presencia completa.',
+      price: '$580.000 COP / año',
+      icon: 'marketing',
+      features: ['Todo lo del plan Básico', 'Sitio Web Básico', 'Hosting 1 GB', '5 Correos Zoho Mail 5 GB c/u', 'Certificado SSL incluido']
+    },
+    enterprise: {
+      title: 'Plan Enterprise',
+      eyebrow: 'Suscripción anual · QUANTUN Digital',
+      desc: 'Solución avanzada con CRM, mayor almacenamiento, correos ilimitados y actualizaciones continuas.',
+      price: '$989.000 COP / año',
+      icon: 'mantenimiento',
+      features: ['Dominio .com + Hosting 50 GB', '20 Correos Zoho Mail 10 GB c/u', 'Google Analytics y Negocios', 'Certificado SSL Premium', 'Motor CRM Inmobiliario', 'Actualizaciones Web mensuales', 'Soporte prioritario dedicado']
+    }
+  };
   /* ============ Carga dinámica de servicios desde CRM ============ */
   async function loadServicesFromCRM() {
     try {
@@ -221,6 +248,33 @@
       document.body.style.overflow = 'hidden';
       setTimeout(function () { var f = form.querySelector('input'); if (f) f.focus(); }, 280);
     }
+
+    window.openPlanModal = function(planKey) {
+      var p = PLANS[planKey];
+      if (!p || !modal) return;
+      var iconKey = p.icon || 'default';
+      elIcon.innerHTML = ICONS[iconKey] || ICONS.default;
+      elEyebrow.textContent = p.eyebrow;
+      elTitle.textContent = p.title;
+      elDesc.textContent = p.desc;
+      elFeatures.innerHTML = p.features.map(function(f) { return '<li>' + f + '</li>'; }).join('');
+      elPlans.innerHTML = '<button type="button" class="plan sel" data-plan="' + p.title + '">' +
+        '<span class="plan__check">&#10003;</span>' +
+        '<span class="plan__tag">Anual</span>' +
+        '<span class="plan__name">' + p.price + '</span>' +
+        '</button>';
+      form.hidden = false;
+      okBox.hidden = true;
+      form.querySelector('.lead__foot').style.display = '';
+      form.reset();
+      elService.value = p.title;
+      elPlan.value = p.title;
+      lastFocus = document.activeElement;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function() { var f = form.querySelector('input'); if (f) f.focus(); }, 280);
+    };
 
     function closeModal() {
       modal.classList.remove('open');
