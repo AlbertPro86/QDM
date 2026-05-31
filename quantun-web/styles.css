@@ -330,7 +330,7 @@ img{max-width:100%;display:block}
 .plans{padding:96px 0;background:var(--q-bg-soft)}
 .plans-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:20px;
   align-items:stretch;
 }
@@ -448,15 +448,14 @@ img{max-width:100%;display:block}
 .svc__more{color:var(--q-ink-4)!important;pointer-events:none}
 .svc__arrow{display:none!important}
 
-/* Responsive planes */
-@media(max-width:1100px){
-  .plans-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+/* Responsive planes — mismos breakpoints que .svc-grid */
+@media(max-width:1024px){
+  .plans-grid{grid-template-columns:repeat(2,1fr)}
 }
-@media(max-width:600px){
-  .plans-grid{grid-template-columns:1fr;gap:14px}
+@media(max-width:680px){
+  .plans-grid{grid-template-columns:1fr}
   .plans{padding:64px 0}
   .plan-card__desc{min-height:0}
-  .plan-card__amount{font-size:32px}
 }
 @media(max-width:640px){
   .plans-grid{grid-template-columns:1fr;gap:12px}
