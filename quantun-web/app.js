@@ -526,13 +526,14 @@
     /* — pantalla inicial — */
     function renderStart() {
       inputW.hidden = true;
+      var now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
       body.innerHTML =
+        '<div class="qchat__msg qchat__msg--agent" style="margin-bottom:4px">¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>. ¿En qué podemos ayudarte hoy?<span class="qchat__msg-time">' + now + '</span></div>' +
+        '<div class="qchat__msg qchat__msg--agent">Para iniciar la conversación déjanos tu nombre y te atendemos de inmediato.<span class="qchat__msg-time">' + now + '</span></div>' +
         '<div class="qchat__start">' +
-          '<div class="qchat__start-title">Chatea con nosotros</div>' +
-          '<p class="qchat__start-sub">Escríbenos y te responderemos lo antes posible.</p>' +
           '<input type="text" id="qchatName" placeholder="Tu nombre *" required>' +
           '<input type="email" id="qchatEmail" placeholder="Tu correo (opcional)">' +
-          '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat</button>' +
+          '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat →</button>' +
         '</div>';
       document.getElementById('qchatStartBtn').addEventListener('click', initSession);
     }
