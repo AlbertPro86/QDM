@@ -330,97 +330,111 @@ img{max-width:100%;display:block}
 .plans{padding:96px 0;background:var(--q-bg-soft)}
 .plans-grid{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:16px;
-  margin-top:48px;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
   align-items:stretch;
 }
 .plan-card{
   background:var(--q-surface);
   border:1.5px solid var(--q-border);
   border-radius:20px;
-  padding:24px 20px 22px;
+  padding:28px 20px 24px;
   display:flex;flex-direction:column;
-  transition:transform .22s var(--ease),box-shadow .22s var(--ease);
   position:relative;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
 }
-.plan-card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(0,0,0,.09)}
-.plan-card--popular{border-color:var(--q-ink);background:var(--q-ink);color:#fff}
+.plan-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.09)}
+.plan-card--popular{
+  border-color:var(--q-ink);
+  background:var(--q-ink);
+  color:#fff;
+  box-shadow:0 20px 60px rgba(14,14,12,.18);
+}
 .plan-card--custom{border-style:dashed;background:var(--q-bg)}
 
-/* badge popular */
+/* badge */
 .plan-card__badge{
   position:absolute;top:16px;right:16px;
   background:var(--q-lima);color:var(--q-ink);
   font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 9px;border-radius:999px;white-space:nowrap;
+  padding:4px 10px;border-radius:999px;
 }
 
 /* icono */
 .plan-card__icon{
-  width:40px;height:40px;border-radius:10px;
+  width:44px;height:44px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:16px;background:var(--q-bg-soft);flex-shrink:0;
+  background:var(--q-bg-soft);margin-bottom:18px;flex-shrink:0;
 }
 .plan-card--popular .plan-card__icon{background:rgba(255,255,255,.1)}
-.plan-card__icon svg{width:20px;height:20px}
+.plan-card__icon svg{width:22px;height:22px}
 
 /* nombre */
 .plan-card__name{
-  font-size:17px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
-  margin-bottom:6px;
+  font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
+  margin-bottom:8px;
 }
 
-/* descripción */
+/* descripción — min-height para que los precios queden alineados */
 .plan-card__desc{
-  font-size:12.5px;color:var(--q-ink-3);line-height:1.5;
-  margin-bottom:16px;
+  font-size:13px;color:var(--q-ink-3);line-height:1.5;
+  margin-bottom:20px;min-height:60px;
 }
 .plan-card--popular .plan-card__desc{color:rgba(255,255,255,.55)}
 
-/* precio — layout vertical: número arriba, moneda abajo */
-.plan-card__price{display:flex;flex-direction:column;gap:2px;margin-bottom:16px}
+/* precio — número grande en mono, etiqueta debajo */
+.plan-card__price{display:flex;flex-direction:column;gap:3px;margin-bottom:20px}
 .plan-card__amount{
   font-family:var(--mono);
-  font-size:26px;font-weight:700;
-  letter-spacing:-.02em;line-height:1;
+  font-size:28px;font-weight:700;line-height:1;
+  letter-spacing:-.02em;
 }
 .plan-card--custom .plan-card__amount{
   font-family:var(--sans);
-  font-size:17px;font-weight:700;letter-spacing:-.01em;
+  font-size:20px;font-weight:700;letter-spacing:-.01em;
+  line-height:1.2;
 }
 .plan-card__period{
   font-family:var(--mono);
-  font-size:11px;color:var(--q-ink-4);letter-spacing:.03em;
+  font-size:11px;color:var(--q-ink-4);letter-spacing:.02em;
 }
-.plan-card--popular .plan-card__period{color:rgba(255,255,255,.38)}
+.plan-card--popular .plan-card__period{color:rgba(255,255,255,.4)}
 
 /* divisor */
-.plan-card__divider{height:1px;background:var(--q-border);margin-bottom:14px}
-.plan-card--popular .plan-card__divider{background:rgba(255,255,255,.1)}
+.plan-card__divider{height:1px;background:var(--q-border);margin-bottom:18px}
+.plan-card--popular .plan-card__divider{background:rgba(255,255,255,.12)}
 
 /* features */
-.plan-card__feat{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px;flex:1}
+.plan-card__feat{
+  list-style:none;flex:1;
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:24px;
+}
 .plan-card__feat li{
-  font-size:12.5px;color:var(--q-ink-2);
-  display:flex;align-items:flex-start;gap:8px;line-height:1.35;
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:13px;line-height:1.4;color:var(--q-ink-2);
 }
 .plan-card__feat li::before{
   content:"✓";
   display:inline-flex;align-items:center;justify-content:center;
-  width:16px;height:16px;min-width:16px;border-radius:50%;
+  min-width:18px;width:18px;height:18px;border-radius:50%;
   background:var(--q-lima);color:var(--q-ink);
-  font-size:9px;font-weight:800;flex-shrink:0;margin-top:1px;
+  font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;
 }
 .plan-card--popular .plan-card__feat li{color:rgba(255,255,255,.82)}
 .plan-card--popular .plan-card__feat li::before{background:var(--q-lima);color:var(--q-ink)}
-.plan-card--custom .plan-card__feat li::before{background:transparent;border:1.5px solid var(--q-border-strong);color:var(--q-ink-3)}
+.plan-card--custom .plan-card__feat li::before{
+  background:transparent;
+  border:1.5px solid var(--q-border-strong);
+  color:var(--q-ink-3);
+}
 
-/* cta */
+/* CTA — forzar display:flex para que width:100% y justify-content funcionen */
 .plan-card__cta{
-  margin-top:auto;text-align:center;width:100%;
-  justify-content:center;font-size:13px;
-  padding:11px 14px;
+  margin-top:auto;
+  display:flex!important;
+  width:100%;justify-content:center;align-items:center;
+  font-size:14px;
 }
 .plan-card--popular .plan-card__cta{
   background:var(--q-lima);color:var(--q-ink);
@@ -436,7 +450,13 @@ img{max-width:100%;display:block}
 
 /* Responsive planes */
 @media(max-width:1100px){
-  .plans-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+  .plans-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+}
+@media(max-width:600px){
+  .plans-grid{grid-template-columns:1fr;gap:14px}
+  .plans{padding:64px 0}
+  .plan-card__desc{min-height:0}
+  .plan-card__amount{font-size:32px}
 }
 @media(max-width:640px){
   .plans-grid{grid-template-columns:1fr;gap:12px}
