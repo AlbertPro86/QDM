@@ -482,4 +482,165 @@
     }
   })();
 
+  /* ============ Chat Widget en vivo ============ */
+  (function() {
+    var CHAT_API = '/CRM-QUANTUN-Digital/api/chat_publico.php';
+    var POLL_MS  = 3500;
+
+    var root   = document.getElementById('qchat');
+    var fab    = document.getElementById('qchatFab');
+    var win    = document.getElementById('qchatWindow');
+    var body   = document.getElementById('qchatBody');
+    var inputW = document.getElementById('qchatInput');
+    var form   = document.getElementById('qchatForm');
+    var msgIn  = document.getElementById('qchatMsg');
+    var badge  = document.getElementById('qchatBadge');
+    var closeB = document.getElementById('qchatClose');
+    if (!root || !fab) return;
+
+    var session  = JSON.parse(localStorage.getItem('qchat_session') || 'null');
+    var lastId   = 0;
+    var pollTimer= null;
+    var isOpen   = false;
+    var unread   = 0;
+
+    /* — toggle ventana — */
+    function toggle() {
+      isOpen = !isOpen;
+      root.classList.toggle('open', isOpen);
+      win.hidden = !isOpen;
+      if (isOpen) {
+        unread = 0; updateBadge();
+        if (session) { renderChat(); startPoll(); }
+        else renderStart();
+      } else { stopPoll(); }
+    }
+    fab.addEventListener('click', toggle);
+    closeB.addEventListener('click', toggle);
+
+    function updateBadge() {
+      badge.textContent = unread;
+      badge.hidden = unread < 1;
+    }
+
+    /* — pantalla inicial — */
+    function renderStart() {
+      inputW.hidden = true;
+      body.innerHTML =
+        '<div class="qchat__start">' +
+          '<div class="qchat__start-title">Chatea con nosotros</div>' +
+          '<p class="qchat__start-sub">Escríbenos y te responderemos lo antes posible.</p>' +
+          '<input type="text" id="qchatName" placeholder="Tu nombre *" required>' +
+          '<input type="email" id="qchatEmail" placeholder="Tu correo (opcional)">' +
+          '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat</button>' +
+        '</div>';
+      document.getElementById('qchatStartBtn').addEventListener('click', initSession);
+    }
+
+    /* — crear sesión — */
+    async function initSession() {
+      var name  = (document.getElementById('qchatName').value || '').trim();
+      var email = (document.getElementById('qchatEmail').value || '').trim();
+      if (!name) { document.getElementById('qchatName').focus(); return; }
+
+      var btn = document.getElementById('qchatStartBtn');
+      btn.disabled = true; btn.textContent = 'Conectando...';
+
+      try {
+        var res = await fetch(CHAT_API, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'init', name: name, email: email })
+        });
+        var data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Error');
+
+        session = { id: data.session_id, token: data.token, name: name };
+        localStorage.setItem('qchat_session', JSON.stringify(session));
+        lastId = 0;
+        renderChat();
+        startPoll();
+      } catch(e) {
+        btn.disabled = false; btn.textContent = 'Iniciar chat';
+        console.error('[QChat]', e);
+      }
+    }
+
+    /* — renderizar chat — */
+    function renderChat() {
+      body.innerHTML = '';
+      inputW.hidden = false;
+      msgIn.focus();
+      pollNow();
+    }
+
+    function addMessage(m) {
+      var div = document.createElement('div');
+      div.className = 'qchat__msg qchat__msg--' + m.sender;
+      var t = m.created_at ? new Date(m.created_at.replace(' ','T')).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}) : '';
+      div.innerHTML = escChat(m.message) + (t ? '<span class="qchat__msg-time">' + t + '</span>' : '');
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function escChat(s) {
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    /* — enviar mensaje — */
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var txt = msgIn.value.trim();
+      if (!txt || !session) return;
+      msgIn.value = '';
+
+      addMessage({ sender: 'visitor', message: txt, created_at: null });
+
+      try {
+        var res = await fetch(CHAT_API, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'send', session_id: session.id, token: session.token, message: txt })
+        });
+        var data = await res.json();
+        if (data.message_id && data.message_id > lastId) lastId = data.message_id;
+      } catch(e) { console.error('[QChat] send:', e); }
+    });
+
+    /* — polling — */
+    async function pollNow() {
+      if (!session) return;
+      try {
+        var url = CHAT_API + '?action=poll&session_id=' + session.id + '&token=' + session.token + '&after=' + lastId;
+        var res = await fetch(url);
+        var data = await res.json();
+        if (!data.success) return;
+        if (data.closed) { stopPoll(); inputW.hidden = true; return; }
+        (data.messages || []).forEach(function(m) {
+          if (parseInt(m.id) > lastId) lastId = parseInt(m.id);
+          addMessage(m);
+          if (!isOpen && m.sender === 'agent') { unread++; updateBadge(); }
+        });
+      } catch(e) {}
+    }
+
+    function startPoll() { stopPoll(); pollTimer = setInterval(pollNow, POLL_MS); }
+    function stopPoll()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+
+    /* — restaurar sesión previa — */
+    if (session) {
+      // Sesión previa existe, mostrar badge si hay mensajes
+      fetch(CHAT_API + '?action=poll&session_id=' + session.id + '&token=' + session.token + '&after=0')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (!d.success) { session = null; localStorage.removeItem('qchat_session'); return; }
+          var agentMsgs = (d.messages || []).filter(function(m) { return m.sender === 'agent'; });
+          if (agentMsgs.length > 1) { unread = 1; updateBadge(); }
+        })
+        .catch(function() {});
+    }
+  })();
+
 })();

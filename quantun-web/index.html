@@ -536,6 +536,36 @@
       </form>
     </div>
   </div>
+  <!-- ===== CHAT WIDGET ===== -->
+  <div class="qchat" id="qchat">
+    <button class="qchat__fab" id="qchatFab" aria-label="Abrir chat">
+      <svg class="qchat__fab-ic qchat__fab-ic--chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      <svg class="qchat__fab-ic qchat__fab-ic--close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <span class="qchat__fab-badge" id="qchatBadge" hidden></span>
+    </button>
+    <div class="qchat__window" id="qchatWindow" hidden>
+      <div class="qchat__header">
+        <div class="qchat__header-info">
+          <span class="qchat__status-dot"></span>
+          <div><strong>QUANTUN Digital</strong><small>Normalmente responde en minutos</small></div>
+        </div>
+        <button class="qchat__header-close" id="qchatClose" aria-label="Cerrar chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="qchat__body" id="qchatBody">
+        <!-- Start form o messages se inyectan por JS -->
+      </div>
+      <div class="qchat__input" id="qchatInput" hidden>
+        <form class="qchat__form" id="qchatForm">
+          <input type="text" id="qchatMsg" placeholder="Escribe tu mensaje..." autocomplete="off" maxlength="2000">
+          <button type="submit" class="qchat__send" aria-label="Enviar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
   <script src="script.js"></script>
   <script src="app.js"></script>
 </body>

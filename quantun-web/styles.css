@@ -544,3 +544,152 @@ img{max-width:100%;display:block}
   .nav__client{padding:0 10px;width:36px;justify-content:center}
   .login-card{padding:32px 22px 28px}
 }
+/* ===== CHAT WIDGET ===== */
+.qchat{position:fixed;bottom:24px;right:24px;z-index:999;font-family:var(--sans)}
+
+/* FAB */
+.qchat__fab{
+  width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--q-ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(14,14,12,.28);
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+  position:relative;
+}
+.qchat__fab:hover{transform:scale(1.06);box-shadow:0 8px 32px rgba(14,14,12,.35)}
+.qchat__fab-ic{width:24px;height:24px;transition:opacity .2s,transform .2s}
+.qchat__fab-ic--close{position:absolute;opacity:0;transform:rotate(-90deg) scale(.6)}
+.qchat.open .qchat__fab-ic--chat{opacity:0;transform:rotate(90deg) scale(.6)}
+.qchat.open .qchat__fab-ic--close{opacity:1;transform:none}
+.qchat__fab-badge{
+  position:absolute;top:-2px;right:-2px;
+  min-width:18px;height:18px;border-radius:99px;
+  background:#ef4444;color:#fff;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid #fff;
+}
+
+/* Window */
+.qchat__window{
+  position:absolute;bottom:68px;right:0;
+  width:360px;max-height:520px;
+  background:var(--q-surface);
+  border:1px solid var(--q-border);
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(14,14,12,.18);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  animation:qchatIn .25s var(--ease);
+}
+@keyframes qchatIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+
+/* Header */
+.qchat__header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  background:var(--q-ink);color:#fff;
+  flex-shrink:0;
+}
+.qchat__header-info{display:flex;align-items:center;gap:10px}
+.qchat__header-info strong{font-size:14px;font-weight:600;display:block;line-height:1.2}
+.qchat__header-info small{font-size:11px;color:rgba(255,255,255,.5)}
+.qchat__status-dot{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--q-lima);
+  box-shadow:0 0 0 2px rgba(198,242,78,.3);
+  flex-shrink:0;
+}
+.qchat__header-close{
+  width:28px;height:28px;border-radius:6px;
+  background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  transition:color .15s,background .15s;
+}
+.qchat__header-close:hover{color:#fff;background:rgba(255,255,255,.1)}
+.qchat__header-close svg{width:14px;height:14px}
+
+/* Body */
+.qchat__body{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:260px;max-height:340px;
+  background:var(--q-bg-soft);
+}
+
+/* Start form */
+.qchat__start{display:flex;flex-direction:column;gap:12px;padding:8px 0}
+.qchat__start-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.qchat__start-sub{font-size:12.5px;color:var(--q-ink-3);margin-bottom:6px}
+.qchat__start input{
+  width:100%;padding:10px 12px;border:1px solid var(--q-border);
+  border-radius:8px;font-size:13.5px;font-family:var(--sans);
+  background:var(--q-surface);color:var(--q-ink);
+  transition:border-color .15s;
+}
+.qchat__start input:focus{outline:none;border-color:var(--q-ink)}
+.qchat__start-btn{
+  width:100%;padding:11px;border:none;border-radius:8px;cursor:pointer;
+  background:var(--q-ink);color:#fff;font-size:14px;font-weight:600;
+  font-family:var(--sans);transition:background .15s;
+}
+.qchat__start-btn:hover{background:#26241d}
+
+/* Messages */
+.qchat__msg{
+  max-width:82%;padding:10px 14px;
+  font-size:13.5px;line-height:1.45;
+  border-radius:14px;word-wrap:break-word;
+  animation:qchatMsg .2s var(--ease);
+}
+@keyframes qchatMsg{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.qchat__msg--agent{
+  background:var(--q-surface);color:var(--q-ink);
+  border:1px solid var(--q-border);
+  align-self:flex-start;
+  border-bottom-left-radius:4px;
+}
+.qchat__msg--visitor{
+  background:var(--q-ink);color:#fff;
+  align-self:flex-end;
+  border-bottom-right-radius:4px;
+}
+.qchat__msg-time{
+  display:block;font-size:10px;margin-top:4px;
+  opacity:.5;font-family:var(--mono);
+}
+.qchat__typing{
+  align-self:flex-start;
+  font-size:12px;color:var(--q-ink-4);
+  font-style:italic;padding:4px 0;
+}
+
+/* Input */
+.qchat__input{
+  padding:10px 12px;border-top:1px solid var(--q-border);
+  background:var(--q-surface);flex-shrink:0;
+}
+.qchat__form{display:flex;gap:8px;align-items:center}
+.qchat__form input{
+  flex:1;padding:10px 12px;
+  border:1px solid var(--q-border);border-radius:8px;
+  font-size:13.5px;font-family:var(--sans);
+  background:var(--q-bg);color:var(--q-ink);
+  transition:border-color .15s;
+}
+.qchat__form input:focus{outline:none;border-color:var(--q-ink)}
+.qchat__send{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--q-lima);color:var(--q-ink);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .15s;
+  flex-shrink:0;
+}
+.qchat__send:hover{background:#d3f76a;transform:scale(1.06)}
+.qchat__send svg{width:16px;height:16px}
+
+/* Responsive */
+@media(max-width:440px){
+  .qchat{bottom:16px;right:16px}
+  .qchat__window{width:calc(100vw - 32px);right:0;bottom:64px;max-height:70vh}
+}

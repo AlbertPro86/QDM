@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * CRM QUANTUN Digital - Sidebar Navigation
  */
@@ -19,6 +19,11 @@ try {
     $newSolicitudesWeb = db()->query("SELECT COUNT(*) FROM crm_solicitudes_web WHERE estado = 'nuevo'")->fetchColumn();
 } catch (Exception $e) {
     $newSolicitudesWeb = 0;
+}
+try {
+    $unreadChats = db()->query("SELECT COUNT(DISTINCT m.session_id) FROM crm_chat_messages m JOIN crm_chat_sessions s ON s.id = m.session_id WHERE m.sender = 'visitor' AND m.seen = 0 AND s.status = 'activo'")->fetchColumn();
+} catch (Exception $e) {
+    $unreadChats = 0;
 }
 ?>
 
@@ -64,6 +69,16 @@ try {
             <span class="nav-link-text">Solicitudes Web</span>
             <?php if ($newSolicitudesWeb > 0): ?>
                 <span class="nav-badge"><?= $newSolicitudesWeb ?></span>
+            <?php endif; ?>
+        </a>
+
+        <a href="chat.php" class="nav-link <?= $currentPage === 'chat' ? 'active' : '' ?>" id="nav-chat" title="Chat en Vivo">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <span class="nav-link-text">Chat en Vivo</span>
+            <?php if ($unreadChats > 0): ?>
+                <span class="nav-badge"><?= $unreadChats ?></span>
             <?php endif; ?>
         </a>
 
