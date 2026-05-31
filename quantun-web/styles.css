@@ -327,7 +327,7 @@ img{max-width:100%;display:block}
 }
 
 /* ===== PLANES ===== */
-.plans{padding:96px 0;background:var(--q-bg-soft)}
+.plans-section{padding:96px 0;background:var(--q-bg-soft)}
 .plans-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -454,11 +454,11 @@ img{max-width:100%;display:block}
 }
 @media(max-width:680px){
   .plans-grid{grid-template-columns:1fr}
-  .plans{padding:64px 0}
+  .plans-section{padding:64px 0}
   .plan-card__desc{min-height:0}
 }
 @media(max-width:640px){
   .plans-grid{grid-template-columns:1fr;gap:12px}
-  .plans{padding:64px 0}
+  .plans-section{padding:64px 0}
   .plan-card__amount{font-size:28px}
 }
