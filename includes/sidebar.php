@@ -15,6 +15,11 @@ try {
 } catch (Exception $e) {
     $mejorasPendientes = 0;
 }
+try {
+    $newSolicitudesWeb = db()->query("SELECT COUNT(*) FROM crm_solicitudes_web WHERE estado = 'nuevo'")->fetchColumn();
+} catch (Exception $e) {
+    $newSolicitudesWeb = 0;
+}
 ?>
 
 <!-- Mobile Backdrop -->
@@ -49,6 +54,16 @@ try {
             <span class="nav-link-text">Gestión de Leads</span>
             <?php if ($newLeadsCount > 0): ?>
                 <span class="nav-badge"><?= $newLeadsCount ?></span>
+            <?php endif; ?>
+        </a>
+
+        <a href="solicitudes_web.php" class="nav-link <?= $currentPage === 'solicitudes_web' ? 'active' : '' ?>" id="nav-solicitudes-web" title="Solicitudes Web">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+            </svg>
+            <span class="nav-link-text">Solicitudes Web</span>
+            <?php if ($newSolicitudesWeb > 0): ?>
+                <span class="nav-badge"><?= $newSolicitudesWeb ?></span>
             <?php endif; ?>
         </a>
 
