@@ -577,10 +577,13 @@ img{max-width:100%;display:block}
   border:1px solid var(--q-border);
   border-radius:16px;
   box-shadow:0 20px 60px rgba(14,14,12,.18);
-  display:flex;flex-direction:column;
+  display:none;          /* oculto por defecto — [hidden] debe ganar */
+  flex-direction:column;
   overflow:hidden;
   animation:qchatIn .25s var(--ease);
 }
+/* Visible solo cuando NO tiene el atributo hidden */
+.qchat__window:not([hidden]){ display:flex; }
 @keyframes qchatIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
 
 /* Estado colapsado: solo el header, sin cuerpo ni input */

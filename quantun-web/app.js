@@ -537,9 +537,9 @@
       '</div>';
     }
 
-    /* — abrir completamente — */
+    /* — abrir ventana — */
     function openFull() {
-      win.classList.remove('qchat__window--collapsed');
+      win.hidden = false;
       isOpen = true;
       root.classList.add('open');
       unread = 0; updateBadge();
@@ -547,37 +547,24 @@
       else renderStart();
     }
 
-    /* — toggle desde FAB o header colapsado — */
-    function toggle() {
-      if (win.classList.contains('qchat__window--collapsed')) {
-        /* estaba en preview colapsado → expandir */
-        openFull();
-        return;
-      }
-      isOpen = !isOpen;
-      root.classList.toggle('open', isOpen);
-      win.hidden = !isOpen;
-      if (isOpen) {
-        win.classList.remove('qchat__window--collapsed');
-        unread = 0; updateBadge();
-        if (session) { renderChat(); startPoll(); }
-        else renderStart();
-      } else {
-        stopPoll();
-      }
-    }
-    fab.addEventListener('click', toggle);
-    /* click en el header colapsado también lo expande */
-    win.addEventListener('click', function(e) {
-      if (win.classList.contains('qchat__window--collapsed')) openFull();
-    });
-    closeB.addEventListener('click', function(e) {
-      e.stopPropagation();
-      win.classList.remove('qchat__window--collapsed');
+    /* — cerrar ventana — */
+    function closeWin() {
       win.hidden = true;
       isOpen = false;
       root.classList.remove('open');
       stopPoll();
+    }
+
+    /* — toggle FAB — */
+    function toggle() {
+      if (isOpen) { closeWin(); }
+      else { openFull(); }
+    }
+
+    fab.addEventListener('click', toggle);
+    closeB.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeWin();
       sessionStorage.setItem('qchat_dismissed', '1');
     });
 
@@ -741,18 +728,10 @@
         .catch(function() {});
     }
 
-    /* — auto-abrir una vez por visita (sessionStorage = se resetea al cerrar el tab) — */
+    /* — auto-abrir una vez por visita a los 3.5s (sessionStorage = se resetea al cerrar el tab) — */
     if (!sessionStorage.getItem('qchat_dismissed')) {
-      /* paso 1 (1.2s): mostrar colapsado */
       setTimeout(function() {
         if (isOpen) return;
-        win.classList.add('qchat__window--collapsed');
-        win.hidden = false;
-      }, 1200);
-      /* paso 2 (3.5s): expandir completamente */
-      setTimeout(function() {
-        if (isOpen) return;
-        win.classList.remove('qchat__window--collapsed');
         openFull();
       }, 3500);
     }
