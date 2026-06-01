@@ -490,7 +490,7 @@
     var root   = document.getElementById('qchat');
     var fab    = document.getElementById('qchatFab');
     var win    = document.getElementById('qchatWindow');
-    var body   = document.getElementById('qchatBody');
+    var chatBody = document.getElementById('qchatBody');
     var inputW = document.getElementById('qchatInput');
     var form   = document.getElementById('qchatForm');
     var msgIn  = document.getElementById('qchatMsg');
@@ -498,11 +498,11 @@
     var closeB = document.getElementById('qchatClose');
     if (!root || !fab) return;
 
-    var session  = JSON.parse(localStorage.getItem('qchat_session') || 'null');
-    var lastId   = 0;
-    var pollTimer= null;
-    var isOpen   = false;
-    var unread   = 0;
+    var session   = JSON.parse(localStorage.getItem('qchat_session') || 'null');
+    var lastId    = 0;
+    var pollTimer = null;
+    var isOpen    = false;
+    var unread    = 0;
 
     /* — toggle ventana — */
     function toggle() {
@@ -511,41 +511,57 @@
       win.hidden = !isOpen;
       if (isOpen) {
         unread = 0; updateBadge();
-        if (session) { renderChat(); startPoll(); }
-        else renderStart();
-      } else { stopPoll(); }
+        if (session) {
+          renderChat();
+          startPoll();
+        } else {
+          renderStart();
+        }
+      } else {
+        stopPoll();
+      }
     }
     fab.addEventListener('click', toggle);
-    closeB.addEventListener('click', toggle);
+    closeB.addEventListener('click', function() {
+      sessionStorage.setItem('qchat_dismissed', '1');
+      toggle();
+    });
 
     function updateBadge() {
       badge.textContent = unread;
       badge.hidden = unread < 1;
     }
 
-    /* — pantalla inicial — */
+    /* — pantalla inicial con saludo — */
     function renderStart() {
       inputW.hidden = true;
       var now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-      body.innerHTML =
-        '<div class="qchat__msg qchat__msg--agent" style="margin-bottom:4px">¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>. ¿En qué podemos ayudarte hoy?<span class="qchat__msg-time">' + now + '</span></div>' +
-        '<div class="qchat__msg qchat__msg--agent">Para iniciar la conversación déjanos tu nombre y te atendemos de inmediato.<span class="qchat__msg-time">' + now + '</span></div>' +
+      chatBody.innerHTML =
+        '<div class="qchat__msg qchat__msg--agent">¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>.<br>¿En qué podemos ayudarte hoy?<span class="qchat__msg-time">' + now + '</span></div>' +
+        '<div class="qchat__msg qchat__msg--agent" style="margin-top:4px">Déjanos tu nombre y te atendemos de inmediato 😊<span class="qchat__msg-time">' + now + '</span></div>' +
         '<div class="qchat__start">' +
-          '<input type="text" id="qchatName" placeholder="Tu nombre *" required>' +
+          '<input type="text" id="qchatName" placeholder="Tu nombre *">' +
           '<input type="email" id="qchatEmail" placeholder="Tu correo (opcional)">' +
           '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat →</button>' +
         '</div>';
       document.getElementById('qchatStartBtn').addEventListener('click', initSession);
+      /* focus suave en el input */
+      setTimeout(function() {
+        var n = document.getElementById('qchatName');
+        if (n) n.focus();
+      }, 150);
     }
 
     /* — crear sesión — */
     async function initSession() {
-      var name  = (document.getElementById('qchatName').value || '').trim();
-      var email = (document.getElementById('qchatEmail').value || '').trim();
-      if (!name) { document.getElementById('qchatName').focus(); return; }
+      var nameEl  = document.getElementById('qchatName');
+      var emailEl = document.getElementById('qchatEmail');
+      var name    = (nameEl ? nameEl.value : '').trim();
+      var email   = (emailEl ? emailEl.value : '').trim();
+      if (!name) { if (nameEl) nameEl.focus(); return; }
 
       var btn = document.getElementById('qchatStartBtn');
-      btn.disabled = true; btn.textContent = 'Conectando...';
+      if (btn) { btn.disabled = true; btn.textContent = 'Conectando...'; }
 
       try {
         var res = await fetch(CHAT_API, {
@@ -554,7 +570,7 @@
           body: JSON.stringify({ action: 'init', name: name, email: email })
         });
         var data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Error');
+        if (!data.success) throw new Error(data.error || 'Error al conectar');
 
         session = { id: data.session_id, token: data.token, name: name };
         localStorage.setItem('qchat_session', JSON.stringify(session));
@@ -562,31 +578,37 @@
         renderChat();
         startPoll();
       } catch(e) {
-        btn.disabled = false; btn.textContent = 'Iniciar chat';
+        if (btn) { btn.disabled = false; btn.textContent = 'Iniciar chat →'; }
         console.error('[QChat]', e);
       }
     }
 
-    /* — renderizar chat — */
+    /* — vista de conversación — */
     function renderChat() {
-      body.innerHTML = '';
+      chatBody.innerHTML = '<p class="qchat__typing">Cargando conversación…</p>';
       inputW.hidden = false;
-      msgIn.focus();
+      setTimeout(function() { if (msgIn) msgIn.focus(); }, 100);
       pollNow();
     }
 
     function addMessage(m) {
+      /* quitar "Cargando..." si existe */
+      var loading = chatBody.querySelector('.qchat__typing');
+      if (loading) loading.remove();
+
       var div = document.createElement('div');
       div.className = 'qchat__msg qchat__msg--' + m.sender;
-      var t = m.created_at ? new Date(m.created_at.replace(' ','T')).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}) : '';
-      div.innerHTML = escChat(m.message) + (t ? '<span class="qchat__msg-time">' + t + '</span>' : '');
-      body.appendChild(div);
-      body.scrollTop = body.scrollHeight;
+      var t = m.created_at
+        ? new Date(m.created_at.replace(' ', 'T')).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'})
+        : new Date().toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
+      div.innerHTML = escChat(m.message) + '<span class="qchat__msg-time">' + t + '</span>';
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
     }
 
     function escChat(s) {
       var d = document.createElement('div');
-      d.textContent = s;
+      d.textContent = s || '';
       return d.innerHTML;
     }
 
@@ -596,65 +618,73 @@
       var txt = msgIn.value.trim();
       if (!txt || !session) return;
       msgIn.value = '';
-
       addMessage({ sender: 'visitor', message: txt, created_at: null });
-
       try {
         var res = await fetch(CHAT_API, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ action: 'send', session_id: session.id, token: session.token, message: txt })
         });
-        var data = await res.json();
-        if (data.message_id && data.message_id > lastId) lastId = data.message_id;
+        var d = await res.json();
+        if (d.message_id && d.message_id > lastId) lastId = d.message_id;
       } catch(e) { console.error('[QChat] send:', e); }
     });
 
-    /* — polling — */
+    /* — polling de mensajes — */
     async function pollNow() {
       if (!session) return;
       try {
         var url = CHAT_API + '?action=poll&session_id=' + session.id + '&token=' + session.token + '&after=' + lastId;
         var res = await fetch(url);
         var data = await res.json();
-        if (!data.success) return;
-        if (data.closed) { stopPoll(); inputW.hidden = true; return; }
+        if (!data.success) {
+          /* sesión inválida/expirada → limpiar y mostrar pantalla inicial */
+          session = null;
+          localStorage.removeItem('qchat_session');
+          stopPoll();
+          renderStart();
+          return;
+        }
+        if (data.closed) {
+          stopPoll();
+          inputW.hidden = true;
+          var closedDiv = document.createElement('p');
+          closedDiv.className = 'qchat__typing';
+          closedDiv.textContent = 'Chat cerrado. ¡Hasta pronto!';
+          chatBody.appendChild(closedDiv);
+          return;
+        }
         (data.messages || []).forEach(function(m) {
-          if (parseInt(m.id) > lastId) lastId = parseInt(m.id);
-          addMessage(m);
-          if (!isOpen && m.sender === 'agent') { unread++; updateBadge(); }
+          if (parseInt(m.id) > lastId) {
+            lastId = parseInt(m.id);
+            addMessage(m);
+            if (!isOpen && m.sender === 'agent') { unread++; updateBadge(); }
+          }
         });
-      } catch(e) {}
+      } catch(e) { /* red caída, reintentar en próximo ciclo */ }
     }
 
     function startPoll() { stopPoll(); pollTimer = setInterval(pollNow, POLL_MS); }
     function stopPoll()  { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
 
-    /* — restaurar sesión previa — */
+    /* — restaurar sesión previa: validar y mostrar badge si hay no leídos — */
     if (session) {
-      // Sesión previa existe, mostrar badge si hay mensajes
       fetch(CHAT_API + '?action=poll&session_id=' + session.id + '&token=' + session.token + '&after=0')
         .then(function(r) { return r.json(); })
         .then(function(d) {
           if (!d.success) { session = null; localStorage.removeItem('qchat_session'); return; }
-          var agentMsgs = (d.messages || []).filter(function(m) { return m.sender === 'agent'; });
-          if (agentMsgs.length > 1) { unread = 1; updateBadge(); }
+          var newAgentMsgs = (d.messages || []).filter(function(m) { return m.sender === 'agent'; });
+          if (newAgentMsgs.length > 0) { unread = newAgentMsgs.length; updateBadge(); }
         })
         .catch(function() {});
     }
 
-    /* — auto-abrir al cargar la página (solo si no fue cerrado antes) — */
-    var chatDismissed = localStorage.getItem('qchat_dismissed');
-    if (!chatDismissed) {
+    /* — auto-abrir una vez por visita (sessionStorage = se resetea al cerrar el tab) — */
+    if (!sessionStorage.getItem('qchat_dismissed')) {
       setTimeout(function() {
         if (!isOpen) toggle();
       }, 3500);
     }
-
-    /* — al cerrar manualmente, recordar que fue cerrado — */
-    closeB.addEventListener('click', function() {
-      localStorage.setItem('qchat_dismissed', '1');
-    });
   })();
 
 })();
