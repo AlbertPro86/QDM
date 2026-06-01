@@ -8,6 +8,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/mailer.php';
+require_once __DIR__ . '/../includes/crm_config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
@@ -90,8 +91,8 @@ $htmlFinal = '<!DOCTYPE html>
                         ' . $logoHtml . '
                     </td>
                     <td style="text-align:right;vertical-align:middle">
-                        <a href="https://wa.me/573332747801" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#ffffff;text-decoration:none;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700">
-                            333 274 7801
+                        <a href="https://wa.me/' . crmWaNum('empresa_tel','573332747801') . '" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#ffffff;text-decoration:none;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700">
+                            ' . htmlspecialchars(crmConfig('empresa_tel','333 274 7801')) . '
                         </a>
                     </td>
                 </tr>
@@ -123,7 +124,7 @@ $htmlFinal = '<!DOCTYPE html>
         <td style="background:#f8fafc;padding:20px 32px;border-radius:0 0 12px 12px;border-top:1px solid #e2e8f0;text-align:center">
             <p style="margin:0;font-size:11px;color:#94a3b8;line-height:1.6">
                 Para más información escríbenos por WhatsApp al
-                <a href="https://wa.me/573332747801" style="color:#25D366;font-weight:700;text-decoration:none">333 274 7801</a>
+                <a href="https://wa.me/' . crmWaNum('empresa_tel','573332747801') . '" style="color:#25D366;font-weight:700;text-decoration:none">' . htmlspecialchars(crmConfig('empresa_tel','333 274 7801')) . '</a>
             </p>
         </td>
     </tr>

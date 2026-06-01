@@ -6,6 +6,7 @@
  */
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/crm_config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -69,7 +70,7 @@ try {
         require_once __DIR__ . '/../services/EvolutionApiService.php';
         $evolution = new EvolutionApiService();
         
-        $adminNumber = '573145979983'; // Número del admin para notificaciones
+        $adminNumber = crmWaNum('notif_whatsapp', '573145979983'); // Número del admin para notificaciones
         $mensaje = "🚀 *Nuevo Lead en CRM QUANTUN*\n\n"
                  . "👤 *Nombre:* {$nombre}\n"
                  . "📱 *WhatsApp:* {$whatsapp}\n"

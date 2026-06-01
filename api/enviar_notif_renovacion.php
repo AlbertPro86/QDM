@@ -12,6 +12,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/mailer.php';
+require_once __DIR__ . '/../includes/crm_config.php';
 
 $isCli = php_sapi_name() === 'cli';
 
@@ -174,7 +175,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
     </table>
   </td></tr>
   <tr><td style='background:#ffffff;padding:0 32px 32px;text-align:center'>
-    <a href='mailto:" . env('MAIL_FROM_ADDRESS','contacto@quantundigital.com') . "?subject=Renovación%20de%20servicios%20-%20{$nombreCliente}'
+    <a href='mailto:" . crmConfig('empresa_email', env('MAIL_FROM_ADDRESS','contacto@quantundigital.com')) . "?subject=Renovación%20de%20servicios%20-%20{$nombreCliente}'
        style='display:inline-block;background:#c9f31d;color:#0f172a;font-size:14px;font-weight:800;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:.3px'>
       Solicitar renovación →
     </a>

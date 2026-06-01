@@ -5,6 +5,7 @@
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/crm_config.php';
 requireAuth();
 
 $id = intval($_GET['id'] ?? 0);
@@ -54,9 +55,9 @@ if (!$plantilla) {
 // Tokens de diseño con fallback a defaults
 $pColPrim  = $plantilla['color_primario']   ?? '#0f172a';
 $pColSec   = $plantilla['color_secundario'] ?? '#c9f31d';
-$pNombreEmp = $plantilla['empresa_nombre'] ?? 'QUANTUN Digital';
-$pEmailEmp  = $plantilla['empresa_email']  ?? 'contacto@quantundigital.com';
-$pTelEmp    = $plantilla['empresa_tel']    ?? '333 274 7801';
+$pNombreEmp = $plantilla['empresa_nombre'] ?? crmConfig('empresa_nombre', 'QUANTUN Digital');
+$pEmailEmp  = $plantilla['empresa_email']  ?? crmConfig('empresa_email',  'contacto@quantundigital.com');
+$pTelEmp    = $plantilla['empresa_tel']    ?? crmConfig('empresa_tel',    '333 274 7801');
 $pDirEmp    = $plantilla['empresa_dir']    ?? '';
 $pNitEmp    = $plantilla['empresa_nit']    ?? '';
 $pLogoUrl   = $plantilla['logo_url']       ?? '';
