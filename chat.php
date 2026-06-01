@@ -244,9 +244,10 @@ include __DIR__ . '/includes/header.php';
 }
 
 /* ═══ PANEL CONVERSACIÓN ═══ */
-.chat-conversation{display:flex;flex-direction:column;background:#fff;overflow:hidden;min-width:0}
-.chat-conv__empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--color-text-muted)}
-.chat-conv__active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.chat-conversation{display:flex;flex-direction:column;background:#fff;min-width:0;overflow:visible}
+.chat-conv__empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--color-text-muted)}
+/* flex:1 + min-height:0 para que el área de mensajes crezca correctamente en flex column */
+.chat-conv__active{display:flex;flex-direction:column;flex:1;min-height:0;overflow:visible}
 
 /* Header */
 .chat-conv__header{
@@ -268,7 +269,7 @@ include __DIR__ . '/includes/header.php';
 
 /* Mensajes */
 .chat-conv__messages{
-    flex:1;overflow-y:auto;padding:16px 18px;
+    flex:1;min-height:0;overflow-y:auto;padding:16px 18px;
     display:flex;flex-direction:column;gap:10px;
     background:var(--color-bg-secondary,#f8f8f6);
 }
@@ -299,11 +300,13 @@ include __DIR__ . '/includes/header.php';
     color:var(--color-text-muted);transition:all .15s;
 }
 .chat-qr-btn:hover{background:var(--color-bg);color:var(--color-text)}
+/* posición fixed via JS para escapar de cualquier overflow:hidden */
 .chat-qr-list{
-    position:absolute;bottom:calc(100% + 6px);right:0;
-    width:300px;background:#fff;border:1px solid var(--color-border);
-    border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.13);
-    z-index:20;overflow:hidden;display:none;
+    position:fixed;
+    width:300px;max-height:320px;overflow-y:auto;
+    background:#fff;border:1px solid var(--color-border);
+    border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.16);
+    z-index:9999;display:none;
 }
 .chat-qr-list.open{display:block}
 .chat-qr-item{
@@ -562,7 +565,19 @@ include __DIR__ . '/includes/header.php';
     })();
     document.getElementById('btnQuickReply').addEventListener('click', function(e){
         e.stopPropagation();
-        document.getElementById('chatQrList').classList.toggle('open');
+        var list = document.getElementById('chatQrList');
+        var isOpen = list.classList.contains('open');
+        if(isOpen){
+            list.classList.remove('open');
+            return;
+        }
+        /* Posicionar fixed usando las coordenadas reales del botón */
+        var rect = e.currentTarget.getBoundingClientRect();
+        list.style.right  = (window.innerWidth - rect.right) + 'px';
+        list.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+        list.style.left   = 'auto';
+        list.style.top    = 'auto';
+        list.classList.add('open');
     });
     document.addEventListener('click', function(e){
         if(!e.target.closest('#chatQrWrap'))
