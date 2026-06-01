@@ -647,23 +647,33 @@ img{max-width:100%;display:block}
 }
 .qchat__start-btn:hover{background:#26241d}
 
-/* Messages */
+/* Messages — filas con avatar */
+.qchat__row{display:flex;align-items:flex-end;gap:8px;animation:qchatMsg .2s var(--ease)}
+.qchat__row--visitor{flex-direction:row-reverse}
+@keyframes qchatMsg{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Avatar asesor / visitante */
+.qchat__av{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;line-height:1;
+  box-shadow:0 2px 6px rgba(14,14,12,.12);
+}
+.qchat__av--agent{background:var(--q-ink);color:#fff}
+.qchat__av--visitor{background:var(--q-lima,#c6f24e);color:var(--q-ink)}
+
 .qchat__msg{
-  max-width:82%;padding:10px 14px;
+  max-width:78%;padding:10px 14px;
   font-size:13.5px;line-height:1.45;
   border-radius:14px;word-wrap:break-word;
-  animation:qchatMsg .2s var(--ease);
 }
-@keyframes qchatMsg{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .qchat__msg--agent{
   background:var(--q-surface);color:var(--q-ink);
   border:1px solid var(--q-border);
-  align-self:flex-start;
   border-bottom-left-radius:4px;
 }
 .qchat__msg--visitor{
   background:var(--q-ink);color:#fff;
-  align-self:flex-end;
   border-bottom-right-radius:4px;
 }
 .qchat__msg-time{

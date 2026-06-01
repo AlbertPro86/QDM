@@ -121,9 +121,21 @@ include __DIR__ . '/includes/header.php';
     padding:12px 14px;border-top:1px solid var(--color-border);
     flex-shrink:0;background:#fff;
 }
+/* filas de mensajes con avatar */
+.chat-row{display:flex;align-items:flex-end;gap:8px;animation:chatRowIn .18s ease}
+.chat-row--agent{flex-direction:row-reverse}
+@keyframes chatRowIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.chat-av{
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;line-height:1;
+    box-shadow:0 1px 4px rgba(0,0,0,.12);
+}
+.chat-av--visitor{background:var(--color-primary,#0E0E0C);color:#fff}
+.chat-av--agent{background:#e8f5e9;color:#15803d;border:1px solid #bbf7d0}
 .chat-bubble{max-width:72%;padding:9px 13px;font-size:13px;line-height:1.45;border-radius:14px;word-wrap:break-word}
-.chat-bubble--visitor{background:var(--color-primary,#0E0E0C);color:#fff;align-self:flex-start;border-bottom-left-radius:4px}
-.chat-bubble--agent{background:#fff;border:1px solid var(--color-border);color:var(--color-text);align-self:flex-end;border-bottom-right-radius:4px}
+.chat-bubble--visitor{background:var(--color-primary,#0E0E0C);color:#fff;border-bottom-left-radius:4px}
+.chat-bubble--agent{background:#fff;border:1px solid var(--color-border);color:var(--color-text);border-bottom-right-radius:4px}
 .chat-bubble__meta{display:flex;align-items:center;gap:6px;margin-top:3px;justify-content:flex-end}
 .chat-bubble__time{font-size:10px;opacity:.5;font-family:var(--font-mono,monospace)}
 .chat-bubble--visitor .chat-bubble__meta{justify-content:flex-start}
@@ -135,13 +147,14 @@ include __DIR__ . '/includes/header.php';
 
 <script>
 (function(){
-    var API      = 'api/chat.php';
-    var POLL_MSG = 3000;
-    var POLL_SES = 5000;
-    var activeSid= null;
-    var lastMsgId= 0;
-    var pollMsg  = null;
-    var pollSes  = null;
+    var API           = 'api/chat.php';
+    var POLL_MSG      = 3000;
+    var POLL_SES      = 5000;
+    var activeSid     = null;
+    var lastMsgId     = 0;
+    var pollMsg       = null;
+    var pollSes       = null;
+    var activeVisitor = '';   /* nombre del visitante activo */
 
     var listEl   = document.getElementById('chatSessionList');
     var emptyEl  = document.getElementById('chatEmpty');
@@ -151,6 +164,22 @@ include __DIR__ . '/includes/header.php';
     var replyF   = document.getElementById('chatReplyForm');
     var replyIn  = document.getElementById('chatReplyInput');
     var filterSt = document.getElementById('chatFilterStatus');
+
+    /* ── sonido de notificación ── */
+    function playNotif(){
+        try{
+            var ctx=new(window.AudioContext||window.webkitAudioContext)();
+            [[520,0],[680,0.14]].forEach(function(n){
+                var o=ctx.createOscillator(),g=ctx.createGain();
+                o.connect(g);g.connect(ctx.destination);
+                o.type='sine';o.frequency.value=n[0];
+                g.gain.setValueAtTime(0,ctx.currentTime+n[1]);
+                g.gain.linearRampToValueAtTime(0.2,ctx.currentTime+n[1]+0.02);
+                g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n[1]+0.4);
+                o.start(ctx.currentTime+n[1]);o.stop(ctx.currentTime+n[1]+0.4);
+            });
+        }catch(e){}
+    }
 
     /* ── helpers ── */
     function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
@@ -202,7 +231,7 @@ include __DIR__ . '/includes/header.php';
 
     /* ── abrir sesión ── */
     async function openSession(sid){
-        activeSid=sid; lastMsgId=0;
+        activeSid=sid; lastMsgId=0; activeVisitor='';
         emptyEl.hidden=true; activeEl.hidden=false;
         msgsEl.innerHTML='<p style="text-align:center;font-size:12px;color:var(--color-text-muted);padding:16px 0">Cargando mensajes...</p>';
         loadSessions();
@@ -228,6 +257,7 @@ include __DIR__ . '/includes/header.php';
                         :'<button onclick="reabrirChat('+s.id+')" style="font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--color-border);background:transparent;cursor:pointer;color:var(--color-text-muted)">Reabrir</button>')+
                 '</div>';
 
+            activeVisitor=s.visitor_name||'?';
             msgsEl.innerHTML='';
             (d.messages||[]).forEach(function(m){
                 addBubble(m);
@@ -242,11 +272,21 @@ include __DIR__ . '/includes/header.php';
     }
 
     function addBubble(m){
-        var div=document.createElement('div');
-        div.className='chat-bubble chat-bubble--'+m.sender;
-        div.innerHTML=esc(m.message)+
-            '<div class="chat-bubble__meta"><span class="chat-bubble__time">'+fmtTime(m.created_at)+'</span></div>';
-        msgsEl.appendChild(div);
+        /* avatar */
+        var avLabel = m.sender==='agent'
+            ? 'Yo'
+            : (activeVisitor||'?').split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase();
+        var avClass = 'chat-av chat-av--'+m.sender;
+        var av = '<div class="'+avClass+'" title="'+(m.sender==='agent'?'Agente':esc(activeVisitor))+'">'+avLabel+'</div>';
+
+        var row=document.createElement('div');
+        row.className='chat-row chat-row--'+m.sender;
+        row.innerHTML=av+
+            '<div class="chat-bubble chat-bubble--'+m.sender+'">'+
+                esc(m.message)+
+                '<div class="chat-bubble__meta"><span class="chat-bubble__time">'+fmtTime(m.created_at)+'</span></div>'+
+            '</div>';
+        msgsEl.appendChild(row);
     }
 
     /* ── enviar respuesta ── */
@@ -256,7 +296,7 @@ include __DIR__ . '/includes/header.php';
         if(!txt||!activeSid||replyIn.disabled) return;
         replyIn.value='';
         addBubble({sender:'agent',message:txt,created_at:new Date().toISOString().replace('T',' ').substring(0,19)});
-        msgsEl.scrollTop=msgsEl.scrollHeight;
+        msgsEl.scrollTop = msgsEl.scrollHeight;
         try{
             var r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:activeSid,message:txt})});
             var d=await r.json();
@@ -271,13 +311,16 @@ include __DIR__ . '/includes/header.php';
             var r=await fetch(API+'?session_id='+activeSid);
             var d=await r.json();
             if(!d.success) return;
+            var hasNew=false;
             (d.messages||[]).forEach(function(m){
                 if(parseInt(m.id)>lastMsgId){
                     lastMsgId=parseInt(m.id);
                     addBubble(m);
                     msgsEl.scrollTop=msgsEl.scrollHeight;
+                    if(m.sender==='visitor') hasNew=true;
                 }
             });
+            if(hasNew) playNotif();
         }catch(e){}
     }
     function startMsgPoll(){ if(pollMsg) clearInterval(pollMsg); pollMsg=setInterval(pollMessages,POLL_MSG); }

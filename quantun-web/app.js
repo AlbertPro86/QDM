@@ -504,6 +504,39 @@
     var isOpen    = false;
     var unread    = 0;
 
+    /* — sonido de notificación (Web Audio API, sin archivos externos) — */
+    function playNotif() {
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [[660, 0], [880, 0.13]].forEach(function(note) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.value = note[0];
+          g.gain.setValueAtTime(0, ctx.currentTime + note[1]);
+          g.gain.linearRampToValueAtTime(0.22, ctx.currentTime + note[1] + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + note[1] + 0.38);
+          o.start(ctx.currentTime + note[1]);
+          o.stop(ctx.currentTime + note[1] + 0.38);
+        });
+      } catch(e) {}
+    }
+
+    /* — construir fila con avatar — */
+    function buildRow(sender, msgHtml, timeStr) {
+      var visIni = session && session.name ? session.name.charAt(0).toUpperCase() : '?';
+      var av = sender === 'agent'
+        ? '<div class="qchat__av qchat__av--agent" title="Asesor QUANTUN">Q</div>'
+        : '<div class="qchat__av qchat__av--visitor" title="Tú">' + visIni + '</div>';
+      return '<div class="qchat__row qchat__row--' + sender + '">' +
+        av +
+        '<div class="qchat__msg qchat__msg--' + sender + '">' +
+          msgHtml +
+          (timeStr ? '<span class="qchat__msg-time">' + timeStr + '</span>' : '') +
+        '</div>' +
+      '</div>';
+    }
+
     /* — abrir completamente — */
     function openFull() {
       win.classList.remove('qchat__window--collapsed');
@@ -558,19 +591,15 @@
       inputW.hidden = true;
       var now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
       chatBody.innerHTML =
-        '<div class="qchat__msg qchat__msg--agent">¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>.<br>¿En qué podemos ayudarte hoy?<span class="qchat__msg-time">' + now + '</span></div>' +
-        '<div class="qchat__msg qchat__msg--agent" style="margin-top:4px">Déjanos tu nombre y te atendemos de inmediato 😊<span class="qchat__msg-time">' + now + '</span></div>' +
+        buildRow('agent', '¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>.<br>¿En qué podemos ayudarte hoy?', now) +
+        buildRow('agent', 'Déjanos tu nombre y te atendemos de inmediato 😊', now) +
         '<div class="qchat__start">' +
           '<input type="text" id="qchatName" placeholder="Tu nombre *">' +
           '<input type="email" id="qchatEmail" placeholder="Tu correo (opcional)">' +
           '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat →</button>' +
         '</div>';
       document.getElementById('qchatStartBtn').addEventListener('click', initSession);
-      /* focus suave en el input */
-      setTimeout(function() {
-        var n = document.getElementById('qchatName');
-        if (n) n.focus();
-      }, 150);
+      setTimeout(function() { var n = document.getElementById('qchatName'); if (n) n.focus(); }, 150);
     }
 
     /* — crear sesión — */
@@ -617,14 +646,17 @@
       var loading = chatBody.querySelector('.qchat__typing');
       if (loading) loading.remove();
 
-      var div = document.createElement('div');
-      div.className = 'qchat__msg qchat__msg--' + m.sender;
       var t = m.created_at
         ? new Date(m.created_at.replace(' ', 'T')).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'})
         : new Date().toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
-      div.innerHTML = escChat(m.message) + '<span class="qchat__msg-time">' + t + '</span>';
-      chatBody.appendChild(div);
+
+      var row = document.createElement('div');
+      row.innerHTML = buildRow(m.sender, escChat(m.message), t);
+      chatBody.appendChild(row.firstElementChild);
       chatBody.scrollTop = chatBody.scrollHeight;
+
+      /* sonido al recibir mensaje del agente */
+      if (m.sender === 'agent') playNotif();
     }
 
     function escChat(s) {
