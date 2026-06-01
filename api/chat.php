@@ -153,4 +153,16 @@ if ($method === 'PUT') {
     jsonResponse(['success' => true]);
 }
 
+/* ══════════════ DELETE — eliminar sesiones ══════════════ */
+if ($method === 'DELETE') {
+    $in  = json_decode(file_get_contents('php://input'), true) ?? [];
+    $ids = array_values(array_filter(array_map('intval', $in['ids'] ?? [])));
+    if (!$ids) jsonResponse(['error' => 'IDs requeridos'], 422);
+
+    $ph = implode(',', array_fill(0, count($ids), '?'));
+    $pdo->prepare("DELETE FROM crm_chat_messages WHERE session_id IN ($ph)")->execute($ids);
+    $pdo->prepare("DELETE FROM crm_chat_sessions WHERE id IN ($ph)")->execute($ids);
+    jsonResponse(['success' => true, 'deleted' => count($ids)]);
+}
+
 jsonResponse(['error' => 'Método no permitido'], 405);

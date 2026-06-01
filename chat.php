@@ -34,6 +34,17 @@ include __DIR__ . '/includes/header.php';
 
     <!-- ── Panel izquierdo: lista de sesiones ── -->
     <div class="chat-sessions">
+        <!-- Barra de selección múltiple -->
+        <div class="chat-sel-bar" id="chatSelBar" hidden>
+            <span id="chatSelCount" style="font-size:12.5px;font-weight:600"></span>
+            <div style="display:flex;gap:6px">
+                <button type="button" class="chat-sel-btn" onclick="clearSelection()">Quitar</button>
+                <button type="button" class="chat-sel-btn chat-sel-btn--del" onclick="deleteSelected()">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
         <div class="chat-sessions__list" id="chatSessionList">
             <p style="padding:40px 16px;text-align:center;color:var(--color-text-muted);font-size:13px">Cargando chats...</p>
         </div>
@@ -92,14 +103,11 @@ include __DIR__ . '/includes/header.php';
                     <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Nota interna — solo visible para el equipo, <strong>no se envía al cliente</strong>
                 </div>
-                <form id="chatReplyForm" style="display:flex;gap:8px;align-items:center">
-                    <input type="text" id="chatReplyInput" class="form-control"
-                           placeholder="Escribe tu respuesta..." autocomplete="off"
-                           style="flex:1;font-size:13px;border-radius:8px;transition:border-color .15s,background .15s">
-                    <button type="submit" id="btnSendMsg" class="btn-primary"
-                            style="padding:0 18px;height:38px;font-size:13px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s">
-                        Enviar
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                <form id="chatReplyForm" class="chat-reply-form">
+                    <input type="text" id="chatReplyInput" class="chat-reply-input"
+                           placeholder="Escribe tu respuesta..." autocomplete="off">
+                    <button type="submit" id="btnSendMsg" class="chat-reply-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                     </button>
                 </form>
             </div>
@@ -218,6 +226,24 @@ include __DIR__ . '/includes/header.php';
     overflow-y:auto;
     background:var(--color-bg-secondary,#f8f8f6);
 }
+/* Barra selección múltiple */
+.chat-sel-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 12px;
+    background:var(--color-primary);color:#fff;
+    flex-shrink:0;
+}
+.chat-sel-bar[hidden]{display:none}
+.chat-sel-btn{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;
+    border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;
+    transition:background .15s;
+}
+.chat-sel-btn:hover{background:rgba(255,255,255,.15)}
+.chat-sel-btn--del{background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.5)}
+.chat-sel-btn--del:hover{background:rgba(239,68,68,.45)}
+
 .chat-sessions__list{display:flex;flex-direction:column}
 .chat-sess{
     display:flex;align-items:flex-start;gap:10px;
@@ -226,6 +252,26 @@ include __DIR__ . '/includes/header.php';
     transition:background .12s;position:relative;
 }
 .chat-sess:hover{background:var(--color-bg,#fff)}
+/* Checkbox */
+.chat-sess__chk{
+    flex-shrink:0;margin-top:3px;cursor:pointer;
+    display:flex;align-items:center;
+    opacity:0;transition:opacity .15s;
+    width:16px;
+}
+.chat-sess:hover .chat-sess__chk,
+.chat-sess--sel .chat-sess__chk{opacity:1}
+.chat-sess__chk input{width:14px;height:14px;cursor:pointer;accent-color:var(--color-primary)}
+/* Botón eliminar individual */
+.chat-sess__del{
+    position:absolute;right:8px;bottom:9px;
+    width:24px;height:24px;border-radius:6px;border:none;
+    background:transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--color-text-muted);opacity:0;transition:opacity .15s,background .15s;
+}
+.chat-sess:hover .chat-sess__del{opacity:1}
+.chat-sess__del:hover{background:#fee2e2;color:#b91c1c}
 .chat-sess.active{background:var(--color-bg,#fff);border-left:3px solid var(--color-primary,#0E0E0C)}
 .chat-sess__avatar{
     width:34px;height:34px;border-radius:50%;
@@ -245,9 +291,11 @@ include __DIR__ . '/includes/header.php';
 
 /* ═══ PANEL CONVERSACIÓN ═══ */
 .chat-conversation{display:flex;flex-direction:column;background:#fff;min-width:0;overflow:visible}
-.chat-conv__empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--color-text-muted)}
+.chat-conv__empty{display:none;flex-direction:column;flex:1;align-items:center;justify-content:center;color:var(--color-text-muted)}
+.chat-conv__empty:not([hidden]){display:flex}
 /* flex:1 + min-height:0 para que el área de mensajes crezca correctamente en flex column */
-.chat-conv__active{display:flex;flex-direction:column;flex:1;min-height:0;overflow:visible}
+.chat-conv__active{display:none;flex-direction:column;flex:1;min-height:0;overflow:visible}
+.chat-conv__active:not([hidden]){display:flex}
 
 /* Header */
 .chat-conv__header{
@@ -320,8 +368,8 @@ include __DIR__ . '/includes/header.php';
 
 /* Reply area */
 .chat-conv__reply{
-    padding:10px 14px;border-top:1px solid var(--color-border);
-    flex-shrink:0;background:#fff;display:flex;flex-direction:column;gap:6px;
+    padding:12px 14px;border-top:1px solid var(--color-border);
+    flex-shrink:0;background:#f8f8f6;display:flex;flex-direction:column;gap:8px;
 }
 .note-mode-bar{
     display:flex;align-items:center;gap:6px;
@@ -329,6 +377,47 @@ include __DIR__ . '/includes/header.php';
     background:#fffbeb;border:1px solid #fde68a;
     font-size:11.5px;color:#b45309;
 }
+/* Input compuesto */
+.chat-reply-form{
+    display:flex;align-items:center;gap:0;
+    background:#fff;
+    border:1.5px solid var(--color-border);
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);
+    overflow:hidden;
+    transition:border-color .18s,box-shadow .18s;
+}
+.chat-reply-form:focus-within{
+    border-color:var(--color-primary);
+    box-shadow:0 0 0 3px rgba(14,14,12,.08), 0 2px 8px rgba(0,0,0,.06);
+}
+.chat-reply-form.note-active{
+    border-color:#f59e0b;
+    box-shadow:0 0 0 3px rgba(245,158,11,.1), 0 2px 8px rgba(0,0,0,.06);
+}
+.chat-reply-input{
+    flex:1;border:none;outline:none;
+    padding:11px 14px;font-size:13.5px;
+    font-family:inherit;color:var(--color-text);
+    background:transparent;min-width:0;
+    transition:background .15s;
+}
+.chat-reply-input::placeholder{color:var(--color-text-muted);opacity:.75}
+.chat-reply-input:disabled{background:#f5f5f3;color:var(--color-text-muted);cursor:not-allowed}
+.chat-reply-btn{
+    flex-shrink:0;
+    width:42px;height:42px;margin:4px;
+    border:none;border-radius:9px;cursor:pointer;
+    background:var(--color-primary);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s,transform .1s,box-shadow .15s;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
+}
+.chat-reply-btn:hover:not(:disabled){background:#26241d;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.chat-reply-btn:active:not(:disabled){transform:scale(.93)}
+.chat-reply-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.chat-reply-btn.note-btn{background:#f59e0b;box-shadow:0 2px 6px rgba(245,158,11,.35)}
+.chat-reply-btn.note-btn:hover:not(:disabled){background:#d97706}
 
 /* ═══ BURBUJAS ═══ */
 .chat-row{display:flex;align-items:flex-end;gap:8px;animation:chatRowIn .18s ease}
@@ -363,8 +452,9 @@ include __DIR__ . '/includes/header.php';
 .chat-info-panel{
     border-left:1px solid var(--color-border);
     background:#fff;overflow-y:auto;
-    display:flex;flex-direction:column;
+    display:none;flex-direction:column;
 }
+.chat-info-panel:not([hidden]){display:flex}
 .cip__section{
     padding:14px 16px;border-bottom:1px solid var(--color-border);
 }
@@ -459,6 +549,7 @@ include __DIR__ . '/includes/header.php';
     var infoPanelOpen = false;
     var sessionStart  = null;
     var durationTimer = null;
+    var selectedSids  = new Set();  /* IDs seleccionados para acción múltiple */
 
     /* ── DOM refs ── */
     var layout    = document.getElementById('chatLayout');
@@ -518,23 +609,22 @@ include __DIR__ . '/includes/header.php';
         chatMode = mode;
         var btnR = document.getElementById('btnModeReply');
         var btnN = document.getElementById('btnModeNote');
+        var form = document.getElementById('chatReplyForm');
         btnR.classList.toggle('active', mode==='reply');
         btnN.classList.toggle('active', mode==='note');
         noteModeBar.hidden = mode !== 'note';
         if(mode==='note'){
             replyIn.placeholder = 'Escribe una nota interna...';
-            replyIn.style.borderColor = '#f59e0b';
             replyIn.style.background  = '#fffbeb';
-            btnSend.style.background  = '#f59e0b';
-            btnSend.style.borderColor = '#f59e0b';
-            btnSend.innerHTML = 'Guardar <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+            form.classList.add('note-active');
+            btnSend.classList.add('note-btn');
+            btnSend.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
         } else {
             replyIn.placeholder = replyIn.disabled ? 'Chat cerrado' : 'Escribe tu respuesta...';
-            replyIn.style.borderColor = '';
             replyIn.style.background  = '';
-            btnSend.style.background  = '';
-            btnSend.style.borderColor = '';
-            btnSend.innerHTML = 'Enviar <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
+            form.classList.remove('note-active');
+            btnSend.classList.remove('note-btn');
+            btnSend.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
         }
         replyIn.focus();
     };
@@ -659,6 +749,47 @@ include __DIR__ . '/includes/header.php';
             renderSessions(d.sessions||[]);
         }catch(e){}
     }
+    /* ── Barra de selección ── */
+    function updateSelectionBar(){
+        var bar   = document.getElementById('chatSelBar');
+        var count = selectedSids.size;
+        bar.hidden = count === 0;
+        if(count > 0)
+            document.getElementById('chatSelCount').textContent = count + ' seleccionada' + (count===1?'':'s');
+    }
+    window.clearSelection = function(){
+        selectedSids.clear();
+        updateSelectionBar();
+        listEl.querySelectorAll('.chat-sess').forEach(function(el){
+            el.classList.remove('chat-sess--sel');
+            var cb = el.querySelector('input[type="checkbox"]');
+            if(cb) cb.checked = false;
+        });
+    };
+    window.deleteSelected = function(){
+        var ids = Array.from(selectedSids);
+        if(ids.length) deleteSessions(ids);
+    };
+    window.deleteSessions = async function(ids){
+        var n   = ids.length;
+        var msg = n===1 ? '¿Eliminar esta conversación? No se puede deshacer.'
+                       : '¿Eliminar '+n+' conversaciones? No se puede deshacer.';
+        var ok  = await confirmAction(msg);
+        if(!ok) return;
+        try{
+            await fetch(API,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:ids})});
+            if(ids.indexOf(activeSid)!==-1){
+                activeSid=null;
+                emptyEl.hidden=false; activeEl.hidden=true;
+                toggleInfoPanel(false);
+                if(durationTimer){clearInterval(durationTimer);durationTimer=null;}
+            }
+            ids.forEach(function(id){selectedSids.delete(id);});
+            updateSelectionBar();
+            loadSessions();
+        }catch(e){console.error(e);}
+    };
+
     function renderSessions(list){
         if(!list.length){
             listEl.innerHTML='<p style="padding:40px 16px;text-align:center;color:var(--color-text-muted);font-size:13px">No hay conversaciones '+filterSt.value+'s</p>';
@@ -666,8 +797,12 @@ include __DIR__ . '/includes/header.php';
         }
         listEl.innerHTML = list.map(function(s){
             var ini=(s.visitor_name||'?').split(' ').map(function(w){return w[0]}).join('').substring(0,2).toUpperCase();
-            var cls=s.id==activeSid?' active':'';
+            var sel=selectedSids.has(s.id);
+            var cls=(s.id==activeSid?' active':'')+(sel?' chat-sess--sel':'');
             return '<div class="chat-sess'+cls+'" data-sid="'+s.id+'">'+
+                '<label class="chat-sess__chk" onclick="event.stopPropagation()">'+
+                    '<input type="checkbox" data-sid="'+s.id+'"'+(sel?' checked':'')+'>'+
+                '</label>'+
                 '<div class="chat-sess__avatar">'+ini+'</div>'+
                 '<div class="chat-sess__info">'+
                     '<div class="chat-sess__name">'+esc(s.visitor_name)+
@@ -676,10 +811,25 @@ include __DIR__ . '/includes/header.php';
                     '<div class="chat-sess__preview">'+esc((s.last_message||'').substring(0,48))+'</div>'+
                 '</div>'+
                 '<span class="chat-sess__time">'+timeAgo(s.last_message_at||s.created_at)+'</span>'+
+                '<button class="chat-sess__del" title="Eliminar conversación" onclick="event.stopPropagation();deleteSessions(['+s.id+'])">'+
+                    '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>'+
+                '</button>'+
             '</div>';
         }).join('');
         listEl.querySelectorAll('.chat-sess').forEach(function(el){
-            el.addEventListener('click',function(){ openSession(parseInt(el.dataset.sid)); });
+            el.addEventListener('click',function(e){
+                if(e.target.closest('.chat-sess__chk')||e.target.closest('.chat-sess__del')) return;
+                openSession(parseInt(el.dataset.sid));
+            });
+        });
+        listEl.querySelectorAll('input[type="checkbox"]').forEach(function(cb){
+            cb.addEventListener('change',function(){
+                var sid=parseInt(cb.dataset.sid);
+                var row=cb.closest('.chat-sess');
+                if(cb.checked){selectedSids.add(sid);row.classList.add('chat-sess--sel');}
+                else{selectedSids.delete(sid);row.classList.remove('chat-sess--sel');}
+                updateSelectionBar();
+            });
         });
     }
 
@@ -735,10 +885,12 @@ include __DIR__ . '/includes/header.php';
 
             /* Input */
             replyIn.disabled=(s.status==='cerrado');
+            btnSend.disabled=(s.status==='cerrado');
             if(s.status==='cerrado') setMode('reply');
             replyIn.focus();
 
-            /* Info panel */
+            /* Info panel — siempre visible al abrir conversación */
+            toggleInfoPanel(true);
             renderInfoPanel(s, d.messages||[]);
 
             startMsgPoll();
@@ -819,6 +971,8 @@ include __DIR__ . '/includes/header.php';
     /* ── Cerrar / Reabrir ── */
     window.cerrarChat = async function(sid){
         await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,status:'cerrado'})});
+        /* Cambiar filtro a "Cerrados" para que la conversación siga visible en la lista */
+        filterSt.value = 'cerrado';
         loadSessions();
         if(sid===activeSid) openSession(sid);
     };

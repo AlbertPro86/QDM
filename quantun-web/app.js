@@ -498,11 +498,12 @@
     var closeB = document.getElementById('qchatClose');
     if (!root || !fab) return;
 
-    var session   = JSON.parse(localStorage.getItem('qchat_session') || 'null');
-    var lastId    = 0;
-    var pollTimer = null;
-    var isOpen    = false;
-    var unread    = 0;
+    var session        = JSON.parse(localStorage.getItem('qchat_session') || 'null');
+    var lastId         = 0;
+    var pollTimer      = null;
+    var isOpen         = false;
+    var unread         = 0;
+    var historyLoaded  = false; /* true tras la primera carga; luego el poll solo pinta mensajes del agente */
 
     /* — sonido de notificación (Web Audio API, sin archivos externos) — */
     function playNotif() {
@@ -622,6 +623,7 @@
 
     /* — vista de conversación — */
     function renderChat() {
+      historyLoaded = false;   /* resetear: el próximo pollNow carga el historial completo */
       chatBody.innerHTML = '<p class="qchat__typing">Cargando conversación…</p>';
       inputW.hidden = false;
       setTimeout(function() { if (msgIn) msgIn.focus(); }, 100);
@@ -690,26 +692,29 @@
         if (loadingEl) loadingEl.remove();
 
         if (data.closed) {
-          /* Sesión cerrada: limpiar y ofrecer iniciar nueva conversación */
+          /* Sesión cerrada: mostrar mensaje y quedarse ahí hasta que el usuario salga */
           stopPoll();
           session = null;
           localStorage.removeItem('qchat_session');
           inputW.hidden = true;
-          chatBody.innerHTML = '';
-          /* Mostrar mensaje de cierre y luego el formulario */
           var closedMsg = document.createElement('div');
           closedMsg.innerHTML = buildRow('agent', 'Este chat ha sido cerrado. Si tienes más preguntas, ¡escríbenos de nuevo! 😊', new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}));
           chatBody.appendChild(closedMsg.firstElementChild || closedMsg);
-          setTimeout(function() { renderStart(); }, 1800);
+          chatBody.scrollTop = chatBody.scrollHeight;
           return;
         }
         (data.messages || []).forEach(function(m) {
           if (parseInt(m.id) > lastId) {
             lastId = parseInt(m.id);
+            /* Carga inicial (historial): pintar todo.
+               Polls siguientes: solo mensajes del agente — los del visitante
+               ya están en pantalla porque se agregan al enviar. */
+            if (historyLoaded && m.sender === 'visitor') return;
             addMessage(m);
             if (!isOpen && m.sender === 'agent') { unread++; updateBadge(); }
           }
         });
+        historyLoaded = true;
       } catch(e) { /* red caída, reintentar en próximo ciclo */ }
     }
 
