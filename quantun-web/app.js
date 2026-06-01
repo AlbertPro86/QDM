@@ -642,6 +642,19 @@
         })
         .catch(function() {});
     }
+
+    /* — auto-abrir al cargar la página (solo si no fue cerrado antes) — */
+    var chatDismissed = localStorage.getItem('qchat_dismissed');
+    if (!chatDismissed) {
+      setTimeout(function() {
+        if (!isOpen) toggle();
+      }, 3500);
+    }
+
+    /* — al cerrar manualmente, recordar que fue cerrado — */
+    closeB.addEventListener('click', function() {
+      localStorage.setItem('qchat_dismissed', '1');
+    });
   })();
 
 })();
