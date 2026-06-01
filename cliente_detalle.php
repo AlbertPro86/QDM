@@ -1832,7 +1832,12 @@ function renderNotifProgressCard(svcs) {
     if (!card) return;
     const activos = (svcs || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
     if (!activos.length) { card.innerHTML = ''; return; }
-    activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+    activos.sort((a, b) => {
+        const d = new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento);
+        if (d !== 0) return d;
+        // Misma fecha: mostrar el que tenga más recordatorios enviados
+        return (parseInt(b.notif_count)||0) - (parseInt(a.notif_count)||0);
+    });
     const svc   = activos[0];
     const count = Math.min(3, parseInt(svc.notif_count) || 0);
     const days  = Math.ceil((new Date(svc.fecha_vencimiento + 'T12:00:00') - new Date()) / 864e5);
@@ -5286,6 +5291,14 @@ async function guardarNotifConfig() {
     const btn = document.getElementById('btnGuardarNotif');
     btn.disabled = true; btn.textContent = 'Guardando...';
     try {
+        const f1 = document.getElementById('notif_r1_fecha')?.value;
+        const f2 = document.getElementById('notif_r2_fecha')?.value;
+        const f3 = document.getElementById('notif_r3_fecha')?.value;
+        // Si hay al menos una fecha programada, activar automáticamente
+        if ((f1 || f2 || f3) && !notifActiva) {
+            notifActiva = true;
+            actualizarToggleNotif();
+        }
         const r = await fetch('api/cliente_notif_config.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

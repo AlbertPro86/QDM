@@ -236,7 +236,12 @@ $stmt = $pdo->query("
     FROM   clientes c
     JOIN   crm_cliente_notif_config n ON n.cliente_id = c.id
     WHERE  c.estado = 'activo'
-      AND  n.activa = 1
+      AND  (
+          n.activa = 1
+          OR n.r1_fecha IS NOT NULL
+          OR n.r2_fecha IS NOT NULL
+          OR n.r3_fecha IS NOT NULL
+      )
 ");
 
 $enviados = 0; $errores = 0;
