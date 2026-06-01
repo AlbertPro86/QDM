@@ -698,13 +698,22 @@
           renderStart();
           return;
         }
+        /* quitar "Cargando..." en cuanto llega cualquier respuesta válida */
+        var loadingEl = chatBody.querySelector('.qchat__typing');
+        if (loadingEl) loadingEl.remove();
+
         if (data.closed) {
+          /* Sesión cerrada: limpiar y ofrecer iniciar nueva conversación */
           stopPoll();
+          session = null;
+          localStorage.removeItem('qchat_session');
           inputW.hidden = true;
-          var closedDiv = document.createElement('p');
-          closedDiv.className = 'qchat__typing';
-          closedDiv.textContent = 'Chat cerrado. ¡Hasta pronto!';
-          chatBody.appendChild(closedDiv);
+          chatBody.innerHTML = '';
+          /* Mostrar mensaje de cierre y luego el formulario */
+          var closedMsg = document.createElement('div');
+          closedMsg.innerHTML = buildRow('agent', 'Este chat ha sido cerrado. Si tienes más preguntas, ¡escríbenos de nuevo! 😊', new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}));
+          chatBody.appendChild(closedMsg.firstElementChild || closedMsg);
+          setTimeout(function() { renderStart(); }, 1800);
           return;
         }
         (data.messages || []).forEach(function(m) {

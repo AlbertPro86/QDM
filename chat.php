@@ -391,9 +391,10 @@ include __DIR__ . '/includes/header.php';
 /* ═══ MODAL LEAD ═══ */
 .cmodal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;
-    display:flex;align-items:center;justify-content:center;
+    display:none;align-items:center;justify-content:center;
     animation:fadeIn .18s ease;
 }
+.cmodal-overlay:not([hidden]){ display:flex; }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .cmodal{
     background:#fff;border-radius:14px;width:500px;max-width:96vw;
@@ -866,18 +867,15 @@ include __DIR__ . '/includes/header.php';
                 var notaMsg = '✅ Contacto guardado como Lead ('+payload.nombre+' · '+payload.servicio_interes+')';
                 addBubble({sender:'agent',message:notaMsg,created_at:new Date().toISOString().replace('T',' ').substring(0,19),type:'note'});
                 msgsEl.scrollTop=msgsEl.scrollHeight;
-                /* enlace al lead */
+                /* toast de confirmación con enlace */
                 if(d.lead_id){
-                    setTimeout(function(){
-                        var go = confirm('Lead creado exitosamente. ¿Ir a Gestión de Leads ahora?');
-                        if(go) window.open('leads.php', '_blank');
-                    }, 200);
+                    showToast('Lead guardado exitosamente. <a href="leads.php" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">Ver en Gestión de Leads →</a>', 'success', 5000);
                 }
             } else {
-                alert(d.error || 'Error al guardar el lead. Inténtalo de nuevo.');
+                showToast(d.error || 'Error al guardar el lead. Inténtalo de nuevo.', 'error');
             }
         }catch(err){
-            alert('Error de conexión. Verifica tu red e intenta de nuevo.');
+            showToast('Error de conexión. Verifica tu red e intenta de nuevo.', 'error');
         }
         btn.disabled = false;
         btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> Guardar Lead';
