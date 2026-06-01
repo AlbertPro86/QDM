@@ -583,6 +583,19 @@ img{max-width:100%;display:block}
 }
 @keyframes qchatIn{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
 
+/* Estado colapsado: solo el header, sin cuerpo ni input */
+.qchat__window--collapsed .qchat__body,
+.qchat__window--collapsed .qchat__input{ display:none }
+.qchat__window--collapsed{
+  max-height:none;
+  border-radius:14px;
+  cursor:pointer;
+  animation:qchatIn .3s var(--ease);
+}
+.qchat__window--collapsed .qchat__header{
+  border-radius:14px;
+}
+
 /* Header */
 .qchat__header{
   display:flex;align-items:center;justify-content:space-between;
