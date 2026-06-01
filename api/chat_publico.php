@@ -114,7 +114,11 @@ switch ($action) {
         $s = chatSession($pdo, $sid, $tok);
         if (!$s) jsonResponse(['error' => 'Sesión no encontrada'], 401);
 
-        $st = $pdo->prepare("SELECT id, sender, message, created_at FROM crm_chat_messages WHERE session_id = ? AND id > ? ORDER BY id ASC");
+        /* Las notas internas (type='note') no se envían al visitante */
+        $st = $pdo->prepare("SELECT id, sender, message, created_at FROM crm_chat_messages
+                              WHERE session_id = ? AND id > ?
+                              AND (type IS NULL OR type = 'message')
+                              ORDER BY id ASC");
         $st->execute([$sid, $after]);
         $msgs = $st->fetchAll(PDO::FETCH_ASSOC);
 
