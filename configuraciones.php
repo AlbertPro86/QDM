@@ -217,7 +217,7 @@ include __DIR__ . '/includes/header.php';
                 </select>
             </div>
             <div class="form-group" style="margin:0">
-                <label class="form-label" style="font-size:11px">Llave (Nequi / Daviplata / QR)</label>
+                <label class="form-label" style="font-size:11px">Llave</label>
                 <input id="banco_llave" class="form-input" type="text" placeholder="Ej: +57 300 000 0000" style="padding:6px 10px;font-size:12px">
             </div>
         </div>

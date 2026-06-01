@@ -91,6 +91,64 @@ $tAlta   = (int)$pdo->query("SELECT COUNT(*) FROM tareas WHERE prioridad='alta' 
 
 $tareasRecientes = $pdo->query("SELECT t.*, c.nombre_comercial AS cnom FROM tareas t LEFT JOIN clientes c ON c.id=t.cliente_id WHERE t.estado NOT IN ('completado','cancelado') ORDER BY FIELD(t.prioridad,'alta','media','baja'), t.fecha_limite IS NULL, t.fecha_limite ASC LIMIT 5")->fetchAll();
 
+// ── Actividad reciente ────────────────────────────────────────────────────────
+$actividadLog = $pdo->query("
+    SELECT al.accion, al.entidad, al.entidad_id, al.detalles, al.created_at,
+           u.nombre AS user_nombre
+    FROM actividad_log al
+    LEFT JOIN usuarios u ON u.id = al.usuario_id
+    ORDER BY al.created_at DESC
+    LIMIT 25
+")->fetchAll();
+
+// Helpers para actividad
+function actIconEmoji(string $accion): string {
+    if (strpos($accion,'notif') !== false || strpos($accion,'renovacion') !== false) return '🔔';
+    if (strpos($accion,'login')  !== false) return '🔐';
+    if (strpos($accion,'logout') !== false) return '🔓';
+    if (strpos($accion,'webhook') !== false) return '🌐';
+    if (strpos($accion,'eliminar') !== false || strpos($accion,'delete') !== false) return '🗑️';
+    if (strpos($accion,'enviar') !== false || strpos($accion,'email') !== false || strpos($accion,'correo') !== false) return '📧';
+    if (strpos($accion,'crear') !== false || strpos($accion,'nuevo') !== false) return '➕';
+    if (strpos($accion,'editar') !== false || strpos($accion,'actualizar') !== false || strpos($accion,'update') !== false) return '✏️';
+    if (strpos($accion,'pago') !== false || strpos($accion,'cobro') !== false || strpos($accion,'transac') !== false) return '💳';
+    if (strpos($accion,'nota') !== false) return '📝';
+    if (strpos($accion,'chat') !== false) return '💬';
+    if (strpos($accion,'cotiz') !== false) return '📄';
+    return '📋';
+}
+
+function actIconBg(string $accion): string {
+    if (strpos($accion,'notif') !== false || strpos($accion,'renovacion') !== false) return '#FEF3C7';
+    if (strpos($accion,'login')  !== false || strpos($accion,'logout') !== false)    return '#E0E7FF';
+    if (strpos($accion,'webhook') !== false) return '#F3E8FF';
+    if (strpos($accion,'eliminar') !== false) return '#FEE2E2';
+    if (strpos($accion,'enviar') !== false || strpos($accion,'email') !== false || strpos($accion,'correo') !== false) return '#D1FAE5';
+    if (strpos($accion,'crear') !== false || strpos($accion,'nuevo') !== false) return '#E0F2FE';
+    return '#EFECE5';
+}
+
+function actDesc(string $accion, ?string $entidad): string {
+    $entLabels = ['leads'=>'Lead','clientes'=>'Cliente','tareas'=>'Tarea','transacciones'=>'Transacción','clientes_archivos'=>'Archivo','cotizaciones'=>'Cotización','cliente_servicios'=>'Servicio','crm_chat_sessions'=>'Chat'];
+    $entLabel = $entLabels[$entidad ?? ''] ?? (strlen($entidad??'') ? ucfirst($entidad) : '');
+    $map = [
+        'webhook_lead'   => 'Nuevo lead de WordPress',
+        'crear'          => 'Creó' . ($entLabel ? " · $entLabel" : ''),
+        'editar'         => 'Editó' . ($entLabel ? " · $entLabel" : ''),
+        'actualizar'     => 'Actualizó' . ($entLabel ? " · $entLabel" : ''),
+        'eliminar'       => 'Eliminó' . ($entLabel ? " · $entLabel" : ''),
+        'enviar'         => 'Envió' . ($entLabel ? " · $entLabel" : ''),
+        'login'          => 'Inició sesión',
+        'logout'         => 'Cerró sesión',
+        'notif_enviada'  => 'Notificación enviada',
+        'cambiar_estado' => 'Cambió estado' . ($entLabel ? " · $entLabel" : ''),
+    ];
+    foreach ($map as $k => $v) {
+        if (strpos($accion, $k) !== false) return $v;
+    }
+    return $accion . ($entLabel ? " · $entLabel" : '');
+}
+
 $pageTitle    = 'Dashboard';
 $pageSubtitle = '';
 include __DIR__ . '/includes/header.php';
@@ -127,6 +185,59 @@ include __DIR__ . '/includes/header.php';
 .month-nav .active { background:#0E0E0C;color:#fff; }
 .month-nav .sep { padding:0;width:1px;background:var(--color-border); }
 
+/* ── Widget panel ────────────────────────────────────────────────── */
+.wg-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1099;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.wg-overlay.open { opacity:1;pointer-events:all; }
+.wg-panel {
+    position:fixed;top:0;right:0;width:300px;height:100dvh;
+    background:#fff;z-index:1100;
+    box-shadow:-4px 0 24px rgba(0,0,0,.12);
+    transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;display:flex;flex-direction:column;
+}
+.wg-panel.open { transform:translateX(0); }
+.wg-toggle-row {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 20px;border-bottom:1px solid #EFECE5;cursor:pointer;
+    transition:background .12s;gap:12px;
+}
+.wg-toggle-row:hover { background:#FAFAF7; }
+.wg-toggle-row label { flex:1;cursor:pointer;font-size:13.5px;font-weight:600;color:#0E0E0C;user-select:none; }
+.wg-toggle-row small { font-size:11px;color:#8A867C;display:block;font-weight:400;margin-top:1px; }
+/* custom checkbox toggle */
+.wg-switch { position:relative;width:38px;height:22px;flex-shrink:0; }
+.wg-switch input { opacity:0;width:0;height:0; }
+.wg-switch-slider {
+    position:absolute;inset:0;background:#E8E5DD;border-radius:12px;cursor:pointer;
+    transition:background .2s;
+}
+.wg-switch-slider::before {
+    content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;
+    left:3px;top:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+.wg-switch input:checked + .wg-switch-slider { background:#0E0E0C; }
+.wg-switch input:checked + .wg-switch-slider::before { transform:translateX(16px); }
+
+/* ── Activity feed ───────────────────────────────────────────────── */
+.act-item {
+    display:flex;align-items:flex-start;gap:11px;
+    padding:11px 18px;border-bottom:1px solid #EFECE5;
+    transition:background .12s;
+}
+.act-item:last-child { border-bottom:none; }
+.act-item:hover { background:#FAFAF7; }
+.act-icon {
+    width:30px;height:30px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;flex-shrink:0;margin-top:1px;
+}
+
+/* Widget hidden — usa !important para no pisar display:grid de inline styles */
+[data-widget].widget-hidden { display:none !important; }
+
 @media(max-width:960px){
   .dash-main-grid { grid-template-columns:1fr !important; }
   .dash-fin-grid  { grid-template-columns:1fr 1fr !important; }
@@ -161,6 +272,10 @@ include __DIR__ . '/includes/header.php';
         <a href="?" class="btn btn-secondary">Mes actual</a>
         <?php endif; ?>
         <a href="finanzas.php" class="btn btn-secondary">Ir a Finanzas</a>
+        <button onclick="openWidgetPanel()" class="btn btn-secondary" title="Personalizar widgets">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            Personalizar
+        </button>
         <button id="btnEnviarResumen" onclick="enviarResumenDiario()" class="btn btn-accent">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             Enviar resumen
@@ -169,7 +284,7 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <!-- ── Fila financiera principal ─────────────────────────────────────────── -->
-<div class="dash-fin-grid" style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+<div data-widget="finanzas" class="dash-fin-grid" style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:14px;margin-bottom:20px">
 
     <!-- Ingresos — card hero -->
     <a href="finanzas.php" style="text-decoration:none;display:block;background:#E3F1E8;border:1.5px solid #B8DEC5;border-radius:3px;padding:20px 22px;transition:box-shadow .15s"
@@ -235,7 +350,7 @@ include __DIR__ . '/includes/header.php';
 <div class="dash-main-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
 
     <!-- ── LEADS ──────────────────────────────────────────────────────────── -->
-    <div>
+    <div data-widget="leads">
         <!-- Header leads -->
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
             <div>
@@ -292,7 +407,7 @@ include __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ── TAREAS ──────────────────────────────────────────────────────────── -->
-    <div>
+    <div data-widget="tareas">
         <!-- Header tareas -->
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
             <div>
@@ -376,11 +491,11 @@ include __DIR__ . '/includes/header.php';
 
 </div>
 
-<!-- ── Fila inferior: Leads recientes + Actividad de conversión ──────────── -->
-<div class="dash-bot-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<!-- ── Fila inferior ─────────────────────────────────────────────────────── -->
+<div class="dash-bot-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
 
     <!-- Leads Recientes -->
-    <div class="dash-card" style="padding:0;overflow:hidden">
+    <div data-widget="leads_recientes" class="dash-card" style="padding:0;overflow:hidden">
         <div style="padding:16px 20px;border-bottom:1px solid #EFECE5;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:14px;font-weight:700;color:#0E0E0C">Leads Recientes</span>
             <a href="leads.php" style="font-size:12px;font-weight:600;color:#57544D;text-decoration:none">Ver todos →</a>
@@ -405,7 +520,7 @@ include __DIR__ . '/includes/header.php';
     </div>
 
     <!-- Resumen financiero del mes -->
-    <div class="dash-card" style="padding:0;overflow:hidden">
+    <div data-widget="resumen_financiero" class="dash-card" style="padding:0;overflow:hidden">
         <div style="padding:16px 20px;border-bottom:1px solid #EFECE5;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:14px;font-weight:700;color:#0E0E0C">Resumen Financiero</span>
             <a href="finanzas.php" style="font-size:12px;font-weight:600;color:#57544D;text-decoration:none">Ver finanzas →</a>
@@ -444,9 +559,90 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
+    <!-- Historial de actividad -->
+    <div data-widget="actividad" class="dash-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:16px 20px;border-bottom:1px solid #EFECE5;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-size:14px;font-weight:700;color:#0E0E0C">Actividad Reciente</span>
+            <span style="font-size:11px;color:#8A867C">Últimas acciones</span>
+        </div>
+        <?php if(empty($actividadLog)): ?>
+        <div style="padding:40px;text-align:center;color:#8A867C;font-size:13px">Sin actividad registrada.</div>
+        <?php else: ?>
+        <div style="overflow-y:auto;flex:1;max-height:420px">
+            <?php foreach($actividadLog as $act):
+                $ico   = actIconEmoji($act['accion']);
+                $icoBg = actIconBg($act['accion']);
+                $desc  = actDesc($act['accion'], $act['entidad']);
+                $det   = $act['detalles'] ? mb_strimwidth($act['detalles'], 0, 58, '…') : '';
+                $who   = $act['user_nombre'] ? sanitize($act['user_nombre']) : 'Sistema';
+                $ts    = $act['created_at'];
+            ?>
+            <div class="act-item">
+                <div class="act-icon" style="background:<?=$icoBg?>"><?=$ico?></div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:12.5px;font-weight:700;color:#0E0E0C;line-height:1.3"><?=htmlspecialchars($desc,ENT_QUOTES)?></div>
+                    <?php if($det): ?>
+                    <div style="font-size:11px;color:#57544D;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><?=htmlspecialchars($det,ENT_QUOTES)?></div>
+                    <?php endif; ?>
+                    <div style="font-size:10px;color:#8A867C;margin-top:3px;display:flex;gap:6px">
+                        <span><?=$who?></span>
+                        <span>·</span>
+                        <span data-ts="<?=htmlspecialchars($ts,ENT_QUOTES)?>"><?=date('d M H:i',strtotime($ts))?></span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+</div>
+
+<!-- ── Widget config panel ────────────────────────────────────────────────── -->
+<div class="wg-overlay" id="wgOverlay" onclick="closeWidgetPanel()"></div>
+<div class="wg-panel" id="wgPanel">
+    <div style="padding:18px 20px;border-bottom:1.5px solid #EFECE5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <div>
+            <div style="font-size:15px;font-weight:800;color:#0E0E0C">Personalizar Dashboard</div>
+            <div style="font-size:11px;color:#8A867C;margin-top:2px">Activa o desactiva cada widget</div>
+        </div>
+        <button onclick="closeWidgetPanel()" style="background:none;border:none;cursor:pointer;padding:6px;color:#8A867C;border-radius:6px;transition:background .15s" onmouseenter="this.style.background='#EFECE5'" onmouseleave="this.style.background='none'">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+        <?php
+        $wgDefs = [
+            'finanzas'           => ['Tarjetas Financieras',  'Ingresos, egresos, ganancia, clientes'],
+            'leads'              => ['Pipeline de Leads',     'Embudo y distribución por etapa'],
+            'tareas'             => ['Gestión de Tareas',     'Estado, prioridades y próximas a vencer'],
+            'leads_recientes'    => ['Leads Recientes',       'Últimos 5 leads del sistema'],
+            'resumen_financiero' => ['Resumen Financiero',    'Barras y datos clave del mes'],
+            'actividad'          => ['Actividad Reciente',    'Historial de acciones del CRM'],
+        ];
+        foreach($wgDefs as $wid => [$wname, $wdesc]):
+        ?>
+        <div class="wg-toggle-row" onclick="document.getElementById('wgcb-<?=$wid?>').click()">
+            <div style="flex:1">
+                <label for="wgcb-<?=$wid?>" style="font-size:13.5px;font-weight:600;color:#0E0E0C;cursor:pointer"><?=$wname?></label>
+                <small style="font-size:11px;color:#8A867C;display:block;margin-top:1px"><?=$wdesc?></small>
+            </div>
+            <label class="wg-switch" onclick="event.stopPropagation()">
+                <input type="checkbox" id="wgcb-<?=$wid?>" checked onchange="toggleWidget('<?=$wid?>',this.checked)">
+                <span class="wg-switch-slider"></span>
+            </label>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid #EFECE5;flex-shrink:0">
+        <button onclick="resetWidgetPrefs()" style="width:100%;padding:9px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;font-size:12px;font-weight:600;color:#57544D;cursor:pointer;transition:background .15s" onmouseenter="this.style.background='#EFECE5'" onmouseleave="this.style.background='#FAFAF7'">
+            Restablecer todo
+        </button>
+    </div>
 </div>
 
 <script>
+// ── Resumen diario ────────────────────────────────────────────────────────
 async function enviarResumenDiario() {
     const btn = document.getElementById('btnEnviarResumen');
     btn.disabled = true;
@@ -466,6 +662,110 @@ async function enviarResumenDiario() {
         btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/> </svg> Enviar resumen';
     }
 }
+
+// ── Widget system ─────────────────────────────────────────────────────────
+const WIDGET_KEY     = 'dash_widgets_v1';
+const WIDGET_IDS     = ['finanzas','leads','tareas','leads_recientes','resumen_financiero','actividad'];
+
+function loadWidgetPrefs() {
+    const defaults = {};
+    WIDGET_IDS.forEach(id => defaults[id] = true);
+    try {
+        const saved = JSON.parse(localStorage.getItem(WIDGET_KEY) || '{}');
+        return Object.assign(defaults, saved);
+    } catch { return defaults; }
+}
+
+function saveWidgetPrefs(prefs) {
+    localStorage.setItem(WIDGET_KEY, JSON.stringify(prefs));
+}
+
+function applyWidgetPrefs(prefs) {
+    WIDGET_IDS.forEach(id => {
+        const el = document.querySelector(`[data-widget="${id}"]`);
+        if (!el) return;
+        // Usar clase en lugar de style.display para no pisar los display:grid inline
+        el.classList.toggle('widget-hidden', !prefs[id]);
+    });
+    // Adjust main grid columns
+    const mainGrid = document.querySelector('.dash-main-grid');
+    if (mainGrid) {
+        const vis = [...mainGrid.children].filter(c => !c.classList.contains('widget-hidden'));
+        if (vis.length === 0) {
+            mainGrid.classList.add('widget-hidden');
+        } else {
+            mainGrid.classList.remove('widget-hidden');
+            mainGrid.style.gridTemplateColumns = vis.length === 1 ? '1fr' : '1fr 1fr';
+        }
+    }
+    // Adjust bot grid columns
+    const botGrid = document.querySelector('.dash-bot-grid');
+    if (botGrid) {
+        const vis = [...botGrid.children].filter(c => !c.classList.contains('widget-hidden'));
+        if (vis.length === 0) {
+            botGrid.classList.add('widget-hidden');
+        } else {
+            botGrid.classList.remove('widget-hidden');
+            const cols = Math.min(vis.length, 3);
+            botGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        }
+    }
+}
+
+function openWidgetPanel() {
+    const prefs = loadWidgetPrefs();
+    WIDGET_IDS.forEach(id => {
+        const cb = document.getElementById(`wgcb-${id}`);
+        if (cb) cb.checked = prefs[id] !== false;
+    });
+    document.getElementById('wgOverlay').classList.add('open');
+    document.getElementById('wgPanel').classList.add('open');
+}
+
+function closeWidgetPanel() {
+    document.getElementById('wgOverlay').classList.remove('open');
+    document.getElementById('wgPanel').classList.remove('open');
+}
+
+function toggleWidget(id, checked) {
+    const prefs = loadWidgetPrefs();
+    prefs[id] = checked;
+    saveWidgetPrefs(prefs);
+    applyWidgetPrefs(prefs);
+}
+
+function resetWidgetPrefs() {
+    localStorage.removeItem(WIDGET_KEY);
+    const prefs = loadWidgetPrefs();
+    WIDGET_IDS.forEach(id => {
+        const cb = document.getElementById(`wgcb-${id}`);
+        if (cb) cb.checked = true;
+    });
+    applyWidgetPrefs(prefs);
+    showToast('Dashboard restablecido', 'success');
+}
+
+// ── Tiempos relativos ─────────────────────────────────────────────────────
+function timeAgo(dateStr) {
+    const d   = new Date(dateStr.replace(' ', 'T'));
+    const now = new Date();
+    const s   = Math.floor((now - d) / 1000);
+    if (isNaN(s)) return dateStr;
+    if (s < 60)      return 'hace un momento';
+    if (s < 3600)    return `hace ${Math.floor(s / 60)} min`;
+    if (s < 86400)   return `hace ${Math.floor(s / 3600)}h`;
+    if (s < 604800)  return `hace ${Math.floor(s / 86400)}d`;
+    return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Apply stored prefs
+    applyWidgetPrefs(loadWidgetPrefs());
+    // Relative timestamps in activity feed
+    document.querySelectorAll('[data-ts]').forEach(el => {
+        el.textContent = timeAgo(el.dataset.ts);
+    });
+});
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

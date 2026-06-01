@@ -449,7 +449,7 @@ enrichWithPaquete($servicios, $pdo);
             'banco'   => ['label'=>'Banco',               'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/>'],
             'cuenta'  => ['label'=>'N° de Cuenta',        'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
             'tipo'    => ['label'=>'Tipo de Cuenta',      'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>'],
-            'llave'   => ['label'=>'Nequi / Daviplata',   'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
+            'llave'   => ['label'=>'Llave',   'icon'=>'<path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>'],
         ];
         $bancFiltered = array_filter($bancarios, fn($v) => !empty($v));
         if (!empty($bancFiltered)):
