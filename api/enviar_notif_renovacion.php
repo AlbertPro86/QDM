@@ -203,18 +203,52 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
     return $result;
 }
 
-// ── Modo web (prueba desde el modal) ─────────────────────────────────────────
+// ── Modo web (envío manual desde el modal) ───────────────────────────────────
 if (!$isCli) {
     ob_start();
     try {
         $clienteId = intval($_GET['cliente_id'] ?? 0);
         if (!$clienteId) { ob_end_clean(); jsonResponse(['error' => 'cliente_id requerido'], 400); }
 
-        $resultado = enviarNotifCliente($pdo, $clienteId, 1, true);
+        // Determinar qué recordatorio corresponde según el estado actual
+        $svcStmt = $pdo->prepare("
+            SELECT id, notif_count FROM cliente_servicios
+            WHERE cliente_id = ? AND estado = 'activo' AND frecuencia != 'unico'
+            ORDER BY fecha_vencimiento ASC LIMIT 1
+        ");
+        $svcStmt->execute([$clienteId]);
+        $svcRow      = $svcStmt->fetch();
+        $currentCount = (int)($svcRow['notif_count'] ?? 0);
+
+        if ($currentCount >= 3) {
+            ob_end_clean();
+            jsonResponse(['error' => 'Ya se enviaron los 3 recordatorios. Para reiniciar el ciclo usa "Reiniciar recordatorios" en el modal.'], 400);
+        }
+
+        $numToSend = $currentCount + 1;
+
+        // esPrueba=true garantiza contenido en el email aunque no haya vencimientos próximos
+        $resultado = enviarNotifCliente($pdo, $clienteId, $numToSend, true);
         ob_end_clean();
 
         if ($resultado['ok'] ?? false) {
-            jsonResponse(['success' => true, 'message' => 'Correo de prueba enviado correctamente']);
+            // Registrar el envío en BD — actualizar TODOS los servicios activos del cliente
+            $dateField = "notif_r{$numToSend}_at";
+            $pdo->prepare("
+                UPDATE cliente_servicios
+                SET    notif_count  = GREATEST(notif_count, ?),
+                       {$dateField} = COALESCE({$dateField}, NOW())
+                WHERE  cliente_id = ? AND estado = 'activo' AND frecuencia != 'unico'
+            ")->execute([$numToSend, $clienteId]);
+
+            // Registrar en historial de notas
+            $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, ?, ?)")
+                ->execute([$clienteId, $_SESSION['user_id'] ?? 0,
+                    "🔔 Recordatorio {$numToSend}/3 enviado manualmente"]);
+
+            $labels = ['1er', '2do', '3er'];
+            $label  = $labels[$numToSend - 1] ?? "{$numToSend}°";
+            jsonResponse(['success' => true, 'message' => "{$label} recordatorio enviado y registrado"]);
         } else {
             jsonResponse(['error' => $resultado['error'] ?? 'Error al enviar']);
         }
@@ -288,16 +322,22 @@ while ($row = $stmt->fetch()) {
 
         // Enviar
         $res = enviarNotifCliente($pdo, $clienteId, $num, false);
-        if ($res['ok'] ?? false) {
-            // Actualizar notif_count y fecha del recordatorio
+        if (($res['ok'] ?? false) && !($res['skipped'] ?? false)) {
+            // Actualizar notif_count y fecha en TODOS los servicios activos del cliente
             $dateField = "notif_r{$num}_at";
-            $pdo->prepare("UPDATE cliente_servicios SET notif_count = ?, {$dateField} = NOW() WHERE id = ?")
-                ->execute([$num, (int)$svc['id']]);
+            $pdo->prepare("
+                UPDATE cliente_servicios
+                SET    notif_count  = GREATEST(notif_count, ?),
+                       {$dateField} = COALESCE({$dateField}, NOW())
+                WHERE  cliente_id = ? AND estado = 'activo' AND frecuencia != 'unico'
+            ")->execute([$num, $clienteId]);
             // Registrar nota
             $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, 0, ?)")
                 ->execute([$clienteId, "🔔 Recordatorio {$num}/3 enviado automáticamente ({$svc['fecha_vencimiento']})"]);
             echo "[OK R{$num}] {$row['nombre_comercial']}\n";
             $enviados++;
+        } elseif ($res['skipped'] ?? false) {
+            echo "[SKIP R{$num}] {$row['nombre_comercial']}: sin servicios en período\n";
         } else {
             echo "[ERR R{$num}] {$row['nombre_comercial']}: " . ($res['error'] ?? '?') . "\n";
             $errores++;

@@ -686,7 +686,7 @@ include __DIR__ . '/includes/header.php';
 
 <!-- ── Modal Registrar Pago ─────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="registrarPagoModal">
-    <div class="modal" style="max-width:480px">
+    <div class="modal" style="max-width:500px">
         <div class="modal-header">
             <h3 class="modal-title" style="display:flex;align-items:center;gap:8px">
                 <svg width="18" height="18" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -695,32 +695,29 @@ include __DIR__ . '/includes/header.php';
             <button class="modal-close" onclick="closeRegistrarPagoModal()">&times;</button>
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
-            <!-- Servicio -->
+
+            <!-- Servicios activos (cargados automáticamente) -->
             <div>
-                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Servicio *</label>
-                <select id="rpServicioSelect"
-                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;outline:none"
-                    onchange="rpOnServicioChange()">
-                    <option value="">— Seleccionar servicio —</option>
-                </select>
-            </div>
-            <!-- Monto -->
-            <div>
-                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Monto *</label>
-                <div style="position:relative">
-                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:#64748b">$</span>
-                    <input type="number" id="rpMonto" min="0" step="1"
-                        style="width:100%;padding:9px 12px 9px 26px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
-                        placeholder="0">
+                <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Servicios incluidos</label>
+                <div id="rpServiciosLista" style="border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#f8fafc">
+                    <div style="padding:18px;text-align:center;color:#94a3b8;font-size:13px">Cargando servicios...</div>
                 </div>
             </div>
+
+            <!-- Total automático -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px">
+                <span style="font-size:13px;font-weight:700;color:#15803d">Total a registrar</span>
+                <span id="rpTotalDisplay" style="font-size:16px;font-weight:800;color:#15803d">$ 0 COP</span>
+            </div>
+
             <!-- Fecha pago -->
             <div>
                 <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Fecha de pago *</label>
                 <input type="date" id="rpFechaPago"
                     style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none">
             </div>
-            <!-- Concepto editable -->
+
+            <!-- Concepto opcional -->
             <div>
                 <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Concepto (opcional)</label>
                 <input type="text" id="rpConcepto"
@@ -1735,22 +1732,24 @@ async function sendPrompt(type) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cliente_id: clienteId, nota: actionLabel })
         });
-        // Si es recordatorio, incrementar notif_count en el servicio con vencimiento más próximo
+        // Si es recordatorio, incrementar notif_count en TODOS los servicios activos del cliente
         if (type === 'reminder') {
             const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
             const ds = await rs.json();
             const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
             if (activos.length) {
                 activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
-                const svc = activos[0];
-                const newCount = Math.min(3, (parseInt(svc.notif_count) || 0) + 1);
+                const maxCount = Math.max(...activos.map(s => parseInt(s.notif_count) || 0));
+                const newCount = Math.min(3, maxCount + 1);
                 const dateField = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'][newCount - 1];
                 const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                await fetch('api/cliente_servicios.php', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
-                });
+                await Promise.all(activos.map(svc =>
+                    fetch('api/cliente_servicios.php', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
+                    })
+                ));
             }
         }
         loadNotes();
@@ -1840,7 +1839,10 @@ function renderNotifProgressCard(svcs) {
     });
     const svc   = activos[0];
     const count = Math.min(3, parseInt(svc.notif_count) || 0);
-    const days  = Math.ceil((new Date(svc.fecha_vencimiento + 'T12:00:00') - new Date()) / 864e5);
+    // Calcular días restantes comparando fechas completas desde medianoche (evita desfase por hora del día)
+    const _hoy   = new Date(); _hoy.setHours(0, 0, 0, 0);
+    const _vence = new Date(svc.fecha_vencimiento + 'T00:00:00');
+    const days   = Math.round((_vence - _hoy) / 864e5);
     const daysLabel = days > 0 ? `Vence en ${days}d` : (days === 0 ? 'Vence hoy' : 'Vencido');
     const dates = [svc.notif_r1_at, svc.notif_r2_at, svc.notif_r3_at];
     const steps = ['1er aviso', '2do aviso', '3er aviso'];
@@ -3666,74 +3668,74 @@ async function registrarPagoDirecto() {
     loadNotes();
 }
 
-/* ── REGISTRAR PAGO (modal legacy — no usado desde botón principal) ──────────── */
+/* ── REGISTRAR PAGO (modal con servicios automáticos) ───────────────────────── */
 let _rpServicios = []; // cache de servicios activos del cliente
 
 async function openRegistrarPagoModal() {
-    // Pre-cargar fecha de hoy
+    // Resetear campos
     document.getElementById('rpFechaPago').value = new Date().toISOString().split('T')[0];
-    document.getElementById('rpConcepto').value = '';
-    document.getElementById('rpMonto').value = '';
-
-    // Cargar servicios activos del cliente
-    const sel = document.getElementById('rpServicioSelect');
-    sel.innerHTML = '<option value="">Cargando...</option>';
-    sel.disabled = true;
-
-    try {
-        const r = await fetch(`api/renovar_servicios.php?cliente_id=${clienteId}&action=preview`);
-        const d = await r.json();
-        _rpServicios = d.preview || [];
-
-        // También incluir pagos únicos (frecuencia unico)
-        const r2 = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}&estado=activo`);
-        const d2 = await r2.json();
-        const unicos = (d2.data || []).filter(s => s.frecuencia === 'unico');
-        // Combinar: recurrentes del preview + únicos
-        const recurrentes = _rpServicios.map(s => ({
-            cs_id:          s.id,
-            servicio_id:    s.servicio_id,
-            servicio_nombre:s.servicio_nombre,
-            frecuencia:     s.frecuencia,
-            monto:          s.monto_renovacion || 0
-        }));
-        const unicosMap = unicos.map(s => ({
-            cs_id:          s.id,
-            servicio_id:    s.servicio_id,
-            servicio_nombre:s.servicio_nombre || s.nombre,
-            frecuencia:     'unico',
-            monto:          s.monto_renovacion || 0
-        }));
-        _rpServicios = [...recurrentes, ...unicosMap];
-    } catch(e) { _rpServicios = []; }
-
-    sel.innerHTML = '<option value="">— Seleccionar servicio —</option>';
-    _rpServicios.forEach((s, i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = s.servicio_nombre + (s.frecuencia && s.frecuencia !== 'unico' ? ` (${s.frecuencia})` : '');
-        sel.appendChild(opt);
-    });
-    // Si solo hay uno, seleccionarlo
-    if (_rpServicios.length === 1) {
-        sel.value = 0;
-        rpOnServicioChange();
-    }
-    sel.disabled = false;
+    document.getElementById('rpConcepto').value  = '';
+    const lista = document.getElementById('rpServiciosLista');
+    const total = document.getElementById('rpTotalDisplay');
+    lista.innerHTML = '<div style="padding:18px;text-align:center;color:#94a3b8;font-size:13px">Cargando servicios...</div>';
+    total.textContent = '$ 0 COP';
 
     document.getElementById('registrarPagoModal').classList.add('show');
-}
 
-function rpOnServicioChange() {
-    const idx = document.getElementById('rpServicioSelect').value;
-    if (idx === '' || !_rpServicios[idx]) return;
-    const svc = _rpServicios[idx];
-    if (!document.getElementById('rpMonto').value) {
-        document.getElementById('rpMonto').value = svc.monto || '';
+    // Cargar servicios activos
+    try {
+        // Recurrentes via preview
+        const [r1, r2] = await Promise.all([
+            fetch(`api/renovar_servicios.php?cliente_id=${clienteId}&action=preview`),
+            fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`)
+        ]);
+        const d1 = await r1.json();
+        const d2 = await r2.json();
+
+        const recurrentes = (d1.preview || []).map(s => ({
+            cs_id:           s.id,
+            servicio_id:     s.servicio_id,
+            servicio_nombre: s.servicio_nombre,
+            frecuencia:      s.frecuencia,
+            monto:           parseFloat(s.monto_renovacion) || 0
+        }));
+        const allSvcs = (d2.data || []).filter(s => s.estado === 'activo');
+        const recIds  = new Set(recurrentes.map(s => s.cs_id));
+        const unicos  = allSvcs
+            .filter(s => s.frecuencia === 'unico' && !recIds.has(s.id))
+            .map(s => ({
+                cs_id:           s.id,
+                servicio_id:     s.servicio_id,
+                servicio_nombre: s.servicio_nombre || s.nombre_display || 'Servicio',
+                frecuencia:      'unico',
+                monto:           parseFloat(s.monto_renovacion) || 0
+            }));
+
+        _rpServicios = [...recurrentes, ...unicos];
+    } catch(e) { _rpServicios = []; }
+
+    if (!_rpServicios.length) {
+        lista.innerHTML = '<div style="padding:18px;text-align:center;color:#94a3b8;font-size:13px">Sin servicios activos para registrar</div>';
+        return;
     }
-    if (!document.getElementById('rpConcepto').value) {
-        document.getElementById('rpConcepto').value = 'Pago – ' + svc.servicio_nombre;
-    }
+
+    // Renderizar tabla de servicios (solo lectura)
+    const freqLabel = { mes:'Mensual', trimestre:'Trimestral', semestre:'Semestral', año:'Anual', unico:'Único' };
+    const rows = _rpServicios.map(s => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid #f1f5f9;gap:8px">
+            <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.servicio_nombre}</div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:2px">${freqLabel[s.frecuencia] || s.frecuencia}</div>
+            </div>
+            <div style="font-size:13px;font-weight:800;color:#0f172a;white-space:nowrap">
+                $ ${s.monto.toLocaleString('es-CO')} <span style="font-size:10px;font-weight:500;color:#64748b">COP</span>
+            </div>
+        </div>`).join('');
+    lista.innerHTML = `<div style="background:#fff">${rows}</div>`;
+    lista.lastElementChild.lastElementChild?.style.setProperty('border-bottom', 'none');
+
+    const totalSum = _rpServicios.reduce((acc, s) => acc + s.monto, 0);
+    total.textContent = '$ ' + totalSum.toLocaleString('es-CO') + ' COP';
 }
 
 function closeRegistrarPagoModal() {
@@ -3741,64 +3743,73 @@ function closeRegistrarPagoModal() {
 }
 
 async function confirmarRegistrarPago() {
-    const idx     = document.getElementById('rpServicioSelect').value;
-    const monto   = parseFloat(document.getElementById('rpMonto').value);
-    const fecha   = document.getElementById('rpFechaPago').value;
+    const fecha    = document.getElementById('rpFechaPago').value;
     const concepto = document.getElementById('rpConcepto').value.trim();
 
-    if (idx === '' || !_rpServicios[idx]) { showToast('Selecciona un servicio', 'error'); return; }
-    if (!monto || monto <= 0)             { showToast('Ingresa un monto válido', 'error'); return; }
-    if (!fecha)                           { showToast('Selecciona la fecha de pago', 'error'); return; }
+    if (!_rpServicios.length) { showToast('No hay servicios para registrar', 'error'); return; }
+    if (!fecha)               { showToast('Selecciona la fecha de pago', 'error'); return; }
 
-    const svc = _rpServicios[idx];
-    const btn = document.getElementById('rpConfirmBtn');
+    const btn  = document.getElementById('rpConfirmBtn');
     const orig = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Registrando...';
 
+    const freqMap = { mes:'mensual', trimestre:'trimestral', semestre:'semestral', año:'anual', unico:'unico' };
+    const totalMonto = _rpServicios.reduce((a, s) => a + s.monto, 0);
+    const nombres    = _rpServicios.map(s => s.servicio_nombre);
+    // Frecuencia representativa: la del primer servicio recurrente, o 'mensual' por defecto
+    const freqRep = freqMap[(_rpServicios.find(s => s.frecuencia !== 'unico') || _rpServicios[0]).frecuencia] || 'mensual';
+
     try {
+        // ── 1. Una sola transacción con el total ─────────────────────────────
+        // titulo = nombres de servicios (texto principal en la tabla de movimientos)
+        const tituloTx = nombres.length === 1
+            ? nombres[0]
+            : nombres.length <= 3
+                ? nombres.join(' · ')
+                : `Suscripción (${nombres.length} servicios)`;
         const payload = {
-            tipo:        'ingreso',
-            monto,
-            concepto:    concepto || ('Pago – ' + svc.servicio_nombre),
-            titulo:      'Pago de servicio',
-            descripcion: 'Registrado manualmente desde ficha de cliente.',
-            fecha_pago:  fecha,
+            tipo:              'ingreso',
+            monto:             totalMonto,
+            concepto:          concepto || tituloTx,
+            titulo:            tituloTx,
+            descripcion:       nombres.join(', '),
+            fecha_pago:        fecha,
             fecha_vencimiento: fecha,
-            estado:      'pagado',
-            cliente_id:  clienteId,
-            servicio_id: svc.servicio_id || null,
-            frecuencia:  svc.frecuencia === 'unico' ? 'unico' : ({mes:'mensual',trimestre:'trimestral',semestre:'semestral',año:'anual'}[svc.frecuencia] || svc.frecuencia),
+            estado:            'pagado',
+            cliente_id:        clienteId,
+            servicio_id:       null,   // cubre todos los servicios
+            frecuencia:        freqRep,
         };
         const r = await fetch('api/transacciones.php', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload)
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
         const d = await r.json();
+
         if (d.success || d.id) {
-            // Si es servicio recurrente, renovar fechas automáticamente
-            if (svc.frecuencia && svc.frecuencia !== 'unico' && svc.cs_id) {
-                await fetch('api/renovar_servicios.php', {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ cliente_id: clienteId, ids: [svc.cs_id], action: 'renovar' })
-                });
-                // Resetear contador de recordatorios al renovar
-                await fetch('api/cliente_servicios.php', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: svc.cs_id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
-                });
+            // ── 2. Renovar cada servicio recurrente + resetear recordatorios ──
+            for (const svc of _rpServicios) {
+                if (svc.frecuencia !== 'unico' && svc.cs_id) {
+                    await fetch('api/renovar_servicios.php', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cliente_id: clienteId, ids: [svc.cs_id], action: 'renovar' })
+                    });
+                    fetch('api/cliente_servicios.php', {
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: svc.cs_id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
+                    });
+                }
             }
-            // Registrar en historial
-            const montoFmt = monto.toLocaleString('es-CO');
+            // ── 3. Nota en historial ─────────────────────────────────────────
+            const totalFmt = totalMonto.toLocaleString('es-CO');
             await fetch('api/cliente_notas.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cliente_id: clienteId, nota: `Pago registrado: $${montoFmt} COP — ${svc.servicio_nombre}` })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente_id: clienteId,
+                    nota: `Pago registrado: $${totalFmt} COP — ${nombres.join(', ')}` })
             });
-            showToast('✓ Pago registrado — servicio renovado', 'success');
+            const n = _rpServicios.length;
+            showToast(`✓ Pago registrado — ${n} servicio${n > 1 ? 's' : ''} renovado${n > 1 ? 's' : ''}`, 'success');
             closeRegistrarPagoModal();
             loadServices();
             loadNotes();
@@ -4037,21 +4048,25 @@ async function confirmarEnvioMsgEmail() {
             fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ cliente_id: clienteId, nota: 'Correo enviado: ' + _msgPlantilla.nombre })
             }).then(() => loadNotes());
-            // Incrementar recordatorio del servicio más próximo
+            // Incrementar recordatorio en TODOS los servicios activos del cliente
             fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`)
                 .then(rs => rs.json())
                 .then(ds => {
                     const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
                     if (!activos.length) return;
                     activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
-                    const svc = activos[0];
-                    const newCount = Math.min(3, (parseInt(svc.notif_count) || 0) + 1);
+                    // Tomar el conteo actual del primer servicio para saber qué recordatorio sigue
+                    const maxCount = Math.max(...activos.map(s => parseInt(s.notif_count) || 0));
+                    const newCount = Math.min(3, maxCount + 1);
                     const dateField = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'][newCount - 1];
                     const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                    fetch('api/cliente_servicios.php', {
-                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
-                    }).then(() => loadServices());
+                    // Actualizar todos los servicios activos para mantener sincronía
+                    Promise.all(activos.map(svc =>
+                        fetch('api/cliente_servicios.php', {
+                            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
+                        })
+                    )).then(() => loadServices());
                 });
             closeMensajesModal();
             showToast('✅ ' + d.message, 'success');
@@ -5337,8 +5352,14 @@ async function enviarNotifPrueba() {
         let d;
         try { d = await r.json(); }
         catch { showToast('Respuesta inesperada del servidor (status ' + r.status + ')', 'error'); return; }
-        if (d.success) showToast('✓ Correo de prueba enviado al cliente', 'success');
-        else showToast(d.error || 'Error al enviar', 'error');
+        if (d.success) {
+            showToast('✓ ' + (d.message || 'Recordatorio enviado y registrado'), 'success');
+            // Refrescar el estado del card de recordatorios y el modal
+            loadServices();
+            cargarEstadoFilasNotif();
+        } else {
+            showToast(d.error || 'Error al enviar', 'error');
+        }
     } catch(e) {
         showToast('Error de red: ' + e.message, 'error');
     } finally {
