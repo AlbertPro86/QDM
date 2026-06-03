@@ -100,14 +100,14 @@ img{max-width:100%;display:block}
 
 /* dot-grid hero background */
 .hero::before{
-  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(120,120,120,.28) 1.5px,transparent 1.5px);
-  background-size:28px 28px;
-  animation:dotSlide 20s linear infinite;
+  content:'';position:absolute;top:68px;left:0;right:0;bottom:0;z-index:1;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(120,120,120,.25) 1.5px,transparent 1.5px);
+  background-size:42px 42px;
+  animation:dotSlide 24s linear infinite;
 }
-@keyframes dotSlide{0%{background-position:0 0}100%{background-position:28px 28px}}
+@keyframes dotSlide{0%{background-position:0 0}100%{background-position:42px 42px}}
 /* canvas wave encima (opcional, progresivo) */
-#heroBg{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;display:block;opacity:0}
+#heroBg{position:absolute;top:68px;left:0;right:0;bottom:0;width:100%;z-index:2;pointer-events:none;display:block;opacity:0}
 .hand{display:inline-block;animation:wave 2.6s ease-in-out infinite;transform-origin:70% 80%}
 @keyframes wave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(16deg)}80%{transform:rotate(-8deg)}90%{transform:rotate(12deg)}}
 

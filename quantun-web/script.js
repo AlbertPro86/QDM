@@ -8,7 +8,7 @@
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var sec  = canvas.parentElement;
-    var GAP  = 28;
+    var GAP  = 42;
     var W = 0, H = 0;
 
     function resize() {
