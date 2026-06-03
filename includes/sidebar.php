@@ -161,6 +161,13 @@ try {
             <span class="nav-link-text">Configuraciones</span>
         </a>
 
+        <a href="archivo.php" class="nav-link <?= $currentPage === 'archivo' ? 'active' : '' ?>" id="nav-archivo" title="Archivo">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
+            <span class="nav-link-text">Archivo</span>
+        </a>
+
         <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.5' ?>;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.5' ?>'">
             <span style="position:relative;display:inline-flex;flex-shrink:0">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" width="20" height="20">
