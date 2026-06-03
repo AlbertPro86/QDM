@@ -723,11 +723,19 @@ async function loadAccesos(){
             const pid='apwd'+i;
             const hasEmail=a.correo&&a.correo.trim();
             const hasPwd=a.clave&&a.clave.trim();
+            const hasUrl=a.url&&a.url.trim();
+            let urlHref=hasUrl?((/^https?:\/\//i.test(a.url)?a.url:'https://'+a.url)):'';
+            let urlLabel=hasUrl?a.url.replace(/^https?:\/\//i,'').replace(/\/$/,''):'';
             return`<div class="acc-card">
                 <div class="acc-title">
                     <div class="acc-ico"><svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg></div>
                     ${esc(a.nombre)}
                 </div>
+                ${hasUrl?`<div class="acc-row">
+                    <span class="acc-lbl">Web</span>
+                    <a class="acc-val" href="${esc(urlHref)}" target="_blank" rel="noopener" style="color:#0d9488;text-decoration:none;font-family:inherit;font-size:12px;font-weight:600" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">${esc(urlLabel)}</a>
+                    <button class="acc-btn" title="Abrir enlace" onclick="window.open('${esc(urlHref)}','_blank')"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
+                </div>`:''}
                 ${hasEmail?`<div class="acc-row">
                     <span class="acc-lbl">Usuario</span>
                     <span class="acc-val" id="ae${i}">${esc(a.correo)}</span>

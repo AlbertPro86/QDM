@@ -336,6 +336,7 @@ include __DIR__ . '/includes/header.php';
                         <thead>
                             <tr>
                                 <th>Nombre / Descripción</th>
+                                <th>URL / Enlace</th>
                                 <th>Correo</th>
                                 <th>Clave</th>
                                 <th>Fecha creación</th>
@@ -4810,6 +4811,10 @@ async function confirmarEnvioMsgEmail() {
                     </button>
                 </div>
             </div>
+            <div class="form-group" style="margin:0">
+                <label class="form-label">URL / Enlace web</label>
+                <input id="credUrl" class="form-input" type="url" placeholder="https://ejemplo.com/login">
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeCredModal()">Cancelar</button>
@@ -4929,14 +4934,21 @@ function renderCredenciales(list) {
     credenciales = list;
     const tbody = document.getElementById('credencialesTable');
     if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--color-text-light)">Sin credenciales registradas. Haz clic en <strong>Agregar</strong> para añadir.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--color-text-light)">Sin credenciales registradas. Haz clic en <strong>Agregar</strong> para añadir.</td></tr>';
         return;
     }
     tbody.innerHTML = list.map(c => {
         const fecha = new Date(c.created_at).toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'});
+        const urlDisplay = c.url ? (() => {
+            let href = c.url.trim();
+            if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
+            const label = c.url.replace(/^https?:\/\//i,'').replace(/\/$/,'');
+            return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" style="font-size:12px;color:#0d9488;text-decoration:none;display:flex;align-items:center;gap:4px;max-width:180px" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(label)}</span></a>`;
+        })() : '<span style="color:#cbd5e1">—</span>';
         return `
         <tr>
             <td><span style="font-weight:700;color:#0f172a;font-size:12px">${escapeHtml(c.nombre)}</span></td>
+            <td>${urlDisplay}</td>
             <td style="font-size:12px;color:#0f172a">${escapeHtml(c.correo) || '<span style="color:#cbd5e1">—</span>'}</td>
             <td>
                 <div style="display:flex;align-items:center;gap:6px">
@@ -4980,6 +4992,7 @@ function openCredModal(id = null) {
     document.getElementById('credNombre').value = '';
     document.getElementById('credCorreo').value = '';
     document.getElementById('credClave').value  = '';
+    document.getElementById('credUrl').value    = '';
     document.getElementById('credModalTitle').textContent = 'Nueva credencial';
     if (id) {
         const c = credenciales.find(x => x.id == id);
@@ -4988,6 +5001,7 @@ function openCredModal(id = null) {
             document.getElementById('credNombre').value  = c.nombre;
             document.getElementById('credCorreo').value  = c.correo;
             document.getElementById('credClave').value   = c.clave;
+            document.getElementById('credUrl').value     = c.url || '';
             document.getElementById('credModalTitle').textContent = 'Editar credencial';
         }
     }
@@ -5017,6 +5031,7 @@ async function saveCred() {
         nombre:      nombre,
         correo:      document.getElementById('credCorreo').value.trim(),
         clave:       document.getElementById('credClave').value.trim(),
+        url:         document.getElementById('credUrl').value.trim(),
     };
 
     btn.disabled = true;
@@ -5907,9 +5922,9 @@ async function eliminarRut() {
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center">
-            <a href="portal_admin.php" target="_blank" style="font-size:12.5px;color:var(--color-info);text-decoration:none;display:flex;align-items:center;gap:4px" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">
+            <a href="portal_cliente.php" target="_blank" style="font-size:12.5px;color:var(--color-info);text-decoration:none;display:flex;align-items:center;gap:4px" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                Gestión completa del portal
+                Acceso al portal del cliente
             </a>
             <button class="btn btn-outline sm" onclick="cerrarPortalModal()">Cerrar</button>
         </div>

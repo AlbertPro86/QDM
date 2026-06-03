@@ -285,8 +285,11 @@ if ($action === 'accesos') {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     } catch (PDOException $e) {}
 
+    // Auto-migración de columna url si no existe
+    try { $pdo->exec("ALTER TABLE crm_cliente_credenciales ADD COLUMN url VARCHAR(500) NOT NULL DEFAULT ''"); } catch (PDOException $e) {}
+
     $stmt = $pdo->prepare("
-        SELECT id, nombre, correo, clave, created_at
+        SELECT id, nombre, correo, clave, url, created_at
         FROM crm_cliente_credenciales
         WHERE cliente_id = ?
         ORDER BY created_at DESC
