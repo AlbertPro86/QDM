@@ -108,12 +108,7 @@ include __DIR__ . '/includes/header.php';
                 <span style="font-size:12px;color:#94a3b8"><?= sanitize($cliente['nit_cedula']) ?></span>
             </div>
             <?php endif; ?>
-            <?php if($cliente['direccion']): ?>
-            <div style="display:flex;align-items:center;gap:6px;min-width:0">
-                <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span style="font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px" title="<?= sanitize($cliente['direccion']) ?>"><?= sanitize($cliente['direccion']) ?></span>
-            </div>
-            <?php endif; ?>
+            <?php /* dirección oculta del encabezado — sigue disponible en edición */ ?>
             <?php if(!empty($cliente['sitio_web'])): ?>
             <?php $webUrl = preg_match('/^https?:\/\//i',$cliente['sitio_web']) ? $cliente['sitio_web'] : 'https://'.$cliente['sitio_web']; ?>
             <a href="<?= sanitize($webUrl) ?>" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;text-decoration:none;flex-shrink:0" title="Abrir sitio web">
