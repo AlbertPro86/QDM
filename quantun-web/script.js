@@ -21,12 +21,15 @@
     }
 
     function mkPt() {
+      var angle = Math.random() * 6.2832;
+      var speed = 0.6 + Math.random() * 0.8;
       return {
         x:  Math.random() * W,
         y:  Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        r:  1.4 + Math.random() * 1.2
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r:  1.4 + Math.random() * 1.2,
+        wanderAngle: Math.random() * 6.2832
       };
     }
 
@@ -70,11 +73,16 @@
           p.vy += (mdy / md) * f;
         }
 
-        // Fricción + límite de velocidad
-        p.vx *= 0.96;
-        p.vy *= 0.96;
+        // Fuerza de vagabundeo autónoma (cambia dirección suavemente)
+        p.wanderAngle += (Math.random() - 0.5) * 0.25;
+        p.vx += Math.cos(p.wanderAngle) * 0.06;
+        p.vy += Math.sin(p.wanderAngle) * 0.06;
+
+        // Fricción suave + límite de velocidad
+        p.vx *= 0.98;
+        p.vy *= 0.98;
         var spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-        if (spd > 2.2) { p.vx = p.vx/spd*2.2; p.vy = p.vy/spd*2.2; }
+        if (spd > 2.8) { p.vx = p.vx/spd*2.8; p.vy = p.vy/spd*2.8; }
 
         p.x += p.vx;
         p.y += p.vy;
