@@ -47,7 +47,7 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 .hero-company{font-size:24px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.02em}
 .hero-person{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;display:none}
 .hero-person b{color:rgba(255,255,255,.72);font-weight:600}
-.hero-nit{font-size:11px;color:rgba(255,255,255,.25);margin-top:2px}
+.hero-nit{display:none}
 .hero-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}
 .hpill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.01em}
 .hpill.ok    {background:rgba(34,197,94,.15);color:#6EE7A8}
@@ -327,7 +327,7 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
         <div class="hero-right">
             <div class="hero-vlabel">Valor de suscripción</div>
             <div class="hero-vnum" id="heroValor">—</div>
-            <div class="hero-vcop">COP</div>
+            <div class="hero-vcop">$</div>
             <div class="hero-renov" id="heroRenov"></div>
         </div>
     </div>
