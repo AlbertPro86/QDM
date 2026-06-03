@@ -268,6 +268,10 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
             <div class="hero-company" id="heroNombre"><?= $nombre ?></div>
             <div class="hero-person" id="heroContact">Encargado: <b id="heroContactName"></b></div>
             <div class="hero-nit" id="heroNit"></div>
+            <a class="hero-web" id="heroWeb" href="#" target="_blank" rel="noopener" style="display:none;margin-top:5px;font-size:11.5px;font-weight:600;color:rgba(198,242,78,.75);text-decoration:none;align-items:center;gap:5px" onmouseenter="this.style.color='#C6F24E'" onmouseleave="this.style.color='rgba(198,242,78,.75)'">
+                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                <span id="heroWebLabel"></span>
+            </a>
             <div class="hero-pills" id="heroPills"><span class="hpill grey">Cargando…</span></div>
         </div>
         <div class="hero-right">
@@ -442,6 +446,13 @@ async function loadHero(){
             const p=pd.data;
             document.getElementById('heroNombre').textContent=p.nombre_comercial||'<?= $nombre ?>';
             if(p.nit_cedula) document.getElementById('heroNit').textContent='NIT / ID: '+p.nit_cedula;
+            if(p.sitio_web){
+                const hw=document.getElementById('heroWeb');
+                const href=/^https?:\/\//i.test(p.sitio_web)?p.sitio_web:'https://'+p.sitio_web;
+                hw.href=href;
+                document.getElementById('heroWebLabel').textContent=p.sitio_web.replace(/^https?:\/\//i,'').replace(/\/$/,'');
+                hw.style.display='flex';
+            }
             if(p.persona_contacto){
                 document.getElementById('heroContactName').textContent=p.persona_contacto;
                 document.getElementById('heroContact').style.display='block';
@@ -723,19 +734,11 @@ async function loadAccesos(){
             const pid='apwd'+i;
             const hasEmail=a.correo&&a.correo.trim();
             const hasPwd=a.clave&&a.clave.trim();
-            const hasUrl=a.url&&a.url.trim();
-            let urlHref=hasUrl?((/^https?:\/\//i.test(a.url)?a.url:'https://'+a.url)):'';
-            let urlLabel=hasUrl?a.url.replace(/^https?:\/\//i,'').replace(/\/$/,''):'';
             return`<div class="acc-card">
                 <div class="acc-title">
                     <div class="acc-ico"><svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg></div>
                     ${esc(a.nombre)}
                 </div>
-                ${hasUrl?`<div class="acc-row">
-                    <span class="acc-lbl">Web</span>
-                    <a class="acc-val" href="${esc(urlHref)}" target="_blank" rel="noopener" style="color:#0d9488;text-decoration:none;font-family:inherit;font-size:12px;font-weight:600" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">${esc(urlLabel)}</a>
-                    <button class="acc-btn" title="Abrir enlace" onclick="window.open('${esc(urlHref)}','_blank')"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></button>
-                </div>`:''}
                 ${hasEmail?`<div class="acc-row">
                     <span class="acc-lbl">Usuario</span>
                     <span class="acc-val" id="ae${i}">${esc(a.correo)}</span>
@@ -790,6 +793,7 @@ async function loadPerfil(){
             ${pf('Correo de contacto',p.email_contacto,true)}
             ${pf('Correo de facturación',p.email_facturacion,true)}
             ${pf('Dirección',p.direccion,true)}
+            <div class="pf-field full"><div class="pf-label">Sitio web</div><div class="pf-value ${!p.sitio_web?'empty':''}">${p.sitio_web?`<a href="${/^https?:\/\//i.test(p.sitio_web)?esc(p.sitio_web):'https://'+esc(p.sitio_web)}" target="_blank" rel="noopener" style="color:#0d9488;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>${esc(p.sitio_web)}</a>`:'No registrado'}</div></div>
             <div class="pf-field full"><div class="pf-label">Acceso al portal</div><div class="pf-value">${acceso}</div></div>
         </div>
         <div class="pwd-section">

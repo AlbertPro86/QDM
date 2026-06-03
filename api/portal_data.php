@@ -46,7 +46,7 @@ $action = $_GET['action'] ?? '';
 if ($action === 'perfil') {
     $stmt = $pdo->prepare("
         SELECT nombre_comercial, nit_cedula, email_contacto, email_facturacion,
-               telefono, direccion, persona_contacto, created_at
+               telefono, direccion, persona_contacto, sitio_web, created_at
         FROM clientes WHERE id = ?
     ");
     $stmt->execute([$cid]);
@@ -285,11 +285,8 @@ if ($action === 'accesos') {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     } catch (PDOException $e) {}
 
-    // Auto-migración de columna url si no existe
-    try { $pdo->exec("ALTER TABLE crm_cliente_credenciales ADD COLUMN url VARCHAR(500) NOT NULL DEFAULT ''"); } catch (PDOException $e) {}
-
     $stmt = $pdo->prepare("
-        SELECT id, nombre, correo, clave, url, created_at
+        SELECT id, nombre, correo, clave, created_at
         FROM crm_cliente_credenciales
         WHERE cliente_id = ?
         ORDER BY created_at DESC

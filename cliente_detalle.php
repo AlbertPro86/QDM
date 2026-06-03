@@ -114,6 +114,13 @@ include __DIR__ . '/includes/header.php';
                 <span style="font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px" title="<?= sanitize($cliente['direccion']) ?>"><?= sanitize($cliente['direccion']) ?></span>
             </div>
             <?php endif; ?>
+            <?php if(!empty($cliente['sitio_web'])): ?>
+            <?php $webUrl = preg_match('/^https?:\/\//i',$cliente['sitio_web']) ? $cliente['sitio_web'] : 'https://'.$cliente['sitio_web']; ?>
+            <a href="<?= sanitize($webUrl) ?>" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;text-decoration:none;flex-shrink:0" title="Abrir sitio web">
+                <svg width="13" height="13" fill="none" stroke="#0d9488" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                <span style="font-size:12px;color:#0d9488;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px"><?= sanitize(preg_replace('/^https?:\/\//i','',$cliente['sitio_web'])) ?></span>
+            </a>
+            <?php endif; ?>
         </div>
         <!-- Valor mensual destacado -->
         <span id="totalIngreso" style="font-size:28px;font-weight:800;color:#0E0E0C;font-family:var(--font-secondary);line-height:1;letter-spacing:-.02em;white-space:nowrap;flex-shrink:0">$ 0</span>
@@ -336,7 +343,6 @@ include __DIR__ . '/includes/header.php';
                         <thead>
                             <tr>
                                 <th>Nombre / Descripción</th>
-                                <th>URL / Enlace</th>
                                 <th>Correo</th>
                                 <th>Clave</th>
                                 <th>Fecha creación</th>
@@ -980,6 +986,11 @@ include __DIR__ . '/includes/header.php';
                         <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Dirección</label>
                         <input type="text" class="form-input" id="editDireccion" placeholder="Calle, número, ciudad">
                     </div>
+                </div>
+                <!-- Fila 5: Sitio web -->
+                <div style="margin-bottom:4px">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Sitio Web</label>
+                    <input type="url" class="form-input" id="editSitioWeb" placeholder="https://www.miempresa.com">
                 </div>
             </form>
         </div>
@@ -3844,6 +3855,7 @@ function openEditModal() {
         'email_facturacion' => $cliente['email_facturacion']      ?? '',
         'email_contacto'    => $cliente['email_contacto']         ?? '',
         'direccion'         => $cliente['direccion']              ?? '',
+        'sitio_web'         => $cliente['sitio_web']              ?? '',
     ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 
     document.getElementById('editNombreComercial').value = cliente.nombre_comercial;
@@ -3854,6 +3866,7 @@ function openEditModal() {
     document.getElementById('editEmailFacturacion').value = cliente.email_facturacion;
     document.getElementById('editEmailContacto').value = cliente.email_contacto;
     document.getElementById('editDireccion').value = cliente.direccion;
+    document.getElementById('editSitioWeb').value  = cliente.sitio_web;
 
     document.getElementById('editClientModal').classList.add('show');
 }
@@ -3873,7 +3886,8 @@ async function saveClientData(event) {
         telefono: document.getElementById('editTelefono').value || null,
         email_facturacion: document.getElementById('editEmailFacturacion').value || null,
         email_contacto: document.getElementById('editEmailContacto').value || null,
-        direccion: document.getElementById('editDireccion').value || null
+        direccion: document.getElementById('editDireccion').value || null,
+        sitio_web: document.getElementById('editSitioWeb').value  || null,
     };
 
     try {
@@ -4811,10 +4825,6 @@ async function confirmarEnvioMsgEmail() {
                     </button>
                 </div>
             </div>
-            <div class="form-group" style="margin:0">
-                <label class="form-label">URL / Enlace web</label>
-                <input id="credUrl" class="form-input" type="url" placeholder="https://ejemplo.com/login">
-            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeCredModal()">Cancelar</button>
@@ -4934,21 +4944,14 @@ function renderCredenciales(list) {
     credenciales = list;
     const tbody = document.getElementById('credencialesTable');
     if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--color-text-light)">Sin credenciales registradas. Haz clic en <strong>Agregar</strong> para añadir.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--color-text-light)">Sin credenciales registradas. Haz clic en <strong>Agregar</strong> para añadir.</td></tr>';
         return;
     }
     tbody.innerHTML = list.map(c => {
         const fecha = new Date(c.created_at).toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'});
-        const urlDisplay = c.url ? (() => {
-            let href = c.url.trim();
-            if (!/^https?:\/\//i.test(href)) href = 'https://' + href;
-            const label = c.url.replace(/^https?:\/\//i,'').replace(/\/$/,'');
-            return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" style="font-size:12px;color:#0d9488;text-decoration:none;display:flex;align-items:center;gap:4px;max-width:180px" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(label)}</span></a>`;
-        })() : '<span style="color:#cbd5e1">—</span>';
         return `
         <tr>
             <td><span style="font-weight:700;color:#0f172a;font-size:12px">${escapeHtml(c.nombre)}</span></td>
-            <td>${urlDisplay}</td>
             <td style="font-size:12px;color:#0f172a">${escapeHtml(c.correo) || '<span style="color:#cbd5e1">—</span>'}</td>
             <td>
                 <div style="display:flex;align-items:center;gap:6px">
@@ -4992,7 +4995,6 @@ function openCredModal(id = null) {
     document.getElementById('credNombre').value = '';
     document.getElementById('credCorreo').value = '';
     document.getElementById('credClave').value  = '';
-    document.getElementById('credUrl').value    = '';
     document.getElementById('credModalTitle').textContent = 'Nueva credencial';
     if (id) {
         const c = credenciales.find(x => x.id == id);
@@ -5001,7 +5003,6 @@ function openCredModal(id = null) {
             document.getElementById('credNombre').value  = c.nombre;
             document.getElementById('credCorreo').value  = c.correo;
             document.getElementById('credClave').value   = c.clave;
-            document.getElementById('credUrl').value     = c.url || '';
             document.getElementById('credModalTitle').textContent = 'Editar credencial';
         }
     }
@@ -5031,7 +5032,6 @@ async function saveCred() {
         nombre:      nombre,
         correo:      document.getElementById('credCorreo').value.trim(),
         clave:       document.getElementById('credClave').value.trim(),
-        url:         document.getElementById('credUrl').value.trim(),
     };
 
     btn.disabled = true;

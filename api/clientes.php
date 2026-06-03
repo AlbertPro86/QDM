@@ -20,6 +20,7 @@ foreach ([
     "ALTER TABLE clientes ADD COLUMN persona_contacto  VARCHAR(150) DEFAULT NULL",
     "ALTER TABLE clientes ADD COLUMN nit_cedula        VARCHAR(50)  DEFAULT NULL",
     "ALTER TABLE clientes ADD COLUMN direccion         VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE clientes ADD COLUMN sitio_web         VARCHAR(500) DEFAULT NULL",
 ] as $ddl) {
     try { $pdo->exec($ddl); } catch (PDOException $e) { /* columna ya existe */ }
 }
@@ -118,7 +119,7 @@ switch ($method) {
         $id = $input['id'] ?? null;
         if(!$id) jsonResponse(['error' => 'ID es requerido'], 400);
         
-        $fields = ['nombre_comercial', 'nit_cedula', 'persona_contacto', 'telefono', 'email_facturacion', 'email_contacto', 'direccion', 'responsable', 'ubicacion', 'estado'];
+        $fields = ['nombre_comercial', 'nit_cedula', 'persona_contacto', 'telefono', 'email_facturacion', 'email_contacto', 'direccion', 'sitio_web', 'responsable', 'ubicacion', 'estado'];
         $up = []; $vals = [];
         foreach($fields as $f) { if(isset($input[$f])) { $up[] = "$f = ?"; $vals[] = $input[$f]; } }
         $vals[] = $id;

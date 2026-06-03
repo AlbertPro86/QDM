@@ -25,7 +25,6 @@ try {
             nombre      VARCHAR(255) NOT NULL DEFAULT '',
             correo      VARCHAR(255) NOT NULL DEFAULT '',
             clave       VARCHAR(500) NOT NULL DEFAULT '',
-            url         VARCHAR(500) NOT NULL DEFAULT '',
             created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX idx_cliente (cliente_id)
@@ -38,9 +37,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
 
     case 'GET':
-        // Auto-migración de columna url si no existe
-        try { $pdo->exec("ALTER TABLE crm_cliente_credenciales ADD COLUMN url VARCHAR(500) NOT NULL DEFAULT ''"); } catch (PDOException $e) {}
-
         $cid = intval($_GET['cliente_id'] ?? 0);
         if (!$cid) jsonResponse(['error' => 'cliente_id requerido'], 400);
         $s = $pdo->prepare("SELECT * FROM crm_cliente_credenciales WHERE cliente_id = ? ORDER BY created_at DESC");
@@ -54,11 +50,10 @@ switch ($method) {
         $nom  = trim($in['nombre'] ?? '');
         $mail = trim($in['correo'] ?? '');
         $pass = trim($in['clave']  ?? '');
-        $url  = trim($in['url']    ?? '');
         if (!$cid || !$nom) jsonResponse(['error' => 'cliente_id y nombre son requeridos'], 400);
 
-        $s = $pdo->prepare("INSERT INTO crm_cliente_credenciales (cliente_id, nombre, correo, clave, url) VALUES (?,?,?,?,?)");
-        $s->execute([$cid, $nom, $mail, $pass, $url]);
+        $s = $pdo->prepare("INSERT INTO crm_cliente_credenciales (cliente_id, nombre, correo, clave) VALUES (?,?,?,?)");
+        $s->execute([$cid, $nom, $mail, $pass]);
         $id = $pdo->lastInsertId();
         $row = $pdo->prepare("SELECT * FROM crm_cliente_credenciales WHERE id = ?");
         $row->execute([$id]);
@@ -71,11 +66,10 @@ switch ($method) {
         $nom  = trim($in['nombre'] ?? '');
         $mail = trim($in['correo'] ?? '');
         $pass = trim($in['clave']  ?? '');
-        $url  = trim($in['url']   ?? '');
         if (!$id || !$nom) jsonResponse(['error' => 'id y nombre son requeridos'], 400);
 
-        $s = $pdo->prepare("UPDATE crm_cliente_credenciales SET nombre=?, correo=?, clave=?, url=? WHERE id=?");
-        $s->execute([$nom, $mail, $pass, $url, $id]);
+        $s = $pdo->prepare("UPDATE crm_cliente_credenciales SET nombre=?, correo=?, clave=? WHERE id=?");
+        $s->execute([$nom, $mail, $pass, $id]);
         jsonResponse(['success' => true, 'message' => 'Credencial actualizada']);
         break;
 
