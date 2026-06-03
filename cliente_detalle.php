@@ -628,6 +628,9 @@ include __DIR__ . '/includes/header.php';
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
         Ver
     </button>
+    <button id="mediaVisBtn" onclick="mediaAccion('toggle_vis')" class="media-menu-item">
+        <!-- contenido inyectado por openMediaMenu() -->
+    </button>
     <div style="height:1px;background:var(--color-border);margin:4px 0"></div>
     <button onclick="mediaAccion('eliminar')"  class="media-menu-item" style="color:#dc2626">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -2545,9 +2548,6 @@ function renderMedia(media) {
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
                 ${descLine}
             </div>
-            <button onclick="toggleMediaVis(${m.id},${isVis?0:1},this)" title="${visTitle}" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:5px;transition:all .12s;opacity:${isVis?'1':'.45'}" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='${isVis?'1':'.45'}'">
-                ${eyeIco}
-            </button>
             <button onclick="openMediaMenu(event,this)" data-mid="${m.id}" data-mnombre="${escapeHtml(m.nombre_archivo)}" data-murl="${escapeHtml(m.archivo_url)}" data-mvis="${isVis?1:0}" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
                 <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
             </button>
@@ -2751,7 +2751,14 @@ function openMediaMenu(e, btn) {
         id:     btn.dataset.mid,
         nombre: btn.dataset.mnombre,
         url:    btn.dataset.murl,
+        vis:    parseInt(btn.dataset.mvis ?? 1),
     };
+    // Actualizar botón de visibilidad dinámicamente
+    const visBtn = document.getElementById('mediaVisBtn');
+    const isVis = _mediaMenu.vis === 1;
+    visBtn.innerHTML = isVis
+        ? `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23" stroke-linecap="round"/></svg> Ocultar al cliente`
+        : `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> Mostrar al cliente`;
     const dd = document.getElementById('mediaDropdown');
     dd.style.display = 'block';
     // Posicionar cerca del botón
@@ -2784,6 +2791,7 @@ function mediaAccion(accion) {
         a.href = url; a.download = nombre; a.target = '_blank';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
+    else if (accion === 'toggle_vis') { toggleMediaVis(id, _mediaMenu.vis === 1 ? 0 : 1); }
     else if (accion === 'eliminar') { deleteMedia(id); }
 }
 
