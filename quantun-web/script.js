@@ -22,7 +22,7 @@
 
     function mkPt() {
       var angle = Math.random() * 6.2832;
-      var speed = 0.6 + Math.random() * 0.8;
+      var speed = 0.3 + Math.random() * 0.4;
       return {
         x:  Math.random() * W,
         y:  Math.random() * H,
@@ -74,15 +74,15 @@
         }
 
         // Fuerza de vagabundeo autónoma (cambia dirección suavemente)
-        p.wanderAngle += (Math.random() - 0.5) * 0.25;
-        p.vx += Math.cos(p.wanderAngle) * 0.06;
-        p.vy += Math.sin(p.wanderAngle) * 0.06;
+        p.wanderAngle += (Math.random() - 0.5) * 0.15;
+        p.vx += Math.cos(p.wanderAngle) * 0.03;
+        p.vy += Math.sin(p.wanderAngle) * 0.03;
 
         // Fricción suave + límite de velocidad
-        p.vx *= 0.98;
-        p.vy *= 0.98;
+        p.vx *= 0.985;
+        p.vy *= 0.985;
         var spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-        if (spd > 2.8) { p.vx = p.vx/spd*2.8; p.vy = p.vy/spd*2.8; }
+        if (spd > 1.6) { p.vx = p.vx/spd*1.6; p.vy = p.vy/spd*1.6; }
 
         p.x += p.vx;
         p.y += p.vy;
