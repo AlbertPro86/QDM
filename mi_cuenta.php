@@ -65,59 +65,70 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#0E0E0C;min-height:
 .wrap{max-width:860px;margin:0 auto;padding:20px 16px 64px}
 
 /* ── Section header ───────────────────────────────────────── */
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sh-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A867C}
-.sh-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:#E8E5DD;color:#57544D}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8A867C}
+.sh-badge{font-size:11px;font-weight:800;padding:2px 9px;border-radius:100px;background:#E8E5DD;color:#57544D;min-width:22px;text-align:center}
 
 /* ── Services grid ────────────────────────────────────────── */
-.svcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:24px}
-.svc{background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:16px 16px 14px}
-.svc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
-.svc-name{font-size:14px;font-weight:800;color:#0E0E0C;line-height:1.2;flex:1}
-.svc-price{text-align:right;flex-shrink:0}
-.svc-price-num{font-size:18px;font-weight:900;color:#0E0E0C;line-height:1}
-.svc-price-cop{font-size:10px;font-weight:600;color:#8A867C;letter-spacing:.04em}
-.svc-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.svc-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;font-size:11px;font-weight:600}
+.svcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:28px}
+.svc{background:#fff;border:1px solid #E4E1D9;border-radius:14px;padding:20px;transition:box-shadow .18s,transform .18s;cursor:default}
+.svc:hover{box-shadow:0 6px 24px rgba(0,0,0,.07);transform:translateY(-1px)}
+.svc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.svc-head-left{flex:1;min-width:0}
+.svc-name{font-size:15px;font-weight:800;color:#0E0E0C;line-height:1.25;margin-bottom:6px}
+.svc-price{text-align:right;flex-shrink:0;padding-top:1px}
+.svc-price-num{font-size:20px;font-weight:900;color:#0E0E0C;line-height:1;letter-spacing:-.02em}
+.svc-price-cop{font-size:10px;font-weight:700;color:#8A867C;letter-spacing:.05em;margin-top:2px}
+.svc-divider{height:1px;background:#F0EDE6;margin:0 0 10px}
+.svc-meta{display:flex;gap:6px;flex-wrap:wrap}
+.svc-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:100px;font-size:11px;font-weight:600;white-space:nowrap}
 .svc-chip.ok     {background:#E3F1E8;color:#1A6B41}
 .svc-chip.warn   {background:#FEF3C7;color:#92400E}
 .svc-chip.danger {background:#FEE2E2;color:#991B1B}
 .svc-chip.grey   {background:#F0EDE6;color:#8A867C}
-.svc-chip.blue   {background:#E1E7F2;color:#3F5E9E}
-.badge-st{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:100px;font-size:10.5px;font-weight:700}
-.badge-st.activo    {background:#E3F1E8;color:#1A6B41}
-.badge-st.suspendido{background:#FEF3C7;color:#92400E}
-.badge-st.cancelado {background:#FEE2E2;color:#991B1B}
+.svc-chip.blue   {background:#EEF2FB;color:#3F5E9E}
+.badge-st{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-st::before{content:'';width:6px;height:6px;border-radius:50%}
+.badge-st.activo    {background:#E3F1E8;color:#1A6B41}.badge-st.activo::before{background:#1A6B41}
+.badge-st.suspendido{background:#FEF3C7;color:#92400E}.badge-st.suspendido::before{background:#B45309}
+.badge-st.cancelado {background:#FEE2E2;color:#991B1B}.badge-st.cancelado::before{background:#991B1B}
 
 /* ── Activity tabs ────────────────────────────────────────── */
-.tabs{display:flex;gap:2px;background:#fff;border:1px solid #E4E1D9;border-radius:8px;padding:4px;margin-bottom:14px}
-.tab{flex:1;padding:7px 4px;border:none;border-radius:5px;background:transparent;font-size:12px;font-weight:500;color:#8A867C;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:14px}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tabs{display:inline-flex;min-width:100%;gap:2px;background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:4px}
+.tab{flex:1;min-width:0;padding:8px 6px;border:none;border-radius:7px;background:transparent;font-size:12.5px;font-weight:500;color:#8A867C;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
 .tab:hover{color:#0E0E0C;background:#F5F3EE}
-.tab.on{background:#0E0E0C;color:#fff;font-weight:700}
+.tab.on{background:#0E0E0C;color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .tab.on svg{opacity:1}
-.tab svg{opacity:.6}
-.tab-cnt{font-size:10px;padding:1px 5px;border-radius:100px;background:rgba(255,255,255,.15);color:inherit;font-weight:800;display:none}
+.tab svg{opacity:.55;flex-shrink:0}
+.tab-cnt{font-size:10px;padding:1px 6px;border-radius:100px;background:rgba(255,255,255,.18);color:inherit;font-weight:800;line-height:1.5;display:none}
 .tab.on .tab-cnt{display:inline}
 .pane{display:none}.pane.on{display:block}
 
 /* ── Activity content ─────────────────────────────────────── */
-.act-wrap{background:#fff;border:1px solid #E4E1D9;border-radius:10px;overflow:hidden}
-.act-row{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid #F0EDE6;transition:background .1s}
+.act-wrap{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden}
+.act-row{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-bottom:1px solid #F0EDE6;transition:background .1s}
 .act-row:last-child{border-bottom:none}
-.act-row:hover{background:#FAFAF7}
-.act-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.act-row:hover{background:#FAFAF8}
+.act-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .act-body{flex:1;min-width:0}
-.act-title{font-size:13px;font-weight:600;color:#0E0E0C;line-height:1.3}
-.act-sub{font-size:11.5px;color:#8A867C;margin-top:2px;line-height:1.3}
-.act-right{text-align:right;flex-shrink:0}
-.act-val{font-size:13.5px;font-weight:700;color:#0E0E0C}
-.act-est{font-size:11px;font-weight:700;margin-top:1px}
-.act-est.pagado   {color:#1A6B41}.act-est.pendiente{color:#B45309}.act-est.vencido{color:#991B1B}
-.act-est.completado{color:#1A6B41}.act-est.en_progreso{color:#1E429F}.act-est.pendiente2{color:#B45309}.act-est.cancelado{color:#991B1B}
-.act-more{text-align:center;padding:11px;border-top:1px solid #F0EDE6}
-.act-more button{background:none;border:none;font-size:12.5px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit}
-.act-more button:hover{color:#0E0E0C}
-.prioridad-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:4px}
+.act-title{font-size:13.5px;font-weight:600;color:#0E0E0C;line-height:1.35}
+.act-sub{font-size:11.5px;color:#8A867C;margin-top:2px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-right{text-align:right;flex-shrink:0;min-width:80px}
+.act-val{font-size:14px;font-weight:800;color:#0E0E0C;letter-spacing:-.01em}
+.act-est{font-size:11px;font-weight:700;margin-top:2px;display:inline-block;padding:2px 7px;border-radius:100px}
+.act-est.pagado    {background:#E3F1E8;color:#1A6B41}
+.act-est.pendiente {background:#FEF3C7;color:#B45309}
+.act-est.vencido   {background:#FEE2E2;color:#991B1B}
+.act-est.completado{background:#E3F1E8;color:#1A6B41}
+.act-est.en_progreso{background:#E1E7F2;color:#1E429F}
+.act-est.pendiente2{background:#FEF3C7;color:#B45309}
+.act-est.cancelado {background:#FEE2E2;color:#991B1B}
+.act-more{text-align:center;padding:12px;border-top:1px solid #F0EDE6}
+.act-more button{background:none;border:1px solid #E4E1D9;border-radius:6px;padding:6px 16px;font-size:12.5px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit;transition:all .15s}
+.act-more button:hover{border-color:#0E0E0C;color:#0E0E0C;background:#F5F3EE}
+.prioridad-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px;vertical-align:middle}
 .pr-alta{background:#EF4444}.pr-media{background:#F59E0B}.pr-baja{background:#10B981}
 
 /* ── Docs ─────────────────────────────────────────────────── */
@@ -166,16 +177,35 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#0E0E0C;min-height:
 #revocado.show{display:flex}
 
 /* ── Responsive ───────────────────────────────────────────── */
-@media(max-width:600px){
-    .hero-name{font-size:20px}
-    .hero-value{font-size:32px}
-    .hero-right{text-align:left;width:100%}
-    .tabs{overflow-x:auto}
+@media(max-width:860px){
+    .svcs{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+}
+@media(max-width:640px){
+    .hero-inner{flex-direction:column;gap:16px}
+    .hero-right{text-align:left;width:100%;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+    .hero-name{font-size:22px}
+    .hero-value{font-size:34px}
+    .wrap{padding:16px 12px 56px}
+    .svcs{grid-template-columns:1fr;gap:10px}
+    .act-row{gap:10px;padding:12px 14px}
+    .act-right{min-width:70px}
+    .act-val{font-size:13px}
+}
+@media(max-width:480px){
+    .nav-nm{display:none}
+    .hero{padding:20px 14px 24px}
+    .hero-name{font-size:19px}
+    .hero-value{font-size:30px}
+    .hero-pills{gap:5px}
     .tab span.tl{display:none}
+    .tab{padding:8px 10px}
+    .act-row{flex-wrap:wrap}
+    .act-right{width:100%;text-align:left;padding-left:50px;margin-top:2px}
+    .act-est{font-size:10.5px}
     .perfil-grid{grid-template-columns:1fr}
     .pf-item{border-right:none}
     .pwd-row{flex-direction:column}
-    .svcs{grid-template-columns:1fr}
+    .svc-name{font-size:14px}
 }
 </style>
 </head>
@@ -234,10 +264,11 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#0E0E0C;min-height:
     <div class="svcs" id="svcsGrid"></div>
 
     <!-- SECCIÓN 3: Actividad -->
-    <div class="sh">
+    <div class="sh" style="margin-top:4px">
         <span class="sh-title">Actividad y detalle</span>
     </div>
 
+    <div class="tabs-wrap">
     <div class="tabs">
         <button class="tab on" id="tab-pagos" onclick="setTab('pagos',this)">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -263,6 +294,7 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#0E0E0C;min-height:
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             <span class="tl">Mi Perfil</span>
         </button>
+    </div>
     </div>
 
     <!-- Pane pagos -->
@@ -415,17 +447,18 @@ async function loadSvcs(){
             }else if(esUnico){chipCls='grey';chipTxt='Pago único';}
 
             return`<div class="svc">
-                <div class="svc-top">
-                    <div>
+                <div class="svc-head">
+                    <div class="svc-head-left">
                         <div class="svc-name">${esc(sv.nombre_servicio)}</div>
-                        <div style="margin-top:4px"><span class="badge-st ${esc(sv.estado)}">${sv.estado.charAt(0).toUpperCase()+sv.estado.slice(1)}</span></div>
+                        <span class="badge-st ${esc(sv.estado)}">${sv.estado.charAt(0).toUpperCase()+sv.estado.slice(1)}</span>
                     </div>
-                    ${val>0?`<div class="svc-price"><div class="svc-price-num">${fn(val)}</div><div class="svc-price-cop">COP</div></div>`:''}
+                    ${val>0?`<div class="svc-price"><div class="svc-price-num">${fn(val)}</div><div class="svc-price-cop">COP / ${esc(ff(sv.frecuencia))}</div></div>`:''}
                 </div>
+                <div class="svc-divider"></div>
                 <div class="svc-meta">
-                    <span class="svc-chip blue"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>${esc(ff(sv.frecuencia))}</span>
+                    ${!esUnico?`<span class="svc-chip blue"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>${esc(ff(sv.frecuencia))}</span>`:''}
                     <span class="svc-chip ${chipCls}"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${esc(chipTxt)}</span>
-                    ${sv.fecha_inicio?`<span class="svc-chip grey">Desde ${fd(sv.fecha_inicio)}</span>`:''}
+                    ${sv.fecha_inicio?`<span class="svc-chip grey"><svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Desde ${fd(sv.fecha_inicio)}</span>`:''}
                 </div>
             </div>`;
         }).join('');
@@ -444,11 +477,12 @@ async function loadPagos(append=false){
         document.getElementById('cntPagos').textContent=_pTotal;
         if(!d.data.length&&!append){el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Sin registros de pago</div>';return;}
         const ic={pagado:{bg:'#E3F1E8',c:'#1A6B41'},pendiente:{bg:'#FEF3C7',c:'#B45309'},vencido:{bg:'#FEE2E2',c:'#991B1B'}};
+        const estLabel={pagado:'Pagado',pendiente:'Pendiente',vencido:'Vencido'};
         const rows=d.data.map(tx=>{
             const col=ic[tx.estado]||{bg:'#F0EDE6',c:'#57544D'};
             const fch=tx.fecha_pago||tx.fecha_vencimiento||tx.created_at;
             const sub=[tx.servicio_nombre?esc(tx.servicio_nombre):'',fd(fch)].filter(Boolean).join(' · ');
-            return`<div class="act-row"><div class="act-ico" style="background:${col.bg}"><svg width="14" height="14" fill="none" stroke="${col.c}" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="act-body"><div class="act-title">${esc(tx.titulo||tx.concepto)}</div><div class="act-sub">${sub}</div></div><div class="act-right"><div class="act-val">${fn(tx.monto)}</div><div class="act-est ${esc(tx.estado)}">${tx.estado.charAt(0).toUpperCase()+tx.estado.slice(1)}</div></div></div>`;
+            return`<div class="act-row"><div class="act-ico" style="background:${col.bg}"><svg width="15" height="15" fill="none" stroke="${col.c}" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="act-body"><div class="act-title">${esc(tx.titulo||tx.concepto)}</div><div class="act-sub">${sub}</div></div><div class="act-right"><div class="act-val">${fn(tx.monto)}</div><div class="act-est ${esc(tx.estado)}">${estLabel[tx.estado]||tx.estado}</div></div></div>`;
         }).join('');
         if(append)el.insertAdjacentHTML('beforeend',rows);else el.innerHTML=rows;
         _pOff+=d.data.length;
