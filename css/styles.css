@@ -2101,6 +2101,14 @@ img {
     background: #f1f5f9;
 }
 
+/* ─── Toggle switch (adjuntos visibilidad) ─── */
+.vis-sw { position:relative; width:30px; height:17px; flex-shrink:0; }
+.vis-sw input { opacity:0; width:0; height:0; position:absolute; }
+.vis-sw-sl { position:absolute; inset:0; background:#cbd5e1; border-radius:99px; cursor:pointer; transition:background .2s; }
+.vis-sw-sl::before { content:''; position:absolute; width:11px; height:11px; background:#fff; border-radius:50%; left:3px; top:3px; transition:transform .2s; }
+.vis-sw input:checked + .vis-sw-sl { background:#0d9488; }
+.vis-sw input:checked + .vis-sw-sl::before { transform:translateX(13px); }
+
 /* ─── Print ─── */
 @media print {
     .sidebar, .topbar, .mobile-menu-btn {

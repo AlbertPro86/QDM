@@ -516,6 +516,18 @@ include __DIR__ . '/includes/header.php';
                 </div>
             </div>
         </div>
+            <!-- Visibilidad -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#F0EFEB;border-radius:var(--radius-sm)">
+                <div>
+                    <div style="font-size:12.5px;font-weight:700;color:#1E1D1B">Visible al cliente</div>
+                    <div style="font-size:11px;color:#8A867C;margin-top:1px">El cliente podrá verlo en su portal</div>
+                </div>
+                <label class="vis-sw" style="margin-left:12px">
+                    <input type="checkbox" id="adjuntoVisible" checked>
+                    <span class="vis-sw-sl"></span>
+                </label>
+            </div>
+        </div>
         <div class="modal-footer">
             <button class="btn btn-ghost" onclick="document.getElementById('adjuntoUploadModal').classList.remove('show');_pendingMediaFile=null">Cancelar</button>
             <button class="btn btn-primary" onclick="confirmarSubirAdjunto()">
@@ -2521,13 +2533,22 @@ function renderMedia(media) {
             ? `<div style="display:flex;align-items:center;gap:0;font-size:10px;color:var(--color-text-muted);margin-top:2px;overflow:hidden;max-width:100%">${infoLine}</div>`
             : '';
 
+        const isVis = parseInt(m.visible_cliente ?? 1) === 1;
+        const visTitle = isVis ? 'Visible al cliente — clic para ocultar' : 'Solo interno — clic para mostrar al cliente';
+        const eyeIco = isVis
+            ? `<svg width="13" height="13" fill="none" stroke="#0d9488" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`
+            : `<svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23" stroke-linecap="round"/></svg>`;
+
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--color-border);min-width:0;max-width:100%;overflow:hidden;cursor:default" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background=''">
             ${avatar}
             <div style="flex:1;min-width:0">
                 <a href="${m.archivo_url}" target="_blank" style="display:block;font-size:12px;font-weight:600;color:var(--color-text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${m.nombre_archivo}">${m.nombre_archivo}</a>
                 ${descLine}
             </div>
-            <button onclick="openMediaMenu(event,this)" data-mid="${m.id}" data-mnombre="${escapeHtml(m.nombre_archivo)}" data-murl="${escapeHtml(m.archivo_url)}" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
+            <button onclick="toggleMediaVis(${m.id},${isVis?0:1},this)" title="${visTitle}" style="flex-shrink:0;background:transparent;border:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:5px;transition:all .12s;opacity:${isVis?'1':'.45'}" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='${isVis?'1':'.45'}'">
+                ${eyeIco}
+            </button>
+            <button onclick="openMediaMenu(event,this)" data-mid="${m.id}" data-mnombre="${escapeHtml(m.nombre_archivo)}" data-murl="${escapeHtml(m.archivo_url)}" data-mvis="${isVis?1:0}" title="Opciones" style="flex-shrink:0;background:transparent;border:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--color-text-light);cursor:pointer;border-radius:5px;transition:all .12s" onmouseenter="this.style.color='var(--color-text)';this.style.background='var(--color-surface)'" onmouseleave="this.style.color='var(--color-text-light)';this.style.background='transparent'">
                 <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
             </button>
         </div>`;
@@ -2558,11 +2579,13 @@ function uploadMedia(input) {
 
 async function confirmarSubirAdjunto() {
     if (!_pendingMediaFile) return;
-    const desc  = document.getElementById('adjuntoDesc').value.trim();
-    const fecha = document.getElementById('adjuntoFecha').value;
+    const desc    = document.getElementById('adjuntoDesc').value.trim();
+    const fecha   = document.getElementById('adjuntoFecha').value;
+    const visible = document.getElementById('adjuntoVisible').checked ? 1 : 0;
     const formData = new FormData();
     formData.append('archivo', _pendingMediaFile);
     formData.append('cliente_id', clienteId);
+    formData.append('visible_cliente', visible);
     if (desc)  formData.append('descripcion', desc);
     if (fecha) formData.append('fecha_documento', fecha);
 
@@ -2698,6 +2721,24 @@ function hideMediaPreview() {
     setTimeout(() => {
         if (!_previewActive) document.getElementById('mediaPreviewInner').innerHTML = '';
     }, 50);
+}
+
+/* ── VISIBILIDAD ADJUNTO ───────────────────────────────────────────────── */
+async function toggleMediaVis(id, newVal, btn) {
+    try {
+        const r = await fetch('api/cliente_archivos.php', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, visible_cliente: newVal })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showToast(newVal ? 'Visible al cliente' : 'Solo interno', newVal ? 'success' : 'info');
+            loadMedia();
+        } else {
+            showToast('Error al actualizar', 'error');
+        }
+    } catch(e) { showToast('Error al actualizar', 'error'); }
 }
 
 /* ── KEBAB MENÚ ADJUNTOS ────────────────────────────────────────────────── */

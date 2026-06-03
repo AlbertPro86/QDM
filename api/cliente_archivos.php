@@ -17,6 +17,7 @@ $pdo = db();
 // Auto-migración
 try { $pdo->exec("ALTER TABLE clientes_archivos ADD COLUMN descripcion VARCHAR(500) DEFAULT NULL"); } catch(PDOException $e){}
 try { $pdo->exec("ALTER TABLE clientes_archivos ADD COLUMN fecha_documento DATE DEFAULT NULL"); } catch(PDOException $e){}
+try { $pdo->exec("ALTER TABLE clientes_archivos ADD COLUMN visible_cliente TINYINT(1) NOT NULL DEFAULT 1"); } catch(PDOException $e){}
 
 switch ($method) {
 
@@ -54,13 +55,14 @@ switch ($method) {
             jsonResponse(['error' => 'Error al guardar el archivo'], 500);
         }
 
-        $descripcion    = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : null;
-        $fechaDocumento = !empty($_POST['fecha_documento']) ? $_POST['fecha_documento'] : date('Y-m-d');
+        $descripcion      = isset($_POST['descripcion'])      ? trim($_POST['descripcion'])    : null;
+        $fechaDocumento   = !empty($_POST['fecha_documento'])  ? $_POST['fecha_documento']      : date('Y-m-d');
+        $visibleCliente   = isset($_POST['visible_cliente'])   ? (int)$_POST['visible_cliente'] : 1;
 
         $stmt = $pdo->prepare(
             "INSERT INTO clientes_archivos
-                (cliente_id, nombre_archivo, archivo_url, tipo_archivo, peso_archivo, descripcion, fecha_documento)
-             VALUES (?, ?, ?, ?, ?, ?, ?)"
+                (cliente_id, nombre_archivo, archivo_url, tipo_archivo, peso_archivo, descripcion, fecha_documento, visible_cliente)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
             $cliente_id,
@@ -70,9 +72,20 @@ switch ($method) {
             $file['size'],
             $descripcion ?: null,
             $fechaDocumento,
+            $visibleCliente,
         ]);
 
         jsonResponse(['success' => true, 'message' => 'Archivo subido correctamente']);
+        break;
+
+    case 'PATCH':
+        // Actualizar visible_cliente
+        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $id             = intval($input['id'] ?? 0);
+        $visibleCliente = intval($input['visible_cliente'] ?? 1);
+        if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
+        $pdo->prepare("UPDATE clientes_archivos SET visible_cliente = ? WHERE id = ?")->execute([$visibleCliente, $id]);
+        jsonResponse(['success' => true, 'visible_cliente' => $visibleCliente]);
         break;
 
     case 'DELETE':

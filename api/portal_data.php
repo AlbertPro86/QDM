@@ -146,7 +146,7 @@ if ($action === 'historial') {
 if ($action === 'documentos') {
     $stmt = $pdo->prepare("
         SELECT id, nombre_archivo, tipo_archivo, archivo_url, descripcion, created_at
-        FROM clientes_archivos WHERE cliente_id = ? ORDER BY created_at DESC
+        FROM clientes_archivos WHERE cliente_id = ? AND visible_cliente = 1 ORDER BY created_at DESC
     ");
     $stmt->execute([$cid]);
     $archivos = $stmt->fetchAll();
