@@ -27,7 +27,17 @@ if (empty($_SESSION['portal_logged_in']) || empty($_SESSION['portal_cliente_id']
     pdJson(['error' => 'No autorizado'], 401);
 }
 
-$cid    = (int)$_SESSION['portal_cliente_id'];
+$cid = (int)$_SESSION['portal_cliente_id'];
+
+// Verificación en vivo: si el admin bloqueó al cliente, la sesión queda inválida inmediatamente
+$_chk = $pdo->prepare("SELECT portal_activo FROM clientes WHERE id = ?");
+$_chk->execute([$cid]);
+$_chkRow = $_chk->fetch();
+if (!$_chkRow || !(int)$_chkRow['portal_activo']) {
+    // Limpiar sesión y rechazar
+    unset($_SESSION['portal_logged_in'], $_SESSION['portal_cliente_id'], $_SESSION['portal_nombre'], $_SESSION['portal_email']);
+    pdJson(['error' => 'Acceso revocado. Tu sesión ha sido cerrada.', 'revocado' => true], 403);
+}
 $pdo    = db();
 $action = $_GET['action'] ?? '';
 

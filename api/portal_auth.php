@@ -4,6 +4,7 @@
  * POST { action:'login',  email, password } → inicia sesión de cliente
  * POST { action:'logout' }                  → cierra sesión
  * GET  { action:'check'  }                  → devuelve estado de sesión
+ * POST { action:'change_password', actual, nueva, confirm } → cambio de contraseña
  */
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
@@ -19,8 +20,10 @@ function portalJson($data, $code = 200) {
 
 $pdo = db();
 
-// Auto-migración: columna portal_password
+// Auto-migraciones: columnas del portal en tabla clientes
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_password VARCHAR(255) DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_activo TINYINT(1) NOT NULL DEFAULT 1"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_ultimo_acceso DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input  = ($method === 'POST') ? (json_decode(file_get_contents('php://input'), true) ?: []) : [];
@@ -58,7 +61,7 @@ if ($action === 'login') {
     }
 
     $stmt = $pdo->prepare("
-        SELECT id, nombre_comercial, nit_cedula, portal_password
+        SELECT id, nombre_comercial, nit_cedula, portal_password, portal_activo
         FROM clientes
         WHERE LOWER(TRIM(email_contacto)) = ?
            OR LOWER(TRIM(email_facturacion)) = ?
@@ -69,6 +72,11 @@ if ($action === 'login') {
 
     if (!$cliente) {
         portalJson(['error' => 'Credenciales incorrectas. Verifica tu email.'], 401);
+    }
+
+    // Verificar si el acceso está activo
+    if (!$cliente['portal_activo']) {
+        portalJson(['error' => 'Tu acceso al portal está desactivado. Comunícate con QUANTUN Digital.'], 403);
     }
 
     // Verificar contraseña
@@ -84,6 +92,9 @@ if ($action === 'login') {
         portalJson(['error' => 'Credenciales incorrectas. Verifica tu contraseña.'], 401);
     }
 
+    // Actualizar último acceso
+    $pdo->prepare("UPDATE clientes SET portal_ultimo_acceso = NOW() WHERE id = ?")->execute([$cliente['id']]);
+
     // Guardar sesión de portal (coexiste con la sesión CRM sin conflicto)
     $_SESSION['portal_logged_in']  = true;
     $_SESSION['portal_cliente_id'] = (int)$cliente['id'];
@@ -96,7 +107,7 @@ if ($action === 'login') {
     ]);
 }
 
-// ─── CAMBIAR CONTRASEÑA ───────────────────────────────────────────────────────
+// ─── CAMBIAR CONTRASEÑA (cliente autenticado) ────────────────────────────────
 if ($action === 'change_password') {
     if (empty($_SESSION['portal_cliente_id'])) {
         portalJson(['error' => 'No autenticado'], 401);

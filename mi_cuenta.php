@@ -499,11 +499,27 @@ async function ptLogout() {
     window.location.href = 'portal_cliente.php';
 }
 
+// ── Manejo de sesión revocada ───────────────────────────────────────────────
+// Si el admin bloquea al cliente a mitad de sesión, la API devuelve revocado:true
+function ptCheckRevocado(resp) {
+    if (resp && resp.revocado) {
+        document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;padding:24px;text-align:center;font-family:Inter,sans-serif">
+            <svg width="48" height="48" fill="none" stroke="#B0382F" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <div style="font-size:18px;font-weight:800">Acceso revocado</div>
+            <div style="font-size:14px;color:#57544D;max-width:360px">Tu acceso al portal ha sido desactivado. Comunícate con QUANTUN Digital para más información.</div>
+            <a href="portal_cliente.php" style="margin-top:8px;padding:10px 22px;background:#0E0E0C;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px">Volver al inicio</a>
+        </div>`;
+        return true;
+    }
+    return false;
+}
+
 // ── Stats + Banner ─────────────────────────────────────────────────────────
 async function ptLoadStats() {
     try {
         const r = await fetch('api/portal_data.php?action=stats');
         const d = await r.json();
+        if (ptCheckRevocado(d)) return;
         if (!d.success) return;
 
         document.getElementById('statSvcs').textContent    = d.servicios_activos;

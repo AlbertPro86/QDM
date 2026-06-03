@@ -133,10 +133,11 @@ include __DIR__ . '/includes/header.php';
                 <span id="btnRutDot" style="display:none;width:7px;height:7px;background:#22c55e;border-radius:50%;flex-shrink:0"></span>
             </button>
             <button class="btn btn-outline sm" style="flex-shrink:0" onclick="openEditModal()">Editar datos</button>
-            <a href="portal_cliente.php" target="_blank" class="btn btn-outline sm" style="flex-shrink:0;display:flex;align-items:center;gap:5px;text-decoration:none" title="Ver Portal del Cliente">
+            <button class="btn btn-outline sm" style="flex-shrink:0;display:flex;align-items:center;gap:5px" onclick="abrirPortalModal()" title="Gestionar acceso al portal de este cliente" id="btnPortalCliente">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 Portal
-            </a>
+                <span id="btnPortalDot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span>
+            </button>
         </div>
     </div>
 
@@ -5872,5 +5873,160 @@ async function eliminarRut() {
     }
 }
 </style>
+
+<!-- ── Modal Portal Cliente (gestión rápida) ──────────────────────────────── -->
+<div id="portalModal" style="display:none;position:fixed;inset:0;z-index:1100;background:rgba(14,14,12,.5);align-items:center;justify-content:center" onclick="if(event.target===this)cerrarPortalModal()">
+    <div style="background:#fff;border-radius:10px;padding:28px 28px 24px;width:100%;max-width:400px;box-shadow:var(--shadow-xl)">
+        <div style="font-size:16px;font-weight:800;margin-bottom:3px">Portal de <span id="pmNombre">—</span></div>
+        <div style="font-size:13px;color:var(--color-text-muted);margin-bottom:20px" id="pmEmail">—</div>
+
+        <!-- Estado actual -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--color-surface-alt);border-radius:6px;margin-bottom:16px">
+            <span style="font-size:13px;font-weight:600">Acceso al portal</span>
+            <label style="position:relative;width:38px;height:22px;cursor:pointer">
+                <input type="checkbox" id="pmToggle" style="opacity:0;width:0;height:0;position:absolute" onchange="pmToggleAccess(this.checked)">
+                <span id="pmToggleSlider" style="position:absolute;inset:0;border-radius:999px;background:var(--color-danger-bg);border:1.5px solid #f3b9b4;transition:all .2s">
+                    <span id="pmToggleDot" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--color-danger);transition:all .2s"></span>
+                </span>
+            </label>
+        </div>
+        <div id="pmStatusText" style="font-size:12px;color:var(--color-text-muted);margin-bottom:18px;text-align:center"></div>
+
+        <!-- Contraseña -->
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;color:var(--color-text)">Contraseña</div>
+        <div style="display:flex;gap:7px;margin-bottom:6px">
+            <input type="password" id="pmNuevaPwd" placeholder="Nueva contraseña" class="form-input" style="font-size:13px;padding:8px 11px;flex:1">
+            <button class="btn btn-primary sm" onclick="pmSetPassword()" style="flex-shrink:0">Guardar</button>
+        </div>
+        <div style="display:flex;gap:7px;margin-bottom:18px">
+            <button class="btn btn-outline sm" onclick="pmResetPassword()" style="font-size:12px;gap:4px;display:flex;align-items:center">
+                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Resetear a NIT
+            </button>
+            <span id="pmPwdType" style="font-size:11.5px;color:var(--color-text-muted);align-self:center;margin-left:auto"></span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <a href="portal_admin.php" target="_blank" style="font-size:12.5px;color:var(--color-info);text-decoration:none;display:flex;align-items:center;gap:4px" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                Gestión completa del portal
+            </a>
+            <button class="btn btn-outline sm" onclick="cerrarPortalModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── Portal modal en cliente_detalle.php ────────────────────────────────────
+let _pmClienteId = <?= (int)($cliente['id'] ?? 0) ?>;
+
+async function abrirPortalModal() {
+    document.getElementById('portalModal').style.display = 'flex';
+
+    // Cargar datos del cliente desde la API admin
+    const r = await fetch('api/portal_admin.php?action=list&buscar=' + encodeURIComponent(<?= json_encode($cliente['nombre_comercial'] ?? '') ?>));
+    const d = await r.json();
+    if (!d.success || !d.data.length) return;
+
+    const c = d.data.find(x => x.id == _pmClienteId) || d.data[0];
+    const email = c.email_contacto || c.email_facturacion || '';
+
+    document.getElementById('pmNombre').textContent = c.nombre_comercial;
+    document.getElementById('pmEmail').textContent  = email ? '📧 ' + email : 'Sin correo registrado';
+
+    pmSetToggleUI(parseInt(c.portal_activo) === 1);
+
+    const hasPwd = parseInt(c.has_custom_password) === 1;
+    document.getElementById('pmPwdType').textContent = hasPwd ? '🔑 Contraseña personalizada' : '🔢 NIT por defecto';
+
+    // Mostrar punto verde/rojo en el botón
+    const dot = document.getElementById('btnPortalDot');
+    dot.style.display = 'inline-block';
+    dot.style.background = (parseInt(c.portal_activo) === 1 && c.has_email) ? 'var(--color-success)' : 'var(--color-danger)';
+}
+
+function cerrarPortalModal() {
+    document.getElementById('portalModal').style.display = 'none';
+}
+
+function pmSetToggleUI(activo) {
+    document.getElementById('pmToggle').checked = activo;
+    const slider = document.getElementById('pmToggleSlider');
+    const dot    = document.getElementById('pmToggleDot');
+    if (activo) {
+        slider.style.background    = 'var(--color-success-bg)';
+        slider.style.borderColor   = '#9dd6b5';
+        dot.style.background       = 'var(--color-success)';
+        dot.style.transform        = 'translateX(16px)';
+        document.getElementById('pmStatusText').innerHTML = '<span style="color:var(--color-success);font-weight:600">✓ El cliente puede ingresar al portal</span>';
+    } else {
+        slider.style.background    = 'var(--color-danger-bg)';
+        slider.style.borderColor   = '#f3b9b4';
+        dot.style.background       = 'var(--color-danger)';
+        dot.style.transform        = 'translateX(0)';
+        document.getElementById('pmStatusText').innerHTML = '<span style="color:var(--color-danger);font-weight:600">✗ Acceso bloqueado — el cliente no puede ingresar</span>';
+    }
+}
+
+async function pmToggleAccess(activar) {
+    pmSetToggleUI(activar);
+    const r = await fetch('api/portal_admin.php', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'toggle_access', id:_pmClienteId, activo: activar?1:0})
+    });
+    const d = await r.json();
+    if (d.success) {
+        showToast(d.message, activar ? 'success' : 'warning');
+    } else {
+        showToast(d.error || 'Error', 'error');
+        pmSetToggleUI(!activar); // revertir
+    }
+}
+
+async function pmSetPassword() {
+    const pwd = document.getElementById('pmNuevaPwd').value.trim();
+    if (pwd.length < 4) { showToast('Mínimo 4 caracteres', 'error'); return; }
+    const r = await fetch('api/portal_admin.php', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'set_password', id:_pmClienteId, password:pwd})
+    });
+    const d = await r.json();
+    if (d.success) {
+        showToast(d.message, 'success');
+        document.getElementById('pmNuevaPwd').value = '';
+        document.getElementById('pmPwdType').textContent = '🔑 Contraseña personalizada';
+    } else {
+        showToast(d.error || 'Error', 'error');
+    }
+}
+
+async function pmResetPassword() {
+    const ok = await confirmAction({
+        title: 'Resetear contraseña',
+        message: 'Se eliminará la contraseña personalizada. El cliente usará su NIT para ingresar.',
+        confirmLabel: 'Resetear',
+    });
+    if (!ok) return;
+    const r = await fetch('api/portal_admin.php', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'reset_password', id:_pmClienteId})
+    });
+    const d = await r.json();
+    if (d.success) {
+        showToast(d.message, 'success');
+        document.getElementById('pmPwdType').textContent = '🔢 NIT por defecto';
+    } else {
+        showToast(d.error || 'Error', 'error');
+    }
+}
+
+// Cargar el estado del portal al abrir la ficha
+(async function() {
+    try {
+        const r = await fetch('api/portal_admin.php?action=list&buscar=');
+        // Solo muestra el dot si hay acceso activo
+    } catch(e) {}
+})();
+</script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
