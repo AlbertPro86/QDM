@@ -97,15 +97,17 @@ include __DIR__ . '/includes/header.php';
             </a>
             <?php endif; ?>
             <?php if($cliente['email_facturacion']): ?>
-            <div style="display:flex;align-items:center;gap:6px;min-width:0" title="Clic para copiar" onclick="cpHdr(this,'<?= addslashes(sanitize($cliente['email_facturacion'])) ?>')" style="cursor:pointer">
+            <div style="display:flex;align-items:center;gap:6px;min-width:0;cursor:pointer" title="Clic para copiar" onclick="cpHdr(this,'<?= addslashes(sanitize($cliente['email_facturacion'])) ?>')">
                 <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span style="font-size:12px;color:var(--color-text);cursor:pointer"><?= sanitize($cliente['email_facturacion']) ?></span>
+                <span style="font-size:12px;color:var(--color-text)"><?= sanitize($cliente['email_facturacion']) ?></span>
+                <svg class="cp-ico" width="11" height="11" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;transition:stroke .15s"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             </div>
             <?php endif; ?>
             <?php if($cliente['nit_cedula']): ?>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer" title="Clic para copiar" onclick="cpHdr(this,'<?= addslashes(sanitize($cliente['nit_cedula'])) ?>')">
                 <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
-                <span style="font-size:12px;color:#94a3b8;cursor:pointer"><?= sanitize($cliente['nit_cedula']) ?></span>
+                <span style="font-size:12px;color:#94a3b8"><?= sanitize($cliente['nit_cedula']) ?></span>
+                <svg class="cp-ico" width="11" height="11" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;transition:stroke .15s"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             </div>
             <?php endif; ?>
             <?php /* dirección oculta del encabezado — sigue disponible en edición */ ?>
@@ -5566,15 +5568,11 @@ function getPkgByName(name) {
     return (window._pkgCatalogGlobal || []).find(p => p.nombre === name) || null;
 }
 
-// Copiar dato del encabezado con feedback visual
+// Copiar dato del encabezado con feedback visual en el icono
 function cpHdr(el, txt) {
     navigator.clipboard.writeText(txt).then(() => {
-        const span = el.querySelector('span');
-        const orig = span.textContent;
-        const origColor = span.style.color;
-        span.textContent = '¡Copiado!';
-        span.style.color = '#0d9488';
-        setTimeout(() => { span.textContent = orig; span.style.color = origColor; }, 1400);
+        const ico = el.querySelector('.cp-ico');
+        if (ico) { ico.style.stroke = '#0d9488'; setTimeout(() => ico.style.stroke = '#cbd5e1', 1400); }
     });
 }
 
