@@ -168,6 +168,13 @@ try {
             <span class="nav-link-text">Archivo</span>
         </a>
 
+        <a href="portal_cliente.php" target="_blank" class="nav-link" id="nav-portal-cliente" title="Portal Cliente" style="opacity:.55;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='.55'">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="nav-link-text">Portal Cliente</span>
+        </a>
+
         <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.5' ?>;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.5' ?>'">
             <span style="position:relative;display:inline-flex;flex-shrink:0">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" width="20" height="20">

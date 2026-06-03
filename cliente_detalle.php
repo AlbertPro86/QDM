@@ -133,6 +133,10 @@ include __DIR__ . '/includes/header.php';
                 <span id="btnRutDot" style="display:none;width:7px;height:7px;background:#22c55e;border-radius:50%;flex-shrink:0"></span>
             </button>
             <button class="btn btn-outline sm" style="flex-shrink:0" onclick="openEditModal()">Editar datos</button>
+            <a href="portal_cliente.php" target="_blank" class="btn btn-outline sm" style="flex-shrink:0;display:flex;align-items:center;gap:5px;text-decoration:none" title="Ver Portal del Cliente">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Portal
+            </a>
         </div>
     </div>
 
