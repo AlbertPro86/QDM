@@ -99,7 +99,7 @@ img{max-width:100%;display:block}
 .hero__chips li{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;color:var(--q-ink-2)}
 
 /* aurora canvas background */
-#heroBg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+#heroBg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block}
 .hand{display:inline-block;animation:wave 2.6s ease-in-out infinite;transform-origin:70% 80%}
 @keyframes wave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(16deg)}80%{transform:rotate(-8deg)}90%{transform:rotate(12deg)}}
 
