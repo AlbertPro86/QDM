@@ -101,7 +101,7 @@ img{max-width:100%;display:block}
 /* dot-grid hero background */
 .hero::before{
   content:'';position:absolute;top:68px;left:0;right:0;bottom:0;z-index:1;pointer-events:none;
-  background-image:radial-gradient(circle,rgba(120,120,120,.25) 1.5px,transparent 1.5px);
+  background-image:radial-gradient(circle,rgba(100,100,100,.42) 1.8px,transparent 1.8px);
   background-size:42px 42px;
   animation:dotSlide 24s linear infinite;
 }

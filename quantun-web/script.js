@@ -28,8 +28,8 @@
           var x = c * GAP, y = r * GAP;
           // onda que viaja diagonal
           var v = 0.5 + 0.5 * Math.sin(x * 0.018 + t * 0.65) * Math.cos(y * 0.018 - t * 0.45);
-          var alpha  = (0.08 + v * 0.28).toFixed(3);
-          var radius = 0.8 + v * 1.0;
+          var alpha  = (0.14 + v * 0.38).toFixed(3);
+          var radius = 1.0 + v * 1.2;
           ctx.beginPath();
           ctx.arc(x, y, radius, 0, 6.2832);
           ctx.fillStyle = 'rgba(100,100,100,' + alpha + ')';
