@@ -189,6 +189,44 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 .btn-save:hover{opacity:.8}
 .btn-save:disabled{opacity:.4;cursor:not-allowed}
 
+/* ── RUT banner ────────────────────────────────────────────── */
+.rut-banner{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#F7F5F0;border-bottom:1px solid #F0EDE6}
+.rut-ico{width:36px;height:36px;border-radius:9px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rut-info{flex:1;min-width:0}
+.rut-title{font-size:13px;font-weight:700;color:#1E1D1B}
+.rut-sub{font-size:11px;color:#8A867C;margin-top:1px}
+.rut-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:#1E1D1B;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;transition:opacity .15s;flex-shrink:0}
+.rut-btn:hover{opacity:.8}
+.rut-btn.outline{background:transparent;color:#1E1D1B;border:1.5px solid #E4E1D9}
+.rut-btn.outline:hover{background:#F0EDE6}
+
+/* ── Modal detalle servicio ────────────────────────────────── */
+#svcModal{display:none;position:fixed;inset:0;z-index:500;background:rgba(14,12,10,.45);align-items:flex-end;justify-content:center}
+#svcModal.open{display:flex}
+@media(min-width:580px){#svcModal{align-items:center}}
+.svc-sheet{background:#fff;width:100%;max-width:480px;border-radius:16px 16px 0 0;padding:20px 20px 32px;max-height:92vh;overflow-y:auto}
+@media(min-width:580px){.svc-sheet{border-radius:14px;padding:24px}}
+.svc-sheet-drag{width:38px;height:4px;background:#E4E1D9;border-radius:2px;margin:0 auto 18px}
+@media(min-width:580px){.svc-sheet-drag{display:none}}
+.svc-sheet-hdr{display:flex;align-items:flex-start;gap:10px;margin-bottom:18px}
+.svc-sheet-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.svc-sheet-name{font-size:18px;font-weight:900;color:#1E1D1B;line-height:1.2;letter-spacing:-.02em;flex:1}
+.svc-sheet-close{width:30px;height:30px;border:1.5px solid #E4E1D9;border-radius:7px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#78746D;flex-shrink:0}
+.svc-sheet-close:hover{background:#F0EDE6}
+.svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#F0EDE6;border:1px solid #F0EDE6;border-radius:10px;overflow:hidden;margin-bottom:14px}
+.svc-detail-cell{background:#fff;padding:12px 14px}
+.svc-detail-cell.full{grid-column:1/-1}
+.svc-detail-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:3px}
+.svc-detail-val{font-size:13.5px;font-weight:700;color:#1E1D1B}
+.svc-detail-val.big{font-size:20px;letter-spacing:-.02em}
+.svc-detail-val.ok{color:#15803D}
+.svc-detail-val.warn{color:#B45309}
+.svc-detail-val.danger{color:#991B1B}
+.svc-price-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F5F3EF;font-size:12.5px;color:#57544D}
+.svc-price-row:last-child{border-bottom:none}
+.svc-price-row b{color:#1E1D1B;font-weight:700}
+.svc-desc-box{background:#FAFAF8;border:1px solid #F0EDE6;border-radius:8px;padding:11px 13px;font-size:12.5px;color:#57544D;line-height:1.55;margin-bottom:14px}
+
 /* ── Loading / Empty ───────────────────────────────────────── */
 .loading{padding:28px;text-align:center;color:#8A867C;font-size:12.5px}
 .empty-state{padding:32px 20px;text-align:center;color:#8A867C;font-size:13px}
@@ -394,6 +432,21 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 
 </div><!-- /wrap -->
 
+<!-- Modal detalle servicio -->
+<div id="svcModal" onclick="if(event.target===this)closeSvcModal()">
+    <div class="svc-sheet">
+        <div class="svc-sheet-drag"></div>
+        <div class="svc-sheet-hdr">
+            <div class="svc-sheet-dot" id="svcDot"></div>
+            <div class="svc-sheet-name" id="svcNombre"></div>
+            <button class="svc-sheet-close" onclick="closeSvcModal()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="svcModalBody"></div>
+    </div>
+</div>
+
 <!-- Revocado -->
 <div id="revocado">
     <svg width="40" height="40" fill="none" stroke="#991B1B" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
@@ -535,8 +588,9 @@ async function loadSvcs(){
         if(!d.success||!d.data.length){blk.style.display='none';return;}
         blk.style.display='block';
         document.getElementById('cntSvcs').textContent=d.data.length;
+        _svcData=d.data; // guardar para el modal
         const dotColor={activo:'#15803D',suspendido:'#B45309',cancelado:'#991B1B'};
-        el.innerHTML=d.data.map(sv=>{
+        el.innerHTML=d.data.map((sv,i)=>{
             const val=Math.max(0,parseFloat(sv.valor_suscripcion)||0);
             const dias=parseInt(sv.dias_para_vencimiento);
             const esUnico=(sv.frecuencia||'').toLowerCase()==='unico';
@@ -547,7 +601,7 @@ async function loadSvcs(){
                 else if(dias<=30){rCls='warn';rTxt=`Vence el ${fd(sv.fecha_vencimiento)}`;}
                 else{rCls='ok';rTxt=`Vigente hasta ${fd(sv.fecha_vencimiento)}`;}
             }else if(esUnico){rCls='grey';rTxt='Pago único';}
-            return`<div class="svc-row">
+            return`<div class="svc-row" style="cursor:pointer" onclick="openSvcModal(${i})" title="Ver detalles">
                 <div class="svc-dot" style="background:${dotColor[sv.estado]||'#8A867C'}"></div>
                 <div class="svc-info">
                     <div class="svc-name">${esc(sv.nombre_servicio)}</div>
@@ -559,11 +613,72 @@ async function loadSvcs(){
                 </div>
                 <div class="svc-price">
                     ${val>0?`<div class="svc-price-num">${fn(val)}</div><div class="svc-price-sub">COP</div>`:''}
+                    <div style="margin-top:3px;opacity:.45"><svg width="11" height="11" fill="none" stroke="#1E1D1B" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
                 </div>
             </div>`;
         }).join('');
     }catch(e){el.innerHTML='<div class="loading">Error al cargar servicios</div>';}
 }
+
+// ── Datos servicios (para modal) ───────────────────────────
+let _svcData=[];
+
+// ── Modal detalle servicio ─────────────────────────────────
+const _dotColor={activo:'#15803D',suspendido:'#B45309',cancelado:'#991B1B'};
+const _estL={activo:'Activo',suspendido:'Suspendido',cancelado:'Cancelado'};
+const _estC={activo:'ok',suspendido:'warn',cancelado:'danger'};
+
+function openSvcModal(i){
+    const sv=_svcData[i];
+    if(!sv)return;
+    const dias=parseInt(sv.dias_para_vencimiento);
+    const esUnico=(sv.frecuencia||'').toLowerCase()==='unico';
+    const base=parseFloat(sv.monto_renovacion)||0;
+    const desc=parseFloat(sv.descuento)||0;
+    const total=Math.max(0,base-desc);
+
+    document.getElementById('svcDot').style.background=_dotColor[sv.estado]||'#8A867C';
+    document.getElementById('svcNombre').textContent=sv.nombre_servicio;
+
+    // Calcular estado vencimiento
+    let vCls='ok',vTxt='Vigente';
+    if(!esUnico&&sv.fecha_vencimiento){
+        if(dias<0){vCls='danger';vTxt=`Venció hace ${Math.abs(dias)} días`;}
+        else if(dias===0){vCls='danger';vTxt='Vence hoy';}
+        else if(dias<=7){vCls='danger';vTxt=`Vence en ${dias} día${dias!==1?'s':''}`;}
+        else if(dias<=30){vCls='warn';vTxt=`Vence en ${dias} días`;}
+        else{vCls='ok';vTxt=`Vigente · ${dias} días restantes`;}
+    }else if(esUnico){vCls='grey';vTxt='Pago único';}
+
+    const precioPart=base>0?`
+        <div class="svc-price-row"><span>Precio base</span><b>${fn(base)}</b></div>
+        ${desc>0?`<div class="svc-price-row"><span>Descuento</span><b style="color:#15803D">− ${fn(desc)}</b></div>`:''}
+        <div class="svc-price-row" style="font-weight:700;font-size:13.5px"><span>Total</span><b style="font-size:15px">${fn(total)} COP</b></div>
+    `:'';
+
+    document.getElementById('svcModalBody').innerHTML=`
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+            <span class="ch ${_estC[sv.estado]||'grey'}">${_estL[sv.estado]||sv.estado}</span>
+            ${!esUnico?`<span class="ch blue">${esc(ff(sv.frecuencia))}</span>`:''}
+            <span class="ch ${vCls}">${esc(vTxt)}</span>
+        </div>
+        <div class="svc-detail-grid">
+            ${sv.fecha_inicio?`<div class="svc-detail-cell"><div class="svc-detail-lbl">Fecha inicio</div><div class="svc-detail-val">${fd(sv.fecha_inicio)}</div></div>`:''}
+            ${sv.fecha_vencimiento&&!esUnico?`<div class="svc-detail-cell"><div class="svc-detail-lbl">Vencimiento</div><div class="svc-detail-val ${vCls}">${fd(sv.fecha_vencimiento)}</div></div>`:''}
+            ${total>0?`<div class="svc-detail-cell full"><div class="svc-detail-lbl">Valor de suscripción</div><div class="svc-detail-val big">${fn(total)}<span style="font-size:13px;font-weight:600;color:#8A867C;margin-left:4px">COP</span></div></div>`:''}
+        </div>
+        ${base>0&&desc>0?`<div style="padding:4px 2px 10px"><div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:7px">Desglose de precio</div>${precioPart}</div>`:''}
+        ${sv.descripcion_servicio?`<div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:6px">Descripción</div><div class="svc-desc-box">${esc(sv.descripcion_servicio)}</div>`:''}
+        ${sv.notas?`<div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:6px">Notas</div><div class="svc-desc-box">${esc(sv.notas)}</div>`:''}
+    `;
+    document.getElementById('svcModal').classList.add('open');
+    document.body.style.overflow='hidden';
+}
+function closeSvcModal(){
+    document.getElementById('svcModal').classList.remove('open');
+    document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSvcModal();});
 
 // ── Pagos ──────────────────────────────────────────────────
 let _pOff=0,_pTotal=0;
@@ -789,7 +904,33 @@ async function loadPerfil(){
         const acceso=p.has_custom_password
             ?'<span style="color:#15803D;font-weight:700;font-size:12.5px">✓ Contraseña personalizada activa</span>'
             :'<span style="color:#78746D;font-style:italic;font-size:12.5px">Contraseña por defecto (NIT)</span>';
+
+        // Banner RUT
+        let rutHtml='';
+        if(p.rut_url){
+            const ext=(p.rut_url.split('.').pop()||'').toLowerCase();
+            const isPdf=ext==='pdf';
+            rutHtml=`<div class="rut-banner">
+                <div class="rut-ico">
+                    <svg width="16" height="16" fill="none" stroke="#DC2626" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="rut-info">
+                    <div class="rut-title">RUT</div>
+                    <div class="rut-sub">Registro Único Tributario · ${isPdf?'PDF':'Imagen'}</div>
+                </div>
+                <a class="rut-btn" href="${esc(p.rut_url)}" target="_blank" rel="noopener" download>
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Descargar
+                </a>
+                <a class="rut-btn outline" href="${esc(p.rut_url)}" target="_blank" rel="noopener" style="margin-left:0">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Ver
+                </a>
+            </div>`;
+        }
+
         el.innerHTML=`
+        ${rutHtml}
         <div class="pf-2col">
             ${pf('Empresa / Razón social',p.nombre_comercial)}
             ${pf('NIT / Identificación',p.nit_cedula)}

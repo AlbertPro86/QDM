@@ -46,7 +46,8 @@ $action = $_GET['action'] ?? '';
 if ($action === 'perfil') {
     $stmt = $pdo->prepare("
         SELECT nombre_comercial, nit_cedula, email_contacto, email_facturacion,
-               telefono, direccion, persona_contacto, sitio_web, portal_config, created_at
+               telefono, direccion, persona_contacto, sitio_web, portal_config,
+               rut_url, created_at
         FROM clientes WHERE id = ?
     ");
     $stmt->execute([$cid]);
@@ -78,7 +79,10 @@ if ($action === 'servicios') {
             cs.frecuencia,
             cs.fecha_inicio,
             cs.fecha_vencimiento,
-            (cs.monto_renovacion - COALESCE(cs.descuento, 0)) AS valor_suscripcion,
+            cs.monto_renovacion,
+            COALESCE(cs.descuento, 0)                            AS descuento,
+            (cs.monto_renovacion - COALESCE(cs.descuento, 0))   AS valor_suscripcion,
+            COALESCE(cs.notas, '')                               AS notas,
             CASE
                 WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
                 WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
