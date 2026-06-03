@@ -27,6 +27,7 @@ $pdo = db();
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_password VARCHAR(255) DEFAULT NULL"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_activo TINYINT(1) NOT NULL DEFAULT 1"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_ultimo_acceso DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_config TEXT DEFAULT NULL"); } catch (PDOException $e) {}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input  = ($method === 'POST') ? (json_decode(file_get_contents('php://input'), true) ?: []) : [];
@@ -72,7 +73,8 @@ if ($action === 'list') {
             (
                 COALESCE(TRIM(c.email_contacto),'') != '' OR
                 COALESCE(TRIM(c.email_facturacion),'') != ''
-            ) AS has_email
+            ) AS has_email,
+            c.portal_config
         FROM clientes c
         {$whereClause}
         ORDER BY c.nombre_comercial ASC
@@ -127,6 +129,32 @@ if ($action === 'reset_password') {
 
     $pdo->prepare("UPDATE clientes SET portal_password = NULL WHERE id = ?")->execute([$id]);
     jsonResponse(['success' => true, 'message' => 'Contraseña restablecida al NIT por defecto']);
+}
+
+// ─── GET CONFIG ───────────────────────────────────────────────────────────────
+if ($action === 'get_config') {
+    $id = intval($_GET['id'] ?? $input['id'] ?? 0);
+    if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
+    $stmt = $pdo->prepare("SELECT portal_config FROM clientes WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    $cfg = $row ? json_decode($row['portal_config'] ?? 'null', true) : null;
+    jsonResponse(['success' => true, 'config' => $cfg ?: new stdClass()]);
+}
+
+// ─── SAVE CONFIG ──────────────────────────────────────────────────────────────
+if ($action === 'save_config') {
+    $id  = intval($input['id'] ?? 0);
+    $cfg = $input['config'] ?? [];
+    if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
+    // Sanitizar: solo keys permitidos, valores bool
+    $keys = ['stats','servicios','pagos','tareas','notificaciones','documentos','accesos','perfil'];
+    $clean = [];
+    foreach ($keys as $k) {
+        $clean[$k] = isset($cfg[$k]) ? (bool)$cfg[$k] : true;
+    }
+    $pdo->prepare("UPDATE clientes SET portal_config = ? WHERE id = ?")->execute([json_encode($clean), $id]);
+    jsonResponse(['success' => true, 'message' => 'Configuración guardada']);
 }
 
 // ─── ACTIVAR TODOS ────────────────────────────────────────────────────────────

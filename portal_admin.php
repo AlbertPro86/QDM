@@ -250,6 +250,45 @@ include __DIR__ . '/includes/header.php';
 .pa-modal-opt:hover { border-color: var(--color-text-muted); background: var(--color-surface-alt); }
 .pa-modal-opt input { accent-color: var(--color-text); }
 
+/* Config modal */
+.pa-cfg-modal {
+    background: #fff;
+    border-radius: var(--radius-xl);
+    padding: 26px 26px 22px;
+    width: 100%; max-width: 480px;
+    box-shadow: var(--shadow-xl);
+}
+.pa-cfg-title { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
+.pa-cfg-sub   { font-size: 12.5px; color: var(--color-text-muted); margin-bottom: 18px; line-height: 1.4; }
+.pa-cfg-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.pa-cfg-item  {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 10px 13px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer; transition: border-color .15s, background .15s;
+}
+.pa-cfg-item:hover { border-color: var(--color-text-muted); background: var(--color-surface-alt); }
+.pa-cfg-item.off   { background: var(--color-surface-alt); border-color: var(--color-border); opacity: .65; }
+.pa-cfg-item-label { display: flex; align-items: center; gap: 7px; }
+.pa-cfg-item-label svg { flex-shrink: 0; }
+.pa-cfg-item-name  { font-size: 12.5px; font-weight: 600; color: var(--color-text); }
+.pa-cfg-item-desc  { font-size: 10.5px; color: var(--color-text-muted); margin-top: 1px; }
+/* Tiny toggle */
+.pa-cfg-toggle { position:relative; width:32px; height:18px; flex-shrink:0; }
+.pa-cfg-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.pa-cfg-toggle-sl {
+    position:absolute; inset:0;
+    background: #E2E8F0; border-radius:999px; transition: background .2s;
+}
+.pa-cfg-toggle-sl::before {
+    content:''; position:absolute; top:2px; left:2px;
+    width:14px; height:14px; border-radius:50%; background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .2s;
+}
+.pa-cfg-toggle input:checked + .pa-cfg-toggle-sl { background:var(--color-success); }
+.pa-cfg-toggle input:checked + .pa-cfg-toggle-sl::before { transform:translateX(14px); }
+
 /* Empty state */
 .pa-empty {
     text-align: center; padding: 52px 24px;
@@ -356,6 +395,27 @@ include __DIR__ . '/includes/header.php';
         <div class="pa-skeleton"></div>
         <div class="pa-skeleton" style="opacity:.7"></div>
         <div class="pa-skeleton" style="opacity:.5"></div>
+    </div>
+</div>
+
+<!-- Modal Config Secciones -->
+<div class="pa-modal-overlay" id="paCfgModal" onclick="if(event.target===this)paCerrarCfg()">
+    <div class="pa-cfg-modal">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px">
+            <div>
+                <div class="pa-cfg-title">Secciones visibles en el portal</div>
+                <div class="pa-cfg-sub" id="paCfgClienteNombre">—</div>
+            </div>
+            <button onclick="paCerrarCfg()" style="width:28px;height:28px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);flex-shrink:0">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <input type="hidden" id="paCfgClienteId">
+        <div class="pa-cfg-grid" id="paCfgGrid"><!-- JS --></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+            <button class="pa-modal-cancel" onclick="paCerrarCfg()">Cancelar</button>
+            <button class="pa-modal-save" id="paCfgSaveBtn" onclick="paSaveConfig()">Guardar cambios</button>
+        </div>
     </div>
 </div>
 
@@ -560,6 +620,13 @@ function paRenderRow(c) {
 
         <!-- Acciones -->
         <div class="pa-actions">
+            <button class="pa-btn-icon" onclick="paAbrirConfig(${c.id}, '${paEsc(c.nombre_comercial).replace(/'/g,"&#39;")}', ${JSON.stringify(c.portal_config||null)})"
+                    title="Personalizar secciones visibles">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </button>
             <button class="pa-btn-icon" onclick="paAbrirModalPwd(${c.id}, '${paEsc(c.nombre_comercial).replace(/'/g,"&#39;")}')"
                     title="Gestionar contraseña">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -699,7 +766,88 @@ async function paGuardarPwd() {
 }
 
 // Cerrar modal con Escape
-document.addEventListener('keydown', e => { if (e.key === 'Escape') paCerrarModal(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { paCerrarModal(); paCerrarCfg(); }
+});
+
+// ── Modal Config secciones ─────────────────────────────────────────────────
+const PA_SECCIONES = [
+    { key:'stats',          icon:'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', name:'Estadísticas',      desc:'4 cifras resumen' },
+    { key:'servicios',      icon:'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', name:'Mis servicios',      desc:'Lista de servicios activos' },
+    { key:'pagos',          icon:'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z', name:'Historial de pagos', desc:'Transacciones e ingresos' },
+    { key:'tareas',         icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', name:'Tareas',             desc:'Tareas asignadas al cliente' },
+    { key:'notificaciones', icon:'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', name:'Notificaciones',    desc:'Recordatorios enviados' },
+    { key:'documentos',     icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', name:'Documentos',        desc:'Archivos y facturas' },
+    { key:'accesos',        icon:'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z', name:'Accesos',           desc:'Credenciales e inventario' },
+    { key:'perfil',         icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', name:'Mi Perfil',         desc:'Datos y cambio de clave' },
+];
+
+let _paCfgState = {};
+
+function paAbrirConfig(id, nombre, cfgRaw) {
+    document.getElementById('paCfgClienteId').value = id;
+    document.getElementById('paCfgClienteNombre').textContent = nombre;
+
+    // Construir estado: true por defecto si no hay config
+    _paCfgState = {};
+    PA_SECCIONES.forEach(s => {
+        _paCfgState[s.key] = cfgRaw && cfgRaw[s.key] === false ? false : true;
+    });
+
+    _renderCfgGrid();
+    document.getElementById('paCfgModal').classList.add('open');
+}
+
+function _renderCfgGrid() {
+    document.getElementById('paCfgGrid').innerHTML = PA_SECCIONES.map(s => {
+        const on = _paCfgState[s.key] !== false;
+        return `<div class="pa-cfg-item ${on?'':'off'}" id="cfgItem_${s.key}" onclick="paCfgToggle('${s.key}')">
+            <div class="pa-cfg-item-label">
+                <svg width="14" height="14" fill="none" stroke="${on?'var(--color-text)':'var(--color-text-light)'}" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="${s.icon}"/>
+                </svg>
+                <div>
+                    <div class="pa-cfg-item-name" style="color:${on?'var(--color-text)':'var(--color-text-light)'}">${s.name}</div>
+                    <div class="pa-cfg-item-desc">${s.desc}</div>
+                </div>
+            </div>
+            <label class="pa-cfg-toggle" onclick="event.stopPropagation()">
+                <input type="checkbox" id="cfgChk_${s.key}" ${on?'checked':''} onchange="paCfgToggle('${s.key}')">
+                <span class="pa-cfg-toggle-sl"></span>
+            </label>
+        </div>`;
+    }).join('');
+}
+
+function paCfgToggle(key) {
+    _paCfgState[key] = !_paCfgState[key];
+    _renderCfgGrid();
+}
+
+function paCerrarCfg() {
+    document.getElementById('paCfgModal').classList.remove('open');
+}
+
+async function paSaveConfig() {
+    const id  = parseInt(document.getElementById('paCfgClienteId').value);
+    const btn = document.getElementById('paCfgSaveBtn');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+
+    const r = await fetch('api/portal_admin.php', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'save_config', id, config: _paCfgState })
+    });
+    const d = await r.json();
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+
+    if (d.success) {
+        paToast('Configuración guardada', 'success');
+        paCerrarCfg();
+        paLoadList(); // refresca para actualizar portal_config en caché de fila
+    } else {
+        paToast(d.error || 'Error al guardar', 'error');
+    }
+}
 
 // ── Init ────────────────────────────────────────────────────────────────────
 paLoadStats();

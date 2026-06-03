@@ -459,6 +459,11 @@ async function loadHero(){
             }
         }
 
+        // Aplicar config de visibilidad
+        if(pd.success&&pd.data&&pd.data.portal_config){
+            applyPortalConfig(pd.data.portal_config);
+        }
+
         if(!sd.success)return;
         const val=sd.valor_suscripcion||0;
 
@@ -820,6 +825,39 @@ async function cambiarPwd(){
         if(d.success){document.getElementById('pwdA').value=document.getElementById('pwdN').value=document.getElementById('pwdC').value='';}
     }catch(e){toast('Error de conexión','err');}
     btn.disabled=false;btn.textContent='Guardar';
+}
+
+// ── Config de visibilidad ──────────────────────────────────
+function applyPortalConfig(cfg){
+    if(!cfg) return;
+    // Stats
+    if(cfg.stats===false) document.querySelector('.stats').style.display='none';
+    // Servicios
+    if(cfg.servicios===false){ const b=document.getElementById('blkSvcs'); if(b) b.style.display='none'; }
+    // Tabs: ocultar botón + pane si está desactivado
+    const tabs={pagos:'pagos',tareas:'tareas',notificaciones:'notif',documentos:'docs',accesos:'accesos',perfil:'perfil'};
+    let firstVisible=null;
+    for(const[key,name] of Object.entries(tabs)){
+        if(cfg[key]===false){
+            const btn=document.getElementById('tab-'+name);
+            const pane=document.getElementById('pane-'+name);
+            if(btn) btn.style.display='none';
+            if(pane){ pane.classList.remove('on'); pane.style.display='none'; }
+            // Si el tab activo fue ocultado, buscar el primer visible
+            if(document.getElementById('tab-'+name)?.classList.contains('on')){
+                const visible=document.querySelector('.tab-btn:not([style*="display:none"])');
+                if(visible) visible.click();
+            }
+        } else {
+            if(!firstVisible) firstVisible=name;
+        }
+    }
+    // Si el tab activo por defecto (pagos) fue ocultado, activar el primero visible
+    const activoBtn=document.querySelector('.tab-btn.on');
+    if(activoBtn && activoBtn.style.display==='none' && firstVisible){
+        const fb=document.getElementById('tab-'+firstVisible);
+        if(fb) fb.click();
+    }
 }
 
 // ── Init ───────────────────────────────────────────────────

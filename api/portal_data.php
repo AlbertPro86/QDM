@@ -46,7 +46,7 @@ $action = $_GET['action'] ?? '';
 if ($action === 'perfil') {
     $stmt = $pdo->prepare("
         SELECT nombre_comercial, nit_cedula, email_contacto, email_facturacion,
-               telefono, direccion, persona_contacto, sitio_web, created_at
+               telefono, direccion, persona_contacto, sitio_web, portal_config, created_at
         FROM clientes WHERE id = ?
     ");
     $stmt->execute([$cid]);
@@ -61,6 +61,10 @@ if ($action === 'perfil') {
         } catch (PDOException $e) {
             $row['has_custom_password'] = 0;
         }
+        // Decodificar portal_config
+        $row['portal_config'] = !empty($row['portal_config'])
+            ? json_decode($row['portal_config'], true)
+            : null;
     }
     pdJson(['success' => true, 'data' => $row]);
 }
