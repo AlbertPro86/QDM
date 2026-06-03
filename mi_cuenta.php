@@ -57,7 +57,7 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 .hero-right{flex-shrink:0;text-align:right}
 .hero-vlabel{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:5px}
 .hero-vnum{font-size:38px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em}
-.hero-vcop{font-size:11px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:.04em;margin-top:3px}
+.hero-vnum .vnum-sym{font-size:22px;font-weight:700;color:rgba(255,255,255,.45);margin-right:3px;vertical-align:.1em}
 .hero-renov{margin-top:9px;font-size:11.5px;color:rgba(255,255,255,.35)}
 .hero-renov b{color:rgba(255,255,255,.6)}
 
@@ -326,8 +326,7 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
         </div>
         <div class="hero-right">
             <div class="hero-vlabel">Valor de suscripción</div>
-            <div class="hero-vnum" id="heroValor">—</div>
-            <div class="hero-vcop">$</div>
+            <div class="hero-vnum"><span class="vnum-sym">$</span><span id="heroValor">—</span></div>
             <div class="hero-renov" id="heroRenov"></div>
         </div>
     </div>
