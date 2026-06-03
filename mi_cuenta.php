@@ -226,6 +226,18 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 .svc-price-row:last-child{border-bottom:none}
 .svc-price-row b{color:#1E1D1B;font-weight:700}
 .svc-desc-box{background:#FAFAF8;border:1px solid #F0EDE6;border-radius:8px;padding:11px 13px;font-size:12.5px;color:#57544D;line-height:1.55;margin-bottom:14px}
+/* Composición de paquete */
+.pkg-comp{background:#FAFAF8;border:1px solid #F0EDE6;border-radius:10px;overflow:hidden;margin-bottom:14px}
+.pkg-comp-hdr{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid #F0EDE6}
+.pkg-comp-hdr svg{opacity:.5;flex-shrink:0}
+.pkg-comp-hdr-lbl{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C}
+.pkg-item{display:flex;align-items:baseline;gap:6px;padding:8px 14px;border-bottom:1px solid #F5F3EF}
+.pkg-item:last-child{border-bottom:none}
+.pkg-item-svc{font-size:12.5px;font-weight:700;color:#1E1D1B}
+.pkg-item-ss{font-size:12px;color:#78746D}
+.pkg-features{display:flex;flex-wrap:wrap;gap:4px 14px;padding:10px 14px;border-top:1px dashed #EDEAE3;background:#F7F5F0}
+.pkg-feat{font-size:11px;color:#57544D;display:flex;align-items:center;gap:4px}
+.pkg-feat::before{content:'✓';color:#15803D;font-weight:700;font-size:10px}
 
 /* ── Loading / Empty ───────────────────────────────────────── */
 .loading{padding:28px;text-align:center;color:#8A867C;font-size:12.5px}
@@ -656,7 +668,7 @@ function openSvcModal(i){
         <div class="svc-price-row" style="font-weight:700;font-size:13.5px"><span>Total</span><b style="font-size:15px">${fn(total)} COP</b></div>
     `:'';
 
-    document.getElementById('svcModalBody').innerHTML=`
+    const staticHtml=`
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap">
             <span class="ch ${_estC[sv.estado]||'grey'}">${_estL[sv.estado]||sv.estado}</span>
             ${!esUnico?`<span class="ch blue">${esc(ff(sv.frecuencia))}</span>`:''}
@@ -668,11 +680,40 @@ function openSvcModal(i){
             ${total>0?`<div class="svc-detail-cell full"><div class="svc-detail-lbl">Valor de suscripción</div><div class="svc-detail-val big">${fn(total)}<span style="font-size:13px;font-weight:600;color:#8A867C;margin-left:4px">COP</span></div></div>`:''}
         </div>
         ${base>0&&desc>0?`<div style="padding:4px 2px 10px"><div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:7px">Desglose de precio</div>${precioPart}</div>`:''}
+        <div id="pkgCompWrap">${sv.paquete_id?'<div class="loading">Cargando composición…</div>':''}</div>
         ${sv.descripcion_servicio?`<div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:6px">Descripción</div><div class="svc-desc-box">${esc(sv.descripcion_servicio)}</div>`:''}
         ${sv.notas?`<div style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:6px">Notas</div><div class="svc-desc-box">${esc(sv.notas)}</div>`:''}
     `;
+    document.getElementById('svcModalBody').innerHTML=staticHtml;
     document.getElementById('svcModal').classList.add('open');
     document.body.style.overflow='hidden';
+
+    // Cargar composición del paquete si aplica
+    if(sv.paquete_id){
+        fetch(`api/portal_data.php?action=composicion&paquete_id=${sv.paquete_id}`)
+            .then(r=>r.json()).then(d=>{
+                const wrap=document.getElementById('pkgCompWrap');
+                if(!wrap)return;
+                if(!d.success||(!d.items.length&&!d.features.length)){wrap.innerHTML='';return;}
+                const itemsHtml=d.items.map(it=>`
+                    <div class="pkg-item">
+                        <span class="pkg-item-svc">${esc(it.svc_nombre)}</span>
+                        ${it.ss_nombre?`<span class="pkg-item-ss">· ${esc(it.ss_nombre)}</span>`:''}
+                    </div>`).join('');
+                const featHtml=d.features.length
+                    ?`<div class="pkg-features">${d.features.map(f=>`<span class="pkg-feat">${esc(f)}</span>`).join('')}</div>`:'';
+                wrap.innerHTML=`<div class="pkg-comp">
+                    <div class="pkg-comp-hdr">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h8m-8 4h8"/></svg>
+                        <span class="pkg-comp-hdr-lbl">Composición del paquete</span>
+                    </div>
+                    ${itemsHtml}${featHtml}
+                </div>`;
+            }).catch(()=>{
+                const wrap=document.getElementById('pkgCompWrap');
+                if(wrap)wrap.innerHTML='';
+            });
+    }
 }
 function closeSvcModal(){
     document.getElementById('svcModal').classList.remove('open');

@@ -80,6 +80,7 @@ if ($action === 'servicios') {
             cs.fecha_inicio,
             cs.fecha_vencimiento,
             cs.monto_renovacion,
+            cs.paquete_id,
             COALESCE(cs.descuento, 0)                            AS descuento,
             (cs.monto_renovacion - COALESCE(cs.descuento, 0))   AS valor_suscripcion,
             COALESCE(cs.notas, '')                               AS notas,
@@ -275,6 +276,38 @@ if ($action === 'notificaciones') {
     usort($eventos, fn($a,$b) => strcmp($b['fecha'], $a['fecha']));
 
     pdJson(['success' => true, 'data' => $eventos]);
+}
+
+// ─── COMPOSICIÓN DE PAQUETE (sin precios) ─────────────────────────────────────
+if ($action === 'composicion') {
+    $pkgId = intval($_GET['paquete_id'] ?? 0);
+    if (!$pkgId) pdJson(['error' => 'paquete_id requerido'], 400);
+
+    // Verificar que el cliente tiene asignado este paquete
+    $chk = $pdo->prepare("SELECT id FROM cliente_servicios WHERE cliente_id=? AND paquete_id=? LIMIT 1");
+    $chk->execute([$cid, $pkgId]);
+    if (!$chk->fetch()) pdJson(['error' => 'No autorizado'], 403);
+
+    // Items: solo nombre servicio + nombre sub-servicio + frecuencia (sin precio/costo)
+    $iStmt = $pdo->prepare("
+        SELECT s.nombre AS svc_nombre, ss.nombre AS ss_nombre, ss.frecuencia
+        FROM paquete_items pi
+        JOIN sub_servicios ss ON pi.sub_servicio_id = ss.id
+        JOIN servicios s      ON ss.servicio_id = s.id
+        WHERE pi.paquete_id = ?
+        ORDER BY s.nombre, ss.nombre
+    ");
+    $iStmt->execute([$pkgId]);
+    $items = $iStmt->fetchAll();
+
+    // Features (viñetas)
+    try {
+        $fStmt = $pdo->prepare("SELECT texto FROM servicio_features WHERE paquete_id = ? ORDER BY orden ASC, id ASC");
+        $fStmt->execute([$pkgId]);
+        $features = array_column($fStmt->fetchAll(), 'texto');
+    } catch (PDOException $e) { $features = []; }
+
+    pdJson(['success' => true, 'items' => $items, 'features' => $features]);
 }
 
 // ─── ACCESOS ──────────────────────────────────────────────────────────────────
