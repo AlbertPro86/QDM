@@ -156,6 +156,11 @@ if ($action === 'stats') {
     $s1->execute([$cid]);
     $nActivos = (int)$s1->fetchColumn();
 
+    // Valor total de suscripciones activas recurrentes
+    $sv = $pdo->prepare("SELECT COALESCE(SUM(monto_renovacion - COALESCE(descuento,0)),0) FROM cliente_servicios WHERE cliente_id=? AND estado='activo' AND LOWER(COALESCE(frecuencia,'')) NOT IN('unico','único')");
+    $sv->execute([$cid]);
+    $valorSuscripcion = (float)$sv->fetchColumn();
+
     $s2 = $pdo->prepare("SELECT COALESCE(SUM(monto),0) FROM transacciones WHERE cliente_id=? AND tipo='ingreso' AND estado='pagado'");
     $s2->execute([$cid]);
     $totalPagado = (float)$s2->fetchColumn();
@@ -176,11 +181,92 @@ if ($action === 'stats') {
     pdJson([
         'success'            => true,
         'servicios_activos'  => $nActivos,
+        'valor_suscripcion'  => $valorSuscripcion,
         'total_pagado'       => $totalPagado,
         'total_pendiente'    => $totalPend,
         'proxima_renovacion' => $renRow['prox'] ?? null,
         'dias_renovacion'    => isset($renRow['dias']) && $renRow['prox'] ? (int)$renRow['dias'] : null,
     ]);
+}
+
+// ─── TAREAS ───────────────────────────────────────────────────────────────────
+if ($action === 'tareas') {
+    // Auto-migración por si tareas no existe
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS tareas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            titulo VARCHAR(255) NOT NULL,
+            descripcion TEXT DEFAULT NULL,
+            prioridad ENUM('alta','media','baja') NOT NULL DEFAULT 'media',
+            estado ENUM('pendiente','en_progreso','revision','completado','cancelado') NOT NULL DEFAULT 'pendiente',
+            responsable VARCHAR(120) DEFAULT NULL,
+            cliente_id INT DEFAULT NULL,
+            fecha_limite DATE DEFAULT NULL,
+            notas TEXT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    } catch (PDOException $e) {}
+
+    $stmt = $pdo->prepare("
+        SELECT id, titulo, descripcion, prioridad, estado, responsable, fecha_limite, notas, created_at, updated_at
+        FROM tareas
+        WHERE cliente_id = ?
+        ORDER BY
+            FIELD(estado,'en_progreso','pendiente','revision','completado','cancelado'),
+            FIELD(prioridad,'alta','media','baja'),
+            created_at DESC
+        LIMIT 50
+    ");
+    $stmt->execute([$cid]);
+    pdJson(['success' => true, 'data' => $stmt->fetchAll()]);
+}
+
+// ─── NOTIFICACIONES ───────────────────────────────────────────────────────────
+if ($action === 'notificaciones') {
+    // Construye historial a partir de notif_r1_at / r2_at / r3_at en cliente_servicios
+    $stmt = $pdo->prepare("
+        SELECT
+            cs.id,
+            cs.notif_r1_at, cs.notif_r2_at, cs.notif_r3_at,
+            cs.fecha_vencimiento,
+            CASE
+                WHEN cs.paquete_id IS NOT NULL AND p.nombre IS NOT NULL THEN p.nombre
+                WHEN cs.nombre_display IS NOT NULL AND cs.nombre_display != '' THEN cs.nombre_display
+                ELSE s.nombre
+            END AS nombre_servicio
+        FROM cliente_servicios cs
+        JOIN servicios s ON cs.servicio_id = s.id
+        LEFT JOIN paquetes p ON cs.paquete_id = p.id
+        WHERE cs.cliente_id = ?
+          AND (cs.notif_r1_at IS NOT NULL OR cs.notif_r2_at IS NOT NULL OR cs.notif_r3_at IS NOT NULL)
+        ORDER BY cs.fecha_vencimiento DESC
+    ");
+    $stmt->execute([$cid]);
+    $rows = $stmt->fetchAll();
+
+    // Aplanar en lista de eventos individuales
+    $eventos = [];
+    foreach ($rows as $r) {
+        $labels = [1 => 'Recordatorio 1', 2 => 'Recordatorio 2', 3 => 'Aviso final'];
+        foreach ([1,2,3] as $n) {
+            $campo = "notif_r{$n}_at";
+            if (!empty($r[$campo])) {
+                $eventos[] = [
+                    'fecha'          => $r[$campo],
+                    'tipo'           => 'renovacion',
+                    'label'          => $labels[$n],
+                    'nombre_servicio'=> $r['nombre_servicio'],
+                    'vencimiento'    => $r['fecha_vencimiento'],
+                ];
+            }
+        }
+    }
+
+    // Ordenar por fecha descendente
+    usort($eventos, fn($a,$b) => strcmp($b['fecha'], $a['fecha']));
+
+    pdJson(['success' => true, 'data' => $eventos]);
 }
 
 pdJson(['error' => 'Acción no válida'], 400);
