@@ -2,54 +2,119 @@
 (function () {
   'use strict';
 
-  /* ── Dot-wave canvas (enhancement sobre CSS dot-grid) ─────────────────── */
-  function initDotWave() {
+  /* ── Particle system — reacciona al mouse ─────────────────────────────── */
+  function initParticles() {
     var canvas = document.getElementById('heroBg');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var sec  = canvas.parentElement;
-    var GAP  = 42;
     var W = 0, H = 0;
+    var mouse = { x: -9999, y: -9999 };
+    var COUNT = 48;
+    var CONNECT_DIST = 140;
+    var REPEL_DIST   = 110;
+    var pts = [];
 
     function resize() {
-      W = canvas.width  = (sec.offsetWidth  > 0 ? sec.offsetWidth  : window.innerWidth);
-      H = canvas.height = (sec.offsetHeight > 0 ? sec.offsetHeight : window.innerHeight);
+      W = canvas.width  = sec.offsetWidth  > 0 ? sec.offsetWidth  : window.innerWidth;
+      H = canvas.height = sec.offsetHeight > 0 ? sec.offsetHeight : window.innerHeight;
+    }
+
+    function mkPt() {
+      return {
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r:  1.4 + Math.random() * 1.2
+      };
+    }
+
+    function init() {
+      pts = [];
+      for (var i = 0; i < COUNT; i++) pts.push(mkPt());
     }
 
     var raf;
-    function draw(ts) {
-      var t = ts * 0.001;
-      if (W < 10) { resize(); }
+    function draw() {
       ctx.clearRect(0, 0, W, H);
-      var cols = Math.ceil(W / GAP) + 1;
-      var rows = Math.ceil(H / GAP) + 1;
-      for (var r = 0; r <= rows; r++) {
-        for (var c = 0; c <= cols; c++) {
-          var x = c * GAP, y = r * GAP;
-          // onda que viaja diagonal
-          var v = 0.5 + 0.5 * Math.sin(x * 0.018 + t * 0.65) * Math.cos(y * 0.018 - t * 0.45);
-          var alpha  = (0.14 + v * 0.38).toFixed(3);
-          var radius = 1.0 + v * 1.2;
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, 6.2832);
-          ctx.fillStyle = 'rgba(100,100,100,' + alpha + ')';
-          ctx.fill();
+
+      // Conexiones entre partículas cercanas
+      for (var i = 0; i < pts.length; i++) {
+        for (var j = i + 1; j < pts.length; j++) {
+          var dx = pts[i].x - pts[j].x;
+          var dy = pts[i].y - pts[j].y;
+          var d  = Math.sqrt(dx*dx + dy*dy);
+          if (d < CONNECT_DIST) {
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.strokeStyle = 'rgba(110,110,110,' + ((1 - d / CONNECT_DIST) * 0.28).toFixed(3) + ')';
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+          }
         }
       }
+
+      // Partículas
+      for (var i = 0; i < pts.length; i++) {
+        var p  = pts[i];
+
+        // Repulsión del mouse
+        var mdx = p.x - mouse.x;
+        var mdy = p.y - mouse.y;
+        var md  = Math.sqrt(mdx*mdx + mdy*mdy);
+        if (md < REPEL_DIST && md > 0) {
+          var f = (REPEL_DIST - md) / REPEL_DIST * 1.2;
+          p.vx += (mdx / md) * f;
+          p.vy += (mdy / md) * f;
+        }
+
+        // Fricción + límite de velocidad
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+        var spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+        if (spd > 2.2) { p.vx = p.vx/spd*2.2; p.vy = p.vy/spd*2.2; }
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Rebote en bordes
+        if (p.x < 0)  { p.x = 0;  p.vx *= -1; }
+        if (p.x > W)  { p.x = W;  p.vx *= -1; }
+        if (p.y < 0)  { p.y = 0;  p.vy *= -1; }
+        if (p.y > H)  { p.y = H;  p.vy *= -1; }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+        ctx.fillStyle = 'rgba(100,100,100,0.55)';
+        ctx.fill();
+      }
+
       raf = requestAnimationFrame(draw);
     }
 
-    window.addEventListener('resize', resize);
+    // Tracking del mouse relativo al canvas
+    sec.addEventListener('mousemove', function(e) {
+      var rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+    sec.addEventListener('mouseleave', function() {
+      mouse.x = -9999; mouse.y = -9999;
+    });
+
+    window.addEventListener('resize', function() { resize(); init(); });
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) cancelAnimationFrame(raf);
       else raf = requestAnimationFrame(draw);
     });
 
     resize();
-    canvas.style.opacity = '1'; // activar canvas (oculta el ::before CSS)
+    init();
     raf = requestAnimationFrame(draw);
   }
-  window.addEventListener('load', initDotWave);
+  window.addEventListener('load', initParticles);
 
   /* Año footer */
   var y = document.getElementById('year');
