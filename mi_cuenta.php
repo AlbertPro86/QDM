@@ -95,18 +95,8 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
 .badge-st.suspendido{background:#FEF3C7;color:#92400E}.badge-st.suspendido::before{background:#B45309}
 .badge-st.cancelado {background:#FEE2E2;color:#991B1B}.badge-st.cancelado::before{background:#991B1B}
 
-/* ── Activity tabs ────────────────────────────────────────── */
-.tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:14px}
-.tabs-wrap::-webkit-scrollbar{display:none}
-.tabs{display:inline-flex;min-width:100%;gap:2px;background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:4px}
-.tab{flex:1;min-width:0;padding:8px 6px;border:none;border-radius:7px;background:transparent;font-size:12.5px;font-weight:500;color:#8A867C;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
-.tab:hover{color:#252422;background:#F5F3EE}
-.tab.on{background:#252422;color:#fff;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.tab.on svg{opacity:1}
-.tab svg{opacity:.55;flex-shrink:0}
-.tab-cnt{font-size:10px;padding:1px 6px;border-radius:100px;background:rgba(255,255,255,.18);color:inherit;font-weight:800;line-height:1.5;display:none}
-.tab.on .tab-cnt{display:inline}
-.pane{display:none}.pane.on{display:block}
+/* ── Secciones de actividad ───────────────────────────────── */
+.ac-section{margin-top:28px}
 
 /* ── Estado badges (usados en cards) ──────────────────────── */
 .est-badge{font-size:11px;font-weight:700;display:inline-block;padding:3px 9px;border-radius:100px;white-space:nowrap;flex-shrink:0}
@@ -210,42 +200,8 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
     .hero-name{font-size:20px}
     .hero-value{font-size:30px}
     .hero-pills{gap:5px}
-    /* Tabs: grid 3 columnas arriba + 2 centradas abajo */
-    .tabs-wrap{overflow-x:unset}
-    .tabs{
-        display:grid;
-        grid-template-columns:repeat(6,1fr);
-        flex-wrap:unset;
-        gap:3px;
-        padding:4px
-    }
-    .tab{
-        flex-direction:column;
-        gap:3px;
-        padding:9px 4px;
-        font-size:10.5px;
-        min-height:52px;
-        white-space:normal
-    }
-    .tab span.tl{display:block !important;font-size:10px;line-height:1.2;text-align:center}
-    .tab svg{width:14px;height:14px}
-    .tab-cnt{font-size:9px;padding:0px 5px}
-    /* Columnas: tabs 1-3 ocupan 2 col cada uno (total 6) */
-    #tab-pagos {grid-column:1/3}
-    #tab-tareas{grid-column:3/5}
-    #tab-notif {grid-column:5/7}
-    /* Tabs 4-5 ocupan 3 col cada uno (mitad del total) */
-    #tab-docs  {grid-column:1/4}
-    #tab-perfil{grid-column:4/7}
-    /* Filas de actividad */
-    .act-row{flex-wrap:wrap;gap:8px;padding:11px 12px}
-    .act-right{width:100%;display:flex;align-items:center;gap:8px;padding-left:44px;margin-top:-2px}
-    .act-val{font-size:13px}
-    .act-est{font-size:10.5px;margin-top:0}
-    /* Perfil */
-    .perfil-grid{grid-template-columns:1fr}
-    .pf-item{border-right:none}
-    .pwd-row{flex-direction:column}
+    /* Secciones */
+    .ac-section{margin-top:20px}
     /* Servicios */
     .svc-name{font-size:14px}
     .svc-price-num{font-size:18px}
@@ -316,59 +272,48 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
     </div>
     <div class="svcs" id="svcsGrid"></div>
 
-    <!-- SECCIÓN 3: Actividad -->
-    <div class="sh" style="margin-top:4px">
-        <span class="sh-title">Actividad y detalle</span>
-    </div>
-
-    <div class="tabs-wrap">
-    <div class="tabs">
-        <button class="tab on" id="tab-pagos" onclick="setTab('pagos',this)">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            <span class="tl">Pagos</span>
-            <span class="tab-cnt" id="cntPagos">0</span>
-        </button>
-        <button class="tab" id="tab-tareas" onclick="setTab('tareas',this)">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="tl">Tareas</span>
-            <span class="tab-cnt" id="cntTareas">0</span>
-        </button>
-        <button class="tab" id="tab-notif" onclick="setTab('notif',this)">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            <span class="tl">Notificaciones</span>
-            <span class="tab-cnt" id="cntNotif">0</span>
-        </button>
-        <button class="tab" id="tab-docs" onclick="setTab('docs',this)">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-            <span class="tl">Documentos</span>
-            <span class="tab-cnt" id="cntDocs">0</span>
-        </button>
-        <button class="tab" id="tab-perfil" onclick="setTab('perfil',this)">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            <span class="tl">Mi Perfil</span>
-        </button>
-    </div>
-    </div>
-
-    <!-- Pane pagos -->
-    <div class="pane on" id="pane-pagos">
+    <!-- Historial de pagos -->
+    <div class="ac-section">
+        <div class="sh">
+            <span class="sh-title">Historial de pagos</span>
+            <span class="sh-badge" id="cntPagos"></span>
+        </div>
         <div id="listPagos"><div class="loading">Cargando…</div></div>
         <div class="more-btn" id="morePagos" style="display:none"><button onclick="loadMorePagos()">Ver más pagos</button></div>
     </div>
-    <!-- Pane tareas -->
-    <div class="pane" id="pane-tareas">
+
+    <!-- Tareas -->
+    <div class="ac-section">
+        <div class="sh">
+            <span class="sh-title">Tareas</span>
+            <span class="sh-badge" id="cntTareas"></span>
+        </div>
         <div id="listTareas"><div class="loading">Cargando…</div></div>
     </div>
-    <!-- Pane notif -->
-    <div class="pane" id="pane-notif">
+
+    <!-- Notificaciones -->
+    <div class="ac-section">
+        <div class="sh">
+            <span class="sh-title">Notificaciones enviadas</span>
+            <span class="sh-badge" id="cntNotif"></span>
+        </div>
         <div id="listNotif"><div class="loading">Cargando…</div></div>
     </div>
-    <!-- Pane docs -->
-    <div class="pane" id="pane-docs">
+
+    <!-- Documentos -->
+    <div class="ac-section">
+        <div class="sh">
+            <span class="sh-title">Documentos</span>
+            <span class="sh-badge" id="cntDocs"></span>
+        </div>
         <div id="listDocs"><div class="loading">Cargando…</div></div>
     </div>
-    <!-- Pane perfil -->
-    <div class="pane" id="pane-perfil">
+
+    <!-- Mi Perfil -->
+    <div class="ac-section">
+        <div class="sh">
+            <span class="sh-title">Mi perfil</span>
+        </div>
         <div id="perfilContent"><div class="loading">Cargando…</div></div>
     </div>
 
@@ -398,15 +343,6 @@ async function doLogout(){
     location.href='portal_cliente.php';
 }
 
-// ── Tab switcher ───────────────────────────────────────────
-const _ld={pagos:false,tareas:false,notif:false,docs:false,perfil:false};
-function setTab(name,btn){
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
-    btn.classList.add('on');
-    document.getElementById('pane-'+name).classList.add('on');
-    if(!_ld[name]){_ld[name]=true;({pagos:loadPagos,tareas:loadTareas,notif:loadNotif,docs:loadDocs,perfil:loadPerfil})[name]();}
-}
 
 // ── HERO + Stats ──────────────────────────────────────────
 async function loadHero(){
@@ -719,7 +655,11 @@ async function cambiarPwd(){
 // ── Init ───────────────────────────────────────────────────
 loadHero();
 loadSvcs();
-_ld.pagos=true; loadPagos();
+loadPagos();
+loadTareas();
+loadNotif();
+loadDocs();
+loadPerfil();
 </script>
 </body>
 </html>
