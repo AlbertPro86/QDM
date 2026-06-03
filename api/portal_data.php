@@ -27,6 +27,10 @@ $pdo = db(); // ← debe ir ANTES de cualquier uso de $pdo
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_password VARCHAR(255) DEFAULT NULL"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_activo TINYINT(1) NOT NULL DEFAULT 1"); } catch (PDOException $e) {}
 try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_ultimo_acceso DATETIME DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN portal_config TEXT DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN sitio_web VARCHAR(500) DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE clientes ADD COLUMN rut_url VARCHAR(255) DEFAULT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE cliente_servicios ADD COLUMN notas TEXT DEFAULT NULL"); } catch (PDOException $e) {}
 
 // Verificación en vivo: si el admin bloqueó al cliente, la sesión queda inválida
 try {
