@@ -269,4 +269,30 @@ if ($action === 'notificaciones') {
     pdJson(['success' => true, 'data' => $eventos]);
 }
 
+// ─── ACCESOS ──────────────────────────────────────────────────────────────────
+if ($action === 'accesos') {
+    // Auto-migración por si la tabla no existe aún
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS crm_cliente_credenciales (
+            id         INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            cliente_id INT          NOT NULL,
+            nombre     VARCHAR(255) NOT NULL DEFAULT '',
+            correo     VARCHAR(255) NOT NULL DEFAULT '',
+            clave      VARCHAR(500) NOT NULL DEFAULT '',
+            created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_cliente (cliente_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    } catch (PDOException $e) {}
+
+    $stmt = $pdo->prepare("
+        SELECT id, nombre, correo, clave, created_at
+        FROM crm_cliente_credenciales
+        WHERE cliente_id = ?
+        ORDER BY created_at DESC
+    ");
+    $stmt->execute([$cid]);
+    pdJson(['success' => true, 'data' => $stmt->fetchAll()]);
+}
+
 pdJson(['error' => 'Acción no válida'], 400);

@@ -159,6 +159,19 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
 .drow-meta{font-size:11px;color:#8A867C;margin-top:2px}
 .drow-ext{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 
+/* ── Accesos ───────────────────────────────────────────────── */
+.acc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:14px 16px}
+.acc-card{background:#FAFAF8;border:1px solid #EDEAE3;border-radius:10px;padding:14px 15px}
+.acc-title{font-size:13px;font-weight:700;color:#1E1D1B;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.acc-ico{width:28px;height:28px;border-radius:7px;background:#F0EDE6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acc-row{display:flex;align-items:center;gap:7px;margin-top:7px}
+.acc-lbl{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A867C;width:56px;flex-shrink:0}
+.acc-val{flex:1;font-size:12px;font-weight:600;color:#1E1D1B;font-family:'Courier New',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc-val.hidden-pwd{letter-spacing:.18em;color:#C0BBB3}
+.acc-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid #E4E1D9;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;transition:all .12s;color:#78746D}
+.acc-btn:hover{background:#F0EDE6;color:#1E1D1B}
+.acc-date{font-size:10px;color:#B8B3AB;margin-top:9px}
+
 /* ── Perfil ────────────────────────────────────────────────── */
 .pf-2col{display:grid;grid-template-columns:1fr 1fr}
 .pf-field{padding:12px 16px;border-bottom:1px solid #F5F3EF}
@@ -329,6 +342,11 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
                 <span class="tl">Documentos</span>
                 <span class="cnt" id="cntDocs"></span>
             </button>
+            <button class="tab-btn" id="tab-accesos" onclick="setTab('accesos',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                <span class="tl">Accesos</span>
+                <span class="cnt" id="cntAccesos"></span>
+            </button>
             <button class="tab-btn" id="tab-perfil" onclick="setTab('perfil',this)">
                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 <span class="tl">Mi Perfil</span>
@@ -356,6 +374,11 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:
         <!-- Pane: Documentos -->
         <div class="pane" id="pane-docs">
             <div id="listDocs"><div class="loading">Cargando…</div></div>
+        </div>
+
+        <!-- Pane: Accesos -->
+        <div class="pane" id="pane-accesos">
+            <div id="listAccesos"><div class="loading">Cargando…</div></div>
         </div>
 
         <!-- Pane: Perfil -->
@@ -393,7 +416,7 @@ async function doLogout(){
 }
 
 // ── Tabs (lazy load) ───────────────────────────────────────
-const _ld={pagos:false,tareas:false,notif:false,docs:false,perfil:false};
+const _ld={pagos:false,tareas:false,notif:false,docs:false,accesos:false,perfil:false};
 function setTab(name,btn){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
@@ -401,7 +424,7 @@ function setTab(name,btn){
     document.getElementById('pane-'+name).classList.add('on');
     if(!_ld[name]){
         _ld[name]=true;
-        ({pagos:loadPagos,tareas:loadTareas,notif:loadNotif,docs:loadDocs,perfil:loadPerfil})[name]();
+        ({pagos:loadPagos,tareas:loadTareas,notif:loadNotif,docs:loadDocs,accesos:loadAccesos,perfil:loadPerfil})[name]();
     }
 }
 
@@ -680,6 +703,62 @@ async function loadDocs(){
             </a>`;
         }).join('');
     }catch(e){el.innerHTML='<div class="empty-state">Error al cargar</div>';}
+}
+
+// ── Accesos ────────────────────────────────────────────────
+async function loadAccesos(){
+    const el=document.getElementById('listAccesos');
+    try{
+        const d=await fetch('api/portal_data.php?action=accesos').then(r=>r.json());
+        if(revocado(d))return;
+        const cnt=d.data?d.data.length:0;
+        const cntEl=document.getElementById('cntAccesos');
+        cntEl.textContent=cnt;
+        cntEl.style.display=cnt?'inline':'none';
+        if(!cnt){
+            el.innerHTML='<div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>Sin accesos registrados</div>';
+            return;
+        }
+        el.innerHTML='<div class="acc-grid">'+d.data.map((a,i)=>{
+            const pid='apwd'+i;
+            const hasEmail=a.correo&&a.correo.trim();
+            const hasPwd=a.clave&&a.clave.trim();
+            return`<div class="acc-card">
+                <div class="acc-title">
+                    <div class="acc-ico"><svg width="13" height="13" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg></div>
+                    ${esc(a.nombre)}
+                </div>
+                ${hasEmail?`<div class="acc-row">
+                    <span class="acc-lbl">Usuario</span>
+                    <span class="acc-val" id="ae${i}">${esc(a.correo)}</span>
+                    <button class="acc-btn" title="Copiar usuario" onclick="cpTxt(${JSON.stringify(a.correo)},'ae${i}')"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                </div>`:''}
+                ${hasPwd?`<div class="acc-row">
+                    <span class="acc-lbl">Clave</span>
+                    <span class="acc-val hidden-pwd" id="${pid}" data-raw="${esc(a.clave)}" data-vis="0">••••••••</span>
+                    <button class="acc-btn" title="Mostrar/ocultar" onclick="togPwd('${pid}')"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                    <button class="acc-btn" title="Copiar clave" onclick="cpTxt(${JSON.stringify(a.clave)},'${pid}')"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                </div>`:''}
+                <div class="acc-date">Agregado ${fd(a.created_at)}</div>
+            </div>`;
+        }).join('')+'</div>';
+    }catch(e){el.innerHTML='<div class="empty-state">Error al cargar accesos</div>';}
+}
+function togPwd(id){
+    const el=document.getElementById(id);
+    if(!el)return;
+    const vis=el.dataset.vis==='1';
+    el.dataset.vis=vis?'0':'1';
+    el.textContent=vis?'••••••••':el.dataset.raw;
+    el.classList.toggle('hidden-pwd',vis);
+}
+function cpTxt(txt,ref){
+    navigator.clipboard.writeText(txt).then(()=>toast('Copiado','ok')).catch(()=>{
+        const ta=document.createElement('textarea');
+        ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();document.execCommand('copy');
+        document.body.removeChild(ta);toast('Copiado','ok');
+    });
 }
 
 // ── Perfil ─────────────────────────────────────────────────
