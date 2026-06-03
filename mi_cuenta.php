@@ -26,163 +26,206 @@ $iniciales = implode('', array_map(fn($p) => mb_strtoupper(mb_substr($p,0,1)),
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased}
-body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#252422;min-height:100vh}
+body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#1E1D1B;min-height:100vh}
 
-/* ── Nav ─────────────────────────────────────────── */
-.nav{background:#252422;height:48px;display:flex;align-items:center;padding:0 18px;gap:10px;position:sticky;top:0;z-index:100}
+/* ── Nav ───────────────────────────────────────────────────── */
+.nav{background:#1E1D1B;height:48px;display:flex;align-items:center;padding:0 20px;gap:10px;position:sticky;top:0;z-index:200}
 .nav-logo img{height:20px;display:block}
 .nav-sep{width:1px;height:14px;background:rgba(255,255,255,.1)}
 .nav-tag{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#C6F24E;background:rgba(198,242,78,.1);padding:2px 7px;border-radius:100px}
 .nav-sp{flex:1}
-.nav-av{width:26px;height:26px;border-radius:50%;background:#C6F24E;color:#252422;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-nm{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-av{width:26px;height:26px;border-radius:50%;background:#C6F24E;color:#1E1D1B;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-nm{font-size:12px;font-weight:600;color:rgba(255,255,255,.65);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-out{display:flex;align-items:center;gap:4px;padding:4px 10px;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:5px;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer;font-family:inherit;transition:all .15s}
-.nav-out:hover{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.75)}
+.nav-out:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.8)}
 
-/* ── Hero ─────────────────────────────────────────── */
-.hero{background:#252422;padding:18px 18px 22px}
-.hero-inner{max-width:900px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
-.hero-id{flex:1;min-width:0}
-.hero-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:5px}
-.hero-company{font-size:22px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.02em}
-.hero-person{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;display:none}
-.hero-person span{color:rgba(255,255,255,.75);font-weight:600}
-.hero-nit{font-size:11px;color:rgba(255,255,255,.28);margin-top:2px}
-.hero-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
-.hpill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600}
-.hpill.ok    {background:rgba(45,143,90,.2);color:#6EE7A8}
-.hpill.warn  {background:rgba(180,122,30,.2);color:#FCD34D}
-.hpill.danger{background:rgba(176,56,47,.2);color:#FCA5A5}
-.hpill.grey  {background:rgba(255,255,255,.07);color:rgba(255,255,255,.4)}
-.hero-val-block{text-align:right;flex-shrink:0}
-.hero-val-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:4px}
-.hero-val{font-size:36px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em}
-.hero-val-cop{font-size:11px;font-weight:700;color:rgba(255,255,255,.3);margin-top:3px;letter-spacing:.04em}
-.hero-renov{margin-top:8px;font-size:11px;color:rgba(255,255,255,.38)}
-.hero-renov strong{color:rgba(255,255,255,.6)}
+/* ── Hero ──────────────────────────────────────────────────── */
+.hero{background:#1E1D1B;padding:22px 20px 26px}
+.hero-inner{max-width:920px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:28px}
+.hero-left{flex:1;min-width:0}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:6px}
+.hero-company{font-size:24px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.02em}
+.hero-person{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px;display:none}
+.hero-person b{color:rgba(255,255,255,.72);font-weight:600}
+.hero-nit{font-size:11px;color:rgba(255,255,255,.25);margin-top:2px}
+.hero-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}
+.hpill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.01em}
+.hpill.ok    {background:rgba(34,197,94,.15);color:#6EE7A8}
+.hpill.warn  {background:rgba(234,179,8,.15);color:#FCD34D}
+.hpill.danger{background:rgba(239,68,68,.15);color:#FCA5A5}
+.hpill.grey  {background:rgba(255,255,255,.07);color:rgba(255,255,255,.38)}
+.hero-right{flex-shrink:0;text-align:right}
+.hero-vlabel{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:5px}
+.hero-vnum{font-size:38px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em}
+.hero-vcop{font-size:11px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:.04em;margin-top:3px}
+.hero-renov{margin-top:9px;font-size:11.5px;color:rgba(255,255,255,.35)}
+.hero-renov b{color:rgba(255,255,255,.6)}
 
-/* ── Wrap ─────────────────────────────────────────── */
-.wrap{max-width:900px;margin:0 auto;padding:14px 14px 60px}
+/* ── Wrap ──────────────────────────────────────────────────── */
+.wrap{max-width:920px;margin:0 auto;padding:16px 16px 64px}
 
-/* ── Alert ────────────────────────────────────────── */
-.alert-bar{display:none;align-items:center;gap:8px;padding:9px 13px;border-radius:8px;margin-bottom:12px;font-size:12px;font-weight:500;line-height:1.4}
-.alert-bar.ok    {background:#E3F1E8;color:#1A6B41}
-.alert-bar.warn  {background:#FEF3C7;color:#92400E}
-.alert-bar.danger{background:#FEE2E2;color:#991B1B}
+/* ── Alert ─────────────────────────────────────────────────── */
+.alert-bar{display:none;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:12.5px;font-weight:500;line-height:1.4}
+.alert-bar.warn  {background:#FEF9E7;border:1px solid #F6D860;color:#7A5200}
+.alert-bar.danger{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B}
 
-/* ── Stats strip ──────────────────────────────────── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.stat{background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:11px 13px}
-.stat-n{font-size:18px;font-weight:900;color:#252422;letter-spacing:-.02em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat-n.sm{font-size:13px;margin-top:2px}
-.stat-lbl{font-size:10px;color:#8A867C;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ── Stats strip ───────────────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat{background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:13px 14px}
+.stat-v{font-size:15px;font-weight:900;color:#1E1D1B;letter-spacing:-.01em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-v.big{font-size:22px}
+.stat-v.ok  {color:#15803D}
+.stat-v.warn{color:#B45309}
+.stat-v.danger{color:#991B1B}
+.stat-l{font-size:10px;color:#8A867C;margin-top:3px;font-weight:500}
 
-/* ── Main 2-col grid ──────────────────────────────── */
-.mgrid{display:grid;grid-template-columns:1fr 310px;gap:12px;align-items:start}
-.col-main{}
-.col-side{}
+/* ── Bloque de servicios ───────────────────────────────────── */
+.svc-block{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.block-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #F0EDE6}
+.block-hdr-title{font-size:12px;font-weight:700;color:#1E1D1B;letter-spacing:.01em}
+.block-hdr-badge{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:100px;background:#F0EDE6;color:#57544D}
 
-/* ── Block (bloque blanco) ────────────────────────── */
-.blk{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden;margin-bottom:12px}
-.blk:last-child{margin-bottom:0}
-.blk-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #F0EDE6}
-.blk-title{font-size:11.5px;font-weight:700;color:#252422}
-.blk-badge{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:100px;background:#F0EDE6;color:#57544D}
-.blk-empty{padding:24px 14px;text-align:center;color:#8A867C;font-size:12px}
-.blk-empty svg{display:block;margin:0 auto 8px;opacity:.2}
-.blk-more{padding:9px 14px;border-top:1px solid #F0EDE6;text-align:center}
-.blk-more button{background:none;border:none;font-size:12px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit;transition:color .15s}
-.blk-more button:hover{color:#252422}
+/* Filas de servicio */
+.svc-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #F5F3EF;transition:background .12s}
+.svc-row:last-child{border-bottom:none}
+.svc-row:hover{background:#FAFAF8}
+.svc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.svc-info{flex:1;min-width:0}
+.svc-name{font-size:13.5px;font-weight:700;color:#1E1D1B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.svc-chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.svc-price{text-align:right;flex-shrink:0}
+.svc-price-num{font-size:15px;font-weight:900;color:#1E1D1B;letter-spacing:-.01em}
+.svc-price-sub{font-size:10px;font-weight:600;color:#8A867C;margin-top:1px}
 
-/* ── List row ─────────────────────────────────────── */
-.lrow{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid #F5F3EF;transition:background .1s}
+/* ── Chips ─────────────────────────────────────────────────── */
+.ch{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:100px;font-size:10.5px;font-weight:600;white-space:nowrap;line-height:1.5}
+.ch.ok    {background:#DCFCE7;color:#15803D}
+.ch.warn  {background:#FEF9C3;color:#A16207}
+.ch.danger{background:#FEE2E2;color:#991B1B}
+.ch.grey  {background:#F0EDE6;color:#78746D}
+.ch.blue  {background:#EFF6FF;color:#1D4ED8}
+.ch.pagado    {background:#DCFCE7;color:#15803D}
+.ch.pendiente {background:#FEF9C3;color:#A16207}
+.ch.vencido   {background:#FEE2E2;color:#991B1B}
+.ch.completado{background:#DCFCE7;color:#15803D}
+.ch.en_progreso,.ch.revision{background:#EFF6FF;color:#1D4ED8}
+.ch.cancelado {background:#FEE2E2;color:#991B1B}
+.ch.alta {background:#FEE2E2;color:#991B1B}
+.ch.media{background:#FEF9C3;color:#A16207}
+.ch.baja {background:#DCFCE7;color:#15803D}
+
+/* ── Área de actividad ─────────────────────────────────────── */
+.activity{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden}
+
+/* ── Tab bar ───────────────────────────────────────────────── */
+.tab-bar{display:flex;border-bottom:1px solid #F0EDE6;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;border:none;background:transparent;font-size:12.5px;font-weight:500;color:#8A867C;cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.tab-btn:hover{color:#1E1D1B;background:#FAFAF8}
+.tab-btn.on{font-weight:700;color:#1E1D1B;border-bottom-color:#1E1D1B}
+.tab-btn svg{opacity:.5;flex-shrink:0;transition:opacity .15s}
+.tab-btn.on svg{opacity:1}
+.tab-btn .cnt{font-size:10px;padding:1px 6px;border-radius:100px;background:#F0EDE6;color:#57544D;font-weight:800;line-height:1.5}
+.tab-btn.on .cnt{background:#1E1D1B;color:#fff}
+
+/* ── Panes ─────────────────────────────────────────────────── */
+.pane{display:none}
+.pane.on{display:block}
+
+/* ── List rows (dentro de panes) ──────────────────────────── */
+.lrow{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #F5F3EF;transition:background .1s}
 .lrow:last-child{border-bottom:none}
 .lrow:hover{background:#FAFAF8}
-.lrow-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.lrow-mark{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
 .lrow-body{flex:1;min-width:0}
-.lrow-name{font-size:13px;font-weight:600;color:#252422;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lrow-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px}
-.lrow-right{flex-shrink:0;text-align:right;min-width:72px}
-.lrow-val{font-size:13px;font-weight:800;color:#252422;white-space:nowrap}
-.lrow-sub{font-size:10.5px;color:#8A867C;margin-top:1px;text-align:right}
+.lrow-title{font-size:13px;font-weight:600;color:#1E1D1B;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.lrow-right{flex-shrink:0;text-align:right;min-width:80px}
+.lrow-val{font-size:13.5px;font-weight:900;color:#1E1D1B;white-space:nowrap;letter-spacing:-.01em}
+.lrow-date{font-size:11px;color:#8A867C;margin-top:2px}
 
-/* ── Chips pequeños ───────────────────────────────── */
-.ch{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:100px;font-size:10.5px;font-weight:600;white-space:nowrap}
-.ch.ok    {background:#E3F1E8;color:#1A6B41}
-.ch.warn  {background:#FEF3C7;color:#B45309}
-.ch.danger{background:#FEE2E2;color:#991B1B}
-.ch.grey  {background:#F0EDE6;color:#8A867C}
-.ch.blue  {background:#EEF2FB;color:#3F5E9E}
-.ch.alta  {background:#FEE2E2;color:#991B1B}
-.ch.media {background:#FEF3C7;color:#B45309}
-.ch.baja  {background:#E3F1E8;color:#1A6B41}
-.ch.pagado    {background:#E3F1E8;color:#1A6B41}
-.ch.pendiente {background:#FEF3C7;color:#B45309}
-.ch.vencido   {background:#FEE2E2;color:#991B1B}
-.ch.completado{background:#E3F1E8;color:#1A6B41}
-.ch.en_progreso,.ch.revision{background:#EEF2FB;color:#3F5E9E}
-.ch.cancelado {background:#FEE2E2;color:#991B1B}
+/* ── Más pagos ─────────────────────────────────────────────── */
+.load-more{padding:12px 16px;border-top:1px solid #F0EDE6;text-align:center}
+.load-more button{background:none;border:none;font-size:12.5px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit;transition:color .15s;padding:2px 8px}
+.load-more button:hover{color:#1E1D1B}
 
-/* ── Perfil ───────────────────────────────────────── */
-.pf-grid{display:grid;grid-template-columns:1fr 1fr}
-.pf-row{padding:9px 14px;border-bottom:1px solid #F5F3EF}
-.pf-row:nth-child(odd){border-right:1px solid #F5F3EF}
-.pf-row.full{grid-column:1/-1;border-right:none}
-.pf-lbl{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:3px}
-.pf-val{font-size:12.5px;font-weight:600;color:#252422}
-.pf-val.e{color:#C4C0BA;font-weight:400;font-style:italic}
-.pwd-hdr{padding:11px 14px;border-top:1px solid #F0EDE6;border-bottom:1px solid #F0EDE6;font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.05em}
-.pwd-wrap{padding:12px 14px;display:flex;gap:7px;flex-wrap:wrap}
-.inp{padding:7px 10px;border:1.5px solid #E4E1D9;border-radius:6px;font-size:12px;font-family:inherit;background:#FAFAF7;color:#252422;outline:none;transition:border-color .15s;flex:1;min-width:110px}
-.inp:focus{border-color:#252422;background:#fff}
-.btn-sm{padding:7px 14px;background:#252422;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s}
-.btn-sm:hover{opacity:.8}
-.btn-sm:disabled{opacity:.4;cursor:not-allowed}
-
-/* ── Documentos compact row ───────────────────────── */
-.drow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #F5F3EF;text-decoration:none;color:inherit;transition:background .1s}
+/* ── Documentos ────────────────────────────────────────────── */
+.drow{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #F5F3EF;text-decoration:none;color:inherit;transition:background .1s}
 .drow:last-child{border-bottom:none}
 .drow:hover{background:#FAFAF8}
-.drow-ext{font-size:8.5px;font-weight:800;padding:3px 6px;border-radius:4px;letter-spacing:.03em;text-transform:uppercase;flex-shrink:0;min-width:30px;text-align:center}
-.drow-name{flex:1;font-size:12.5px;font-weight:600;color:#252422;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.drow-date{font-size:10.5px;color:#8A867C;flex-shrink:0}
+.drow-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.drow-info{flex:1;min-width:0}
+.drow-name{font-size:13px;font-weight:600;color:#1E1D1B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow-meta{font-size:11px;color:#8A867C;margin-top:2px}
+.drow-ext{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 
-/* ── Loading / Empty ──────────────────────────────── */
-.loading{padding:22px;text-align:center;color:#8A867C;font-size:12px}
+/* ── Perfil ────────────────────────────────────────────────── */
+.pf-2col{display:grid;grid-template-columns:1fr 1fr}
+.pf-field{padding:12px 16px;border-bottom:1px solid #F5F3EF}
+.pf-field:nth-child(odd){border-right:1px solid #F5F3EF}
+.pf-field.full{grid-column:1/-1;border-right:none}
+.pf-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:3px}
+.pf-value{font-size:13px;font-weight:600;color:#1E1D1B}
+.pf-value.empty{color:#C0BBB3;font-weight:400;font-style:italic}
+.pwd-section{padding:14px 16px;border-top:1px solid #F0EDE6;background:#FAFAF8}
+.pwd-section-title{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:10px}
+.pwd-fields{display:flex;gap:8px;flex-wrap:wrap}
+.inp{flex:1;min-width:120px;padding:8px 11px;border:1.5px solid #E4E1D9;border-radius:7px;font-size:12.5px;font-family:inherit;background:#fff;color:#1E1D1B;outline:none;transition:border-color .15s}
+.inp:focus{border-color:#1E1D1B}
+.btn-save{padding:8px 16px;background:#1E1D1B;color:#fff;border:none;border-radius:7px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s}
+.btn-save:hover{opacity:.8}
+.btn-save:disabled{opacity:.4;cursor:not-allowed}
 
-/* ── Toast ────────────────────────────────────────── */
-#toast{position:fixed;bottom:16px;right:16px;z-index:9999;padding:9px 14px;border-radius:7px;font-size:12px;font-weight:600;color:#fff;background:#252422;box-shadow:0 4px 16px rgba(0,0,0,.15);opacity:0;transform:translateY(5px);transition:all .2s;pointer-events:none}
+/* ── Loading / Empty ───────────────────────────────────────── */
+.loading{padding:28px;text-align:center;color:#8A867C;font-size:12.5px}
+.empty-state{padding:32px 20px;text-align:center;color:#8A867C;font-size:13px}
+.empty-state svg{display:block;margin:0 auto 10px;opacity:.18}
+
+/* ── Toast ─────────────────────────────────────────────────── */
+#toast{position:fixed;bottom:18px;right:18px;z-index:9999;padding:10px 15px;border-radius:8px;font-size:12.5px;font-weight:600;color:#fff;background:#1E1D1B;box-shadow:0 4px 18px rgba(0,0,0,.16);opacity:0;transform:translateY(6px);transition:all .22s;pointer-events:none;max-width:300px}
 #toast.show{opacity:1;transform:none}
-#toast.ok{background:#1A6B41}
+#toast.ok {background:#15803D}
 #toast.err{background:#991B1B}
 
-/* ── Revocado ─────────────────────────────────────── */
+/* ── Revocado overlay ──────────────────────────────────────── */
 #revocado{display:none;position:fixed;inset:0;z-index:9000;background:#fff;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px}
 #revocado.show{display:flex}
 
-/* ── Responsive ───────────────────────────────────── */
-@media(max-width:820px){
-    .mgrid{grid-template-columns:1fr}
-    .col-side{display:contents}
-    /* reordenar columna lateral inline */
-}
-@media(max-width:600px){
-    .hero-inner{flex-direction:column;gap:0}
-    .hero-val-block{width:100%;text-align:left;padding-top:12px;margin-top:12px;border-top:1px solid rgba(255,255,255,.08)}
-    .hero-company{font-size:19px}
-    .hero-val{font-size:28px}
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+
+/* Tablet y debajo: stats 2 filas */
+@media(max-width:700px){
     .stats{grid-template-columns:repeat(2,1fr)}
-    .wrap{padding:12px 10px 50px}
+    .hero-vnum{font-size:30px}
+    .hero-company{font-size:20px}
 }
-@media(max-width:420px){
-    .nav-nm{display:none}
-    .hero{padding:14px 12px 18px}
-    .lrow-name{font-size:12.5px}
+
+/* Móvil: hero apilado */
+@media(max-width:580px){
+    .hero-inner{flex-direction:column;gap:0}
+    .hero-right{width:100%;text-align:left;padding-top:14px;margin-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+    .hero-vnum{font-size:28px}
+    .hero-company{font-size:19px}
+    .wrap{padding:12px 12px 56px}
+    .tab-btn{font-size:11.5px;padding:11px 6px;gap:4px}
+    .tab-btn svg{width:12px;height:12px}
     .lrow-val{font-size:12.5px}
-    .pf-grid{grid-template-columns:1fr}
-    .pf-row:nth-child(odd){border-right:none}
-    .pf-row.full{grid-column:1}
-    .pwd-wrap{flex-direction:column}
+}
+
+/* Móvil pequeño */
+@media(max-width:440px){
+    .nav-nm{display:none}
+    .hero{padding:16px 14px 20px}
+    .tab-btn .tl{display:none}
+    .tab-btn{padding:12px}
+    .svc-price-num{font-size:13px}
+    .lrow-right{min-width:65px}
+    .pf-2col{grid-template-columns:1fr}
+    .pf-field:nth-child(odd){border-right:none}
+    .pf-field.full{grid-column:1}
+    .pwd-fields{flex-direction:column}
 }
 </style>
 </head>
@@ -207,139 +250,162 @@ body{font-family:'Inter',sans-serif;background:#EDEAE3;color:#252422;min-height:
 <!-- Hero -->
 <div class="hero">
     <div class="hero-inner">
-        <div class="hero-id">
+        <div class="hero-left">
             <div class="hero-label">Portal de cliente</div>
             <div class="hero-company" id="heroNombre"><?= $nombre ?></div>
-            <div class="hero-person" id="heroContact">Encargado: <span id="heroContactName"></span></div>
+            <div class="hero-person" id="heroContact">Encargado: <b id="heroContactName"></b></div>
             <div class="hero-nit" id="heroNit"></div>
-            <div class="hero-pills" id="heroPills">
-                <span class="hpill grey">Cargando…</span>
-            </div>
+            <div class="hero-pills" id="heroPills"><span class="hpill grey">Cargando…</span></div>
         </div>
-        <div class="hero-val-block">
-            <div class="hero-val-lbl">Valor suscripción</div>
-            <div class="hero-val" id="heroValor">—</div>
-            <div class="hero-val-cop">COP</div>
+        <div class="hero-right">
+            <div class="hero-vlabel">Valor de suscripción</div>
+            <div class="hero-vnum" id="heroValor">—</div>
+            <div class="hero-vcop">COP</div>
             <div class="hero-renov" id="heroRenov"></div>
         </div>
     </div>
 </div>
 
-<!-- Contenido -->
+<!-- Contenido principal -->
 <div class="wrap">
 
-    <!-- Alert -->
+    <!-- Alerta -->
     <div class="alert-bar" id="alertBar">
-        <span id="alertIco" style="font-size:14px;flex-shrink:0"></span>
+        <span id="alertIco" style="font-size:15px;flex-shrink:0"></span>
         <span id="alertTxt"></span>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats strip -->
     <div class="stats">
-        <div class="stat"><div class="stat-n" id="stActivos">—</div><div class="stat-lbl">Servicios activos</div></div>
-        <div class="stat"><div class="stat-n" id="stValor" style="font-size:14px;margin-top:1px">—</div><div class="stat-lbl">Suscripción</div></div>
-        <div class="stat"><div class="stat-n" id="stPagado" style="font-size:14px;margin-top:1px">—</div><div class="stat-lbl">Total pagado</div></div>
-        <div class="stat"><div class="stat-n" id="stRenov" style="font-size:13px;margin-top:1px">—</div><div class="stat-lbl">Próx. renovación</div></div>
+        <div class="stat">
+            <div class="stat-v big" id="stActivos">—</div>
+            <div class="stat-l">Servicios activos</div>
+        </div>
+        <div class="stat">
+            <div class="stat-v" id="stValor">—</div>
+            <div class="stat-l">Suscripción mensual</div>
+        </div>
+        <div class="stat">
+            <div class="stat-v" id="stPagado">—</div>
+            <div class="stat-l">Total pagado</div>
+        </div>
+        <div class="stat">
+            <div class="stat-v" id="stRenov">—</div>
+            <div class="stat-l" id="stRenovLbl">Próx. renovación</div>
+        </div>
     </div>
 
-    <!-- Grid principal -->
-    <div class="mgrid">
+    <!-- Bloque servicios -->
+    <div class="svc-block" id="blkSvcs" style="display:none">
+        <div class="block-hdr">
+            <span class="block-hdr-title">Mis servicios</span>
+            <span class="block-hdr-badge" id="cntSvcs"></span>
+        </div>
+        <div id="listSvcs"><div class="loading">Cargando…</div></div>
+    </div>
 
-        <!-- Columna principal -->
-        <div class="col-main">
+    <!-- Actividad: tabs + panes -->
+    <div class="activity">
 
-            <!-- Servicios -->
-            <div class="blk" id="blkSvcs">
-                <div class="blk-hdr">
-                    <span class="blk-title">Mis servicios</span>
-                    <span class="blk-badge" id="cntSvcs"></span>
-                </div>
-                <div id="listSvcs"><div class="loading">Cargando…</div></div>
+        <!-- Tab bar -->
+        <div class="tab-bar">
+            <button class="tab-btn on" id="tab-pagos" onclick="setTab('pagos',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                <span class="tl">Pagos</span>
+                <span class="cnt" id="cntPagos"></span>
+            </button>
+            <button class="tab-btn" id="tab-tareas" onclick="setTab('tareas',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="tl">Tareas</span>
+                <span class="cnt" id="cntTareas"></span>
+            </button>
+            <button class="tab-btn" id="tab-notif" onclick="setTab('notif',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span class="tl">Notificaciones</span>
+                <span class="cnt" id="cntNotif"></span>
+            </button>
+            <button class="tab-btn" id="tab-docs" onclick="setTab('docs',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span class="tl">Documentos</span>
+                <span class="cnt" id="cntDocs"></span>
+            </button>
+            <button class="tab-btn" id="tab-perfil" onclick="setTab('perfil',this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <span class="tl">Mi Perfil</span>
+            </button>
+        </div>
+
+        <!-- Pane: Pagos -->
+        <div class="pane on" id="pane-pagos">
+            <div id="listPagos"><div class="loading">Cargando…</div></div>
+            <div class="load-more" id="morePagos" style="display:none">
+                <button onclick="loadMorePagos()">Ver más pagos</button>
             </div>
+        </div>
 
-            <!-- Pagos -->
-            <div class="blk">
-                <div class="blk-hdr">
-                    <span class="blk-title">Historial de pagos</span>
-                    <span class="blk-badge" id="cntPagos"></span>
-                </div>
-                <div id="listPagos"><div class="loading">Cargando…</div></div>
-                <div class="blk-more" id="morePagos" style="display:none">
-                    <button onclick="loadMorePagos()">Ver más pagos →</button>
-                </div>
-            </div>
+        <!-- Pane: Tareas -->
+        <div class="pane" id="pane-tareas">
+            <div id="listTareas"><div class="loading">Cargando…</div></div>
+        </div>
 
-        </div><!-- /col-main -->
+        <!-- Pane: Notificaciones -->
+        <div class="pane" id="pane-notif">
+            <div id="listNotif"><div class="loading">Cargando…</div></div>
+        </div>
 
-        <!-- Columna lateral -->
-        <div class="col-side">
+        <!-- Pane: Documentos -->
+        <div class="pane" id="pane-docs">
+            <div id="listDocs"><div class="loading">Cargando…</div></div>
+        </div>
 
-            <!-- Tareas -->
-            <div class="blk">
-                <div class="blk-hdr">
-                    <span class="blk-title">Tareas</span>
-                    <span class="blk-badge" id="cntTareas"></span>
-                </div>
-                <div id="listTareas"><div class="loading">Cargando…</div></div>
-            </div>
+        <!-- Pane: Perfil -->
+        <div class="pane" id="pane-perfil">
+            <div id="perfilContent"><div class="loading">Cargando…</div></div>
+        </div>
 
-            <!-- Mi Perfil -->
-            <div class="blk">
-                <div class="blk-hdr"><span class="blk-title">Mi perfil</span></div>
-                <div id="perfilContent"><div class="loading">Cargando…</div></div>
-            </div>
-
-            <!-- Documentos (se muestra solo si hay docs) -->
-            <div class="blk" id="blkDocs" style="display:none">
-                <div class="blk-hdr">
-                    <span class="blk-title">Documentos</span>
-                    <span class="blk-badge" id="cntDocs"></span>
-                </div>
-                <div id="listDocs"></div>
-            </div>
-
-            <!-- Notificaciones (se muestra solo si hay) -->
-            <div class="blk" id="blkNotif" style="display:none">
-                <div class="blk-hdr">
-                    <span class="blk-title">Notificaciones enviadas</span>
-                    <span class="blk-badge" id="cntNotif"></span>
-                </div>
-                <div id="listNotif"></div>
-            </div>
-
-        </div><!-- /col-side -->
-
-    </div><!-- /mgrid -->
+    </div><!-- /activity -->
 
 </div><!-- /wrap -->
 
+<!-- Revocado -->
 <div id="revocado">
-    <svg width="38" height="38" fill="none" stroke="#991B1B" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-    <div style="font-size:16px;font-weight:800">Acceso desactivado</div>
-    <div style="font-size:12.5px;color:#57544D;max-width:300px">Tu acceso fue desactivado. Comunícate con QUANTUN Digital.</div>
-    <a href="portal_cliente.php" style="margin-top:4px;padding:8px 18px;background:#252422;color:#fff;border-radius:6px;text-decoration:none;font-weight:700;font-size:12.5px">Volver al inicio</a>
+    <svg width="40" height="40" fill="none" stroke="#991B1B" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+    <div style="font-size:17px;font-weight:800;color:#1E1D1B">Acceso desactivado</div>
+    <div style="font-size:13px;color:#57544D;max-width:300px;line-height:1.5">Tu acceso al portal fue desactivado. Comunícate con QUANTUN Digital.</div>
+    <a href="portal_cliente.php" style="padding:9px 20px;background:#1E1D1B;color:#fff;border-radius:7px;text-decoration:none;font-weight:700;font-size:13px;margin-top:4px">Volver al inicio</a>
 </div>
 <div id="toast"></div>
 
 <script>
-// ── Utils ──────────────────────────────────────────
+// ── Utils ──────────────────────────────────────────────────
 const M=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 function fd(d){if(!d)return'—';const s=d.split('T')[0].split('-');return`${+s[2]} ${M[+s[1]]} ${s[0]}`;}
 function fn(n){return'$ '+Number(n).toLocaleString('es-CO',{maximumFractionDigits:0});}
-function fnShort(n){const v=Number(n);if(v>=1000000)return'$'+(v/1000000).toFixed(1).replace('.0','')+'M';if(v>=1000)return'$'+(v/1000).toFixed(0)+'k';return fn(v);}
 function ff(f){const m={mensual:'Mensual',anual:'Anual',trimestral:'Trimestral',semestral:'Semestral',mes:'Mensual','año':'Anual',trimestre:'Trimestral',semestre:'Semestral',unico:'Único'};return m[(f||'').toLowerCase()]||f||'—';}
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 function toast(msg,t=''){const el=document.getElementById('toast');el.textContent=msg;el.className='show '+t;clearTimeout(el._t);el._t=setTimeout(()=>el.className='',3200);}
 function revocado(d){if(d&&d.revocado){document.getElementById('revocado').classList.add('show');return true;}return false;}
-function emptyBlk(msg,icon=''){return`<div class="blk-empty">${icon?`<svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">${icon}</svg>`:''}${esc(msg)}</div>`;}
 
-// ── Logout ─────────────────────────────────────────
+// ── Logout ─────────────────────────────────────────────────
 async function doLogout(){
     await fetch('api/portal_auth.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout'})});
     location.href='portal_cliente.php';
 }
 
-// ── Hero + Stats ───────────────────────────────────
+// ── Tabs (lazy load) ───────────────────────────────────────
+const _ld={pagos:false,tareas:false,notif:false,docs:false,perfil:false};
+function setTab(name,btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('pane-'+name).classList.add('on');
+    if(!_ld[name]){
+        _ld[name]=true;
+        ({pagos:loadPagos,tareas:loadTareas,notif:loadNotif,docs:loadDocs,perfil:loadPerfil})[name]();
+    }
+}
+
+// ── Hero + Stats ───────────────────────────────────────────
 async function loadHero(){
     try{
         const[sd,pd]=await Promise.all([
@@ -348,7 +414,7 @@ async function loadHero(){
         ]);
         if(revocado(sd)||revocado(pd))return;
 
-        // Perfil
+        // Perfil en hero
         if(pd.success&&pd.data){
             const p=pd.data;
             document.getElementById('heroNombre').textContent=p.nombre_comercial||'<?= $nombre ?>';
@@ -360,51 +426,46 @@ async function loadHero(){
         }
 
         if(!sd.success)return;
-
-        // Valor hero
         const val=sd.valor_suscripcion||0;
+
+        // Hero valor
         document.getElementById('heroValor').textContent=val>0?fn(val).replace('$ ',''):'0';
 
-        // Renovación hero
+        // Hero renovación
         if(sd.proxima_renovacion){
             const dias=sd.dias_renovacion;
-            let txt='';
-            if(dias<0) txt=`Vencida hace ${Math.abs(dias)} días`;
-            else if(dias===0) txt='Vence hoy';
-            else txt=`Renueva <strong>${fd(sd.proxima_renovacion)}</strong> · en ${dias} días`;
+            const txt=dias<0?`Vencida hace ${Math.abs(dias)} días`
+                :dias===0?'Vence hoy'
+                :`Renueva <b>${fd(sd.proxima_renovacion)}</b> · en ${dias} días`;
             document.getElementById('heroRenov').innerHTML=txt;
         }
 
-        // Pills
+        // Hero pills
         const pills=[];
         if(sd.servicios_activos>0)
-            pills.push(`<span class="hpill ok"><svg width="7" height="7" fill="#6EE7A8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>${sd.servicios_activos} activo${sd.servicios_activos!==1?'s':''}</span>`);
+            pills.push(`<span class="hpill ok"><svg width="7" height="7" fill="#6EE7A8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>${sd.servicios_activos} servicio${sd.servicios_activos!==1?'s':''} activo${sd.servicios_activos!==1?'s':''}</span>`);
         if(sd.proxima_renovacion){
-            const dias=sd.dias_renovacion;
-            let cls='grey',txt='';
-            if(dias<0){cls='danger';txt='Vencido';}
-            else if(dias<=7){cls='danger';txt=`Vence en ${dias}d`;}
-            else if(dias<=30){cls='warn';txt=`${dias}d para renovar`;}
-            else{cls='ok';txt='Al día';}
-            pills.push(`<span class="hpill ${cls}"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${txt}</span>`);
+            const d=sd.dias_renovacion;
+            const cls=d<0?'danger':d<=7?'danger':d<=30?'warn':'ok';
+            const txt=d<0?'Vencido':d<=7?`Vence en ${d}d`:d<=30?`${d} días para renovar`:'Al día';
+            pills.push(`<span class="hpill ${cls}">${txt}</span>`);
         }
         if(sd.total_pendiente>0)
-            pills.push(`<span class="hpill warn">${fn(sd.total_pendiente)} por pagar</span>`);
+            pills.push(`<span class="hpill warn">${fn(sd.total_pendiente)} pendiente</span>`);
         document.getElementById('heroPills').innerHTML=pills.join('')||'<span class="hpill grey">Sin servicios activos</span>';
 
-        // Stats strip
+        // Stats strip — precios completos
         document.getElementById('stActivos').textContent=sd.servicios_activos||'0';
-        document.getElementById('stValor').textContent=val>0?fnShort(val):'$ 0';
-        document.getElementById('stPagado').textContent=sd.total_pagado>0?fnShort(sd.total_pagado):'$ 0';
+        document.getElementById('stValor').textContent=val>0?fn(val):'$ 0';
+        document.getElementById('stPagado').textContent=sd.total_pagado>0?fn(sd.total_pagado):'$ 0';
         if(sd.proxima_renovacion){
             const dias=sd.dias_renovacion;
             const el=document.getElementById('stRenov');
             el.textContent=fd(sd.proxima_renovacion);
-            el.style.color=dias<0?'#991B1B':dias<=7?'#B45309':'#252422';
-            el.nextElementSibling.textContent=dias<0?'Vencida':dias===0?'Hoy':dias<=30?`En ${dias} días`:'Próx. renovación';
+            el.className='stat-v'+(dias<0?' danger':dias<=7?' danger':dias<=30?' warn':'');
+            document.getElementById('stRenovLbl').textContent=dias<0?'¡Vencida!':dias===0?'¡Hoy!':dias<=7?`En ${dias} días`:dias<=30?`En ${dias} días`:'Próx. renovación';
         }else{
             document.getElementById('stRenov').textContent='—';
-            document.getElementById('stRenov').nextElementSibling.textContent='Próx. renovación';
         }
 
         // Alert bar
@@ -414,83 +475,85 @@ async function loadHero(){
                 const ab=document.getElementById('alertBar');
                 document.getElementById('alertIco').textContent=dias<0?'⚠️':dias<=7?'🔔':'📅';
                 document.getElementById('alertTxt').innerHTML=dias<0
-                    ?`<strong>Suscripción vencida hace ${Math.abs(dias)} días.</strong> Comunícate con QUANTUN Digital.`
+                    ?`<strong>Suscripción vencida hace ${Math.abs(dias)} días.</strong> Comunícate con QUANTUN Digital para renovar.`
                     :dias<=7
-                    ?`<strong>Vence en ${dias} día${dias!==1?'s':''}.</strong> Realiza tu pago para evitar la suspensión.`
-                    :`Próxima renovación el <strong>${fd(sd.proxima_renovacion)}</strong>, en ${dias} días.`;
-                ab.className='alert-bar '+(dias<0||dias<=7?'danger':'warn');
+                    ?`<strong>Tu servicio vence en ${dias} día${dias!==1?'s':''}.</strong> Realiza tu pago para evitar la suspensión.`
+                    :`Tu próxima renovación es el <strong>${fd(sd.proxima_renovacion)}</strong>, en ${dias} días.`;
+                ab.className='alert-bar '+(dias<=7?'danger':'warn');
                 ab.style.display='flex';
             }
         }
     }catch(e){}
 }
 
-// ── Servicios ──────────────────────────────────────
+// ── Servicios ──────────────────────────────────────────────
 async function loadSvcs(){
     const el=document.getElementById('listSvcs');
+    const blk=document.getElementById('blkSvcs');
     try{
         const d=await fetch('api/portal_data.php?action=servicios').then(r=>r.json());
         if(revocado(d))return;
-        if(!d.success||!d.data.length){
-            document.getElementById('blkSvcs').style.display='none';
-            return;
-        }
+        if(!d.success||!d.data.length){blk.style.display='none';return;}
+        blk.style.display='block';
         document.getElementById('cntSvcs').textContent=d.data.length;
-        const stDot={activo:'#1A6B41',suspendido:'#B45309',cancelado:'#991B1B'};
+        const dotColor={activo:'#15803D',suspendido:'#B45309',cancelado:'#991B1B'};
         el.innerHTML=d.data.map(sv=>{
             const val=Math.max(0,parseFloat(sv.valor_suscripcion)||0);
             const dias=parseInt(sv.dias_para_vencimiento);
             const esUnico=(sv.frecuencia||'').toLowerCase()==='unico';
             let rCls='grey',rTxt='—';
             if(sv.estado==='activo'&&sv.fecha_vencimiento&&!esUnico){
-                if(dias<0){rCls='danger';rTxt=`Venció hace ${Math.abs(dias)}d`;}
-                else if(dias<=7){rCls='danger';rTxt=`Vence en ${dias}d`;}
-                else if(dias<=30){rCls='warn';rTxt=`Vence ${fd(sv.fecha_vencimiento)}`;}
+                if(dias<0){rCls='danger';rTxt=`Venció hace ${Math.abs(dias)} días`;}
+                else if(dias<=7){rCls='danger';rTxt=`Vence en ${dias} día${dias!==1?'s':''}`;}
+                else if(dias<=30){rCls='warn';rTxt=`Vence el ${fd(sv.fecha_vencimiento)}`;}
                 else{rCls='ok';rTxt=`Vigente hasta ${fd(sv.fecha_vencimiento)}`;}
             }else if(esUnico){rCls='grey';rTxt='Pago único';}
-            return`<div class="lrow">
-                <div class="lrow-dot" style="background:${stDot[sv.estado]||'#8A867C'}"></div>
-                <div class="lrow-body">
-                    <div class="lrow-name">${esc(sv.nombre_servicio)}</div>
-                    <div class="lrow-meta">
-                        <span class="ch grey">${esc(ff(sv.frecuencia))}</span>
+            return`<div class="svc-row">
+                <div class="svc-dot" style="background:${dotColor[sv.estado]||'#8A867C'}"></div>
+                <div class="svc-info">
+                    <div class="svc-name">${esc(sv.nombre_servicio)}</div>
+                    <div class="svc-chips">
+                        ${!esUnico?`<span class="ch blue">${esc(ff(sv.frecuencia))}</span>`:''}
                         <span class="ch ${rCls}">${esc(rTxt)}</span>
+                        ${sv.fecha_inicio?`<span class="ch grey">Desde ${fd(sv.fecha_inicio)}</span>`:''}
                     </div>
                 </div>
-                <div class="lrow-right">
-                    ${val>0?`<div class="lrow-val">${fn(val)}</div><div class="lrow-sub">COP</div>`:''}
+                <div class="svc-price">
+                    ${val>0?`<div class="svc-price-num">${fn(val)}</div><div class="svc-price-sub">COP</div>`:''}
                 </div>
             </div>`;
         }).join('');
-    }catch(e){el.innerHTML=emptyBlk('Error al cargar');}
+    }catch(e){el.innerHTML='<div class="loading">Error al cargar servicios</div>';}
 }
 
-// ── Pagos ──────────────────────────────────────────
+// ── Pagos ──────────────────────────────────────────────────
 let _pOff=0,_pTotal=0;
 async function loadPagos(append=false){
     const el=document.getElementById('listPagos');
     if(!append)el.innerHTML='<div class="loading">Cargando…</div>';
     try{
-        const d=await fetch(`api/portal_data.php?action=historial&limite=15&offset=${_pOff}`).then(r=>r.json());
+        const d=await fetch(`api/portal_data.php?action=historial&limite=20&offset=${_pOff}`).then(r=>r.json());
         if(revocado(d))return;
         _pTotal=d.total||0;
-        document.getElementById('cntPagos').textContent=_pTotal;
+        const cntEl=document.getElementById('cntPagos');
+        cntEl.textContent=_pTotal;
+        cntEl.style.display=_pTotal?'inline':'none';
         if(!d.data.length&&!append){
-            el.innerHTML=emptyBlk('Sin registros de pago','<path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>');
+            el.innerHTML='<div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>Sin registros de pago</div>';
             return;
         }
         const estL={pagado:'Pagado',pendiente:'Pendiente',vencido:'Vencido'};
         const rows=d.data.map(tx=>{
             const fch=tx.fecha_pago||tx.fecha_vencimiento||tx.created_at;
-            const srv=esc(tx.servicio_nombre||tx.titulo||tx.concepto||'');
-            const tit=esc(tx.titulo||tx.concepto||'');
+            const srv=tx.servicio_nombre||'';
+            const tit=tx.titulo||tx.concepto||'';
             return`<div class="lrow">
                 <div class="lrow-body">
-                    <div class="lrow-name">${tit}</div>
+                    <div class="lrow-title">${esc(tit)}</div>
                     <div class="lrow-meta">
                         <span class="ch ${esc(tx.estado)}">${estL[tx.estado]||tx.estado}</span>
-                        ${srv&&srv!==tit?`<span style="font-size:10.5px;color:#8A867C">${srv}</span>`:''}
-                        <span style="font-size:10.5px;color:#8A867C">${fd(fch)}</span>
+                        ${srv&&srv!==tit?`<span style="font-size:11px;color:#78746D">${esc(srv)}</span>`:''}
+                        <span style="font-size:11px;color:#78746D">${fd(fch)}</span>
                     </div>
                 </div>
                 <div class="lrow-right">
@@ -502,100 +565,124 @@ async function loadPagos(append=false){
         else el.innerHTML=rows;
         _pOff+=d.data.length;
         document.getElementById('morePagos').style.display=_pOff<_pTotal?'block':'none';
-    }catch(e){if(!append)el.innerHTML=emptyBlk('Error al cargar');}
+    }catch(e){if(!append)el.innerHTML='<div class="empty-state">Error al cargar</div>';}
 }
 function loadMorePagos(){loadPagos(true);}
 
-// ── Tareas ─────────────────────────────────────────
+// ── Tareas ─────────────────────────────────────────────────
 async function loadTareas(){
     const el=document.getElementById('listTareas');
     try{
         const d=await fetch('api/portal_data.php?action=tareas').then(r=>r.json());
         if(revocado(d))return;
         const cnt=d.data?d.data.length:0;
-        document.getElementById('cntTareas').textContent=cnt;
+        const cntEl=document.getElementById('cntTareas');
+        cntEl.textContent=cnt;
+        cntEl.style.display=cnt?'inline':'none';
         if(!cnt){
-            el.innerHTML=emptyBlk('Sin tareas asignadas','<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>');
+            el.innerHTML='<div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Sin tareas asignadas</div>';
             return;
         }
-        const estL={pendiente:'Pendiente',en_progreso:'En progreso',revision:'Revisión',completado:'Completado',cancelado:'Cancelado'};
+        const estL={pendiente:'Pendiente',en_progreso:'En progreso',revision:'En revisión',completado:'Completado',cancelado:'Cancelado'};
         const estC={pendiente:'warn',en_progreso:'en_progreso',revision:'revision',completado:'completado',cancelado:'cancelado'};
-        const prioC={alta:'#EF4444',media:'#F59E0B',baja:'#10B981'};
+        const prioC={alta:'#EF4444',media:'#F59E0B',baja:'#22C55E'};
+        const prioL={alta:'Alta',media:'Media',baja:'Baja'};
         el.innerHTML=d.data.map(t=>{
             const pc=prioC[t.prioridad]||'#8A867C';
             const meta=[];
-            if(t.responsable) meta.push(`<span style="font-size:10.5px;color:#8A867C">${esc(t.responsable)}</span>`);
-            if(t.fecha_limite) meta.push(`<span style="font-size:10.5px;color:#8A867C">Límite: ${fd(t.fecha_limite)}</span>`);
+            if(t.responsable) meta.push(`<span style="font-size:11px;color:#78746D">${esc(t.responsable)}</span>`);
+            if(t.fecha_limite) meta.push(`<span style="font-size:11px;color:#78746D">Límite: ${fd(t.fecha_limite)}</span>`);
             return`<div class="lrow">
-                <div class="lrow-dot" style="background:${pc}"></div>
+                <div class="lrow-mark" style="background:${pc}"></div>
                 <div class="lrow-body">
-                    <div class="lrow-name">${esc(t.titulo)}</div>
+                    <div class="lrow-title">${esc(t.titulo)}</div>
                     <div class="lrow-meta">
                         <span class="ch ${estC[t.estado]||'grey'}">${estL[t.estado]||t.estado}</span>
+                        <span class="ch ${t.prioridad||'grey'}" style="font-size:10px">${prioL[t.prioridad]||'—'}</span>
                         ${meta.join('')}
                     </div>
+                    ${t.descripcion?`<div style="font-size:11.5px;color:#78746D;margin-top:4px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(t.descripcion)}</div>`:''}
                 </div>
             </div>`;
         }).join('');
-    }catch(e){el.innerHTML=emptyBlk('Error al cargar');}
+    }catch(e){el.innerHTML='<div class="empty-state">Error al cargar</div>';}
 }
 
-// ── Documentos ─────────────────────────────────────
+// ── Notificaciones ─────────────────────────────────────────
+async function loadNotif(){
+    const el=document.getElementById('listNotif');
+    try{
+        const d=await fetch('api/portal_data.php?action=notificaciones').then(r=>r.json());
+        if(revocado(d))return;
+        const cnt=d.data?d.data.length:0;
+        const cntEl=document.getElementById('cntNotif');
+        cntEl.textContent=cnt;
+        cntEl.style.display=cnt?'inline':'none';
+        if(!cnt){
+            el.innerHTML='<div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>Sin notificaciones enviadas</div>';
+            return;
+        }
+        el.innerHTML=d.data.map(n=>{
+            return`<div class="lrow">
+                <div class="lrow-body">
+                    <div class="lrow-title">${esc(n.label)} de renovación</div>
+                    <div class="lrow-meta">
+                        <span class="ch blue">Renovación</span>
+                        ${n.nombre_servicio?`<span style="font-size:11px;color:#78746D">${esc(n.nombre_servicio)}</span>`:''}
+                        ${n.vencimiento?`<span style="font-size:11px;color:#78746D">Vence: ${fd(n.vencimiento)}</span>`:''}
+                    </div>
+                </div>
+                <div class="lrow-right">
+                    <div class="lrow-date">${fd(n.fecha)}</div>
+                </div>
+            </div>`;
+        }).join('');
+    }catch(e){el.innerHTML='<div class="empty-state">Error al cargar</div>';}
+}
+
+// ── Documentos ─────────────────────────────────────────────
 async function loadDocs(){
+    const el=document.getElementById('listDocs');
     try{
         const d=await fetch('api/portal_data.php?action=documentos').then(r=>r.json());
         if(revocado(d))return;
         const items=[];
         (d.archivos||[]).forEach(a=>{
             const ext=((a.archivo_url||'').split('.').pop()||'').toLowerCase();
-            items.push({url:a.archivo_url,name:a.nombre_archivo||'Archivo',date:a.created_at,ext});
+            items.push({url:a.archivo_url,name:a.nombre_archivo||'Archivo',date:a.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});
         });
         (d.tx_docs||[]).forEach(tx=>{
             ['factura_path','documento_path','imagen_path'].forEach(k=>{
-                if(tx[k]){const ext=(tx[k].split('.').pop()||'').toLowerCase();items.push({url:tx[k],name:tx.nombre_archivo||'Documento',date:tx.created_at,ext});}
+                if(tx[k]){const ext=(tx[k].split('.').pop()||'').toLowerCase();items.push({url:tx[k],name:tx.nombre_archivo||'Documento',date:tx.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});}
             });
         });
-        document.getElementById('cntDocs').textContent=items.length;
-        if(!items.length)return;
-        const cc={pdf:'#EF4444',doc:'#3B82F6',docx:'#3B82F6',xls:'#10B981',xlsx:'#10B981',jpg:'#F59E0B',jpeg:'#F59E0B',png:'#8B5CF6',webp:'#8B5CF6'};
+        const cntEl=document.getElementById('cntDocs');
+        cntEl.textContent=items.length;
+        cntEl.style.display=items.length?'inline':'none';
+        if(!items.length){
+            el.innerHTML='<div class="empty-state"><svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Sin documentos</div>';
+            return;
+        }
+        const cc={pdf:'#EF4444',doc:'#3B82F6',docx:'#3B82F6',xls:'#15803D',xlsx:'#15803D',jpg:'#F59E0B',jpeg:'#F59E0B',png:'#8B5CF6',webp:'#8B5CF6'};
         const gc=e=>cc[e]||'#6B7280';
-        document.getElementById('listDocs').innerHTML=items.map(it=>{
+        el.innerHTML=items.map(it=>{
             const c=gc(it.ext),bg=c+'18';
+            const ico=it.isImg
+                ?`<img src="${esc(it.url)}" style="width:34px;height:34px;object-fit:cover;border-radius:7px" onerror="this.style.display='none'">`
+                :`<svg width="16" height="16" fill="none" stroke="${c}" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
             return`<a class="drow" href="${esc(it.url)}" target="_blank" rel="noopener">
-                <span class="drow-ext" style="background:${bg};color:${c}">${it.ext.toUpperCase()||'—'}</span>
-                <span class="drow-name">${esc(it.name)}</span>
-                <span class="drow-date">${fd(it.date)}</span>
+                <div class="drow-ico" style="background:${bg}">${ico}</div>
+                <div class="drow-info">
+                    <div class="drow-name">${esc(it.name)}</div>
+                    <div class="drow-meta"><span class="drow-ext" style="color:${c}">${it.ext.toUpperCase()}</span> · ${fd(it.date)}</div>
+                </div>
+                <svg width="14" height="14" fill="none" stroke="#C0BBB3" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             </a>`;
         }).join('');
-        document.getElementById('blkDocs').style.display='block';
-    }catch(e){}
+    }catch(e){el.innerHTML='<div class="empty-state">Error al cargar</div>';}
 }
 
-// ── Notificaciones ─────────────────────────────────
-async function loadNotif(){
-    try{
-        const d=await fetch('api/portal_data.php?action=notificaciones').then(r=>r.json());
-        if(revocado(d))return;
-        const cnt=d.data?d.data.length:0;
-        document.getElementById('cntNotif').textContent=cnt;
-        if(!cnt)return;
-        document.getElementById('listNotif').innerHTML=d.data.map(n=>{
-            return`<div class="lrow">
-                <div class="lrow-body">
-                    <div class="lrow-name">${esc(n.label)} de renovación</div>
-                    <div class="lrow-meta">
-                        ${n.nombre_servicio?`<span style="font-size:10.5px;color:#8A867C">${esc(n.nombre_servicio)}</span>`:''}
-                        ${n.vencimiento?`<span style="font-size:10.5px;color:#8A867C">Vence: ${fd(n.vencimiento)}</span>`:''}
-                    </div>
-                </div>
-                <div class="lrow-right"><div class="lrow-sub" style="font-size:11px">${fd(n.fecha)}</div></div>
-            </div>`;
-        }).join('');
-        document.getElementById('blkNotif').style.display='block';
-    }catch(e){}
-}
-
-// ── Perfil ─────────────────────────────────────────
+// ── Perfil ─────────────────────────────────────────────────
 async function loadPerfil(){
     const el=document.getElementById('perfilContent');
     try{
@@ -603,33 +690,35 @@ async function loadPerfil(){
         if(revocado(d))return;
         if(!d.success||!d.data)throw new Error();
         const p=d.data;
-        const prow=(lbl,val,full=false)=>`<div class="pf-row${full?' full':''}"><div class="pf-lbl">${lbl}</div><div class="pf-val ${!val?'e':''}">${val?esc(val):'—'}</div></div>`;
-        const pwdSt=p.has_custom_password
-            ?'<span style="color:#1A6B41;font-size:11px;font-weight:700">✓ Contraseña personalizada</span>'
-            :'<span style="color:#8A867C;font-size:11px;font-style:italic">Usando NIT por defecto</span>';
+        const pf=(lbl,val,full=false)=>`<div class="pf-field${full?' full':''}"><div class="pf-label">${lbl}</div><div class="pf-value ${!val?'empty':''}">${val?esc(val):'No registrado'}</div></div>`;
+        const acceso=p.has_custom_password
+            ?'<span style="color:#15803D;font-weight:700;font-size:12.5px">✓ Contraseña personalizada activa</span>'
+            :'<span style="color:#78746D;font-style:italic;font-size:12.5px">Contraseña por defecto (NIT)</span>';
         el.innerHTML=`
-        <div class="pf-grid">
-            ${prow('Empresa / Razón social',p.nombre_comercial)}
-            ${prow('NIT / Identificación',p.nit_cedula)}
-            ${prow('Persona de contacto',p.persona_contacto)}
-            ${prow('Teléfono',p.telefono)}
-            ${prow('Correo de contacto',p.email_contacto,true)}
-            ${prow('Correo facturación',p.email_facturacion,true)}
-            ${prow('Dirección',p.direccion,true)}
-            <div class="pf-row full"><div class="pf-lbl">Acceso al portal</div><div class="pf-val">${pwdSt}</div></div>
+        <div class="pf-2col">
+            ${pf('Empresa / Razón social',p.nombre_comercial)}
+            ${pf('NIT / Identificación',p.nit_cedula)}
+            ${pf('Persona de contacto',p.persona_contacto)}
+            ${pf('Teléfono',p.telefono)}
+            ${pf('Correo de contacto',p.email_contacto,true)}
+            ${pf('Correo de facturación',p.email_facturacion,true)}
+            ${pf('Dirección',p.direccion,true)}
+            <div class="pf-field full"><div class="pf-label">Acceso al portal</div><div class="pf-value">${acceso}</div></div>
         </div>
-        <div class="pwd-hdr">Cambiar contraseña</div>
-        <div class="pwd-wrap">
-            <input class="inp" type="password" id="pwdA" placeholder="Contraseña actual" autocomplete="current-password">
-            <input class="inp" type="password" id="pwdN" placeholder="Nueva (mín. 6 caracteres)" autocomplete="new-password">
-            <input class="inp" type="password" id="pwdC" placeholder="Confirmar nueva" autocomplete="new-password">
-            <button class="btn-sm" onclick="cambiarPwd()">Guardar</button>
+        <div class="pwd-section">
+            <div class="pwd-section-title">Cambiar contraseña de acceso</div>
+            <div class="pwd-fields">
+                <input class="inp" type="password" id="pwdA" placeholder="Contraseña actual" autocomplete="current-password">
+                <input class="inp" type="password" id="pwdN" placeholder="Nueva contraseña (mín. 6 car.)" autocomplete="new-password">
+                <input class="inp" type="password" id="pwdC" placeholder="Confirmar nueva" autocomplete="new-password">
+                <button class="btn-save" onclick="cambiarPwd()">Guardar</button>
+            </div>
         </div>`;
-    }catch(e){el.innerHTML=emptyBlk('Error al cargar perfil');}
+    }catch(e){el.innerHTML='<div class="empty-state">Error al cargar perfil</div>';}
 }
 
 async function cambiarPwd(){
-    const btn=document.querySelector('.btn-sm');
+    const btn=document.querySelector('.btn-save');
     const a=document.getElementById('pwdA').value.trim();
     const n=document.getElementById('pwdN').value.trim();
     const c=document.getElementById('pwdC').value.trim();
@@ -642,14 +731,11 @@ async function cambiarPwd(){
     btn.disabled=false;btn.textContent='Guardar';
 }
 
-// ── Init ───────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────
 loadHero();
 loadSvcs();
-loadPagos();
-loadTareas();
-loadDocs();
-loadNotif();
-loadPerfil();
+// Pagos: carga inicial (tab activo por defecto)
+_ld.pagos=true; loadPagos();
 </script>
 </body>
 </html>
