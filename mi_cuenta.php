@@ -108,49 +108,57 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
 .tab.on .tab-cnt{display:inline}
 .pane{display:none}.pane.on{display:block}
 
-/* ── Activity content ─────────────────────────────────────── */
-.act-wrap{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden}
-.act-row{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-bottom:1px solid #F0EDE6;transition:background .1s}
-.act-row:last-child{border-bottom:none}
-.act-row:hover{background:#FAFAF8}
-.act-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.act-body{flex:1;min-width:0}
-.act-title{font-size:13.5px;font-weight:600;color:#252422;line-height:1.35}
-.act-sub{font-size:11.5px;color:#8A867C;margin-top:2px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.act-right{text-align:right;flex-shrink:0;min-width:80px}
-.act-val{font-size:14px;font-weight:800;color:#252422;letter-spacing:-.01em}
-.act-est{font-size:11px;font-weight:700;margin-top:2px;display:inline-block;padding:2px 7px;border-radius:100px}
-.act-est.pagado    {background:#E3F1E8;color:#1A6B41}
-.act-est.pendiente {background:#FEF3C7;color:#B45309}
-.act-est.vencido   {background:#FEE2E2;color:#991B1B}
-.act-est.completado{background:#E3F1E8;color:#1A6B41}
-.act-est.en_progreso{background:#E1E7F2;color:#1E429F}
-.act-est.pendiente2{background:#FEF3C7;color:#B45309}
-.act-est.cancelado {background:#FEE2E2;color:#991B1B}
-.act-more{text-align:center;padding:12px;border-top:1px solid #F0EDE6}
-.act-more button{background:none;border:1px solid #E4E1D9;border-radius:6px;padding:6px 16px;font-size:12.5px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit;transition:all .15s}
-.act-more button:hover{border-color:#252422;color:#252422;background:#F5F3EE}
-.prioridad-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px;vertical-align:middle}
-.pr-alta{background:#EF4444}.pr-media{background:#F59E0B}.pr-baja{background:#10B981}
+/* ── Estado badges (usados en cards) ──────────────────────── */
+.est-badge{font-size:11px;font-weight:700;display:inline-block;padding:3px 9px;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.est-badge.pagado    {background:#E3F1E8;color:#1A6B41}
+.est-badge.pendiente {background:#FEF3C7;color:#B45309}
+.est-badge.vencido   {background:#FEE2E2;color:#991B1B}
+.est-badge.completado{background:#E3F1E8;color:#1A6B41}
+.est-badge.en_progreso,.est-badge.revision{background:#E1E7F2;color:#1E429F}
+.est-badge.cancelado {background:#FEE2E2;color:#991B1B}
+.est-badge.pendiente2{background:#FEF3C7;color:#B45309}
+.prio-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:700}
 
-/* ── Docs ─────────────────────────────────────────────────── */
-.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;padding:14px 14px}
-.doc{background:#FAFAF7;border:1px solid #EFECE5;border-radius:8px;padding:11px 11px 9px;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;transition:all .15s}
-.doc:hover{border-color:#B5B0A6;background:#fff}
-.doc-ico{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center}
-.doc-nm{font-size:11.5px;font-weight:600;color:#252422;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.doc-dt{font-size:10.5px;color:#8A867C}
+/* ── Item cards grid ──────────────────────────────────────── */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.icard{background:#fff;border:1px solid #E4E1D9;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;transition:box-shadow .18s,transform .18s}
+.icard:hover{box-shadow:0 4px 18px rgba(0,0,0,.07);transform:translateY(-1px)}
+.icard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.icard-srv{font-size:11.5px;color:#8A867C;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.icard-amount{font-size:30px;font-weight:900;color:#252422;letter-spacing:-.03em;line-height:1}
+.icard-cop{font-size:10.5px;font-weight:700;color:#8A867C;letter-spacing:.04em;margin-top:3px}
+.icard-sep{height:1px;background:#F0EDE6;margin:12px 0}
+.icard-footer{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto}
+.icard-date{font-size:11px;color:#8A867C;flex-shrink:0}
+.icard-title{font-size:13.5px;font-weight:700;color:#252422;line-height:1.3;margin-bottom:5px}
+.icard-desc{font-size:12px;color:#6B6762;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.icard-meta{font-size:11.5px;color:#8A867C;padding-top:10px;margin-top:auto;border-top:1px solid #F0EDE6;display:flex;flex-wrap:wrap;gap:6px 12px}
+.icard-meta span{display:inline-flex;align-items:center;gap:4px}
+/* Botón cargar más */
+.more-btn{margin-top:12px}
+.more-btn button{width:100%;background:#fff;border:1px solid #E4E1D9;border-radius:8px;padding:10px;font-size:12.5px;font-weight:600;color:#57544D;cursor:pointer;font-family:inherit;transition:all .15s}
+.more-btn button:hover{border-color:#252422;color:#252422;background:#F5F3EE}
 
-/* ── Perfil ───────────────────────────────────────────────── */
-.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;background:#fff;border:1px solid #E4E1D9;border-radius:10px;overflow:hidden;margin-bottom:12px}
-.pf-item{padding:12px 16px;border-right:1px solid #F0EDE6;border-bottom:1px solid #F0EDE6}
-.pf-item:nth-child(even){border-right:none}
-.pf-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:3px}
+/* ── Documentos grid ──────────────────────────────────────── */
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.doc{background:#fff;border:1px solid #E4E1D9;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:box-shadow .15s,transform .15s}
+.doc:hover{box-shadow:0 4px 14px rgba(0,0,0,.07);transform:translateY(-1px)}
+.doc-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.doc-nm{font-size:12px;font-weight:600;color:#252422;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.doc-ext{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+.doc-dt{font-size:10.5px;color:#8A867C;margin-top:auto}
+
+/* ── Perfil cards ─────────────────────────────────────────── */
+.pf-card{background:#fff;border:1px solid #E4E1D9;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.pf-card-hdr{padding:13px 18px;border-bottom:1px solid #F0EDE6;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A867C}
+.pf-fields{display:grid;grid-template-columns:1fr 1fr}
+.pf-item{padding:13px 18px;border-bottom:1px solid #F5F3EF}
+.pf-fields .pf-item:nth-child(odd){border-right:1px solid #F5F3EF}
+.pf-item.pf-full{grid-column:1/-1;border-right:none}
+.pf-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#8A867C;margin-bottom:4px}
 .pf-val{font-size:13px;font-weight:600;color:#252422}
 .pf-val.e{color:#C4C0BA;font-weight:400;font-style:italic}
-.pwd-section{background:#fff;border:1px solid #E4E1D9;border-radius:10px;padding:16px 16px 14px}
-.pwd-title{font-size:12.5px;font-weight:700;margin-bottom:11px;color:#252422}
-.pwd-row{display:flex;gap:7px;flex-wrap:wrap}
+.pwd-row{display:flex;gap:7px;flex-wrap:wrap;padding:16px 18px}
 .inp{padding:8px 11px;border:1.5px solid #E4E1D9;border-radius:6px;font-size:12.5px;font-family:inherit;background:#FAFAF7;color:#252422;outline:none;transition:border-color .15s;flex:1;min-width:130px}
 .inp:focus{border-color:#252422;background:#fff}
 .btn-dark{padding:8px 16px;background:#252422;color:#fff;border:none;border-radius:6px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s}
@@ -241,6 +249,15 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
     /* Servicios */
     .svc-name{font-size:14px}
     .svc-price-num{font-size:18px}
+    /* Cards */
+    .cards-grid{grid-template-columns:1fr}
+    .icard-amount{font-size:26px}
+    .docs-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+    /* Perfil */
+    .pf-fields{grid-template-columns:1fr}
+    .pf-fields .pf-item:nth-child(odd){border-right:none}
+    .pf-item.pf-full{grid-column:1}
+    .pwd-row{flex-direction:column;padding:14px 16px}
 }
 </style>
 </head>
@@ -335,19 +352,20 @@ body{font-family:'Inter',sans-serif;background:#F0EDE6;color:#252422;min-height:
 
     <!-- Pane pagos -->
     <div class="pane on" id="pane-pagos">
-        <div class="act-wrap"><div id="listPagos"><div class="loading">Cargando…</div></div><div class="act-more" id="morePagos" style="display:none"><button onclick="loadMorePagos()">Cargar más ↓</button></div></div>
+        <div id="listPagos"><div class="loading">Cargando…</div></div>
+        <div class="more-btn" id="morePagos" style="display:none"><button onclick="loadMorePagos()">Ver más pagos</button></div>
     </div>
     <!-- Pane tareas -->
     <div class="pane" id="pane-tareas">
-        <div class="act-wrap"><div id="listTareas"><div class="loading">Cargando…</div></div></div>
+        <div id="listTareas"><div class="loading">Cargando…</div></div>
     </div>
     <!-- Pane notif -->
     <div class="pane" id="pane-notif">
-        <div class="act-wrap"><div id="listNotif"><div class="loading">Cargando…</div></div></div>
+        <div id="listNotif"><div class="loading">Cargando…</div></div>
     </div>
     <!-- Pane docs -->
     <div class="pane" id="pane-docs">
-        <div class="act-wrap"><div id="listDocs"><div class="loading">Cargando…</div></div></div>
+        <div id="listDocs"><div class="loading">Cargando…</div></div>
     </div>
     <!-- Pane perfil -->
     <div class="pane" id="pane-perfil">
@@ -515,16 +533,31 @@ async function loadPagos(append=false){
         if(revocado(d))return;
         _pTotal=d.total||0;
         document.getElementById('cntPagos').textContent=_pTotal;
-        if(!d.data.length&&!append){el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Sin registros de pago</div>';return;}
-        const ic={pagado:{bg:'#E3F1E8',c:'#1A6B41'},pendiente:{bg:'#FEF3C7',c:'#B45309'},vencido:{bg:'#FEE2E2',c:'#991B1B'}};
+        if(!d.data.length&&!append){
+            el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Sin registros de pago</div>';
+            return;
+        }
         const estLabel={pagado:'Pagado',pendiente:'Pendiente',vencido:'Vencido'};
-        const rows=d.data.map(tx=>{
-            const col=ic[tx.estado]||{bg:'#F0EDE6',c:'#57544D'};
+        const cards=d.data.map(tx=>{
             const fch=tx.fecha_pago||tx.fecha_vencimiento||tx.created_at;
-            const sub=[tx.servicio_nombre?esc(tx.servicio_nombre):'',fd(fch)].filter(Boolean).join(' · ');
-            return`<div class="act-row"><div class="act-ico" style="background:${col.bg}"><svg width="15" height="15" fill="none" stroke="${col.c}" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="act-body"><div class="act-title">${esc(tx.titulo||tx.concepto)}</div><div class="act-sub">${sub}</div></div><div class="act-right"><div class="act-val">${fn(tx.monto)}</div><div class="act-est ${esc(tx.estado)}">${estLabel[tx.estado]||tx.estado}</div></div></div>`;
+            const srv=esc(tx.servicio_nombre||'');
+            const concepto=esc(tx.titulo||tx.concepto||'');
+            return`<div class="icard">
+                <div class="icard-top">
+                    <div class="icard-srv">${srv||concepto}</div>
+                    <span class="est-badge ${esc(tx.estado)}">${estLabel[tx.estado]||tx.estado}</span>
+                </div>
+                <div class="icard-amount">${fn(tx.monto)}</div>
+                <div class="icard-cop">COP</div>
+                <div class="icard-sep"></div>
+                <div class="icard-footer">
+                    <span class="icard-date">${fd(fch)}</span>
+                    ${srv&&concepto&&srv!==concepto?`<span style="font-size:11px;color:#57544D;font-weight:500;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${concepto}</span>`:''}
+                </div>
+            </div>`;
         }).join('');
-        if(append)el.insertAdjacentHTML('beforeend',rows);else el.innerHTML=rows;
+        if(append) el.querySelector('.cards-grid').insertAdjacentHTML('beforeend',cards);
+        else el.innerHTML=`<div class="cards-grid">${cards}</div>`;
         _pOff+=d.data.length;
         document.getElementById('morePagos').style.display=_pOff<_pTotal?'block':'none';
     }catch(e){if(!append)el.innerHTML='<div class="empty">Error al cargar</div>';}
@@ -539,18 +572,29 @@ async function loadTareas(){
         if(revocado(d))return;
         const cnt=d.data?d.data.length:0;
         document.getElementById('cntTareas').textContent=cnt;
-        if(!cnt){el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Sin tareas registradas</div>';return;}
-
-        const estadoLabel={pendiente:'Pendiente',en_progreso:'En progreso',revision:'En revisión',completado:'Completado',cancelado:'Cancelado'};
-        const estadoCls  ={pendiente:'pendiente2',en_progreso:'en_progreso',revision:'en_progreso',completado:'completado',cancelado:'cancelado'};
-        const prioColors ={alta:'#EF4444',media:'#F59E0B',baja:'#10B981'};
-        const bgEst={pendiente:'#F5F4EF',en_progreso:'#E1E7F2',revision:'#FEF3C7',completado:'#E3F1E8',cancelado:'#FEE2E2'};
-        const cEst ={pendiente:'#57544D',en_progreso:'#1E429F',revision:'#92400E',completado:'#1A6B41',cancelado:'#991B1B'};
-
-        el.innerHTML=d.data.map(t=>{
-            const sub=[t.responsable?`Asignado: ${esc(t.responsable)}`:'',t.fecha_limite?`Límite: ${fd(t.fecha_limite)}`:''].filter(Boolean).join(' · ');
-            return`<div class="act-row"><div class="act-ico" style="background:${bgEst[t.estado]||'#F5F4EF'}"><svg width="14" height="14" fill="none" stroke="${cEst[t.estado]||'#57544D'}" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="act-body"><div class="act-title"><span class="prioridad-dot pr-${esc(t.prioridad)}" style="background:${prioColors[t.prioridad]||'#ccc'}"></span>${esc(t.titulo)}</div>${sub?`<div class="act-sub">${sub}</div>`:''}</div><div class="act-right"><div class="act-est ${estadoCls[t.estado]||''}">${estadoLabel[t.estado]||t.estado}</div>${t.fecha_limite&&!t.updated_at?'':'<div class="act-sub" style="font-size:10.5px">'+fd(t.updated_at)+'</div>'}</div></div>`;
-        }).join('');
+        if(!cnt){
+            el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Sin tareas registradas</div>';
+            return;
+        }
+        const estL={pendiente:'Pendiente',en_progreso:'En progreso',revision:'En revisión',completado:'Completado',cancelado:'Cancelado'};
+        const estC={pendiente:'pendiente2',en_progreso:'en_progreso',revision:'revision',completado:'completado',cancelado:'cancelado'};
+        const prioC={alta:'#EF4444',media:'#F59E0B',baja:'#10B981'};
+        const prioL={alta:'Alta',media:'Media',baja:'Baja'};
+        el.innerHTML='<div class="cards-grid">'+d.data.map(t=>{
+            const pc=prioC[t.prioridad]||'#8A867C';
+            const meta=[];
+            if(t.responsable) meta.push(`<span><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>${esc(t.responsable)}</span>`);
+            if(t.fecha_limite) meta.push(`<span><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>${fd(t.fecha_limite)}</span>`);
+            return`<div class="icard">
+                <div class="icard-top">
+                    <span class="prio-badge" style="background:${pc}20;color:${pc}"><span style="width:6px;height:6px;border-radius:50%;background:${pc};display:inline-block;flex-shrink:0"></span>${prioL[t.prioridad]||t.prioridad}</span>
+                    <span class="est-badge ${estC[t.estado]||''}">${estL[t.estado]||t.estado}</span>
+                </div>
+                <div class="icard-title">${esc(t.titulo)}</div>
+                ${t.descripcion?`<div class="icard-desc">${esc(t.descripcion)}</div>`:''}
+                ${meta.length?`<div class="icard-meta">${meta.join('')}</div>`:''}
+            </div>`;
+        }).join('')+'</div>';
     }catch(e){el.innerHTML='<div class="empty">Error al cargar</div>';}
 }
 
@@ -562,12 +606,24 @@ async function loadNotif(){
         if(revocado(d))return;
         const cnt=d.data?d.data.length:0;
         document.getElementById('cntNotif').textContent=cnt;
-        if(!cnt){el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>Sin notificaciones enviadas</div>';return;}
-
-        el.innerHTML=d.data.map(n=>{
-            const sub=[n.nombre_servicio?esc(n.nombre_servicio):'',n.vencimiento?`Vencimiento: ${fd(n.vencimiento)}`:''].filter(Boolean).join(' · ');
-            return`<div class="act-row"><div class="act-ico" style="background:#E1E7F2"><svg width="14" height="14" fill="none" stroke="#3F5E9E" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div class="act-body"><div class="act-title">${esc(n.label)} de renovación</div><div class="act-sub">${sub}</div></div><div class="act-right"><div class="act-sub" style="font-size:11px">${fd(n.fecha)}</div></div></div>`;
-        }).join('');
+        if(!cnt){
+            el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>Sin notificaciones enviadas</div>';
+            return;
+        }
+        el.innerHTML='<div class="cards-grid">'+d.data.map(n=>{
+            return`<div class="icard">
+                <div class="icard-top">
+                    <div class="icard-srv">${esc(n.nombre_servicio||'Servicio')}</div>
+                    <span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:#EEF2FB;color:#3F5E9E;white-space:nowrap;flex-shrink:0">${esc(n.label)}</span>
+                </div>
+                <div class="icard-title">Recordatorio de renovación</div>
+                <div class="icard-sep"></div>
+                <div class="icard-footer">
+                    <span class="icard-date"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="vertical-align:middle;margin-right:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Enviado ${fd(n.fecha)}</span>
+                    ${n.vencimiento?`<span class="icard-date">Vence ${fd(n.vencimiento)}</span>`:''}
+                </div>
+            </div>`;
+        }).join('')+'</div>';
     }catch(e){el.innerHTML='<div class="empty">Error al cargar</div>';}
 }
 
@@ -578,14 +634,35 @@ async function loadDocs(){
         const d=await fetch('api/portal_data.php?action=documentos').then(r=>r.json());
         if(revocado(d))return;
         const items=[];
-        (d.archivos||[]).forEach(a=>{const ext=((a.archivo_url||'').split('.').pop()||'').toLowerCase();items.push({url:a.archivo_url,name:a.nombre_archivo||'Archivo',date:a.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});});
-        (d.tx_docs||[]).forEach(tx=>{['factura_path','documento_path','imagen_path'].forEach(k=>{if(tx[k]){const ext=(tx[k].split('.').pop()||'').toLowerCase();items.push({url:tx[k],name:tx.nombre_archivo||'Documento',date:tx.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});}});});
+        (d.archivos||[]).forEach(a=>{
+            const ext=((a.archivo_url||'').split('.').pop()||'').toLowerCase();
+            items.push({url:a.archivo_url,name:a.nombre_archivo||'Archivo',date:a.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});
+        });
+        (d.tx_docs||[]).forEach(tx=>{
+            ['factura_path','documento_path','imagen_path'].forEach(k=>{
+                if(tx[k]){const ext=(tx[k].split('.').pop()||'').toLowerCase();items.push({url:tx[k],name:tx.nombre_archivo||'Documento',date:tx.created_at,ext,isImg:['jpg','jpeg','png','webp'].includes(ext)});}
+            });
+        });
         document.getElementById('cntDocs').textContent=items.length;
-        if(!items.length){el.innerHTML='<div class="empty" style="padding:28px"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>Sin documentos</div>';return;}
+        if(!items.length){
+            el.innerHTML='<div class="empty"><svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>Sin documentos</div>';
+            return;
+        }
         const cc={pdf:'#EF4444',doc:'#3B82F6',docx:'#3B82F6',xls:'#10B981',xlsx:'#10B981',jpg:'#F59E0B',jpeg:'#F59E0B',png:'#8B5CF6',webp:'#8B5CF6'};
         const gc=e=>cc[e]||'#6B7280';
-        el.innerHTML=`<div class="docs-grid">${items.map(it=>{const c=gc(it.ext),bg=c+'1a';const ico=it.isImg?`<img src="${esc(it.url)}" style="width:30px;height:30px;object-fit:cover;border-radius:5px" onerror="this.style.display='none'">`:`<svg width="15" height="15" fill="none" stroke="${c}" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;return`<a class="doc" href="${esc(it.url)}" target="_blank" rel="noopener"><div class="doc-ico" style="background:${bg}">${ico}</div><div class="doc-nm">${esc(it.name)}</div><div class="doc-dt">${fd(it.date)}</div></a>`;}).join('')}</div>`;
-    }catch(e){el.innerHTML='<div class="empty" style="padding:28px">Error al cargar</div>';}
+        el.innerHTML='<div class="docs-grid">'+items.map(it=>{
+            const c=gc(it.ext),bg=c+'18';
+            const ico=it.isImg
+                ?`<img src="${esc(it.url)}" style="width:36px;height:36px;object-fit:cover;border-radius:7px" onerror="this.parentNode.style.background='${bg}'">`
+                :`<svg width="17" height="17" fill="none" stroke="${c}" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
+            return`<a class="doc" href="${esc(it.url)}" target="_blank" rel="noopener">
+                <div class="doc-ico" style="background:${bg}">${ico}</div>
+                <div class="doc-nm">${esc(it.name)}</div>
+                <div class="doc-ext" style="color:${c}">${it.ext.toUpperCase()||'—'}</div>
+                <div class="doc-dt">${fd(it.date)}</div>
+            </a>`;
+        }).join('')+'</div>';
+    }catch(e){el.innerHTML='<div class="empty">Error al cargar</div>';}
 }
 
 // ── Perfil ─────────────────────────────────────────────────
@@ -597,9 +674,32 @@ async function loadPerfil(){
         if(!d.success||!d.data)throw new Error();
         const p=d.data;
         const fi=(lbl,val)=>`<div class="pf-item"><div class="pf-lbl">${lbl}</div><div class="pf-val ${!val?'e':''}">${val?esc(val):'No registrado'}</div></div>`;
-        const pwdTxt=p.has_custom_password?'<span style="color:#1A6B41;font-weight:700">Contraseña propia ✓</span>':'<span style="color:#8A867C;font-style:italic">NIT por defecto</span>';
-        el.innerHTML=`<div class="perfil-grid">${fi('Empresa / Razón social',p.nombre_comercial)}${fi('NIT / Identificación',p.nit_cedula)}${fi('Persona de contacto',p.persona_contacto)}${fi('Correo contacto',p.email_contacto)}${fi('Correo facturación',p.email_facturacion)}${fi('Teléfono',p.telefono)}${fi('Dirección',p.direccion)}<div class="pf-item"><div class="pf-lbl">Contraseña portal</div><div class="pf-val">${pwdTxt}</div></div></div>
-        <div class="pwd-section"><div class="pwd-title">Cambiar contraseña de acceso</div><div class="pwd-row"><input class="inp" type="password" id="pwdA" placeholder="Contraseña actual" autocomplete="current-password"><input class="inp" type="password" id="pwdN" placeholder="Nueva contraseña (mín. 6)" autocomplete="new-password"><input class="inp" type="password" id="pwdC" placeholder="Confirmar nueva" autocomplete="new-password"><button class="btn-dark" onclick="cambiarPwd()">Guardar</button></div></div>`;
+        const pwdTxt=p.has_custom_password
+            ?'<span style="color:#1A6B41;font-weight:700">✓ Contraseña personalizada activa</span>'
+            :'<span style="color:#8A867C;font-style:italic">Usando NIT como contraseña por defecto</span>';
+        el.innerHTML=`
+        <div class="pf-card">
+            <div class="pf-card-hdr">Información del cliente</div>
+            <div class="pf-fields">
+                ${fi('Empresa / Razón social',p.nombre_comercial)}
+                ${fi('NIT / Identificación',p.nit_cedula)}
+                ${fi('Persona de contacto',p.persona_contacto)}
+                ${fi('Correo de contacto',p.email_contacto)}
+                ${fi('Correo facturación',p.email_facturacion)}
+                ${fi('Teléfono',p.telefono)}
+                <div class="pf-item pf-full"><div class="pf-lbl">Dirección</div><div class="pf-val ${!p.direccion?'e':''}">${p.direccion?esc(p.direccion):'No registrada'}</div></div>
+                <div class="pf-item pf-full"><div class="pf-lbl">Acceso al portal</div><div class="pf-val">${pwdTxt}</div></div>
+            </div>
+        </div>
+        <div class="pf-card">
+            <div class="pf-card-hdr">Cambiar contraseña de acceso</div>
+            <div class="pwd-row">
+                <input class="inp" type="password" id="pwdA" placeholder="Contraseña actual" autocomplete="current-password">
+                <input class="inp" type="password" id="pwdN" placeholder="Nueva contraseña (mín. 6)" autocomplete="new-password">
+                <input class="inp" type="password" id="pwdC" placeholder="Confirmar nueva contraseña" autocomplete="new-password">
+                <button class="btn-dark" onclick="cambiarPwd()">Guardar</button>
+            </div>
+        </div>`;
     }catch(e){el.innerHTML='<div class="empty">Error al cargar perfil</div>';}
 }
 async function cambiarPwd(){
