@@ -7,7 +7,6 @@
     var canvas = document.getElementById('heroBg');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
-    var sec  = canvas.parentElement;
     var W = 0, H = 0;
     var mouse = { x: -9999, y: -9999 };
     var COUNT = 48;
@@ -16,8 +15,8 @@
     var pts = [];
 
     function resize() {
-      W = canvas.width  = sec.offsetWidth  > 0 ? sec.offsetWidth  : window.innerWidth;
-      H = canvas.height = sec.offsetHeight > 0 ? sec.offsetHeight : window.innerHeight;
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
     }
 
     function mkPt() {
@@ -102,13 +101,12 @@
       raf = requestAnimationFrame(draw);
     }
 
-    // Tracking del mouse relativo al canvas
-    sec.addEventListener('mousemove', function(e) {
-      var rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+    // Mouse relativo al viewport (canvas fixed = coordenadas = clientX/Y)
+    document.addEventListener('mousemove', function(e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     });
-    sec.addEventListener('mouseleave', function() {
+    document.addEventListener('mouseleave', function() {
       mouse.x = -9999; mouse.y = -9999;
     });
 
