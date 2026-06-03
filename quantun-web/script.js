@@ -2,49 +2,39 @@
 (function () {
   'use strict';
 
-  /* ── Aurora Hero Background ──────────────────────────────────────────── */
-  function initAurora() {
+  /* ── Dot-wave canvas (enhancement sobre CSS dot-grid) ─────────────────── */
+  function initDotWave() {
     var canvas = document.getElementById('heroBg');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
-
-    var orbs = [
-      { x:.14, y:.42, r:.62, c:[198,242,78],  f:.19, p:0,   a:.13 },
-      { x:.78, y:.28, r:.56, c:[255,199,168], f:.15, p:1.8, a:.11 },
-      { x:.50, y:.78, r:.50, c:[167,239,208], f:.21, p:3.2, a:.10 },
-      { x:.88, y:.72, r:.46, c:[205,180,246], f:.17, p:2.5, a:.12 },
-      { x:.26, y:.12, r:.40, c:[198,242,78],  f:.13, p:4.1, a:.09 },
-      { x:.60, y:.50, r:.44, c:[255,230,140], f:.22, p:5.6, a:.08 },
-    ];
+    var sec  = canvas.parentElement;
+    var GAP  = 28;
+    var W = 0, H = 0;
 
     function resize() {
-      var hero = canvas.parentElement;
-      var w = hero.offsetWidth  || window.innerWidth;
-      var h = hero.offsetHeight || window.innerHeight;
-      canvas.width  = w;
-      canvas.height = h;
+      W = canvas.width  = (sec.offsetWidth  > 0 ? sec.offsetWidth  : window.innerWidth);
+      H = canvas.height = (sec.offsetHeight > 0 ? sec.offsetHeight : window.innerHeight);
     }
 
     var raf;
     function draw(ts) {
       var t = ts * 0.001;
-      var w = canvas.width, h = canvas.height;
-      if (!w || !h) { resize(); raf = requestAnimationFrame(draw); return; }
-      ctx.clearRect(0, 0, w, h);
-      for (var i = 0; i < orbs.length; i++) {
-        var o  = orbs[i];
-        var cx = (o.x + Math.sin(t * o.f + o.p) * o.a) * w;
-        var cy = (o.y + Math.cos(t * o.f * 1.3 + o.p * 1.2) * o.a * .65) * h;
-        var r  = (o.r + Math.sin(t * o.f * .7 + o.p) * .04) * Math.min(w, h) * .8;
-        var g  = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        var rgb = o.c[0]+','+o.c[1]+','+o.c[2];
-        g.addColorStop(0,   'rgba('+rgb+',.32)');
-        g.addColorStop(.45, 'rgba('+rgb+',.12)');
-        g.addColorStop(1,   'rgba('+rgb+',0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.fill();
+      if (W < 10) { resize(); }
+      ctx.clearRect(0, 0, W, H);
+      var cols = Math.ceil(W / GAP) + 1;
+      var rows = Math.ceil(H / GAP) + 1;
+      for (var r = 0; r <= rows; r++) {
+        for (var c = 0; c <= cols; c++) {
+          var x = c * GAP, y = r * GAP;
+          // onda que viaja diagonal
+          var v = 0.5 + 0.5 * Math.sin(x * 0.018 + t * 0.65) * Math.cos(y * 0.018 - t * 0.45);
+          var alpha  = (0.08 + v * 0.28).toFixed(3);
+          var radius = 0.8 + v * 1.0;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, 6.2832);
+          ctx.fillStyle = 'rgba(100,100,100,' + alpha + ')';
+          ctx.fill();
+        }
       }
       raf = requestAnimationFrame(draw);
     }
@@ -55,11 +45,11 @@
       else raf = requestAnimationFrame(draw);
     });
 
-    // Esperar al primer paint para tener dimensiones correctas
     resize();
+    canvas.style.opacity = '1'; // activar canvas (oculta el ::before CSS)
     raf = requestAnimationFrame(draw);
   }
-  window.addEventListener('load', initAurora);
+  window.addEventListener('load', initDotWave);
 
   /* Año footer */
   var y = document.getElementById('year');
