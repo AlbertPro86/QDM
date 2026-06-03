@@ -98,8 +98,13 @@ img{max-width:100%;display:block}
 .hero__chips{list-style:none;display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center}
 .hero__chips li{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;color:var(--q-ink-2)}
 
-/* particle canvas — cubre toda la página, bajo el nav (z:50) */
-#heroBg{position:fixed;inset:0;width:100vw;height:100vh;z-index:49;pointer-events:none;display:block}
+/* particle canvas — detrás de todo el contenido */
+#heroBg{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;pointer-events:none;display:block}
+/* todas las secciones encima del canvas */
+.hero,.about,.services,.faq,.works,.stats,.tst,.cta,.footer,.skills,.plans-section{position:relative;z-index:2}
+/* secciones blancas: fondo transparente → canvas visible debajo */
+.hero,.about,.services,.faq,.works,.stats,.tst,.cta,.footer{background:transparent}
+/* .skills y .plans-section conservan su fondo opaco → tapan canvas */
 .hand{display:inline-block;animation:wave 2.6s ease-in-out infinite;transform-origin:70% 80%}
 @keyframes wave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(16deg)}80%{transform:rotate(-8deg)}90%{transform:rotate(12deg)}}
 
