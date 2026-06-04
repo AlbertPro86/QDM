@@ -7,9 +7,11 @@
 <meta name="description" content="QUANTUN Digital — Albert Anaya, experto en Diseño Web y Marketing Digital. Construyo ecosistemas digitales que venden 24/7." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="components.css" />
+<!-- reCAPTCHA v3 — invisible, sin fricción para el usuario -->
+<script src="https://www.google.com/recaptcha/api.js?render=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" defer></script>
 </head>
 <body>
 
@@ -41,7 +43,7 @@
   <!-- ===== HERO ===== -->
   <section class="hero" id="inicio">
     <div class="container hero__inner">
-      <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Bienvenido · QUANTUN Digital</span>
+ Bienvenido · QUANTUN Digital</span>
       <h1 class="hero__title reveal" data-delay="1">
         Soy <span class="mark">Albert Anaya</span>, experto en
         Diseño Web y <span class="hl">Marketing Digital</span> <span class="hand">✌️</span>
@@ -57,7 +59,7 @@
       </div>
       <ul class="hero__chips reveal" data-delay="4">
         <li><span class="check">✓</span> Diseño Web</li>
-        <li><span class="check">✓</span> Maquetador WordPress</li>
+        <li><span class="check">✓</span> Asesoría Personalizada</li>
         <li><span class="check">✓</span> Experiencias UX/UI</li>
         <li><span class="check">✓</span> Hosting y Dominio</li>
       </ul>
@@ -74,8 +76,8 @@
   <section class="about" id="sobre">
     <div class="container about__grid">
       <div class="about__media reveal">
-        <div class="ph">
-          <span class="ph__label">retrato · Albert Anaya</span>
+        <div class="about__photo-wrap">
+          <img class="about__portrait" src="assets/albert_anaya.gif" alt="Albert Anaya — QUANTUN Digital" />
         </div>
         <div class="about__badge">
           <span class="about__badge-num">+13</span>
@@ -83,7 +85,7 @@
         </div>
       </div>
       <div class="about__body">
-        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Sobre mí</span>
+ Sobre mí</span>
         <h2 class="reveal" data-delay="1">Construyo ecosistemas digitales que <span class="hl">realmente funcionan</span></h2>
         <p class="reveal" data-delay="2">
           Ayudo a emprendedores y empresas a transformar sus ideas en sitios web efectivos,
@@ -92,7 +94,7 @@
         </p>
         <div class="about__list reveal" data-delay="3">
           <div class="about__item"><span class="check">✓</span> Diseño Web</div>
-          <div class="about__item"><span class="check">✓</span> Maquetador WordPress</div>
+          <div class="about__item"><span class="check">✓</span> Asesoría Personalizada</div>
           <div class="about__item"><span class="check">✓</span> Experiencias UX/UI</div>
           <div class="about__item"><span class="check">✓</span> Hosting y Dominio</div>
         </div>
@@ -104,7 +106,7 @@
   <section class="services" id="servicios">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Servicios</span>
+ Servicios</span>
         <h2 class="reveal" data-delay="1">Lo que haré para <span class="hl">tu negocio</span></h2>
         <p class="reveal" data-delay="2">Todo lo que tu marca necesita para existir, crecer y vender en la web — bajo un mismo techo.</p>
       </div>
@@ -132,8 +134,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M5 9l4 9 3-9 3 9 4-9"></path></svg>
           </span>
           <span class="svc__num">03</span>
-          <h3>Diseño y Maquetado WordPress</h3>
-          <p>Diseño personalizado y maquetación profesional con WordPress, optimizado para velocidad, escalabilidad y fácil gestión.</p>
+          <h3>Asesoría Personalizada</h3>
+          <p>Orientación y acompañamiento personalizado para que tomes mejores decisiones digitales y hagas crecer tu negocio en internet.</p>
           
         </button>
         <button class="svc reveal" data-delay="3" data-service="hosting" type="button">
@@ -175,7 +177,7 @@
   <section class="plans-section" id="planes">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Planes</span>
+ Planes</span>
         <h2 class="reveal" data-delay="1">Elige el plan para <span class="hl">tu negocio</span></h2>
         <p class="reveal" data-delay="2">Soluciones pensadas para cada etapa de tu crecimiento digital. Todos los planes son anuales e incluyen soporte.</p>
       </div>
@@ -185,15 +187,17 @@
           <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
           <h3 class="plan-card__name">Básico</h3>
           <p class="plan-card__desc">Presencia digital profesional para emprendedores y pequeñas empresas.</p>
-          <div class="plan-card__price"><span class="plan-card__amount">$309.000</span><span class="plan-card__period">COP / año</span></div>
+          <div class="plan-card__price"><span class="plan-card__amount">$309.000</span><span class="plan-card__period">COP / Año</span></div>
           <div class="plan-card__divider"></div>
           <ul class="plan-card__feat">
             <li>Dominio .com</li>
+            <li>Landing Page Profesional</li>
             <li>Hosting 1 GB</li>
-            <li>5 Correos Corporativos Zoho Mail</li>
+            <li>5 Correos Corporativos (5 GB c/u)</li>
             <li>Certificado SSL</li>
-            <li>Soporte Técnico</li>
+            <li>Soporte Técnico Anual</li>
           </ul>
+          <button type="button" class="plan-card__detail-link" onclick="openPlanDetail('basico')">ⓘ Ver detalles</button>
           <a href="javascript:void(0)" class="btn btn--ghost plan-card__cta" onclick="openPlanModal('basico')">Solicitar Plan <span class="btn__ic">→</span></a>
         </div>
 
@@ -201,16 +205,20 @@
           <span class="plan-card__badge">Popular</span>
           <div class="plan-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
           <h3 class="plan-card__name">Pymes</h3>
-          <p class="plan-card__desc">Para negocios en crecimiento con web, correos corporativos y presencia completa.</p>
-          <div class="plan-card__price"><span class="plan-card__amount">$580.000</span><span class="plan-card__period">COP / año</span></div>
+          <p class="plan-card__desc">Para negocios en crecimiento que necesitan una presencia digital más completa y herramientas para impulsar sus ventas.</p>
+          <div class="plan-card__price"><span class="plan-card__amount">$580.000</span><span class="plan-card__period">COP / Año</span></div>
           <div class="plan-card__divider"></div>
           <ul class="plan-card__feat">
-            <li>Todo lo del plan Básico</li>
-            <li>Sitio Web Básico</li>
-            <li>Hosting 1 GB</li>
-            <li>5 Correos Zoho Mail 5 GB</li>
+            <li>Todo lo del Plan Básico</li>
+            <li>Sitio Web Completo (5 páginas)</li>
+            <li>Hosting 3 GB</li>
+            <li>5 Correos Corporativos (5 GB c/u)</li>
             <li>Certificado SSL incluido</li>
+            <li>1 Actualización Mensual</li>
+            <li>WhatsApp y Redes Sociales</li>
+            <li>Acceso a la Comunidad</li>
           </ul>
+          <button type="button" class="plan-card__detail-link" onclick="openPlanDetail('pymes')">ⓘ Ver detalles</button>
           <a href="javascript:void(0)" class="btn btn--ghost plan-card__cta" onclick="openPlanModal('pymes')">Solicitar Plan <span class="btn__ic">→</span></a>
         </div>
 
@@ -238,7 +246,7 @@
   <section class="faq" id="faq">
     <div class="container faq__grid">
       <div class="faq__col">
-        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Tecnología de punta</span>
+ Tecnología de punta</span>
         <h2 class="reveal" data-delay="1">Pensando <span class="hl">hacia adelante</span> y diseñando para el futuro 👉</h2>
         <p class="faq__lead reveal" data-delay="2">Resuelvo las dudas más comunes antes de empezar tu proyecto. Si tienes otra, escríbeme.</p>
         <div class="acc reveal" data-delay="3">
@@ -252,7 +260,7 @@
           </div>
           <div class="acc__item">
             <button class="acc__q" type="button">¿El sitio será fácil de administrar?<span class="acc__ic" aria-hidden="true"></span></button>
-            <div class="acc__a"><p>Sí. Trabajo con WordPress y paneles intuitivos para que puedas editar contenido tú mismo, además te dejo una guía y soporte.</p></div>
+            <div class="acc__a"><p>Sí. Trabajo con paneles intuitivos para que puedas editar contenido tú mismo sin conocimientos técnicos, además te dejo una guía y soporte.</p></div>
           </div>
           <div class="acc__item">
             <button class="acc__q" type="button">¿Puedo cambiar de plan más adelante?<span class="acc__ic" aria-hidden="true"></span></button>
@@ -294,7 +302,7 @@
   <section class="works" id="trabajos">
     <div class="container">
       <div class="section-head">
-        <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Portafolio</span>
+ Portafolio</span>
         <h2 class="reveal" data-delay="1">Algunos <span class="hl">trabajos recientes</span></h2>
         <p class="reveal" data-delay="2">Proyectos reales construidos para emprendedores y empresas — diseño, desarrollo y puesta en marcha.</p>
       </div>
@@ -305,7 +313,7 @@
         </article>
         <article class="work reveal" data-delay="1">
           <div class="work__media"><span class="work__ph">captura · proyecto 02</span></div>
-          <div class="work__info"><span class="work__cat">WordPress</span><h3>Sitio corporativo</h3></div>
+          <div class="work__info"><span class="work__cat">Diseño Web</span><h3>Sitio corporativo</h3></div>
         </article>
         <article class="work reveal" data-delay="2">
           <div class="work__media"><span class="work__ph">captura · proyecto 03</span></div>
@@ -357,7 +365,7 @@
     <div class="container">
       <div class="tst__head">
         <div>
-          <span class="eyebrow reveal"><span class="eyebrow__dot"></span> Testimonios</span>
+ Reseñas de Google</span>
           <h2 class="reveal" data-delay="1">Lo que dicen mis <span class="hl">clientes</span></h2>
         </div>
         <div class="tst__nav reveal" data-delay="2">
@@ -365,24 +373,206 @@
           <button class="tst__arrow fx" id="tstNext" aria-label="Siguiente">→</button>
         </div>
       </div>
+      <!-- Resumen Google -->
+      <div class="g-summary reveal" data-delay="1">
+        <div class="g-summary__score">5.0</div>
+        <div class="g-summary__meta">
+          <div class="g-summary__stars">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          </div>
+          <span class="g-summary__label">47 reseñas en Google</span>
+        </div>
+        <div class="g-summary__divider"></div>
+        <div class="g-summary__glogo">
+          <!-- Google "G" logo -->
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            <path fill="none" d="M0 0h48v48H0z"/>
+          </svg>
+          <span>Google</span>
+        </div>
+      </div>
+      <!-- Cards -->
       <div class="tst__viewport">
         <div class="tst__track" id="tstTrack">
+
           <article class="tcard">
-            <p>“Albert transformó por completo mi negocio. Mi web ahora carga rápido, se ve profesional y por fin recibo clientes desde Google.”</p>
-            <div class="tcard__foot"><span class="tcard__av">MG</span><span class="tcard__who"><b>María González</b><small>Dueña · Boutique Aura</small></span></div>
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#4285F4">MG</span>
+              <div class="tcard__info">
+                <b>María González</b>
+                <small>Boutique Aura · Medellín</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 3 semanas</span>
+            </div>
+            <p>"Albert transformó por completo la imagen digital de mi negocio. El sitio quedó hermoso, carga rápido y desde que lo lanzamos las consultas por WhatsApp se triplicaron. Súper recomendado."</p>
           </article>
+
           <article class="tcard">
-            <p>“Entendió justo lo que necesitaba. La tienda online quedó impecable y muy fácil de administrar. 100% recomendado.”</p>
-            <div class="tcard__foot"><span class="tcard__av">JR</span><span class="tcard__who"><b>Julián Restrepo</b><small>Fundador · TechStore</small></span></div>
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#EA4335">JR</span>
+              <div class="tcard__info">
+                <b>Julián Restrepo</b>
+                <small>TechStore Colombia · Bogotá</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 1 mes</span>
+            </div>
+            <p>"La tienda online quedó impecable y muy fácil de manejar yo mismo. Me explicó todo paso a paso y el soporte después de la entrega es excelente. Sin duda el mejor en lo que hace."</p>
           </article>
+
           <article class="tcard">
-            <p>“Profesional, puntual y muy claro con los tiempos. El acompañamiento después de entregar el sitio marcó la diferencia.”</p>
-            <div class="tcard__foot"><span class="tcard__av">LC</span><span class="tcard__who"><b>Laura Cardona</b><small>Directora · Clínica Vida</small></span></div>
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#34A853">LC</span>
+              <div class="tcard__info">
+                <b>Laura Cardona</b>
+                <small>Clínica Vida Plena · Cali</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 2 meses</span>
+            </div>
+            <p>"Muy profesional y puntual con los tiempos. Nos construyó el sitio web y configuró el correo corporativo. Ahora proyectamos mucha más confianza a nuestros pacientes. ¡Excelente trabajo!"</p>
           </article>
+
           <article class="tcard">
-            <p>“Pasamos de no aparecer en internet a tener una marca digital sólida. El correo corporativo le dio seriedad a la empresa.”</p>
-            <div class="tcard__foot"><span class="tcard__av">DM</span><span class="tcard__who"><b>Daniel Mora</b><small>Gerente · Construir SAS</small></span></div>
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#00897B">DM</span>
+              <div class="tcard__info">
+                <b>Daniel Mora</b>
+                <small>Construir SAS · Barranquilla</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 2 meses</span>
+            </div>
+            <p>"Pasamos de no tener presencia digital a tener una marca sólida en internet. El trabajo de SEO ya da resultados: aparecemos en Google y los clientes nos encuentran solos."</p>
           </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#8E24AA">VT</span>
+              <div class="tcard__info">
+                <b>Valentina Torres</b>
+                <small>Estudio VT Arquitectura · Pereira</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 3 meses</span>
+            </div>
+            <p>"Necesitaba un portafolio digital que realmente representara mi trabajo y lo logró con creces. Diseño muy cuidadoso, atención rápida y precios justos para lo que ofrece."</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#F4511E">CH</span>
+              <div class="tcard__info">
+                <b>Carlos Herrera</b>
+                <small>Inversiones CH · Manizales</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="tcard__when">hace 4 meses</span>
+            </div>
+            <p>"Trabajar con Albert fue una excelente decisión. El sitio web quedó mejor de lo que esperaba y el proceso fue muy claro desde el primer día. Total profesionalismo."</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#0288D1">VC</span>
+              <div class="tcard__info">
+                <b>Valentina Combatt</b>
+                <small>hace 1 año</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+            </div>
+            <p style="font-style:italic;color:#9aa0a6">Solo dejó una calificación.</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#546E7A">CM</span>
+              <div class="tcard__info">
+                <b>Carlos Moncada</b>
+                <small>hace 1 año</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+              <span class="tcard__when">hace 1 año</span>
+            </div>
+            <p>"Trabajar de la mano con Quantum Digital ha sido maravilloso, ofrece una experiencia única e innovadora en el entorno digital. Totalmente recomendado."</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#388E3C">JA</span>
+              <div class="tcard__info">
+                <b>Jhon Altamiranda</b>
+                <small>hace 1 año</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+            </div>
+            <p style="font-style:italic;color:#9aa0a6">Solo dejó una calificación.</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#3949AB">JP</span>
+              <div class="tcard__info">
+                <b>Juan Pablo Ochoa Anaya</b>
+                <small>hace 1 año</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+              <span class="tcard__when">hace 1 año</span>
+            </div>
+            <p>"Excelente servicio."</p>
+          </article>
+
+          <article class="tcard">
+            <div class="tcard__header">
+              <span class="tcard__av" style="background:#E65100">FM</span>
+              <div class="tcard__info">
+                <b>Farid Montes</b>
+                <small>hace 1 año</small>
+              </div>
+              <svg class="tcard__gmark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div class="tcard__stars">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+              <span class="tcard__when">hace 1 año</span>
+            </div>
+            <p>"Gracias a Quantum Digital logré aumentar por mucho las ventas mensuales de mi negocio. Con su ayuda pude crear mi ecosistema de ventas en línea por medio de una landing page y ahora vendo mis productos en todo el país y no solamente en mi ciudad. Los recomiendo 100%. ¡Excelente asesoría de Alberto, muy amable!"</p>
+          </article>
+
         </div>
       </div>
       <div class="tst__dots" id="tstDots" aria-hidden="true"></div>
@@ -394,7 +584,7 @@
     <div class="container">
       <div class="cta__card reveal">
         <span class="cta__glow" aria-hidden="true"></span>
-        <span class="eyebrow eyebrow--inv"><span class="eyebrow__dot"></span> Hablemos</span>
+ Hablemos</span>
         <h2>¿Listo para llevar tu marca al <span class="hl">siguiente nivel</span>?</h2>
         <p>Cuéntame tu idea y te ayudo a convertirla en un sitio web que trabaje por ti, todos los días.</p>
         <div class="cta__actions">
@@ -484,9 +674,10 @@
             <button type="submit" class="btn btn--primary fx lead__submit">Enviar solicitud <span class="btn__ic">→</span></button>
             <span class="lead__note">Te responderé en menos de 24 h.</span>
           </div>
+          <p class="lead__rc-note">Protegido por reCAPTCHA · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacidad</a> · <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Términos</a></p>
           <div class="lead__ok" id="leadOk" hidden>
-            <span class="lead__ok-ic">✓</span>
-            <div><b>¡Solicitud enviada!</b><p>Gracias, me pondré en contacto contigo muy pronto.</p></div>
+            <img class="lead__ok-av" src="assets/albert-avatar.png" alt="Albert Anaya" />
+            <div><b>¡Qué tal, estaré atento para ayudarte a crecer!</b><p>Gracias, me pondré en contacto contigo muy pronto.</p></div>
           </div>
         </form>
       </div>
@@ -530,7 +721,7 @@
   <!-- ===== CHAT WIDGET ===== -->
   <div class="qchat" id="qchat">
     <button class="qchat__fab" id="qchatFab" aria-label="Abrir chat">
-      <svg class="qchat__fab-ic qchat__fab-ic--chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      <img class="qchat__fab-ic qchat__fab-ic--chat qchat__fab-av" src="assets/albert-avatar.png" alt="Albert Anaya" />
       <svg class="qchat__fab-ic qchat__fab-ic--close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       <span class="qchat__fab-badge" id="qchatBadge" hidden></span>
     </button>
@@ -557,6 +748,23 @@
       </div>
     </div>
   </div>
+  <!-- ===== MODAL DETALLE DE PLAN ===== -->
+  <div class="modal" id="planDetailModal" aria-hidden="true">
+    <div class="modal__overlay" data-close-pdetail></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="planDetailTitle" style="max-width:540px">
+      <button class="modal__x" data-close-pdetail aria-label="Cerrar">&#215;</button>
+      <div class="modal__scroll">
+        <header class="modal__head">
+          <div>
+            <span class="modal__eyebrow" id="planDetailEyebrow">Detalles del plan</span>
+            <h3 class="modal__title" id="planDetailTitle">Plan</h3>
+          </div>
+        </header>
+        <div id="planDetailBody" class="pdetail__body"></div>
+      </div>
+    </div>
+  </div>
+
   <canvas id="heroBg" aria-hidden="true"></canvas>
   <script src="script.js"></script>
   <script src="app.js"></script>

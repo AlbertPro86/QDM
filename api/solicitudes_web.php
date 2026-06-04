@@ -48,9 +48,29 @@ switch ($method) {
 
         // Honeypot anti-bot
         if (!empty($in['website_url'])) {
-            // Bot llenó el campo oculto → respuesta falsa exitosa
+            // Bot llenó el campo oculto → respuesta falsa exitosa (no revelar que fue bloqueado)
             jsonResponse(['success' => true, 'message' => 'Solicitud recibida']);
         }
+
+        // reCAPTCHA v3 — verificar token con Google
+        $rcToken = trim($in['recaptcha_token'] ?? '');
+        if ($rcToken) {
+            $rcVerify = @file_get_contents(
+                'https://www.google.com/recaptcha/api/siteverify?secret='
+                . urlencode(RECAPTCHA_SECRET_KEY)
+                . '&response=' . urlencode($rcToken)
+                . '&remoteip=' . urlencode($_SERVER['REMOTE_ADDR'] ?? '')
+            );
+            if ($rcVerify !== false) {
+                $rcResult = json_decode($rcVerify, true);
+                // Bloquear si: verificación falló O score muy bajo (bot probable)
+                if (empty($rcResult['success']) || ($rcResult['score'] ?? 1) < RECAPTCHA_MIN_SCORE) {
+                    jsonResponse(['error' => 'Verificación de seguridad fallida. Intenta de nuevo.'], 403);
+                }
+            }
+            // Si file_get_contents falla (sin internet en dev) se deja pasar con advertencia
+        }
+        // Si no viene token (clave de sitio no cargó), se acepta igual para no bloquear usuarios reales
 
         // Rate limiting: máx 3 solicitudes por IP en 5 min
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';

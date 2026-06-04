@@ -67,9 +67,9 @@
       ]
     },
     wordpress: {
-      title: 'Diseño y Maquetado WordPress',
-      eyebrow: 'Servicio · WordPress',
-      desc: 'Diseño personalizado y maquetación profesional con WordPress, optimizado para velocidad, escalabilidad y fácil gestión.',
+      title: 'Asesoría Personalizada',
+      eyebrow: 'Servicio · Asesoría',
+      desc: 'Orientación y acompañamiento personalizado para que tomes mejores decisiones digitales y hagas crecer tu negocio en internet.',
       features: ['Tema personalizado', 'Panel fácil de editar', 'Plugins esenciales', 'Optimización de carga', 'Backup inicial', 'Capacitación de uso'],
       plans: [
         { name: 'Starter', tag: 'Inicia' },
@@ -118,17 +118,17 @@
       title: 'Plan Básico',
       eyebrow: 'Suscripción anual · QUANTUN Digital',
       desc: 'Presencia digital profesional para emprendedores y pequeñas empresas.',
-      price: '$309.000 COP / año',
+      price: '$309.000 COP / Año',
       icon: 'web',
-      features: ['Dominio .com', 'Hosting 1 GB', '5 Correos Corporativos Zoho Mail', 'Certificado SSL', 'Soporte Técnico']
+      features: ['Dominio .com', 'Landing Page Profesional', 'Hosting 1 GB', '5 Correos Corporativos (5 GB c/u)', 'Certificado SSL', 'Soporte Técnico Anual']
     },
     pymes: {
       title: 'Plan Pymes',
       eyebrow: 'Suscripción anual · QUANTUN Digital',
-      desc: 'Para negocios en crecimiento con web, correos corporativos y presencia completa.',
-      price: '$580.000 COP / año',
+      desc: 'Para negocios en crecimiento que necesitan una presencia digital más completa y herramientas para impulsar sus ventas.',
+      price: '$580.000 COP / Año',
       icon: 'marketing',
-      features: ['Todo lo del plan Básico', 'Sitio Web Básico', 'Hosting 1 GB', '5 Correos Zoho Mail 5 GB c/u', 'Certificado SSL incluido']
+      features: ['Todo lo del Plan Básico', 'Sitio Web Completo (5 páginas)', 'Hosting 3 GB', '5 Correos Corporativos (5 GB c/u)', 'Certificado SSL incluido', '1 Actualización Mensual', 'WhatsApp y Redes Sociales', 'Acceso a la Comunidad']
     },
     enterprise: {
       title: 'Plan Enterprise',
@@ -139,6 +139,86 @@
       features: ['Dominio .com + Hosting 50 GB', '20 Correos Zoho Mail 10 GB c/u', 'Google Analytics y Negocios', 'Certificado SSL Premium', 'Motor CRM Inmobiliario', 'Actualizaciones Web mensuales', 'Soporte prioritario dedicado']
     }
   };
+  /* ============ Detalles de planes (modal informativo) ============ */
+  var PDETAIL_ICONS = {
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    rocket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+    server: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>',
+    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    wrench: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+    smartphone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
+  };
+
+  var PLAN_DETAILS = {
+    basico: {
+      title: 'Plan Básico',
+      eyebrow: 'Detalle del plan · Básico',
+      items: [
+        { icon: 'globe',    name: 'Dominio .com',            notes: ['Incluye dominio .com por 1 año.', 'Otras extensiones pueden generar costos adicionales.', 'Transferencias o migraciones futuras no están incluidas.'] },
+        { icon: 'rocket',   name: 'Landing Page',            notes: ['Sitio web de una sola página.', 'Diseño profesional para presentar tu negocio.', 'Puede incluir información, servicios, galería, formularios y WhatsApp.', 'No incluye actualizaciones de contenido posteriores.'] },
+        { icon: 'server',   name: 'Hosting 1 GB',            notes: ['Espacio para alojar tu sitio web.', 'Mantiene tu página disponible en internet.', 'Incluye configuración inicial.'] },
+        { icon: 'mail',     name: '5 Correos Corporativos',  notes: ['Incluye 5 cuentas de correo.', '5 GB de almacenamiento por cuenta.', 'Todos los correos deben mantener la misma capacidad.', 'Si se requiere más espacio, el valor del servicio cambia.', 'Requiere dominio, hosting y SSL activos.', 'Si ya tienes correos con otro proveedor, se debe revisar la migración previamente.'] },
+        { icon: 'shield',   name: 'Certificado SSL',         notes: ['Incluido sin costo adicional.', 'Protege la navegación de tu sitio.', 'Activa el protocolo HTTPS.'] },
+        { icon: 'wrench',   name: 'Soporte Técnico',         notes: ['Monitoreo y soporte técnico anual.', 'Mantiene los servicios operativos.', 'No incluye cambios de textos, imágenes o diseño web.'] },
+        { icon: 'user',     name: 'Área de Cliente',         notes: ['Consulta tus servicios.', 'Revisa renovaciones.', 'Gestiona solicitudes de soporte.'] },
+        { icon: 'calendar', name: 'Vigencia',                notes: ['Todos los servicios son por 1 año.'] },
+        { icon: 'users',    name: 'Comunidad',               notes: ['Este plan no incluye acceso a la comunidad privada.'] }
+      ]
+    },
+    pymes: {
+      title: 'Plan Pymes',
+      eyebrow: 'Detalle del plan · Pymes',
+      items: [
+        { icon: 'rocket',     name: 'Sitio Web Completo (5 Páginas)', notes: ['Sitio web profesional de hasta 5 páginas.', 'Páginas incluidas: Home, Nosotros, Servicios, Blog y Contacto.', 'Diseño adaptable para móviles, tablets y computadores.', 'Incluye botón de WhatsApp y enlaces a redes sociales.'] },
+        { icon: 'globe',      name: 'Dominio .com',                   notes: ['Incluye dominio .com por 1 año.', 'Otras extensiones pueden generar costos adicionales.', 'Transferencias o migraciones futuras no están incluidas.'] },
+        { icon: 'server',     name: 'Hosting 3 GB',                   notes: ['3 GB de espacio para alojar tu sitio web.', 'Mayor capacidad para imágenes, documentos y contenido.', 'Mantiene tu sitio disponible en internet.'] },
+        { icon: 'mail',       name: '5 Correos Corporativos',         notes: ['Incluye 5 cuentas de correo corporativo.', '5 GB de almacenamiento por cuenta.', 'Todos los correos deben mantener la misma capacidad.', 'Si se requiere ampliar el almacenamiento, el valor del servicio cambia.', 'Requiere dominio, hosting y SSL activos.', 'Si ya cuentas con correos corporativos, se debe revisar la migración previamente.'] },
+        { icon: 'shield',     name: 'Certificado SSL',                notes: ['Incluido sin costo adicional.', 'Protección y navegación segura mediante HTTPS.'] },
+        { icon: 'refresh',    name: '1 Actualización Mensual',        notes: ['Incluye un cambio mensual sobre el sitio web.', 'Puede ser: publicación de artículos, cambio de textos, actualización de imágenes, carga de documentos, creación de una nueva página sencilla o ajustes menores de contenido.', 'Cambios adicionales podrán cotizarse por separado.'] },
+        { icon: 'smartphone', name: 'WhatsApp y Redes Sociales',      notes: ['Integración directa con WhatsApp.', 'Acceso rápido a redes sociales desde el sitio web.', 'Facilita el contacto con clientes potenciales.'] },
+        { icon: 'wrench',     name: 'Soporte Técnico',                notes: ['Supervisión y soporte técnico durante toda la vigencia.', 'Monitoreo de dominio, hosting, correos y funcionamiento general.'] },
+        { icon: 'users',      name: 'Comunidad de Crecimiento',       notes: ['Acceso exclusivo a recursos y contenido de apoyo para tu negocio.', 'Temas: marketing digital, redes sociales, sitios web, comercio electrónico, modelos de negocio, ventas, estrategias comerciales y plantillas prácticas.'] },
+        { icon: 'user',       name: 'Área de Cliente',                notes: ['Consulta tus servicios activos.', 'Revisa renovaciones y facturación.', 'Gestiona solicitudes de soporte.'] },
+        { icon: 'calendar',   name: 'Vigencia',                       notes: ['Todos los servicios incluidos tienen una duración de 1 año.'] }
+      ]
+    }
+  };
+
+  var planDetailModal = document.getElementById('planDetailModal');
+  if (planDetailModal) {
+    window.openPlanDetail = function(planKey) {
+      var d = PLAN_DETAILS[planKey];
+      if (!d) return;
+      document.getElementById('planDetailEyebrow').textContent = d.eyebrow;
+      document.getElementById('planDetailTitle').textContent = d.title;
+      document.getElementById('planDetailBody').innerHTML = d.items.map(function(item) {
+        return '<div class="pdetail__item">' +
+          '<div class="pdetail__item-head"><span class="pdetail__icon">' + (PDETAIL_ICONS[item.icon] || PDETAIL_ICONS.globe) + '</span><strong>' + item.name + '</strong></div>' +
+          '<ul class="pdetail__notes">' + item.notes.map(function(n) { return '<li>' + n + '</li>'; }).join('') + '</ul>' +
+          '</div>';
+      }).join('');
+      planDetailModal.classList.add('open');
+      planDetailModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+    function closePlanDetail() {
+      planDetailModal.classList.remove('open');
+      planDetailModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    planDetailModal.querySelectorAll('[data-close-pdetail]').forEach(function(el) {
+      el.addEventListener('click', closePlanDetail);
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && planDetailModal.classList.contains('open')) closePlanDetail();
+    });
+  }
+
   /* ============ Carga dinámica de servicios desde CRM ============ */
   async function loadServicesFromCRM() {
     try {
@@ -309,6 +389,19 @@
       btn.innerHTML = 'Enviando&hellip;';
 
       var data = Object.fromEntries(new FormData(form).entries());
+
+      // Obtener token reCAPTCHA v3 (invisible para el usuario)
+      try {
+        if (typeof grecaptcha !== 'undefined') {
+          var rcToken = await new Promise(function(resolve) {
+            grecaptcha.ready(function() {
+              grecaptcha.execute('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', { action: 'cotizacion' }).then(resolve);
+            });
+          });
+          data.recaptcha_token = rcToken;
+        }
+      } catch(rcErr) { /* si falla reCAPTCHA, el servidor decide */ }
+
       try {
         await submitToCRM(data);
         form.querySelector('.lead__foot').style.display = 'none';

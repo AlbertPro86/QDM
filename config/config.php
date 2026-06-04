@@ -63,6 +63,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// ─── reCAPTCHA v3 ───
+define('RECAPTCHA_SITE_KEY',   env('RECAPTCHA_SITE_KEY',   '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'));
+define('RECAPTCHA_SECRET_KEY', env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'));
+define('RECAPTCHA_MIN_SCORE',  (float) env('RECAPTCHA_MIN_SCORE', 0.5));
+
 // ─── Zona Horaria ───
 date_default_timezone_set('America/Bogota');
 

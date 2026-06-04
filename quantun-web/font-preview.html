@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Preview de Fuentes — QUANTUN Digital</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Figtree:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --q-ink:#0e0e0c;
+  --q-ink-3:#6b6b68;
+  --q-ink-4:#9b9b97;
+  --q-bg:#f5f2ea;
+  --q-surface:#faf9f5;
+  --q-border:#e4e1d8;
+  --q-lima:#b8f73c;
+  --q-lima-deep:#4d6900;
+  --q-lima-soft:#edf9cc;
+  --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.25,.46,.45,.94);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--q-bg);color:var(--q-ink);overflow-x:hidden}
+
+/* TOP BAR */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(245,242,234,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--q-border);
+  padding:11px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.topbar__brand b{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--q-ink);display:block}
+.topbar__brand span{font-family:var(--mono);font-size:11px;color:var(--q-ink-4)}
+.topbar__right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fnav{display:flex;gap:6px;flex-wrap:wrap}
+.fnav-btn{
+  padding:6px 14px;font-size:12px;font-weight:600;border-radius:999px;
+  border:1px solid var(--q-border);background:var(--q-surface);
+  color:var(--q-ink-3);cursor:pointer;transition:all .18s var(--ease);
+  font-family:'Rethink Sans',sans-serif;white-space:nowrap;
+}
+.fnav-btn:hover{border-color:var(--q-ink);color:var(--q-ink)}
+.fnav-btn.active{background:var(--q-ink);color:#fff;border-color:var(--q-ink)}
+.arrows{display:flex;gap:8px}
+.arr-btn{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--q-border);background:var(--q-surface);
+  display:grid;place-items:center;cursor:pointer;
+  transition:all .18s var(--ease);color:var(--q-ink-3);flex:none;
+}
+.arr-btn:hover{border-color:var(--q-ink);color:var(--q-ink)}
+.arr-btn svg{width:15px;height:15px}
+
+/* SLIDER */
+.slider-outer{overflow:hidden}
+.slider-track{display:flex;transition:transform .5s var(--ease);will-change:transform}
+.slide{flex:0 0 100%;width:100%;padding:48px 0 88px}
+.slide-inner{max-width:900px;margin:0 auto;padding:0 32px}
+
+/* BADGE */
+.font-badge{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:var(--q-surface);border:1px solid var(--q-border);
+  border-radius:14px;padding:14px 20px;margin-bottom:40px;
+}
+.badge-num{
+  font-family:var(--mono);font-size:11px;color:var(--q-ink-4);
+  background:var(--q-bg);border:1px solid var(--q-border);
+  border-radius:6px;padding:3px 8px;flex:none;
+}
+.badge-info{display:flex;flex-direction:column;gap:3px}
+.badge-name{font-size:19px;font-weight:700;color:var(--q-ink);line-height:1}
+.badge-meta{font-size:11px;color:var(--q-ink-4);font-family:var(--mono)}
+.badge-tag{
+  font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  background:var(--q-lima);color:var(--q-lima-deep);
+  padding:4px 10px;border-radius:999px;margin-left:auto;white-space:nowrap;
+}
+
+/* SECCIONES */
+.demo-s{margin-bottom:44px;padding-bottom:44px;border-bottom:1px solid var(--q-border)}
+.demo-s:last-child{border-bottom:none;margin-bottom:0}
+.demo-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--q-ink-4);font-family:var(--mono);margin-bottom:18px}
+
+/* escala tipográfica */
+.td{font-size:clamp(36px,5.8vw,70px);font-weight:800;letter-spacing:-.025em;line-height:1.05;color:var(--q-ink)}
+.th1{font-size:clamp(28px,4vw,52px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:12px;color:var(--q-ink)}
+.th2{font-size:clamp(20px,2.8vw,34px);font-weight:600;letter-spacing:-.015em;line-height:1.2;margin-bottom:10px;color:var(--q-ink)}
+.th3{font-size:20px;font-weight:600;letter-spacing:-.01em;line-height:1.25;color:var(--q-ink)}
+.tb{font-size:16px;color:var(--q-ink-3);line-height:1.68;font-family:'Rethink Sans',sans-serif}
+.tb strong{color:var(--q-ink)}
+
+/* hero mock */
+.hero-m{
+  background:var(--q-surface);border:1px solid var(--q-border);
+  border-radius:22px;padding:44px 40px;position:relative;overflow:hidden;
+}
+.hero-m::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 85% 30%,rgba(184,247,60,.22),transparent 70%);
+  pointer-events:none;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--q-ink-3);font-family:var(--mono);margin-bottom:18px;
+}
+.eyebrow__dot{width:7px;height:7px;border-radius:50%;background:var(--q-lima);flex:none}
+.hl{background:var(--q-lima);padding:2px 8px 3px;border-radius:5px;color:var(--q-ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{
+  font-size:13px;font-weight:500;padding:7px 15px;border-radius:999px;
+  border:1px solid var(--q-border);background:transparent;
+  color:var(--q-ink-3);font-family:'Rethink Sans',sans-serif;
+}
+
+/* nav mock */
+.nav-m{
+  background:rgba(245,242,234,.9);border:1px solid var(--q-border);
+  border-radius:14px;padding:13px 22px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin-bottom:18px;
+}
+.logo-t{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.nav-lnks{display:flex;gap:20px}
+.nav-lnks span{font-size:14px;font-weight:500;color:var(--q-ink-3);font-family:'Rethink Sans',sans-serif}
+.btn-m{background:var(--q-ink);color:#fff;font-size:12px;font-weight:700;padding:9px 17px;border-radius:999px;font-family:'Rethink Sans',sans-serif;white-space:nowrap}
+
+/* cards */
+.cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card-m{background:var(--q-surface);border:1px solid var(--q-border);border-radius:16px;padding:20px 18px}
+.cat-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--q-lima-deep);background:var(--q-lima-soft);display:inline-block;padding:3px 9px;border-radius:999px;margin-bottom:10px;font-family:'Rethink Sans',sans-serif}
+
+/* DOTS */
+.dots{display:flex;justify-content:center;gap:7px;padding:28px 0 8px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--q-border);cursor:pointer;transition:all .2s var(--ease)}
+.dot.active{background:var(--q-ink);width:22px;border-radius:4px}
+
+/* ===== FONT ASSIGNMENTS ===== */
+.f1 .td,.f1 .th1,.f1 .th2,.f1 .th3,.f1 .logo-t,.f1 .badge-name{font-family:'Rethink Sans',sans-serif}
+.f2 .td,.f2 .th1,.f2 .th2,.f2 .th3,.f2 .logo-t,.f2 .badge-name{font-family:'Figtree',sans-serif}
+.f3 .td,.f3 .th1,.f3 .th2,.f3 .th3,.f3 .logo-t,.f3 .badge-name{font-family:'Rubik',sans-serif}
+.f4 .td,.f4 .th1,.f4 .th2,.f4 .th3,.f4 .logo-t,.f4 .badge-name{font-family:'Nunito Sans',sans-serif}
+.f5 .td,.f5 .th1,.f5 .th2,.f5 .th3,.f5 .logo-t,.f5 .badge-name{font-family:'Be Vietnam Pro',sans-serif}
+
+@media(max-width:680px){
+  .cards-row{grid-template-columns:1fr}
+  .nav-lnks{display:none}
+  .slide-inner{padding:0 16px}
+  .hero-m{padding:28px 20px}
+  .topbar{padding:10px 16px}
+  .badge-tag{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar__brand">
+    <b>QUANTUN · Preview de fuentes</b>
+    <span>Estilo Rethink Sans — grotesca limpia y moderna</span>
+  </div>
+  <div class="topbar__right">
+    <nav class="fnav" id="fnav">
+      <button class="fnav-btn active" data-i="0">Rethink Sans</button>
+      <button class="fnav-btn" data-i="1">Figtree</button>
+      <button class="fnav-btn" data-i="2">Rubik</button>
+      <button class="fnav-btn" data-i="3">Nunito Sans</button>
+      <button class="fnav-btn" data-i="4">Be Vietnam Pro</button>
+    </nav>
+    <div class="arrows">
+      <button class="arr-btn" id="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="arr-btn" id="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<div class="slider-outer">
+<div class="slider-track" id="track">
+
+<!-- 1 — RETHINK SANS (la referencia) -->
+<div class="slide f1">
+<div class="slide-inner">
+  <div class="font-badge">
+    <span class="badge-num">01 / 05</span>
+    <div class="badge-info">
+      <div class="badge-name">Rethink Sans</div>
+      <div class="badge-meta">Henrique Beier · Google Fonts · 2023</div>
+    </div>
+    <span class="badge-tag">La referencia</span>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Hero — título principal</div>
+    <div class="hero-m">
+      <div class="eyebrow"><span class="eyebrow__dot"></span>Diseño Web &amp; Marketing Digital</div>
+      <div class="td">Construyo presencias digitales que <span class="hl">venden.</span></div>
+      <p class="tb" style="margin-top:18px;max-width:510px">Páginas web, branding y estrategia digital para negocios que quieren crecer de verdad en internet.</p>
+      <div class="chips"><span class="chip">Diseño Web</span><span class="chip">Asesoría Personalizada</span><span class="chip">Experiencias UX/UI</span></div>
+    </div>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Escala tipográfica</div>
+    <div class="th1">Servicios que hacen crecer tu marca</div>
+    <div class="th2">Diseño Web Profesional</div>
+    <div class="th3">Plan Básico — Desde $1.200.000 COP</div>
+    <p class="tb" style="margin-top:12px">Creamos sitios web <strong>rápidos, modernos y optimizados</strong> para que tus clientes confíen en tu marca desde el primer clic.</p>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Nav + cards</div>
+    <div class="nav-m">
+      <div class="logo-t">QUANTUN</div>
+      <div class="nav-lnks"><span>Servicios</span><span>Trabajos</span><span>Blog</span></div>
+      <div class="btn-m">Cotizar proyecto</div>
+    </div>
+    <div class="cards-row">
+      <div class="card-m"><div class="cat-lbl">Diseño Web</div><div class="th3">Diseño responsive y por qué importa</div></div>
+      <div class="card-m"><div class="cat-lbl">SEO</div><div class="th3">Cómo aparecer en Google sin pagar</div></div>
+      <div class="card-m"><div class="cat-lbl">Marketing</div><div class="th3">Textos que sí venden en tu web</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2 — FIGTREE -->
+<div class="slide f2">
+<div class="slide-inner">
+  <div class="font-badge">
+    <span class="badge-num">02 / 05</span>
+    <div class="badge-info">
+      <div class="badge-name">Figtree</div>
+      <div class="badge-meta">Erik Kennedy · Google Fonts · 2022</div>
+    </div>
+    <span class="badge-tag">Muy similar · Geométrica limpia</span>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Hero — título principal</div>
+    <div class="hero-m">
+      <div class="eyebrow"><span class="eyebrow__dot"></span>Diseño Web &amp; Marketing Digital</div>
+      <div class="td">Construyo presencias digitales que <span class="hl">venden.</span></div>
+      <p class="tb" style="margin-top:18px;max-width:510px">Páginas web, branding y estrategia digital para negocios que quieren crecer de verdad en internet.</p>
+      <div class="chips"><span class="chip">Diseño Web</span><span class="chip">Asesoría Personalizada</span><span class="chip">Experiencias UX/UI</span></div>
+    </div>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Escala tipográfica</div>
+    <div class="th1">Servicios que hacen crecer tu marca</div>
+    <div class="th2">Diseño Web Profesional</div>
+    <div class="th3">Plan Básico — Desde $1.200.000 COP</div>
+    <p class="tb" style="margin-top:12px">Creamos sitios web <strong>rápidos, modernos y optimizados</strong> para que tus clientes confíen en tu marca desde el primer clic.</p>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Nav + cards</div>
+    <div class="nav-m">
+      <div class="logo-t">QUANTUN</div>
+      <div class="nav-lnks"><span>Servicios</span><span>Trabajos</span><span>Blog</span></div>
+      <div class="btn-m">Cotizar proyecto</div>
+    </div>
+    <div class="cards-row">
+      <div class="card-m"><div class="cat-lbl">Diseño Web</div><div class="th3">Diseño responsive y por qué importa</div></div>
+      <div class="card-m"><div class="cat-lbl">SEO</div><div class="th3">Cómo aparecer en Google sin pagar</div></div>
+      <div class="card-m"><div class="cat-lbl">Marketing</div><div class="th3">Textos que sí venden en tu web</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 3 — RUBIK -->
+<div class="slide f3">
+<div class="slide-inner">
+  <div class="font-badge">
+    <span class="badge-num">03 / 05</span>
+    <div class="badge-info">
+      <div class="badge-name">Rubik</div>
+      <div class="badge-meta">Hubert and Fischer · Google Fonts · 2015</div>
+    </div>
+    <span class="badge-tag">Redondeada · Amigable · Moderna</span>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Hero — título principal</div>
+    <div class="hero-m">
+      <div class="eyebrow"><span class="eyebrow__dot"></span>Diseño Web &amp; Marketing Digital</div>
+      <div class="td">Construyo presencias digitales que <span class="hl">venden.</span></div>
+      <p class="tb" style="margin-top:18px;max-width:510px">Páginas web, branding y estrategia digital para negocios que quieren crecer de verdad en internet.</p>
+      <div class="chips"><span class="chip">Diseño Web</span><span class="chip">Asesoría Personalizada</span><span class="chip">Experiencias UX/UI</span></div>
+    </div>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Escala tipográfica</div>
+    <div class="th1">Servicios que hacen crecer tu marca</div>
+    <div class="th2">Diseño Web Profesional</div>
+    <div class="th3">Plan Básico — Desde $1.200.000 COP</div>
+    <p class="tb" style="margin-top:12px">Creamos sitios web <strong>rápidos, modernos y optimizados</strong> para que tus clientes confíen en tu marca desde el primer clic.</p>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Nav + cards</div>
+    <div class="nav-m">
+      <div class="logo-t">QUANTUN</div>
+      <div class="nav-lnks"><span>Servicios</span><span>Trabajos</span><span>Blog</span></div>
+      <div class="btn-m">Cotizar proyecto</div>
+    </div>
+    <div class="cards-row">
+      <div class="card-m"><div class="cat-lbl">Diseño Web</div><div class="th3">Diseño responsive y por qué importa</div></div>
+      <div class="card-m"><div class="cat-lbl">SEO</div><div class="th3">Cómo aparecer en Google sin pagar</div></div>
+      <div class="card-m"><div class="cat-lbl">Marketing</div><div class="th3">Textos que sí venden en tu web</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 4 — NUNITO SANS -->
+<div class="slide f4">
+<div class="slide-inner">
+  <div class="font-badge">
+    <span class="badge-num">04 / 05</span>
+    <div class="badge-info">
+      <div class="badge-name">Nunito Sans</div>
+      <div class="badge-meta">Vernon Adams · Google Fonts · 2016</div>
+    </div>
+    <span class="badge-tag">Suave · Profesional · Legible</span>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Hero — título principal</div>
+    <div class="hero-m">
+      <div class="eyebrow"><span class="eyebrow__dot"></span>Diseño Web &amp; Marketing Digital</div>
+      <div class="td">Construyo presencias digitales que <span class="hl">venden.</span></div>
+      <p class="tb" style="margin-top:18px;max-width:510px">Páginas web, branding y estrategia digital para negocios que quieren crecer de verdad en internet.</p>
+      <div class="chips"><span class="chip">Diseño Web</span><span class="chip">Asesoría Personalizada</span><span class="chip">Experiencias UX/UI</span></div>
+    </div>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Escala tipográfica</div>
+    <div class="th1">Servicios que hacen crecer tu marca</div>
+    <div class="th2">Diseño Web Profesional</div>
+    <div class="th3">Plan Básico — Desde $1.200.000 COP</div>
+    <p class="tb" style="margin-top:12px">Creamos sitios web <strong>rápidos, modernos y optimizados</strong> para que tus clientes confíen en tu marca desde el primer clic.</p>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Nav + cards</div>
+    <div class="nav-m">
+      <div class="logo-t">QUANTUN</div>
+      <div class="nav-lnks"><span>Servicios</span><span>Trabajos</span><span>Blog</span></div>
+      <div class="btn-m">Cotizar proyecto</div>
+    </div>
+    <div class="cards-row">
+      <div class="card-m"><div class="cat-lbl">Diseño Web</div><div class="th3">Diseño responsive y por qué importa</div></div>
+      <div class="card-m"><div class="cat-lbl">SEO</div><div class="th3">Cómo aparecer en Google sin pagar</div></div>
+      <div class="card-m"><div class="cat-lbl">Marketing</div><div class="th3">Textos que sí venden en tu web</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 5 — BE VIETNAM PRO -->
+<div class="slide f5">
+<div class="slide-inner">
+  <div class="font-badge">
+    <span class="badge-num">05 / 05</span>
+    <div class="badge-info">
+      <div class="badge-name">Be Vietnam Pro</div>
+      <div class="badge-meta">Be Theme · Google Fonts · 2021</div>
+    </div>
+    <span class="badge-tag">Nítida · Dinámica · Contemporánea</span>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Hero — título principal</div>
+    <div class="hero-m">
+      <div class="eyebrow"><span class="eyebrow__dot"></span>Diseño Web &amp; Marketing Digital</div>
+      <div class="td">Construyo presencias digitales que <span class="hl">venden.</span></div>
+      <p class="tb" style="margin-top:18px;max-width:510px">Páginas web, branding y estrategia digital para negocios que quieren crecer de verdad en internet.</p>
+      <div class="chips"><span class="chip">Diseño Web</span><span class="chip">Asesoría Personalizada</span><span class="chip">Experiencias UX/UI</span></div>
+    </div>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Escala tipográfica</div>
+    <div class="th1">Servicios que hacen crecer tu marca</div>
+    <div class="th2">Diseño Web Profesional</div>
+    <div class="th3">Plan Básico — Desde $1.200.000 COP</div>
+    <p class="tb" style="margin-top:12px">Creamos sitios web <strong>rápidos, modernos y optimizados</strong> para que tus clientes confíen en tu marca desde el primer clic.</p>
+  </div>
+  <div class="demo-s">
+    <div class="demo-lbl">Nav + cards</div>
+    <div class="nav-m">
+      <div class="logo-t">QUANTUN</div>
+      <div class="nav-lnks"><span>Servicios</span><span>Trabajos</span><span>Blog</span></div>
+      <div class="btn-m">Cotizar proyecto</div>
+    </div>
+    <div class="cards-row">
+      <div class="card-m"><div class="cat-lbl">Diseño Web</div><div class="th3">Diseño responsive y por qué importa</div></div>
+      <div class="card-m"><div class="cat-lbl">SEO</div><div class="th3">Cómo aparecer en Google sin pagar</div></div>
+      <div class="card-m"><div class="cat-lbl">Marketing</div><div class="th3">Textos que sí venden en tu web</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- /track -->
+</div><!-- /outer -->
+
+<div class="dots" id="dots">
+  <div class="dot active" data-i="0"></div>
+  <div class="dot" data-i="1"></div>
+  <div class="dot" data-i="2"></div>
+  <div class="dot" data-i="3"></div>
+  <div class="dot" data-i="4"></div>
+</div>
+
+<script>
+const track = document.getElementById('track');
+const btns  = document.querySelectorAll('.fnav-btn');
+const dots  = document.querySelectorAll('.dot');
+const N = 5;
+let cur = 0;
+function go(n){
+  cur = ((n%N)+N)%N;
+  track.style.transform=`translateX(-${cur*100}%)`;
+  btns.forEach((b,i)=>b.classList.toggle('active',i===cur));
+  dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+document.getElementById('next').addEventListener('click',()=>go(cur+1));
+btns.forEach(b=>b.addEventListener('click',()=>go(+b.dataset.i)));
+dots.forEach(d=>d.addEventListener('click',()=>go(+d.dataset.i)));
+let sx=0;
+track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+track.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)go(dx<0?cur+1:cur-1)},{passive:true});
+</script>
+</body>
+</html>

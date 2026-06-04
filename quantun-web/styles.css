@@ -9,6 +9,7 @@
   --q-lima:#C6F24E; --q-lima-soft:#E8FA9E; --q-lima-deep:#8FB31F;
   /* Type */
   --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --heading:'Nunito Sans',ui-sans-serif,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,monospace;
   /* Motion */
   --ease:cubic-bezier(.2,.7,.3,1);
@@ -17,6 +18,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+h1,h2,h3,h4,h5,h6{font-family:var(--heading)}
 body{
   font-family:var(--sans);
   background:var(--q-bg);
@@ -30,7 +32,7 @@ img{max-width:100%;display:block}
 .container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 28px}
 
 /* highlight + mark */
-.hl{color:var(--q-lima-deep);white-space:nowrap}
+.hl{color:inherit;white-space:nowrap}
 .mark{color:var(--q-ink)}
 
 .eyebrow{
@@ -125,6 +127,8 @@ img{max-width:100%;display:block}
   display:grid;place-items:center;
 }
 .ph__label{font-family:var(--mono);font-size:12px;color:var(--q-ink-4);letter-spacing:.04em;background:var(--q-surface);padding:6px 12px;border-radius:6px;border:1px solid var(--q-border)}
+.about__photo-wrap{width:100%;aspect-ratio:4/5;border-radius:18px;overflow:hidden;border:1px solid var(--q-border)}
+.about__portrait{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
 .about__badge{
   position:absolute;right:-18px;bottom:30px;background:var(--q-ink);color:#fff;
   border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:14px;
@@ -222,7 +226,7 @@ img{max-width:100%;display:block}
 .cta__card .eyebrow{position:relative;z-index:2}
 .cta__card h2{position:relative;z-index:2;font-size:clamp(28px,4vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1.06;margin-bottom:16px;max-width:680px;margin-inline:auto}
 .cta__card>p{position:relative;z-index:2;font-size:18px;color:rgba(255,255,255,.72);max-width:520px;margin:0 auto 32px}
-.cta__card .hl{color:var(--q-lima)}
+.cta__card .hl{color:inherit}
 .cta__actions{position:relative;z-index:2;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .cta__social{position:relative;z-index:2;display:flex;gap:22px;justify-content:center;margin-top:30px;flex-wrap:wrap}
 .cta__social a{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-family:var(--mono);color:rgba(255,255,255,.62);transition:color .18s var(--ease)}
@@ -553,6 +557,7 @@ img{max-width:100%;display:block}
 }
 .qchat__fab:hover{transform:scale(1.06);box-shadow:0 8px 32px rgba(14,14,12,.35)}
 .qchat__fab-ic{width:24px;height:24px;transition:opacity .2s,transform .2s}
+.qchat__fab-av{width:100%!important;height:100%!important;border-radius:50%;object-fit:cover;object-position:top center;position:absolute;inset:0}
 .qchat__fab-ic--close{position:absolute;opacity:0;transform:rotate(-90deg) scale(.6)}
 .qchat.open .qchat__fab-ic--chat{opacity:0;transform:rotate(90deg) scale(.6)}
 .qchat.open .qchat__fab-ic--close{opacity:1;transform:none}
