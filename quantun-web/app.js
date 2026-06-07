@@ -599,7 +599,9 @@
 
   /* ============ Chat Widget en vivo ============ */
   (function() {
-    var CHAT_API = '/CRM-QUANTUN-Digital/api/chat_publico.php';
+    var CHAT_API = window.location.hostname === 'localhost'
+      ? '/CRM-QUANTUN-Digital/api/chat_publico.php'
+      : '/crm/api/chat_publico.php';
     var POLL_MS  = 3500;
 
     var root   = document.getElementById('qchat');
