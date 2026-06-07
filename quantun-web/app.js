@@ -552,11 +552,11 @@
 
   /* ============ Inicialización: cargar servicios del CRM ============ */
   (async function initServices() {
-    var loaded = await loadServicesFromCRM();
-    if (loaded) {
-      renderServiceCards();
-    }
-    // Si falla, los servicios estáticos hardcoded funcionan como fallback
+    // Carga datos del CRM para enriquecer los modales (features, planes).
+    // NO se llama renderServiceCards() — las 6 cards del HTML son la fuente
+    // de verdad del grid. Reconstruirlas desde la API borraría las que no
+    // están en el CRM y dejaría solo 3 (o las que haya configuradas).
+    await loadServicesFromCRM();
   })();
 
   /* ============ Pre-seleccion de plan desde seccion Planes ============ */
