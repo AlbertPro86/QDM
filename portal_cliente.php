@@ -129,15 +129,6 @@ if (!empty($_SESSION['portal_logged_in'])) {
                 </form>
 
 
-                <div class="portal-divider">¿Eres del equipo QUANTUN?</div>
-                <div style="text-align:center">
-                    <a href="index.php" class="portal-back">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        Ir al CRM Operativo
-                    </a>
-                </div>
 
                 <div class="login-footer" style="margin-top:28px">
                     © <?= date('Y') ?> QUANTUN Digital · Todos los derechos reservados
