@@ -1,0 +1,25 @@
+name: Deploy a Hostinger
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 195.179.239.212
+          port: 65002
+          username: u260705801
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ~/quantun-repo && git pull origin master
+            rsync -av --delete --exclude='.git' --exclude='crm/' ~/quantun-repo/quantun-web/ ~/domains/quantundigital.com/public_html/
+            rsync -av --delete --exclude='.git' --exclude='quantun-web/' --exclude='backups/' --exclude='.env' --exclude='uploads/' ~/quantun-repo/ ~/domains/quantundigital.com/public_html/crm/
+            echo "Deploy completado."
