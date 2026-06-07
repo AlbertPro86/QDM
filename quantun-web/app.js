@@ -299,6 +299,10 @@
       grid.appendChild(btn);
       idx++;
     }
+    // Las cards dinámicas no están en el array de reveal de script.js → revelarlas ahora
+    setTimeout(function() {
+      grid.querySelectorAll('.svc.reveal').forEach(function(el) { el.classList.add('in'); });
+    }, 50);
   }
 
   /* ============ Modal ============ */
@@ -338,10 +342,11 @@
       elPlan.value = s.plans[1] ? s.plans[1].name : (s.plans[0] && s.plans[0].name) || '';
 
       // reset form
-      form.hidden = false;
-      okBox.hidden = true;
+      okBox.style.display = 'none';
       var _ms = document.getElementById('modalScroll');
-      if (_ms) _ms.hidden = false;
+      if (_ms) _ms.style.display = '';
+      var _sb = form.querySelector('.lead__submit');
+      if (_sb) { _sb.disabled = false; _sb.innerHTML = 'Enviar solicitud <span class="btn__ic">→</span>'; }
       form.querySelector('.lead__foot').style.display = '';
       form.reset();
       elService.value = s.title;
@@ -368,10 +373,11 @@
         '<span class="plan__tag">Anual</span>' +
         '<span class="plan__name">' + p.price + '</span>' +
         '</button>';
-      form.hidden = false;
-      okBox.hidden = true;
+      okBox.style.display = 'none';
       var _msp = document.getElementById('modalScroll');
-      if (_msp) _msp.hidden = false;
+      if (_msp) _msp.style.display = '';
+      var _sbp = form.querySelector('.lead__submit');
+      if (_sbp) { _sbp.disabled = false; _sbp.innerHTML = 'Enviar solicitud <span class="btn__ic">→</span>'; }
       form.querySelector('.lead__foot').style.display = '';
       form.reset();
       elService.value = p.title;
@@ -387,6 +393,12 @@
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      // Restaurar estado del formulario al cerrar
+      okBox.style.display = 'none';
+      var _msc = document.getElementById('modalScroll');
+      if (_msc) _msc.style.display = '';
+      var _sbc = form.querySelector('.lead__submit');
+      if (_sbc) { _sbc.disabled = false; _sbc.innerHTML = 'Enviar solicitud <span class="btn__ic">→</span>'; }
       if (lastFocus) lastFocus.focus();
     }
 
@@ -438,8 +450,8 @@
       try {
         await submitToCRM(data);
         var modalScroll = document.getElementById('modalScroll');
-        if (modalScroll) modalScroll.hidden = true;
-        okBox.hidden = false;
+        if (modalScroll) modalScroll.style.display = 'none';
+        okBox.style.display = 'flex';
       } catch (err) {
         btn.disabled = false;
         btn.innerHTML = prev;
