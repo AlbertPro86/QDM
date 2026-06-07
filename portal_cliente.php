@@ -128,11 +128,6 @@ if (!empty($_SESSION['portal_logged_in'])) {
                     </button>
                 </form>
 
-                <div class="portal-hint">
-                    <strong>Primera vez accediendo?</strong><br>
-                    Tu contraseña inicial es tu <strong>NIT o número de identificación</strong> registrado.<br>
-                    Si no recuerdas tus datos, comunícate con QUANTUN Digital.
-                </div>
 
                 <div class="portal-divider">¿Eres del equipo QUANTUN?</div>
                 <div style="text-align:center">
