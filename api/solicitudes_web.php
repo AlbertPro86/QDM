@@ -52,24 +52,7 @@ switch ($method) {
             jsonResponse(['success' => true, 'message' => 'Solicitud recibida']);
         }
 
-        // reCAPTCHA v3 — verificar token con Google (timeout 5s para no colgar)
-        $rcToken = trim($in['recaptcha_token'] ?? '');
-        if ($rcToken) {
-            $ctx = stream_context_create(['http' => ['timeout' => 5]]);
-            $rcVerify = @file_get_contents(
-                'https://www.google.com/recaptcha/api/siteverify?secret='
-                . urlencode(RECAPTCHA_SECRET_KEY)
-                . '&response=' . urlencode($rcToken)
-                . '&remoteip=' . urlencode($_SERVER['REMOTE_ADDR'] ?? ''),
-                false, $ctx
-            );
-            if ($rcVerify !== false) {
-                $rcResult = json_decode($rcVerify, true);
-                if (empty($rcResult['success']) || ($rcResult['score'] ?? 1) < RECAPTCHA_MIN_SCORE) {
-                    jsonResponse(['error' => 'Verificación de seguridad fallida. Intenta de nuevo.'], 403);
-                }
-            }
-        }
+        // reCAPTCHA: desactivado hasta configurar claves reales de producción
 
         // Rate limiting: máx 3 solicitudes por IP en 5 min
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
