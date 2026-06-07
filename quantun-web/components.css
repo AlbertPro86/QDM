@@ -194,7 +194,7 @@
 .lead__rc-note a:hover{color:var(--q-ink)}
 /* Ocultar badge flotante reCAPTCHA — permitido por Google ToS si se incluye texto alternativo en el formulario */
 .grecaptcha-badge{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
-.lead__ok{display:flex;flex-direction:column;align-items:center;gap:18px;background:var(--q-success-soft);border:1.5px solid #BFE3CD;border-radius:16px;padding:40px 28px;margin-top:14px;text-align:center;animation:pop .4s var(--ease)}
+.lead__ok{display:flex;flex-direction:column;align-items:center;gap:18px;background:var(--q-success-soft);border-radius:18px;padding:44px 28px 40px;margin:0;text-align:center;animation:pop .4s var(--ease)}
 @keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .lead__ok-av{flex:none;width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid var(--q-success);box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .lead__ok b{font-size:19px;font-weight:700;color:var(--q-success-ink);display:block;margin-bottom:8px}
