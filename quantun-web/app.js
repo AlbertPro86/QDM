@@ -340,6 +340,8 @@
       // reset form
       form.hidden = false;
       okBox.hidden = true;
+      var _mp = document.querySelector('.modal__plans');
+      if (_mp) _mp.hidden = false;
       form.querySelector('.lead__foot').style.display = '';
       form.reset();
       elService.value = s.title;
@@ -433,7 +435,9 @@
 
       try {
         await submitToCRM(data);
-        form.querySelector('.lead__foot').style.display = 'none';
+        form.hidden = true;
+        var modalPlans = document.querySelector('.modal__plans');
+        if (modalPlans) modalPlans.hidden = true;
         okBox.hidden = false;
       } catch (err) {
         btn.disabled = false;
