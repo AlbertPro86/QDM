@@ -413,15 +413,21 @@
 
       var data = Object.fromEntries(new FormData(form).entries());
 
-      // Obtener token reCAPTCHA v3 (invisible para el usuario)
+      // Asegurar que siempre haya un servicio
+      if (!data.service) data.service = 'Consulta General';
+
+      // Obtener token reCAPTCHA v3 con timeout de 3s
       try {
         if (typeof grecaptcha !== 'undefined') {
-          var rcToken = await new Promise(function(resolve) {
-            grecaptcha.ready(function() {
-              grecaptcha.execute('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', { action: 'cotizacion' }).then(resolve);
-            });
-          });
-          data.recaptcha_token = rcToken;
+          var rcToken = await Promise.race([
+            new Promise(function(resolve) {
+              grecaptcha.ready(function() {
+                grecaptcha.execute('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', { action: 'cotizacion' }).then(resolve);
+              });
+            }),
+            new Promise(function(resolve) { setTimeout(function() { resolve(''); }, 3000); })
+          ]);
+          if (rcToken) data.recaptcha_token = rcToken;
         }
       } catch(rcErr) { /* si falla reCAPTCHA, el servidor decide */ }
 
@@ -432,7 +438,14 @@
       } catch (err) {
         btn.disabled = false;
         btn.innerHTML = prev;
-        alert('No se pudo enviar la solicitud. Intenta de nuevo o escríbeme por WhatsApp.');
+        var errMsg = form.querySelector('.lead__error-msg');
+        if (!errMsg) {
+          errMsg = document.createElement('p');
+          errMsg.className = 'lead__error-msg';
+          errMsg.style.cssText = 'color:#e53e3e;font-size:13px;margin:8px 0 0;text-align:center';
+          btn.parentNode.insertBefore(errMsg, btn.nextSibling);
+        }
+        errMsg.textContent = 'No se pudo enviar. Intenta de nuevo o escríbeme por WhatsApp.';
         console.error(err);
       }
     });
