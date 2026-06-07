@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<title>Inteligencia Artificial para tu Negocio — QUANTUN Digital</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 750px; overflow: hidden; background: #0e0e0c; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .banner { position: relative; width: 1200px; height: 750px; background: #0e0e0c; overflow: hidden; }
+  .bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Radial glow from right */
+  .glow {
+    position: absolute;
+    right: -100px; top: 50%;
+    transform: translateY(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, rgba(200,240,78,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .content {
+    position: absolute;
+    top: 0; left: 0;
+    width: 600px; height: 750px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    background: rgba(200,240,78,0.08);
+    border: 1px solid rgba(200,240,78,0.2);
+    padding: 6px 14px;
+    width: fit-content;
+    border-radius: 1px;
+  }
+  .category-dot { width: 5px; height: 5px; background: #c8f04e; border-radius: 50%; }
+  .category-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c8f04e;
+  }
+
+  .title {
+    font-size: 62px;
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    margin-bottom: 28px;
+  }
+  .title span { color: #c8f04e; }
+  .title .thin { font-weight: 300; color: rgba(255,255,255,0.7); }
+
+  .desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.42);
+    line-height: 1.7;
+    max-width: 420px;
+    font-weight: 400;
+    margin-bottom: 36px;
+  }
+
+  /* Feature tags */
+  .tags { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 5px 12px;
+    border-radius: 2px;
+  }
+  .tag.active { color: #0e0e0c; background: #c8f04e; border-color: #c8f04e; }
+
+  .logo {
+    position: absolute;
+    top: 48px; right: 64px;
+    text-align: right;
+  }
+  .logo-wordmark {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  .logo-wordmark em { color: #c8f04e; font-style: normal; }
+  .logo-sub {
+    font-size: 9.5px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* Bottom accent line */
+  .bottom-accent {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 420px; height: 3px;
+    background: linear-gradient(90deg, #c8f04e, transparent);
+  }
+
+  /* Article number BG */
+  .bg-num {
+    position: absolute;
+    right: 60px; bottom: 20px;
+    font-size: 200px;
+    font-weight: 900;
+    color: rgba(200,240,78,0.04);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    user-select: none;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+
+  <div class="glow"></div>
+
+  <svg class="bg-svg" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+    <!-- AI / neural network visualization on right side -->
+
+    <!-- Main brain outline - abstract hexagonal lattice -->
+    <!-- Hexagon grid - AI chip look -->
+    <g transform="translate(650, 100)" opacity="1">
+      <!-- Hex grid cells -->
+      <polygon points="90,0 180,52 180,156 90,208 0,156 0,52" fill="none" stroke="rgba(200,240,78,0.12)" stroke-width="1.2"/>
+      <polygon points="270,0 360,52 360,156 270,208 180,156 180,52" fill="none" stroke="rgba(200,240,78,0.10)" stroke-width="1"/>
+      <polygon points="90,208 180,260 180,364 90,416 0,364 0,260" fill="none" stroke="rgba(200,240,78,0.10)" stroke-width="1"/>
+      <polygon points="270,208 360,260 360,364 270,416 180,364 180,260" fill="none" stroke="rgba(200,240,78,0.14)" stroke-width="1.2"/>
+      <polygon points="450,0 540,52 540,156 450,208 360,156 360,52" fill="none" stroke="rgba(200,240,78,0.07)" stroke-width="1"/>
+      <polygon points="450,208 540,260 540,364 450,416 360,364 360,260" fill="none" stroke="rgba(200,240,78,0.08)" stroke-width="1"/>
+      <polygon points="90,416 180,468 180,572 90,572 0,468 0,364" fill="none" stroke="rgba(200,240,78,0.06)" stroke-width="1"/>
+      <polygon points="270,416 360,468 360,572 270,572 180,468 180,416" fill="none" stroke="rgba(200,240,78,0.08)" stroke-width="1"/>
+
+      <!-- Bright highlighted cells -->
+      <polygon points="270,208 360,260 360,364 270,416 180,364 180,260" fill="rgba(200,240,78,0.06)" stroke="#c8f04e" stroke-width="1.5"/>
+
+      <!-- Node dots at intersections -->
+      <circle cx="90" cy="104" r="3" fill="#c8f04e" opacity="0.6"/>
+      <circle cx="270" cy="104" r="4" fill="#c8f04e" opacity="0.8"/>
+      <circle cx="180" cy="208" r="5" fill="#c8f04e" opacity="0.9"/>
+      <circle cx="360" cy="208" r="3" fill="#c8f04e" opacity="0.5"/>
+      <circle cx="90" cy="312" r="3.5" fill="#c8f04e" opacity="0.55"/>
+      <circle cx="270" cy="312" r="6" fill="#c8f04e" opacity="1"/>
+      <circle cx="450" cy="104" r="2.5" fill="#c8f04e" opacity="0.35"/>
+      <circle cx="180" cy="416" r="3" fill="#c8f04e" opacity="0.4"/>
+      <circle cx="360" cy="416" r="2.5" fill="#c8f04e" opacity="0.35"/>
+    </g>
+
+    <!-- Connecting lines to content area -->
+    <line x1="650" y1="375" x2="580" y2="375" stroke="rgba(200,240,78,0.1)" stroke-width="1" stroke-dasharray="4,8"/>
+
+    <!-- Pulse rings on highlight node -->
+    <circle cx="930" cy="375" r="30" fill="none" stroke="rgba(200,240,78,0.15)" stroke-width="1"/>
+    <circle cx="930" cy="375" r="50" fill="none" stroke="rgba(200,240,78,0.08)" stroke-width="1"/>
+    <circle cx="930" cy="375" r="70" fill="none" stroke="rgba(200,240,78,0.04)" stroke-width="1"/>
+
+    <!-- Corner brackets -->
+    <path d="M 40 40 L 40 90 M 40 40 L 90 40" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+    <path d="M 1160 710 L 1160 660 M 1160 710 L 1110 710" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+
+    <!-- Divider vertical line -->
+    <line x1="610" y1="80" x2="610" y2="670" stroke="rgba(200,240,78,0.08)" stroke-width="1"/>
+  </svg>
+
+  <div class="logo">
+    <div class="logo-wordmark">QUANTUN<em>.</em></div>
+    <div class="logo-sub">Digital Agency</div>
+  </div>
+
+  <div class="content">
+    <div class="category">
+      <div class="category-dot"></div>
+      <span class="category-label">Tecnología</span>
+    </div>
+    <h1 class="title">
+      <span class="thin">Inteligencia</span><br>
+      <span>Artificial</span><br>
+      para tu Negocio
+    </h1>
+    <p class="desc">Automatiza, optimiza y escala con herramientas de IA diseñadas para el mundo real.</p>
+    <div class="tags">
+      <span class="tag active">IA Generativa</span>
+      <span class="tag">Automatización</span>
+      <span class="tag">Productividad</span>
+    </div>
+  </div>
+
+  <div class="bg-num">04</div>
+  <div class="bottom-accent"></div>
+
+</div>
+</body>
+</html>

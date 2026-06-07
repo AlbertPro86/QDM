@@ -1,223 +1,281 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Blog — QUANTUN Digital · Albert Anaya</title>
-<meta name="description" content="Blog de QUANTUN Digital — consejos de diseño web, marketing digital, SEO y más, por Albert Anaya." />
+<title>Blog — Diseño web, marketing digital, SEO e IA | QUANTUN Digital</title>
+<meta name="description" content="Artículos prácticos sobre diseño web, ecosistema digital, marketing en redes sociales, inteligencia artificial y SEO para empresas y emprendedores. Por Albert Anaya — QUANTUN Digital." />
+<meta name="keywords" content="blog diseño web, marketing digital Colombia, SEO para negocios, inteligencia artificial empresas, ecosistema digital, correos profesionales, redes sociales leads" />
+<meta name="author" content="Albert Anaya" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://quantundigital.com/blog.html" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Blog — Diseño web, marketing digital, SEO e IA | QUANTUN Digital" />
+<meta property="og:description" content="Artículos prácticos para hacer crecer tu marca digital. Por Albert Anaya." />
+<meta property="og:image" content="https://quantundigital.com/assets/quantun-logo.png" />
+<meta property="og:url" content="https://quantundigital.com/blog.html" />
+<meta property="og:site_name" content="QUANTUN Digital" />
+<meta property="og:locale" content="es_CO" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Blog QUANTUN Digital — Diseño web, marketing, SEO e IA" />
+<meta name="twitter:description" content="Artículos prácticos para hacer crecer tu marca digital." />
+<meta name="twitter:site" content="@quantundigital" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Blog QUANTUN Digital",
+  "description": "Artículos prácticos sobre diseño web, marketing digital, SEO e inteligencia artificial para empresas y emprendedores.",
+  "url": "https://quantundigital.com/blog.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "QUANTUN Digital",
+    "logo": { "@type": "ImageObject", "url": "https://quantundigital.com/assets/quantun-logo.png" }
+  },
+  "author": { "@type": "Person", "name": "Albert Anaya", "url": "https://quantundigital.com" }
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="components.css" />
 <style>
-  .bloghero{padding:150px 0 50px;position:relative;overflow:hidden;z-index:2;background:transparent}
-  .blogwrap{position:relative;z-index:2;background:transparent}
+  .bloghero{padding:150px 0 50px;position:relative;overflow:hidden;z-index:2}
   .bloghero__inner{position:relative;z-index:2;max-width:760px}
   .bloghero h1{font-size:clamp(34px,5vw,60px);font-weight:700;letter-spacing:-.03em;line-height:1.04;margin:18px 0 16px}
-  .bloghero p{font-size:18px;color:var(--q-ink-3);max-width:560px}
+  .bloghero p{font-size:18px;color:var(--q-ink-3);max-width:560px;line-height:1.6}
   .blogfilters{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
   .blogchip{font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;border:1px solid var(--q-border-strong);background:var(--q-surface);color:var(--q-ink-3);cursor:pointer;transition:all .18s var(--ease)}
   .blogchip:hover{border-color:var(--q-ink);color:var(--q-ink)}
   .blogchip.active{background:var(--q-ink);color:#fff;border-color:var(--q-ink)}
-
   .blogwrap{padding:30px 0 110px}
   /* destacado */
-  .featured{display:grid;grid-template-columns:1.15fr 1fr;gap:0;border:1px solid var(--q-border);border-radius:20px;overflow:hidden;margin-bottom:40px;background:var(--q-surface);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+  .featured{display:grid;grid-template-columns:1.15fr 1fr;gap:0;border:1px solid var(--q-border);border-radius:20px;overflow:hidden;margin-bottom:40px;background:var(--q-surface);transition:transform .25s var(--ease),box-shadow .25s var(--ease);text-decoration:none;color:inherit}
   .featured:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(14,14,12,.1)}
-  .featured__media{min-height:320px;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 14px,#efece4 14px 28px);display:grid;place-items:center;position:relative}
-  .featured__media .ph__label{position:relative;z-index:1}
+  .featured__media{min-height:320px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 14px,#efece4 14px 28px);display:grid;place-items:center;position:relative}
+  .featured__media img{width:100%;height:100%;object-fit:cover;display:block}
   .featured__body{padding:42px 40px;display:flex;flex-direction:column;justify-content:center}
-  .featured__body .work__cat{align-self:flex-start;margin-bottom:14px}
-  .featured__body h2{font-size:clamp(24px,2.6vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.12;margin-bottom:14px}
-  .featured__body p{font-size:16px;color:var(--q-ink-3);line-height:1.6;margin-bottom:22px}
-  .postmeta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--q-ink-4);font-family:var(--mono)}
+  .featured__body .post__cat{align-self:flex-start;margin-bottom:14px}
+  .featured__body h2{font-size:clamp(22px,2.6vw,30px);font-weight:700;letter-spacing:-.02em;line-height:1.12;margin-bottom:14px}
+  .featured__body p{font-size:15px;color:var(--q-ink-3);line-height:1.6;margin-bottom:22px}
+  .postmeta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--q-ink-4);font-family:var(--mono);flex-wrap:wrap}
   .postmeta .dot{font-size:6px;color:var(--q-border-strong)}
-
+  .featured__body .post__more{margin-top:18px}
   .bloggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .post{background:var(--q-surface);border:1px solid var(--q-border);border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
+  .post{background:var(--q-surface);border:1px solid var(--q-border);border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease);text-decoration:none;color:inherit}
   .post:hover{transform:translateY(-6px);border-color:var(--q-border-strong);box-shadow:0 18px 40px rgba(14,14,12,.1)}
-  .post__media{aspect-ratio:16/10;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 12px,#efece4 12px 24px);display:grid;place-items:center;position:relative;overflow:hidden}
-  .post:hover .post__media .ph__label{transform:scale(1.04)}
-  .post__media .ph__label{transition:transform .3s var(--ease)}
-  .post__body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .post__media{aspect-ratio:16/10;overflow:hidden;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 12px,#efece4 12px 24px);display:grid;place-items:center;position:relative}
+  .post__media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease)}
+  .post:hover .post__media img{transform:scale(1.04)}
+  .post__body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
   .post__cat{align-self:flex-start;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--q-lima-deep);background:var(--q-lima-soft);padding:4px 9px;border-radius:999px}
-  .post__body h3{font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+  .post__body h3{font-size:18px;font-weight:600;letter-spacing:-.01em;line-height:1.25;color:var(--q-ink)}
   .post:hover .post__body h3{color:var(--q-lima-deep)}
   .post__excerpt{font-size:14px;color:var(--q-ink-3);line-height:1.55}
-  .post__foot{margin-top:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--q-ink-4);font-family:var(--mono);padding-top:6px}
-  .post__more{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--q-ink);margin-top:4px}
+  .post__foot{margin-top:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--q-ink-4);font-family:var(--mono);padding-top:8px;border-top:1px solid var(--q-border)}
+  .post__more{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--q-ink)}
   .post__more .a{transition:transform .25s var(--ease)}
   .post:hover .post__more .a{transform:translateX(5px)}
-
+  /* ocultar/mostrar por filtro */
+  .post[hidden],.featured[hidden]{display:none}
   .blognote{margin-top:54px;text-align:center;font-size:14px;color:var(--q-ink-4)}
-  @media (max-width:920px){
+  @media(max-width:920px){
     .featured{grid-template-columns:1fr}
     .featured__media{min-height:220px}
     .bloggrid{grid-template-columns:repeat(2,1fr)}
   }
-  @media (max-width:680px){
+  @media(max-width:680px){
     .bloghero{padding-top:116px}
-    .featured__body{padding:28px 22px}
+    .featured__body{padding:26px 20px}
     .bloggrid{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 
-  <!-- ===== NAV ===== -->
-  <header class="nav" id="nav">
-    <div class="nav__inner">
-      <a href="index.html" class="nav__logo" aria-label="QUANTUN Digital">
-        <img src="assets/quantun-logo.png" alt="QUANTUN Dimensión Digital" />
-      </a>
-      <nav class="nav__links" id="navLinks">
-        <a href="index.html#inicio">Inicio</a>
-        <a href="index.html#sobre">Sobre mí</a>
-        <a href="index.html#servicios">Servicios</a>
-        <a href="index.html#trabajos">Trabajos</a>
-        <a href="blog.html" class="active">Blog</a>
-      </nav>
-      <div class="nav__cta">
-        <a href="index.html#contacto" class="btn btn--pill">Cotizar Proyecto</a>
-        <button class="nav__burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
-      </div>
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="QUANTUN Digital">
+      <img src="assets/quantun-logo.png" alt="QUANTUN Dimensión Digital" />
+    </a>
+    <nav class="nav__links" id="navLinks">
+      <a href="index.html#inicio">Inicio</a>
+      <a href="index.html#sobre">Sobre mí</a>
+      <a href="index.html#servicios">Servicios</a>
+      <a href="index.html#planes">Planes</a>
+      <a href="blog.html" class="active">Blog</a>
+    </nav>
+    <div class="nav__cta">
+      <button class="btn btn--pill" id="navCotizar">Cotizar Proyecto</button>
+      <button class="nav__burger" id="burger" aria-label="Menú"><span></span><span></span><span></span></button>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- ===== HERO BLOG ===== -->
-  <section class="bloghero">
-    <div class="container bloghero__inner">
-      <h1 class="reveal" data-delay="1">Ideas para hacer crecer tu <span class="hl">marca digital</span></h1>
-      <p class="reveal" data-delay="2">Consejos prácticos sobre diseño web, marketing digital, SEO y todo lo que necesitas para vender más en internet.</p>
-      <div class="blogfilters reveal" data-delay="3">
-        <button class="blogchip active">Todos</button>
-        <button class="blogchip">Diseño Web</button>
-        <button class="blogchip">Marketing</button>
-        <button class="blogchip">Plataformas Web</button>
-        <button class="blogchip">SEO</button>
-      </div>
+<!-- HERO BLOG -->
+<section class="bloghero">
+  <div class="container bloghero__inner">
+    <h1 class="reveal" data-delay="1">Ideas para hacer crecer tu <span class="hl">marca digital</span></h1>
+    <p class="reveal" data-delay="2">Artículos prácticos sobre diseño web, marketing digital, inteligencia artificial y todo lo que necesitas para vender más en internet.</p>
+    <div class="blogfilters reveal" data-delay="3" role="group" aria-label="Filtrar por categoría">
+      <button class="blogchip active" data-cat="todos">Todos</button>
+      <button class="blogchip" data-cat="estrategia-digital">Estrategia Digital</button>
+      <button class="blogchip" data-cat="marketing-digital">Marketing Digital</button>
+      <button class="blogchip" data-cat="tecnologia">Tecnología</button>
+      <button class="blogchip" data-cat="seo">SEO</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ===== POSTS ===== -->
-  <section class="blogwrap">
-    <div class="container">
-      <!-- destacado -->
-      <article class="featured reveal">
-        <div class="featured__media"><span class="ph__label">imagen · artículo destacado</span></div>
-        <div class="featured__body">
-          <span class="work__cat">Destacado · Marketing</span>
-          <h2>5 razones por las que tu negocio necesita una página web en 2026</h2>
-          <p>Tener presencia digital ya no es opcional. Te explico por qué un sitio web propio sigue siendo la mejor inversión para atraer clientes y generar confianza.</p>
-          <div class="postmeta"><span>Albert Anaya</span><span class="dot">●</span><span>6 min de lectura</span><span class="dot">●</span><span>May 2026</span></div>
+<!-- POSTS -->
+<section class="blogwrap">
+  <div class="container">
+
+    <!-- DESTACADO -->
+    <a href="blog/ecosistema-digital.html" class="featured reveal" data-cat="estrategia-digital">
+      <div class="featured__media">
+        <img src="images/blog/ecosistema-digital/portada.png" alt="Ecosistema digital para tu empresa" loading="eager" />
+      </div>
+      <div class="featured__body">
+        <span class="post__cat">Destacado · Estrategia Digital</span>
+        <h2>Por qué tu empresa necesita un ecosistema digital (y cómo construirlo)</h2>
+        <p>Un ecosistema digital conecta tu sitio web, redes sociales, correo y herramientas para que trabajen juntos y multipliquen tus resultados.</p>
+        <div class="postmeta">
+          <span>Albert Anaya</span><span class="dot">●</span><span>7 min de lectura</span><span class="dot">●</span><span>May 2026</span>
         </div>
-      </article>
-
-      <!-- grid -->
-      <div class="bloggrid">
-        <article class="post reveal">
-          <div class="post__media"><span class="ph__label">imagen · post 01</span></div>
-          <div class="post__body">
-            <span class="post__cat">Diseño Web</span>
-            <h3>Qué es el diseño responsive y por qué importa</h3>
-            <p class="post__excerpt">Cómo lograr que tu web se vea perfecta en móvil, tablet y escritorio, y por qué Google lo premia.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>4 min</span><span class="dot">●</span><span>May 2026</span></div>
-          </div>
-        </article>
-        <article class="post reveal" data-delay="1">
-          <div class="post__media"><span class="ph__label">imagen · post 02</span></div>
-          <div class="post__body">
-            <span class="post__cat">SEO</span>
-            <h3>SEO básico: cómo aparecer en Google sin pagar publicidad</h3>
-            <p class="post__excerpt">Las primeras acciones de posicionamiento que todo sitio nuevo debería aplicar desde el día uno.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>7 min</span><span class="dot">●</span><span>Abr 2026</span></div>
-          </div>
-        </article>
-        <article class="post reveal" data-delay="2">
-          <div class="post__media"><span class="ph__label">imagen · post 03</span></div>
-          <div class="post__body">
-            <span class="post__cat">Plataformas Web</span>
-            <h3>CMS vs. constructores web: ¿cuál elegir para tu proyecto?</h3>
-            <p class="post__excerpt">Ventajas, costos y casos en los que conviene cada opción para tu negocio.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>5 min</span><span class="dot">●</span><span>Abr 2026</span></div>
-          </div>
-        </article>
-        <article class="post reveal">
-          <div class="post__media"><span class="ph__label">imagen · post 04</span></div>
-          <div class="post__body">
-            <span class="post__cat">Marketing</span>
-            <h3>Cómo escribir textos que sí venden en tu web</h3>
-            <p class="post__excerpt">Fórmulas de copywriting simples para convertir visitantes en clientes.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>6 min</span><span class="dot">●</span><span>Mar 2026</span></div>
-          </div>
-        </article>
-        <article class="post reveal" data-delay="1">
-          <div class="post__media"><span class="ph__label">imagen · post 05</span></div>
-          <div class="post__body">
-            <span class="post__cat">Identidad</span>
-            <h3>Correo corporativo: el detalle que da confianza</h3>
-            <p class="post__excerpt">Por qué un correo @tudominio.com proyecta más seriedad que un Gmail gratuito.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>3 min</span><span class="dot">●</span><span>Mar 2026</span></div>
-          </div>
-        </article>
-        <article class="post reveal" data-delay="2">
-          <div class="post__media"><span class="ph__label">imagen · post 06</span></div>
-          <div class="post__body">
-            <span class="post__cat">Infraestructura</span>
-            <h3>Hosting lento: el error que te cuesta clientes</h3>
-            <p class="post__excerpt">Cómo la velocidad de carga impacta tus ventas y qué revisar en tu hosting.</p>
-            <span class="post__more">Leer artículo <span class="a">→</span></span>
-            <div class="post__foot"><span>5 min</span><span class="dot">●</span><span>Feb 2026</span></div>
-          </div>
-        </article>
+        <span class="post__more">Leer artículo <span class="a">→</span></span>
       </div>
+    </a>
 
-      <p class="blognote">¿Quieres que escriba sobre un tema en específico? <a href="index.html#contacto" style="color:var(--q-ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--q-lima)">Escríbeme</a>.</p>
+    <!-- GRID -->
+    <div class="bloggrid">
+
+      <a href="blog/correos-profesionales.html" class="post reveal" data-cat="estrategia-digital">
+        <div class="post__media">
+          <img src="images/blog/correos-profesionales/portada.jpg" alt="Correos profesionales" loading="lazy" />
+        </div>
+        <div class="post__body">
+          <span class="post__cat">Estrategia Digital</span>
+          <h3>Correos profesionales: la primera impresión que genera confianza</h3>
+          <p class="post__excerpt">Por qué un correo @tuempresa.com es la base de cualquier estrategia digital seria y cómo obtenerlo hoy.</p>
+          <span class="post__more">Leer artículo <span class="a">→</span></span>
+          <div class="post__foot"><span>5 min</span><span class="dot">●</span><span>May 2026</span></div>
+        </div>
+      </a>
+
+      <a href="blog/redes-sociales-leads.html" class="post reveal" data-cat="marketing-digital" data-delay="1">
+        <div class="post__media">
+          <img src="images/blog/redes-sociales-leads/portada.png" alt="Redes sociales para captar leads" loading="lazy" />
+        </div>
+        <div class="post__body">
+          <span class="post__cat">Marketing Digital</span>
+          <h3>Cómo usar las redes sociales para captar prospectos reales</h3>
+          <p class="post__excerpt">Estrategias probadas para convertir tus perfiles en una fuente constante de leads calificados.</p>
+          <span class="post__more">Leer artículo <span class="a">→</span></span>
+          <div class="post__foot"><span>8 min</span><span class="dot">●</span><span>Jun 2026</span></div>
+        </div>
+      </a>
+
+      <a href="blog/ia-para-negocios.html" class="post reveal" data-cat="tecnologia" data-delay="2">
+        <div class="post__media">
+          <img src="images/blog/ia-para-negocios/portada.jpg" alt="Inteligencia Artificial para negocios" loading="lazy" />
+        </div>
+        <div class="post__body">
+          <span class="post__cat">Tecnología</span>
+          <h3>Inteligencia Artificial para tu negocio: guía práctica para empezar hoy</h3>
+          <p class="post__excerpt">Chatbots, creación de contenido, automatización. La IA ya es accesible para cualquier empresa.</p>
+          <span class="post__more">Leer artículo <span class="a">→</span></span>
+          <div class="post__foot"><span>9 min</span><span class="dot">●</span><span>Jun 2026</span></div>
+        </div>
+      </a>
+
+      <a href="blog/seo-ia-visibilidad.html" class="post reveal" data-cat="seo">
+        <div class="post__media">
+          <img src="images/blog/seo-ia-visibilidad/portada.png" alt="SEO en la era de la IA" loading="lazy" />
+        </div>
+        <div class="post__body">
+          <span class="post__cat">SEO</span>
+          <h3>SEO en 2026: cómo Google y la IA deciden quién recomendar</h3>
+          <p class="post__excerpt">Los factores que hacen que los buscadores y los modelos de IA recomienden tu negocio sobre la competencia.</p>
+          <span class="post__more">Leer artículo <span class="a">→</span></span>
+          <div class="post__foot"><span>7 min</span><span class="dot">●</span><span>Jun 2026</span></div>
+        </div>
+      </a>
+
     </div>
-  </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <img src="assets/quantun-logo.png" alt="QUANTUN Dimensión Digital" />
-        <p>Dimensión Digital — Diseño Web &amp; Marketing Digital por Albert Anaya.</p>
-      </div>
-      <nav class="footer__nav">
-        <a href="index.html#sobre">Sobre mí</a>
-        <a href="index.html#servicios">Servicios</a>
-        <a href="index.html#trabajos">Trabajos</a>
-        <a href="blog.html">Blog</a>
-        <a href="index.html#contacto">Contacto</a>
-      </nav>
-      <div class="footer__social">
-        <a href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
-        </a>
-        <a href="https://facebook.com/" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 8.5h2.2V5.6c-.4-.05-1.6-.16-3-.16-3 0-5 1.8-5 5.2v2.5H5.5V16h2.7v8h3.3v-8h2.6l.4-2.86h-3V11c0-.83.23-1.4 1.5-1.4z"></path></svg>
-        </a>
-      </div>
-      <span class="footer__copy">© <span id="year"></span> QUANTUN Digital. Todos los derechos reservados.</span>
+    <p class="blognote">¿Quieres que escriba sobre un tema en específico? <button id="blogContactar" style="background:none;border:none;padding:0;font:inherit;color:var(--q-ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--q-lima);cursor:pointer">Escríbeme.</button></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <img src="assets/quantun-logo.png" alt="QUANTUN Dimensión Digital" />
+      <p>Dimensión Digital — Diseño Web &amp; Marketing Digital por Albert Anaya.</p>
     </div>
-  </footer>
+    <nav class="footer__nav">
+      <a href="index.html#sobre">Sobre mí</a>
+      <a href="index.html#servicios">Servicios</a>
+      <a href="index.html#planes">Planes</a>
+      <a href="blog.html">Blog</a>
+      <button class="footer__chat-link" id="footerContacto">Contacto</button>
+    </nav>
+    <div class="footer__social">
+      <a href="https://www.instagram.com/quantundigital/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
+      </a>
+      <a href="https://www.facebook.com/quantundigital" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 8.5h2.2V5.6c-.4-.05-1.6-.16-3-.16-3 0-5 1.8-5 5.2v2.5H5.5V16h2.7v8h3.3v-8h2.6l.4-2.86h-3V11c0-.83.23-1.4 1.5-1.4z"></path></svg>
+      </a>
+    </div>
+    <span class="footer__copy">© <span id="year"></span> QUANTUN Digital. Todos los derechos reservados.</span>
+  </div>
+</footer>
 
-  <script src="script.js"></script>
-  <script>
-    // filtros de categoría (demo visual)
-    document.querySelectorAll('.blogchip').forEach(function (c) {
-      c.addEventListener('click', function () {
-        document.querySelectorAll('.blogchip').forEach(function (x) { x.classList.remove('active'); });
-        c.classList.add('active');
+<script src="script.js"></script>
+<script>
+  /* ── Filtros de categoría ── */
+  var chips = document.querySelectorAll('.blogchip');
+  var posts = document.querySelectorAll('.bloggrid .post, .featured');
+
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var cat = chip.getAttribute('data-cat');
+      chips.forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      posts.forEach(function(p) {
+        var pCat = p.getAttribute('data-cat');
+        if (cat === 'todos' || pCat === cat) {
+          p.removeAttribute('hidden');
+        } else {
+          p.setAttribute('hidden', '');
+        }
       });
     });
-  </script>
-  <canvas id="heroBg" aria-hidden="true"></canvas>
+  });
+
+  /* ── Abrir chat ── */
+  function openChat() {
+    window.location.href = 'index.html';
+    sessionStorage.setItem('openChatOnLoad', '1');
+  }
+  var bc = document.getElementById('blogContactar');
+  var fc = document.getElementById('footerContacto');
+  var nc = document.getElementById('navCotizar');
+  if (bc) bc.addEventListener('click', openChat);
+  if (fc) fc.addEventListener('click', openChat);
+  if (nc) nc.addEventListener('click', openChat);
+</script>
+<canvas id="heroBg" aria-hidden="true"></canvas>
 </body>
 </html>
+
+

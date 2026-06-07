@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<title>Ecosistema Digital — QUANTUN Digital</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 750px; overflow: hidden; background: #1a1a18; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .banner { position: relative; width: 1200px; height: 750px; background: #1a1a18; overflow: hidden; }
+  .bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Subtle noise overlay via CSS */
+  .noise {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(ellipse 800px 600px at 75% 50%, rgba(200,240,78,0.06) 0%, transparent 70%);
+  }
+
+  .content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    padding: 7px 16px 7px 12px;
+    border: 1px solid rgba(200,240,78,0.25);
+    border-radius: 2px;
+    width: fit-content;
+  }
+  .category-dot { width: 6px; height: 6px; background: #c8f04e; border-radius: 50%; }
+  .category-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c8f04e;
+  }
+
+  .title {
+    font-size: 68px;
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    max-width: 620px;
+    margin-bottom: 32px;
+  }
+  .title-accent { color: #c8f04e; }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 8px;
+  }
+  .meta-line {
+    width: 48px; height: 2px;
+    background: linear-gradient(90deg, #c8f04e, transparent);
+  }
+  .meta-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.06em;
+    max-width: 460px;
+    line-height: 1.65;
+  }
+
+  .logo {
+    position: absolute;
+    top: 48px; right: 64px;
+    text-align: right;
+  }
+  .logo-wordmark {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  .logo-wordmark em { color: #c8f04e; font-style: normal; }
+  .logo-sub {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .bottom-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c8f04e 0%, rgba(200,240,78,0.3) 40%, transparent 100%);
+  }
+
+  .article-num {
+    position: absolute;
+    bottom: 56px;
+    right: 64px;
+    font-size: 90px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: rgba(200,240,78,0.06);
+    line-height: 1;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+
+  <svg class="bg-svg" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ecosystem nodes — interconnected network -->
+    <!-- Central hub -->
+    <circle cx="880" cy="375" r="18" fill="rgba(200,240,78,0.12)" stroke="#c8f04e" stroke-width="1.5"/>
+    <circle cx="880" cy="375" r="8" fill="#c8f04e" opacity="0.5"/>
+
+    <!-- Satellite nodes -->
+    <circle cx="980" cy="250" r="10" fill="rgba(200,240,78,0.08)" stroke="rgba(200,240,78,0.3)" stroke-width="1"/>
+    <circle cx="980" cy="250" r="4" fill="#c8f04e" opacity="0.4"/>
+
+    <circle cx="1080" cy="380" r="13" fill="rgba(200,240,78,0.08)" stroke="rgba(200,240,78,0.25)" stroke-width="1"/>
+    <circle cx="1080" cy="380" r="5" fill="#c8f04e" opacity="0.35"/>
+
+    <circle cx="970" cy="510" r="9" fill="rgba(200,240,78,0.08)" stroke="rgba(200,240,78,0.3)" stroke-width="1"/>
+    <circle cx="970" cy="510" r="3.5" fill="#c8f04e" opacity="0.4"/>
+
+    <circle cx="780" cy="490" r="7" fill="rgba(200,240,78,0.08)" stroke="rgba(200,240,78,0.2)" stroke-width="1"/>
+    <circle cx="780" cy="490" r="3" fill="#c8f04e" opacity="0.3"/>
+
+    <circle cx="760" cy="260" r="11" fill="rgba(200,240,78,0.08)" stroke="rgba(200,240,78,0.25)" stroke-width="1"/>
+    <circle cx="760" cy="260" r="4.5" fill="#c8f04e" opacity="0.4"/>
+
+    <circle cx="1140" cy="240" r="7" fill="rgba(200,240,78,0.06)" stroke="rgba(200,240,78,0.2)" stroke-width="1"/>
+    <circle cx="1140" cy="570" r="8" fill="rgba(200,240,78,0.06)" stroke="rgba(200,240,78,0.18)" stroke-width="1"/>
+
+    <!-- Connecting lines -->
+    <line x1="880" y1="375" x2="980" y2="250" stroke="rgba(200,240,78,0.18)" stroke-width="1.2" stroke-dasharray="4,6"/>
+    <line x1="880" y1="375" x2="1080" y2="380" stroke="rgba(200,240,78,0.2)" stroke-width="1.2"/>
+    <line x1="880" y1="375" x2="970" y2="510" stroke="rgba(200,240,78,0.18)" stroke-width="1.2" stroke-dasharray="4,6"/>
+    <line x1="880" y1="375" x2="780" y2="490" stroke="rgba(200,240,78,0.12)" stroke-width="1" stroke-dasharray="3,8"/>
+    <line x1="880" y1="375" x2="760" y2="260" stroke="rgba(200,240,78,0.15)" stroke-width="1" stroke-dasharray="4,6"/>
+    <line x1="980" y1="250" x2="1140" y2="240" stroke="rgba(200,240,78,0.1)" stroke-width="1" stroke-dasharray="3,8"/>
+    <line x1="1080" y1="380" x2="1140" y2="570" stroke="rgba(200,240,78,0.1)" stroke-width="1" stroke-dasharray="3,8"/>
+    <line x1="970" y1="510" x2="1140" y2="570" stroke="rgba(200,240,78,0.1)" stroke-width="1" stroke-dasharray="3,8"/>
+
+    <!-- Outer ring faint -->
+    <circle cx="880" cy="375" r="180" fill="none" stroke="rgba(200,240,78,0.05)" stroke-width="1" stroke-dasharray="6,12"/>
+
+    <!-- Corner decoration -->
+    <path d="M 40 40 L 40 100 M 40 40 L 100 40" fill="none" stroke="rgba(200,240,78,0.18)" stroke-width="1.5"/>
+    <path d="M 1160 710 L 1160 650 M 1160 710 L 1100 710" fill="none" stroke="rgba(200,240,78,0.18)" stroke-width="1.5"/>
+
+    <!-- Horizontal rule -->
+    <line x1="80" y1="96" x2="280" y2="96" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  </svg>
+
+  <div class="noise"></div>
+
+  <div class="logo">
+    <div class="logo-wordmark">QUANTUN<em>.</em></div>
+    <div class="logo-sub">Digital Agency</div>
+  </div>
+
+  <div class="content">
+    <div class="category">
+      <div class="category-dot"></div>
+      <span class="category-label">Estrategia Digital</span>
+    </div>
+    <h1 class="title">Ecosistema<br>Digital para tu<br><span class="title-accent">Empresa</span></h1>
+    <div class="meta-row">
+      <div class="meta-line"></div>
+      <p class="meta-text">Conecta cada pieza de tu presencia online en una estrategia coherente y escalable.</p>
+    </div>
+  </div>
+
+  <div class="article-num">02</div>
+  <div class="bottom-bar"></div>
+
+</div>
+</body>
+</html>

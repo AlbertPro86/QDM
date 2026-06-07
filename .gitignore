@@ -1,0 +1,29 @@
+# Entorno y credenciales
+.env
+.env.local
+
+# Uploads (archivos subidos por usuarios — se crean en deploy.sh)
+uploads/*
+!uploads/.gitkeep
+
+# Backups locales
+backups/
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# PHP
+*.phar
+
+# Node (si se usa en el futuro)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp

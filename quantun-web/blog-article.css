@@ -1,0 +1,81 @@
+/* ================================================
+   QUANTUN Digital — Artículo de blog
+   blog-article.css
+   ================================================ */
+
+/* ── Header del artículo ── */
+.art-header{padding:130px 0 44px;position:relative;z-index:2}
+.art-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--q-ink-4);margin-bottom:22px;font-family:var(--mono);flex-wrap:wrap}
+.art-breadcrumb a{color:var(--q-ink-4);text-decoration:none;transition:color .18s}
+.art-breadcrumb a:hover{color:var(--q-ink)}
+.art-breadcrumb span.sep{opacity:.4}
+.art-cat{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--q-lima-deep);background:var(--q-lima-soft);padding:5px 13px;border-radius:999px;margin-bottom:20px}
+.art-header h1{font-size:clamp(28px,4.5vw,54px);font-weight:700;letter-spacing:-.03em;line-height:1.06;max-width:840px;margin-bottom:18px}
+.art-excerpt{font-size:18px;color:var(--q-ink-3);max-width:680px;line-height:1.6;margin-bottom:28px}
+.art-meta{display:flex;align-items:center;gap:12px}
+.art-meta__av{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid var(--q-border);flex:none}
+.art-meta__info strong{display:block;font-size:14px;font-weight:600;color:var(--q-ink)}
+.art-meta__info span{font-size:12px;color:var(--q-ink-4);font-family:var(--mono)}
+
+/* ── Layout principal ── */
+.art-layout{max-width:820px;padding-bottom:100px}
+
+/* ── Portada ── */
+.art-cover{aspect-ratio:16/10;border-radius:20px;overflow:hidden;margin-bottom:48px;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 14px,#efece4 14px 28px)}
+.art-cover img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ── Cuerpo ── */
+.art-body{font-size:17px;line-height:1.76;color:var(--q-ink-2)}
+.art-body h2{font-size:clamp(20px,2.5vw,28px);font-weight:700;letter-spacing:-.022em;line-height:1.15;color:var(--q-ink);margin:52px 0 16px}
+.art-body h3{font-size:clamp(17px,2vw,22px);font-weight:600;letter-spacing:-.015em;line-height:1.2;color:var(--q-ink);margin:38px 0 12px}
+.art-body p{margin-bottom:22px}
+.art-body ul,.art-body ol{padding-left:26px;margin-bottom:22px}
+.art-body li{margin-bottom:9px;line-height:1.6}
+.art-body strong{color:var(--q-ink);font-weight:600}
+.art-body a{color:var(--q-ink);text-decoration:underline;text-decoration-color:var(--q-lima);text-underline-offset:3px;transition:opacity .18s}
+.art-body a:hover{opacity:.75}
+.art-body blockquote{border-left:3px solid var(--q-lima);padding:16px 24px;background:var(--q-lima-soft);border-radius:0 14px 14px 0;margin:32px 0;color:var(--q-ink-2);font-style:italic}
+.art-body blockquote p{margin:0}
+.art-callout{background:var(--q-surface);border:1px solid var(--q-border);border-radius:14px;padding:22px 24px;margin:30px 0}
+.art-callout p{margin:0;font-size:16px}
+.art-callout strong{display:block;margin-bottom:6px;font-size:15px}
+
+/* ── Compartir ── */
+.art-share{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:52px 0 0;padding-top:28px;border-top:1px solid var(--q-border)}
+.art-share__label{font-size:14px;font-weight:600;color:var(--q-ink-3);margin-right:4px}
+.art-share__btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:8px 15px;border-radius:999px;border:1px solid var(--q-border);background:var(--q-surface);color:var(--q-ink-3);cursor:pointer;text-decoration:none;transition:all .18s var(--ease);white-space:nowrap}
+.art-share__btn svg{flex:none}
+.art-share__btn:hover{border-color:var(--q-ink);color:var(--q-ink);transform:translateY(-2px)}
+.art-share__btn--wa{border-color:#25D366;color:#25D366}
+.art-share__btn--wa:hover{background:#25D366;color:#fff;border-color:#25D366}
+.art-share__btn--fb:hover{border-color:#1877F2;color:#1877F2}
+.art-share__btn--tw:hover{border-color:#000;color:#000}
+.art-share__btn--li:hover{border-color:#0A66C2;color:#0A66C2}
+
+/* ── Artículos relacionados ── */
+.art-related{margin-top:64px;padding-top:40px;border-top:1px solid var(--q-border)}
+.art-related h2{font-size:22px;font-weight:700;letter-spacing:-.022em;margin-bottom:26px}
+.art-related__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.art-rel-card{background:var(--q-surface);border:1px solid var(--q-border);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease)}
+.art-rel-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(14,14,12,.09);border-color:var(--q-border-strong)}
+.art-rel-card__img{aspect-ratio:16/10;background:repeating-linear-gradient(135deg,var(--q-bg-soft) 0 10px,#efece4 10px 20px);overflow:hidden}
+.art-rel-card__img img{width:100%;height:100%;object-fit:cover;display:block}
+.art-rel-card__body{padding:14px 16px 18px}
+.art-rel-card__cat{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--q-lima-deep);display:block;margin-bottom:6px}
+.art-rel-card__body h3{font-size:15px;font-weight:600;line-height:1.3;letter-spacing:-.01em;color:var(--q-ink)}
+.art-rel-card:hover .art-rel-card__body h3{color:var(--q-lima-deep)}
+
+/* ── Responsive ── */
+@media(max-width:920px){
+  .art-header{padding-top:110px}
+  .art-related__grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:680px){
+  .art-header{padding-top:96px}
+  .art-excerpt{font-size:16px}
+  .art-body{font-size:16px}
+  .art-body h2{margin-top:38px}
+  .art-related__grid{grid-template-columns:1fr}
+  .art-share{gap:6px}
+  .art-share__btn{font-size:12px;padding:7px 12px}
+}

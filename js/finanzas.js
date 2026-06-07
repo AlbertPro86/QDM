@@ -531,10 +531,13 @@ function switchTab(tab) {
     const tabMov    = document.getElementById('tabMovimientos');
     const tabUnicos = document.getElementById('tabPagosUnicos');
     const tabCli    = document.getElementById('tabClientes');
+    const tabArch   = document.getElementById('tabArchivos');
     if (tabMov)    tabMov.style.display    = tab === 'movimientos'  ? '' : 'none';
     if (tabUnicos) tabUnicos.style.display = tab === 'pagosUnicos'  ? '' : 'none';
     if (tabCli)    tabCli.style.display    = tab === 'clientes'     ? '' : 'none';
+    if (tabArch)   tabArch.style.display   = tab === 'archivos'     ? '' : 'none';
     if (tab === 'pagosUnicos') loadPagosUnicos();
+    if (tab === 'archivos')    loadArchivosTab();
 }
 
 /* ── PAGOS ÚNICOS ───────────────────────────────────────────── */
@@ -1083,6 +1086,8 @@ async function abrirModalTransaccion(id = null) {
     document.getElementById('txFrecuencia').value = 'unico';
     document.getElementById('txEstado').value = 'pendiente';
     document.getElementById('txFechaVenc').value = '';
+    const _lbl = document.getElementById('txFechaVencLabel');
+    if (_lbl) _lbl.textContent = 'Fecha de vencimiento';
     document.getElementById('txNotas').value = '';
     resetTxProv();
     resetTxArchivos();
@@ -1394,10 +1399,13 @@ function setTxTipo(tipo) {
         document.getElementById('txCatalogoSection').style.display = '';
         document.getElementById('txTituloSection').style.display = '';
         document.getElementById('txArchivosSection').style.display = '';
+        // Restaurar label de fecha
+        const lblFechaI = document.getElementById('txFechaVencLabel');
+        if (lblFechaI) lblFechaI.textContent = 'Fecha de vencimiento';
     } else {
         egr.style.background = '#0E0E0C'; egr.style.color = '#C6F24E';
         ing.style.background = '#fff';    ing.style.color = '#8A867C';
-        // Ocultar destinatario, catálogo, título y archivos — egresos son gastos simples
+        // Ocultar destinatario, catálogo, título — egresos son gastos simples
         document.getElementById('txDestSection').style.display = 'none';
         document.getElementById('txEgresoSection').style.display = '';
         document.getElementById('txCatalogoSection').style.display = 'none';
@@ -1408,6 +1416,21 @@ function setTxTipo(tipo) {
         txState.destNombre = '';
         txState.items = [];
         renderTxItems();
+        // Cambiar label de fecha a "Fecha del egreso" y poner hoy por defecto
+        const lblFecha = document.getElementById('txFechaVencLabel');
+        if (lblFecha) lblFecha.textContent = 'Fecha del egreso';
+        const elFecha = document.getElementById('txFechaVenc');
+        if (elFecha && !elFecha.value) {
+            const _h = new Date();
+            const _p = n => String(n).padStart(2, '0');
+            elFecha.value = `${_h.getFullYear()}-${_p(_h.getMonth()+1)}-${_p(_h.getDate())}`;
+        }
+        // Defaults para egreso mensual ya pagado
+        const elFrec = document.getElementById('txFrecuencia');
+        if (elFrec && elFrec.value === 'unico') elFrec.value = 'mensual';
+        const elEst = document.getElementById('txEstado');
+        if (elEst && elEst.value === 'pendiente') elEst.value = 'pagado';
+        recalcularTxTotal();
     }
 }
 
@@ -2122,6 +2145,64 @@ function renderComprobante() {
             </div>
         </div>`;
 
+    // Archivos adjuntos
+    const archivos = [];
+    if (tx.factura_path)   archivos.push({ tipo:'factura',   path: tx.factura_path,   label:'Factura / Recibo', ext:'PDF' });
+    if (tx.imagen_path)    archivos.push({ tipo:'imagen',    path: tx.imagen_path,    label:'Imagen adjunta',   ext: tx.imagen_path.split('.').pop().toUpperCase() });
+    if (tx.documento_path) archivos.push({ tipo:'documento', path: tx.documento_path, label:'Documento',        ext: tx.documento_path.split('.').pop().toUpperCase() });
+
+    const archivosHtml = archivos.length ? `
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F3F2EE">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8A867C;margin-bottom:10px">Archivos adjuntos</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                ${archivos.map(a => {
+                    const isImg = a.tipo === 'imagen';
+                    const isPdf = a.tipo === 'factura';
+                    const iconPath = isPdf
+                        ? 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+                        : isImg
+                            ? 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                            : 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+                    const iconBg    = isPdf ? '#F4DEDB' : isImg ? '#E3F1E8' : '#EEF2FF';
+                    const iconColor = isPdf ? '#6E211B' : isImg ? '#1B5A39' : '#4338CA';
+                    const badgeBg   = isPdf ? '#F4DEDB' : isImg ? '#E3F1E8' : '#EEF2FF';
+                    const badgeCol  = isPdf ? '#6E211B' : isImg ? '#1B5A39' : '#4338CA';
+                    const previewHtml = isImg
+                        ? `<div style="margin-top:8px;border-radius:4px;overflow:hidden;max-height:160px">
+                               <img src="${a.path}" alt="${a.label}" style="width:100%;max-height:160px;object-fit:cover;display:block">
+                           </div>`
+                        : '';
+                    return `<div style="border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden">
+                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+                            <div style="flex-shrink:0;width:32px;height:32px;background:${iconBg};border-radius:6px;display:flex;align-items:center;justify-content:center">
+                                <svg width="15" height="15" fill="none" stroke="${iconColor}" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="${iconPath}"/></svg>
+                            </div>
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:12px;font-weight:700;color:#0E0E0C">${a.label}</div>
+                                <div style="font-size:10px;color:#8A867C;margin-top:1px">${a.path.split('/').pop()}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                                <span style="font-size:10px;font-weight:700;background:${badgeBg};color:${badgeCol};padding:2px 7px;border-radius:3px">${a.ext}</span>
+                                <a href="${a.path}" target="_blank" download
+                                    style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#0E0E0C;color:#C6F24E;border-radius:4px;font-size:11px;font-weight:700;text-decoration:none;transition:filter .15s"
+                                    onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    Descargar
+                                </a>
+                                ${isImg || isPdf ? `<a href="${a.path}" target="_blank"
+                                    style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#FAFAF7;border:1.5px solid #E8E5DD;color:#57544D;border-radius:4px;font-size:11px;font-weight:700;text-decoration:none;transition:all .15s"
+                                    onmouseenter="this.style.background='#EFECE5'" onmouseleave="this.style.background='#FAFAF7'">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Ver
+                                </a>` : ''}
+                            </div>
+                        </div>
+                        ${previewHtml}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>` : '';
+
     const html = `
         <!-- Monto grande -->
         <div style="background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:6px;padding:20px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -2142,9 +2223,10 @@ function renderComprobante() {
             ${nombre ? campo('M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', esIngreso ? 'Cliente' : 'Proveedor', nombre) : ''}
             ${campo('M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 'Fecha de registro', fmt(tx.created_at))}
             ${tx.fecha_pago ? campo('M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'Fecha de pago', fmt(tx.fecha_pago)) : ''}
-            ${tx.fecha_vencimiento ? campo('M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'Fecha de vencimiento', fmt(tx.fecha_vencimiento)) : ''}
+            ${tx.fecha_vencimiento ? campo('M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', tx.tipo === 'egreso' ? 'Fecha del egreso' : 'Fecha de vencimiento', fmt(tx.fecha_vencimiento)) : ''}
             ${tx.frecuencia && tx.frecuencia !== 'unico' ? campo('M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'Frecuencia', tx.frecuencia.charAt(0).toUpperCase()+tx.frecuencia.slice(1)) : ''}
-        </div>`;
+        </div>
+        ${archivosHtml}`;
 
     document.getElementById('cmpPreview').innerHTML = html;
 
@@ -2329,4 +2411,151 @@ function exportarClientesExcel() {
 
     const p = fnPeriodo;
     exportXLSX(rows, 'Clientes', `finanzas_clientes_${p.desde}_${p.hasta}.xlsx`);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TAB ARCHIVOS — muestra todos los archivos adjuntos a transacciones
+   ══════════════════════════════════════════════════════════════════════════ */
+
+let _fnArchivosData = [];   // caché de transacciones con archivos
+
+async function loadArchivosTab() {
+    const grid = document.getElementById('fnArchivosGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div style="padding:60px;text-align:center;color:#8A867C;font-size:13px">Cargando archivos...</div>';
+
+    try {
+        // Cargamos un lote amplio sin filtro de período para ver todos los archivos
+        const r = await fetch('api/transacciones.php?limite=1000');
+        const d = await r.json();
+        if (!d.success) throw new Error('API error');
+        // Solo conservar las que tienen al menos un archivo adjunto
+        _fnArchivosData = (d.data || []).filter(tx =>
+            tx.factura_path || tx.imagen_path || tx.documento_path
+        );
+    } catch(e) {
+        grid.innerHTML = '<div style="padding:60px;text-align:center;color:#ef4444;font-size:13px">Error al cargar archivos</div>';
+        return;
+    }
+    filtrarArchivos();
+}
+
+function filtrarArchivos() {
+    const q      = (document.getElementById('fnArchivosBuscar')?.value      || '').toLowerCase();
+    const tipo   =  document.getElementById('fnArchivosTipo')?.value         || 'todos';
+    const fileFlt = document.getElementById('fnArchivosFiltroFile')?.value   || 'todos';
+
+    let data = _fnArchivosData;
+    if (tipo !== 'todos')    data = data.filter(tx => tx.tipo === tipo);
+    if (fileFlt !== 'todos') {
+        data = data.filter(tx => {
+            if (fileFlt === 'factura')   return !!tx.factura_path;
+            if (fileFlt === 'imagen')    return !!tx.imagen_path;
+            if (fileFlt === 'documento') return !!tx.documento_path;
+            return true;
+        });
+    }
+    if (q) {
+        data = data.filter(tx =>
+            (tx.concepto       || '').toLowerCase().includes(q) ||
+            (tx.titulo         || '').toLowerCase().includes(q) ||
+            (tx.proveedor      || '').toLowerCase().includes(q) ||
+            (tx.cliente_nombre || '').toLowerCase().includes(q) ||
+            (tx.lead_nombre    || '').toLowerCase().includes(q)
+        );
+    }
+    renderArchivosTab(data);
+}
+
+function renderArchivosTab(data) {
+    const grid = document.getElementById('fnArchivosGrid');
+    if (!grid) return;
+
+    if (!data || data.length === 0) {
+        grid.innerHTML = `<div style="padding:60px;text-align:center;color:#8A867C;font-size:13px;font-style:italic">
+            ${_fnArchivosData.length === 0 ? 'No hay archivos adjuntos en ninguna transacción.' : 'Sin archivos que coincidan con los filtros.'}
+        </div>`;
+        return;
+    }
+
+    const fileEntry = (tx, tipo, path, label) => {
+        if (!path) return '';
+        const ext    = path.split('.').pop().toUpperCase();
+        const isImg  = tipo === 'imagen';
+        const isPdf  = tipo === 'factura';
+        const iconPath = isPdf
+            ? 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+            : isImg
+                ? 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                : 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+        const iconBg    = isPdf ? '#F4DEDB' : isImg ? '#E3F1E8' : '#EEF2FF';
+        const iconColor = isPdf ? '#6E211B' : isImg ? '#1B5A39' : '#4338CA';
+        const badgeBg   = tx.tipo === 'ingreso' ? '#E3F1E8' : '#F4DEDB';
+        const badgeCol  = tx.tipo === 'ingreso' ? '#1B5A39' : '#6E211B';
+        const txLabel   = tx.tipo === 'ingreso' ? '↑ Ingreso' : '↓ Egreso';
+        const dest      = tx.tipo === 'egreso'
+            ? (tx.proveedor || '—')
+            : (tx.cliente_nombre || tx.lead_nombre || '—');
+        const fechaRef  = tx.fecha_pago || tx.fecha_vencimiento || (tx.created_at ? tx.created_at.split(' ')[0] : null);
+        const fecha     = fechaRef
+            ? new Date(fechaRef + 'T12:00:00').toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'})
+            : '—';
+        const filename  = path.split('/').pop();
+
+        return `<div style="background:#FFFFFF;border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden;display:flex;flex-direction:column">
+            ${isImg ? `<div style="height:140px;overflow:hidden;background:#F3F2EE;cursor:pointer" onclick="window.open('${path}','_blank')">
+                <img src="${path}" alt="${label}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s" onmouseenter="this.style.transform='scale(1.04)'" onmouseleave="this.style.transform=''">
+            </div>` : ''}
+            <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:8px">
+                <!-- tipo archivo + badge tx -->
+                <div style="display:flex;align-items:center;gap:6px">
+                    <div style="width:28px;height:28px;background:${iconBg};border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <svg width="13" height="13" fill="none" stroke="${iconColor}" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="${iconPath}"/></svg>
+                    </div>
+                    <span style="font-size:10px;font-weight:700;color:#57544D;flex:1">${label} · <span style="color:#8A867C">${ext}</span></span>
+                    <span style="font-size:10px;font-weight:700;background:${badgeBg};color:${badgeCol};padding:2px 7px;border-radius:3px;white-space:nowrap">${txLabel}</span>
+                </div>
+                <!-- descripción transacción -->
+                <div style="flex:1">
+                    <div style="font-size:12px;font-weight:700;color:#0E0E0C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(tx.titulo || tx.concepto || '—')}</div>
+                    <div style="font-size:11px;color:#8A867C;margin-top:2px">${escapeHtml(dest)} · ${fecha}</div>
+                    <div style="font-size:10px;color:#94a3b8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${filename}">${filename}</div>
+                </div>
+                <!-- monto + acciones -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:6px;border-top:1px solid #F3F2EE">
+                    <span style="font-size:13px;font-weight:900;color:${tx.tipo==='ingreso'?'#1B5A39':'#6E211B'}">${tx.tipo==='egreso'?'−':'+'}${formatMoney(tx.monto)}</span>
+                    <div style="display:flex;gap:5px">
+                        <a href="${path}" target="_blank" download
+                            style="display:inline-flex;align-items:center;gap:3px;padding:4px 9px;background:#0E0E0C;color:#C6F24E;border-radius:3px;font-size:10px;font-weight:700;text-decoration:none;transition:filter .15s"
+                            onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Descargar
+                        </a>
+                        <button onclick="verComprobante(${tx.id})" title="Ver detalle"
+                            style="display:inline-flex;align-items:center;gap:3px;padding:4px 9px;background:#FAFAF7;border:1.5px solid #E8E5DD;color:#57544D;border-radius:3px;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s"
+                            onmouseenter="this.style.background='#EFECE5'" onmouseleave="this.style.background='#FAFAF7'">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Detalle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    };
+
+    const cards = data.map(tx => [
+        fileEntry(tx, 'factura',   tx.factura_path,   'Factura / PDF'),
+        fileEntry(tx, 'imagen',    tx.imagen_path,    'Imagen'),
+        fileEntry(tx, 'documento', tx.documento_path, 'Documento'),
+    ].join('')).join('');
+
+    const total = data.reduce((s, tx) => s + (tx.factura_path ? 1 : 0) + (tx.imagen_path ? 1 : 0) + (tx.documento_path ? 1 : 0), 0);
+
+    grid.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1.5px solid #E8E5DD;background:#FAFAF7">
+            <span style="font-size:11px;font-weight:700;color:#57544D">${total} archivo${total !== 1 ? 's' : ''} en ${data.length} transacción${data.length !== 1 ? 'es' : ''}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:16px">
+            ${cards}
+        </div>`;
 }

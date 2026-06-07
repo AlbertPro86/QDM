@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<title>Correos Profesionales — QUANTUN Digital</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 750px; overflow: hidden; background: #0e0e0c; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .banner { position: relative; width: 1200px; height: 750px; background: #0e0e0c; overflow: hidden; }
+
+  /* Background geometric layer */
+  .bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Grid overlay */
+  .grid-overlay {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,240,78,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,240,78,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Content area */
+  .content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 64px 80px;
+  }
+
+  /* Category pill */
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .category-dot {
+    width: 8px; height: 8px;
+    background: #c8f04e;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .category-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c8f04e;
+  }
+
+  /* Title */
+  .title {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    max-width: 700px;
+    margin-bottom: 36px;
+  }
+  .title span { color: #c8f04e; }
+
+  /* Divider line */
+  .divider {
+    width: 64px; height: 3px;
+    background: #c8f04e;
+    margin-bottom: 28px;
+  }
+
+  /* Subtitle */
+  .subtitle {
+    font-size: 17px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.02em;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  /* Logo — top right */
+  .logo {
+    position: absolute;
+    top: 48px; right: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .logo-wordmark {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  .logo-wordmark span { color: #c8f04e; }
+  .logo-sub {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+
+  /* Number decoration */
+  .big-number {
+    position: absolute;
+    top: 40px; left: 80px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+    text-transform: uppercase;
+  }
+
+  /* Right accent block */
+  .right-accent {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+
+  <!-- Background SVG shapes -->
+  <svg class="bg-svg" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+    <!-- Large circle - right side -->
+    <circle cx="950" cy="375" r="320" fill="none" stroke="rgba(200,240,78,0.08)" stroke-width="1.5"/>
+    <circle cx="950" cy="375" r="240" fill="none" stroke="rgba(200,240,78,0.06)" stroke-width="1"/>
+    <circle cx="950" cy="375" r="160" fill="none" stroke="rgba(200,240,78,0.05)" stroke-width="1"/>
+
+    <!-- Inner filled accent -->
+    <circle cx="950" cy="375" r="90" fill="rgba(200,240,78,0.05)"/>
+    <circle cx="950" cy="375" r="50" fill="rgba(200,240,78,0.08)"/>
+
+    <!-- Envelope icon - stylized SVG in right area -->
+    <g transform="translate(870, 295)">
+      <!-- Envelope body -->
+      <rect x="0" y="0" width="160" height="110" rx="6" fill="none" stroke="rgba(200,240,78,0.3)" stroke-width="2"/>
+      <!-- Envelope flap lines -->
+      <polyline points="0,0 80,65 160,0" fill="none" stroke="rgba(200,240,78,0.3)" stroke-width="2"/>
+      <!-- Bottom corner lines -->
+      <line x1="0" y1="110" x2="55" y2="55" stroke="rgba(200,240,78,0.15)" stroke-width="1.5"/>
+      <line x1="160" y1="110" x2="105" y2="55" stroke="rgba(200,240,78,0.15)" stroke-width="1.5"/>
+      <!-- Lime dot accent -->
+      <circle cx="80" cy="65" r="4" fill="#c8f04e" opacity="0.6"/>
+    </g>
+
+    <!-- Small decorative dots -->
+    <circle cx="820" cy="180" r="3" fill="#c8f04e" opacity="0.4"/>
+    <circle cx="1080" cy="580" r="3" fill="#c8f04e" opacity="0.3"/>
+    <circle cx="1120" cy="200" r="2" fill="#c8f04e" opacity="0.25"/>
+
+    <!-- Horizontal rule line -->
+    <line x1="80" y1="110" x2="300" y2="110" stroke="rgba(200,240,78,0.15)" stroke-width="1"/>
+
+    <!-- Corner bracket top-left -->
+    <path d="M 40 40 L 40 90 M 40 40 L 90 40" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+    <!-- Corner bracket bottom-right -->
+    <path d="M 1160 710 L 1160 660 M 1160 710 L 1110 710" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+  </svg>
+
+  <!-- Grid -->
+  <div class="grid-overlay"></div>
+
+  <!-- Logo -->
+  <div class="logo">
+    <div class="logo-wordmark">QUANTUN<span>.</span></div>
+    <div class="logo-sub">Digital Agency</div>
+  </div>
+
+  <!-- Top label -->
+  <div class="big-number">Artículo / 01</div>
+
+  <!-- Main content -->
+  <div class="content">
+    <div class="category">
+      <div class="category-dot"></div>
+      <span class="category-label">Estrategia Digital</span>
+    </div>
+    <div class="divider"></div>
+    <h1 class="title">Correos<br><span>Profesionales</span></h1>
+    <p class="subtitle">La identidad detrás de cada mensaje. Cómo un correo corporativo transforma la percepción de tu marca.</p>
+  </div>
+
+</div>
+</body>
+</html>

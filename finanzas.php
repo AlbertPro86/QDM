@@ -80,6 +80,11 @@ include __DIR__ . '/includes/header.php';
         style="padding:10px 20px;border:none;background:none;font-size:13px;font-weight:600;color:#8A867C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s">
         Clientes / Servicios
     </button>
+    <button onclick="switchTab('archivos')" data-tab="archivos"
+        style="padding:10px 20px;border:none;background:none;font-size:13px;font-weight:600;color:#8A867C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:inline-flex;align-items:center;gap:6px">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+        Archivos
+    </button>
 </div>
 
 <!-- Tab Movimientos -->
@@ -224,6 +229,34 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+
+<!-- Tab Archivos (oculto por defecto) -->
+<div id="tabArchivos" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="position:relative;flex:1;min-width:200px;max-width:320px">
+            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8A867C;pointer-events:none" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="fnArchivosBuscar" placeholder="Buscar por concepto o proveedor..."
+                style="width:100%;padding:8px 12px 8px 32px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
+                oninput="filtrarArchivos()">
+        </div>
+        <select id="fnArchivosTipo" onchange="filtrarArchivos()"
+            style="padding:8px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-family:inherit;background:#FFFFFF;outline:none">
+            <option value="todos">Todos los tipos</option>
+            <option value="ingreso">Solo ingresos</option>
+            <option value="egreso">Solo egresos</option>
+        </select>
+        <select id="fnArchivosFiltroFile" onchange="filtrarArchivos()"
+            style="padding:8px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-family:inherit;background:#FFFFFF;outline:none">
+            <option value="todos">Todos los archivos</option>
+            <option value="factura">Facturas (PDF)</option>
+            <option value="imagen">Imágenes</option>
+            <option value="documento">Documentos</option>
+        </select>
+    </div>
+    <div id="fnArchivosGrid" style="background:#FFFFFF;border:1.5px solid #E8E5DD;border-radius:6px;overflow:hidden;min-height:120px">
+        <div style="padding:60px;text-align:center;color:#8A867C;font-size:13px">Cargando archivos adjuntos...</div>
+    </div>
+</div>
 
 <!-- ══════════════════════════════════════════════════════════
      MODAL NUEVA TRANSACCIÓN
@@ -460,7 +493,7 @@ include __DIR__ . '/includes/header.php';
             </select>
           </div>
           <div>
-            <label style="font-size:11px;font-weight:700;color:#57544D;display:block;margin-bottom:5px">Fecha de vencimiento</label>
+            <label id="txFechaVencLabel" style="font-size:11px;font-weight:700;color:#57544D;display:block;margin-bottom:5px">Fecha de vencimiento</label>
             <input type="date" id="txFechaVenc" style="width:100%;padding:9px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s" onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'">
           </div>
           <div style="grid-column:1/-1">
@@ -528,9 +561,13 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <script>
-// Cerrar modal al click fuera
+// Cerrar modal solo al hacer click en el backdrop (no en el contenido)
 document.getElementById('modalTx').addEventListener('click', function(e) {
   if (e.target === this) cerrarModalTx();
+});
+// Evitar que clicks dentro del modal se propaguen al backdrop
+document.getElementById('modalTx').querySelector(':scope > div').addEventListener('click', function(e) {
+  e.stopPropagation();
 });
 // Cerrar al buscar destino – click fuera del dropdown
 document.addEventListener('click', function(e) {

@@ -68,7 +68,7 @@ switch ($action) {
         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
         $st = $pdo->prepare("SELECT COUNT(*) FROM crm_chat_sessions WHERE visitor_ip = ? AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
         $st->execute([$ip]);
-        if ($st->fetchColumn() >= 5) jsonResponse(['error' => 'Demasiadas sesiones, intenta luego.'], 429);
+        if ($st->fetchColumn() >= 10) jsonResponse(['error' => 'Demasiadas sesiones, intenta luego.'], 429);
 
         $token = bin2hex(random_bytes(32));
         $pdo->prepare("INSERT INTO crm_chat_sessions (visitor_name, visitor_email, visitor_ip, token, last_message_at) VALUES (?,?,?,?,NOW())")
@@ -96,10 +96,12 @@ switch ($action) {
         if (!$s)                              jsonResponse(['error' => 'Sesión no encontrada'], 401);
         if ($s['status'] === 'cerrado')       jsonResponse(['error' => 'Chat cerrado'], 403);
 
-        $pdo->prepare("INSERT INTO crm_chat_messages (session_id, sender, message) VALUES (?, 'visitor', ?)")->execute([$sid, $msg]);
+        $ins = $pdo->prepare("INSERT INTO crm_chat_messages (session_id, sender, message) VALUES (?, 'visitor', ?)");
+        $ins->execute([$sid, $msg]);
+        $msgId = (int)$pdo->lastInsertId();
         $pdo->prepare("UPDATE crm_chat_sessions SET last_message_at = NOW() WHERE id = ?")->execute([$sid]);
 
-        jsonResponse(['success' => true, 'message_id' => (int)$pdo->lastInsertId()]);
+        jsonResponse(['success' => true, 'message_id' => $msgId]);
         break;
 
     /* ========== POLL ========== */

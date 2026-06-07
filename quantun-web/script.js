@@ -2,6 +2,40 @@
 (function () {
   'use strict';
 
+  /* ── Marquee sin espacios en blanco ───────────────────────────────────── */
+  (function initMarquee() {
+    var track = document.querySelector('.marquee__track');
+    if (!track) return;
+
+    /* Guardar el set original (los hijos actuales) */
+    var originalHTML = track.innerHTML;
+
+    /* Asegurarse de que el track tenga al menos 3× el ancho de pantalla
+       para que nunca quede espacio en blanco al hacer scroll */
+    var needed = window.innerWidth * 3;
+    var copies = 1; /* ya hay 1 copia (el HTML original) */
+    while (track.scrollWidth < needed && copies < 12) {
+      track.insertAdjacentHTML('beforeend', originalHTML);
+      copies++;
+    }
+
+    /* Calcular el ancho exacto de UNA copia = scrollWidth / copies */
+    var oneSetPx = track.scrollWidth / copies;
+
+    /* Inyectar la keyframe con píxeles exactos para evitar diferencias
+       de cálculo porcentual entre navegadores */
+    var styleId = 'marquee-kf';
+    var existing = document.getElementById(styleId);
+    if (existing) existing.remove();
+    var s = document.createElement('style');
+    s.id = styleId;
+    s.textContent = '@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-' + oneSetPx.toFixed(2) + 'px)}}';
+    document.head.appendChild(s);
+
+    /* Duración proporcional al contenido (80 px/s) */
+    track.style.animationDuration = (oneSetPx / 80).toFixed(2) + 's';
+  })();
+
   /* ── Particle system — reacciona al mouse ─────────────────────────────── */
   function initParticles() {
     var canvas = document.getElementById('heroBg');
@@ -125,6 +159,31 @@
   /* Año footer */
   var y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
+
+  /* Abrir chat si se llega desde el blog con la bandera */
+  if (sessionStorage.getItem('openChatOnLoad')) {
+    sessionStorage.removeItem('openChatOnLoad');
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var fab = document.getElementById('qchatFab');
+        if (fab) fab.click();
+      }, 600);
+    });
+  }
+
+  /* Abrir chat desde botones de contacto/cotizar */
+  function openChat() {
+    var fab = document.getElementById('qchatFab');
+    if (!fab) return;
+    var root = document.getElementById('qchat');
+    if (root && root.classList.contains('open')) return; /* ya abierto */
+    fab.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  ['navCotizar','heroCotizar','faqContactar','footerContacto'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', openChat);
+  });
 
   /* Nav: fondo al hacer scroll */
   var nav = document.getElementById('nav');

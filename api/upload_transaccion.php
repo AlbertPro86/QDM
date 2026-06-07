@@ -1,6 +1,7 @@
 <?php
 /**
  * CRM QUANTUN Digital - Upload de archivos adjuntos a transacciones
+ * Soporta claves individuales (factura, imagen, documento) y múltiples (archivo_0, archivo_1…)
  */
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
@@ -17,50 +18,90 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
 
-$result = [];
+$imgMimes  = ['image/jpeg','image/png','image/gif','image/webp'];
+$imgExts   = ['jpg','jpeg','png','gif','webp'];
+$docMimes  = ['application/pdf','application/msword',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'application/vnd.ms-excel',
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              'text/plain'];
+$docExts   = ['pdf','doc','docx','xls','xlsx','txt'];
 
-// Procesar archivo factura (PDF)
-if (isset($_FILES['factura']) && $_FILES['factura']['error'] === UPLOAD_ERR_OK) {
-    $file = $_FILES['factura'];
-    if ($file['type'] === 'application/pdf' && pathinfo($file['name'], PATHINFO_EXTENSION) === 'pdf') {
-        $filename = 'factura_' . uniqid() . '.pdf';
-        $filepath = $uploadDir . $filename;
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $result['factura_path'] = 'uploads/transacciones/' . $filename;
+$result  = [];
+$extras  = [];   // archivos adicionales más allá del primero de cada tipo
+
+function saveFile($file, $prefix, $destDir) {
+    $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $name = $prefix . '_' . uniqid() . '.' . $ext;
+    $dest = $destDir . $name;
+    if (move_uploaded_file($file['tmp_name'], $dest)) {
+        return 'uploads/transacciones/' . $name;
+    }
+    return null;
+}
+
+// ── Claves individuales legacy (factura / imagen / documento) ─────────────
+if (!empty($_FILES['factura']) && $_FILES['factura']['error'] === UPLOAD_ERR_OK) {
+    $f   = $_FILES['factura'];
+    $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+    if ($f['type'] === 'application/pdf' && $ext === 'pdf') {
+        $p = saveFile($f, 'factura', $uploadDir);
+        if ($p) $result['factura_path'] = $p;
+    }
+}
+if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+    $f   = $_FILES['imagen'];
+    $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+    if (in_array($f['type'], $imgMimes) && in_array($ext, $imgExts)) {
+        $p = saveFile($f, 'imagen', $uploadDir);
+        if ($p) $result['imagen_path'] = $p;
+    }
+}
+if (!empty($_FILES['documento']) && $_FILES['documento']['error'] === UPLOAD_ERR_OK) {
+    $f   = $_FILES['documento'];
+    $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+    if (in_array($f['type'], $docMimes) && in_array($ext, $docExts)) {
+        $p = saveFile($f, 'documento', $uploadDir);
+        if ($p) $result['documento_path'] = $p;
+    }
+}
+
+// ── Claves múltiples archivo_0, archivo_1… ────────────────────────────────
+foreach ($_FILES as $key => $file) {
+    if (!preg_match('/^archivo_\d+$/', $key)) continue;
+    if ($file['error'] !== UPLOAD_ERR_OK) continue;
+
+    $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $mime = $file['type'];
+
+    if (in_array($mime, $imgMimes) && in_array($ext, $imgExts)) {
+        // Imagen
+        if (!isset($result['imagen_path'])) {
+            $p = saveFile($file, 'imagen', $uploadDir);
+            if ($p) $result['imagen_path'] = $p;
+        } else {
+            $p = saveFile($file, 'imagen', $uploadDir);
+            if ($p) $extras[] = ['tipo' => 'imagen', 'path' => $p, 'nombre' => $file['name']];
+        }
+    } elseif ($mime === 'application/pdf' || $ext === 'pdf') {
+        // PDF → factura
+        if (!isset($result['factura_path'])) {
+            $p = saveFile($file, 'factura', $uploadDir);
+            if ($p) $result['factura_path'] = $p;
+        } else {
+            $p = saveFile($file, 'factura', $uploadDir);
+            if ($p) $extras[] = ['tipo' => 'factura', 'path' => $p, 'nombre' => $file['name']];
+        }
+    } elseif (in_array($mime, $docMimes) && in_array($ext, $docExts)) {
+        // Documento
+        if (!isset($result['documento_path'])) {
+            $p = saveFile($file, 'documento', $uploadDir);
+            if ($p) $result['documento_path'] = $p;
+        } else {
+            $p = saveFile($file, 'documento', $uploadDir);
+            if ($p) $extras[] = ['tipo' => 'documento', 'path' => $p, 'nombre' => $file['name']];
         }
     }
 }
 
-// Procesar archivo imagen
-if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-    $file = $_FILES['imagen'];
-    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-    if (in_array($file['type'], $allowedMimes) && in_array($ext, $allowedExts)) {
-        $filename = 'imagen_' . uniqid() . '.' . $ext;
-        $filepath = $uploadDir . $filename;
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $result['imagen_path'] = 'uploads/transacciones/' . $filename;
-        }
-    }
-}
-
-// Procesar archivo documento
-if (isset($_FILES['documento']) && $_FILES['documento']['error'] === UPLOAD_ERR_OK) {
-    $file = $_FILES['documento'];
-    $allowedMimes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/plain'];
-    $allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-    if (in_array($file['type'], $allowedMimes) && in_array($ext, $allowedExts)) {
-        $filename = 'documento_' . uniqid() . '.' . $ext;
-        $filepath = $uploadDir . $filename;
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $result['documento_path'] = 'uploads/transacciones/' . $filename;
-        }
-    }
-}
-
-jsonResponse(['success' => true, 'data' => $result]);
+jsonResponse(['success' => true, 'data' => $result, 'extras' => $extras]);

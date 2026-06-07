@@ -133,10 +133,10 @@
     enterprise: {
       title: 'Plan Enterprise',
       eyebrow: 'Suscripción anual · QUANTUN Digital',
-      desc: 'Solución avanzada con CRM, mayor almacenamiento, correos ilimitados y actualizaciones continuas.',
-      price: '$989.000 COP / año',
+      desc: 'Solución avanzada para empresas que buscan gestionar sus servicios, clientes y procesos desde una sola plataforma.',
+      price: '$989.000 COP / Año',
       icon: 'mantenimiento',
-      features: ['Dominio .com + Hosting 50 GB', '20 Correos Zoho Mail 10 GB c/u', 'Google Analytics y Negocios', 'Certificado SSL Premium', 'Motor CRM Inmobiliario', 'Actualizaciones Web mensuales', 'Soporte prioritario dedicado']
+      features: ['Dominio .com', 'Sitio Web Profesional', 'Hosting 5 GB', 'Motor de Servicios', '5 Correos Corporativos (5 GB c/u)', 'Google Analytics', 'Google Negocios', 'Certificado SSL', '1 Actualización Mensual', 'Soporte Técnico', 'Comunidad Exclusiva', 'Área de Cliente']
     }
   };
   /* ============ Detalles de planes (modal informativo) ============ */
@@ -151,7 +151,10 @@
     calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
     users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
-    smartphone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
+    smartphone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+    mappin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    cogs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>'
   };
 
   var PLAN_DETAILS = {
@@ -185,6 +188,25 @@
         { icon: 'users',      name: 'Comunidad de Crecimiento',       notes: ['Acceso exclusivo a recursos y contenido de apoyo para tu negocio.', 'Temas: marketing digital, redes sociales, sitios web, comercio electrónico, modelos de negocio, ventas, estrategias comerciales y plantillas prácticas.'] },
         { icon: 'user',       name: 'Área de Cliente',                notes: ['Consulta tus servicios activos.', 'Revisa renovaciones y facturación.', 'Gestiona solicitudes de soporte.'] },
         { icon: 'calendar',   name: 'Vigencia',                       notes: ['Todos los servicios incluidos tienen una duración de 1 año.'] }
+      ]
+    },
+    enterprise: {
+      title: 'Plan Enterprise',
+      eyebrow: 'Detalle del plan · Enterprise',
+      items: [
+        { icon: 'rocket',   name: 'Sitio Web Profesional',       notes: ['Sitio web corporativo para tu empresa.', 'Diseño adaptable para móviles, tablets y computadores.', 'Incluye formulario de contacto, botón de WhatsApp y enlaces a redes sociales.', 'Ideal para presentar tu negocio, servicios y canales de contacto.'] },
+        { icon: 'globe',    name: 'Dominio .com',                 notes: ['Incluye dominio .com por 1 año.', 'Otras extensiones pueden generar costos adicionales.', 'Transferencias o migraciones futuras no están incluidas.', 'Inicialmente el dominio es administrado por nuestra empresa.', 'Para trasladarlo a otro proveedor, el cliente deberá estar a paz y salvo y asumir los costos correspondientes.'] },
+        { icon: 'server',   name: 'Hosting 5 GB',                notes: ['5 GB de espacio para alojar tu sitio web y servicios asociados.', 'Mayor capacidad para crecimiento y almacenamiento de contenido.', 'Mantiene tu plataforma disponible en internet.'] },
+        { icon: 'mail',     name: '5 Correos Corporativos',      notes: ['Incluye 5 cuentas de correo corporativo.', '5 GB de almacenamiento por cuenta.', 'Todos los correos deben mantener la misma capacidad.', 'Si se requiere ampliar el almacenamiento, el valor del servicio cambia.', 'Requiere dominio, hosting y certificado SSL activos.', 'Si ya cuentas con correos corporativos, se debe revisar la migración previamente mediante una reunión técnica.'] },
+        { icon: 'cogs',     name: 'Motor de Servicios',          notes: ['Herramienta para administrar clientes, servicios y procesos.', 'Permite centralizar información importante de tu negocio.', 'Facilita el seguimiento de solicitudes y actividades.', 'Diseñado para mejorar la organización y eficiencia operativa.'] },
+        { icon: 'chart',    name: 'Google Analytics',            notes: ['Configuración e integración con Google Analytics.', 'Permite medir visitas, comportamiento y rendimiento del sitio web.', 'Acceso a estadísticas para apoyar la toma de decisiones.'] },
+        { icon: 'mappin',   name: 'Google Negocios',             notes: ['Configuración de perfil empresarial en Google.', 'Mejora la visibilidad de tu negocio en búsquedas y Google Maps.', 'Facilita que los clientes encuentren tu empresa.'] },
+        { icon: 'shield',   name: 'Certificado SSL',             notes: ['Incluido sin costo adicional.', 'Protección y navegación segura mediante HTTPS.', 'Mejora la confianza de los visitantes.'] },
+        { icon: 'refresh',  name: '1 Actualización Mensual',     notes: ['Incluye un cambio mensual sobre el sitio web.', 'Puede ser: publicación de artículos, cambio de textos, actualización de imágenes, carga de documentos, creación de una nueva página sencilla o ajustes menores de contenido.', 'Cambios adicionales podrán cotizarse por separado.'] },
+        { icon: 'wrench',   name: 'Soporte Técnico',             notes: ['Supervisión y soporte técnico durante toda la vigencia.', 'Monitoreo de dominio, hosting, correos y funcionamiento general de la plataforma.', 'Garantiza la continuidad operativa de los servicios contratados.'] },
+        { icon: 'users',    name: 'Comunidad Exclusiva',         notes: ['Acceso a contenido y recursos para fortalecer tu negocio.', 'Temas: marketing digital, sitios web, redes sociales, comercio electrónico, automatización, modelos de negocio, ventas y estrategias comerciales.', 'Recursos y plantillas de apoyo incluidos.'] },
+        { icon: 'user',     name: 'Área de Cliente',             notes: ['Consulta tus servicios activos.', 'Revisa renovaciones y facturación.', 'Gestiona solicitudes de soporte.', 'Accede al historial de servicios contratados.'] },
+        { icon: 'calendar', name: 'Vigencia',                    notes: ['Todos los servicios incluidos tienen una duración de 1 año.'] }
       ]
     }
   };
@@ -672,15 +694,19 @@
       inputW.hidden = true;
       var now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
       chatBody.innerHTML =
-        buildRow('agent', '¡Hola! 👋 Bienvenido a <strong>QUANTUN Digital</strong>.<br>¿En qué podemos ayudarte hoy?', now) +
-        buildRow('agent', 'Déjanos tu nombre y te atendemos de inmediato 😊', now) +
+        buildRow('agent', '¡Hola! Bienvenido a <strong>QUANTUN Digital</strong>. ¿En qué podemos ayudarte?', now) +
         '<div class="qchat__start">' +
           '<input type="text" id="qchatName" placeholder="Tu nombre *">' +
           '<input type="email" id="qchatEmail" placeholder="Tu correo (opcional)">' +
           '<button type="button" class="qchat__start-btn" id="qchatStartBtn">Iniciar chat →</button>' +
+          '<p class="qchat__start-err" id="qchatStartErr" hidden></p>' +
         '</div>';
       document.getElementById('qchatStartBtn').addEventListener('click', initSession);
       setTimeout(function() { var n = document.getElementById('qchatName'); if (n) n.focus(); }, 150);
+      chatBody.addEventListener('input', function() {
+        var errEl = document.getElementById('qchatStartErr');
+        if (errEl) errEl.hidden = true;
+      }, { once: true });
     }
 
     /* — crear sesión — */
@@ -710,6 +736,15 @@
         startPoll();
       } catch(e) {
         if (btn) { btn.disabled = false; btn.textContent = 'Iniciar chat →'; }
+        var errEl = document.getElementById('qchatStartErr');
+        if (errEl) {
+          var msg = e.message || '';
+          if (msg === 'Failed to fetch' || msg.indexOf('fetch') !== -1) {
+            msg = 'No se pudo conectar. Asegúrate de abrir el sitio desde http://localhost.';
+          }
+          errEl.textContent = msg || 'Error al conectar. Intenta de nuevo.';
+          errEl.hidden = false;
+        }
         console.error('[QChat]', e);
       }
     }
@@ -785,14 +820,20 @@
         if (loadingEl) loadingEl.remove();
 
         if (data.closed) {
-          /* Sesión cerrada: mostrar mensaje y quedarse ahí hasta que el usuario salga */
           stopPoll();
           session = null;
           localStorage.removeItem('qchat_session');
           inputW.hidden = true;
           var closedMsg = document.createElement('div');
-          closedMsg.innerHTML = buildRow('agent', 'Este chat ha sido cerrado. Si tienes más preguntas, ¡escríbenos de nuevo! 😊', new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}));
+          closedMsg.innerHTML = buildRow('agent', 'Este chat ha sido cerrado. Si tienes más preguntas, escríbenos de nuevo.', new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}));
           chatBody.appendChild(closedMsg.firstElementChild || closedMsg);
+          /* botón para reiniciar sin necesidad de recargar la página */
+          var restartBtn = document.createElement('button');
+          restartBtn.type = 'button';
+          restartBtn.className = 'qchat__restart-btn';
+          restartBtn.textContent = 'Iniciar nueva conversación';
+          restartBtn.addEventListener('click', function() { renderStart(); });
+          chatBody.appendChild(restartBtn);
           chatBody.scrollTop = chatBody.scrollHeight;
           return;
         }

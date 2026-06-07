@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1200">
+<title>Redes Sociales para Captar Leads — QUANTUN Digital</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 750px; overflow: hidden; background: #0e0e0c; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  .banner { position: relative; width: 1200px; height: 750px; background: #0e0e0c; overflow: hidden; }
+  .bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Diagonal split background */
+  .split-bg {
+    position: absolute;
+    top: 0; right: 0;
+    width: 500px; height: 750px;
+    background: #141412;
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  .content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 80px 60px;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .cat-bar { width: 28px; height: 3px; background: #c8f04e; border-radius: 1px; }
+  .category-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #c8f04e;
+  }
+
+  .title {
+    font-size: 66px;
+    font-weight: 900;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: #ffffff;
+    max-width: 660px;
+    margin-bottom: 30px;
+  }
+  .word-accent {
+    display: inline-block;
+    background: #c8f04e;
+    color: #0e0e0c;
+    padding: 0 10px;
+    line-height: 1.1;
+    margin-bottom: 2px;
+  }
+
+  .desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.42);
+    line-height: 1.7;
+    max-width: 480px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  .logo {
+    position: absolute;
+    top: 48px; right: 64px;
+    text-align: right;
+  }
+  .logo-wordmark {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+  .logo-wordmark em { color: #c8f04e; font-style: normal; }
+  .logo-sub {
+    font-size: 9.5px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* Right side stat cards */
+  .stats {
+    position: absolute;
+    right: 64px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .stat-card {
+    width: 200px;
+    padding: 18px 20px;
+    border: 1px solid rgba(200,240,78,0.15);
+    border-left: 3px solid #c8f04e;
+    background: rgba(200,240,78,0.03);
+  }
+  .stat-val {
+    font-size: 32px;
+    font-weight: 800;
+    color: #c8f04e;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+
+  <div class="split-bg"></div>
+
+  <svg class="bg-svg" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg">
+    <!-- Arrow/flow upward motif - leads flowing up -->
+    <g opacity="0.12">
+      <polyline points="920,650 920,550 960,510 1000,550 1000,420 1040,380 1080,420 1080,300" fill="none" stroke="#c8f04e" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- Arrow tips going up -->
+      <polyline points="1065,315 1080,300 1095,315" fill="none" stroke="#c8f04e" stroke-width="1.5"/>
+    </g>
+
+    <!-- Scatter dots - leads -->
+    <circle cx="900" cy="660" r="4" fill="#c8f04e" opacity="0.25"/>
+    <circle cx="940" cy="620" r="3" fill="#c8f04e" opacity="0.2"/>
+    <circle cx="970" cy="640" r="2.5" fill="#c8f04e" opacity="0.15"/>
+    <circle cx="1010" cy="600" r="4" fill="#c8f04e" opacity="0.2"/>
+    <circle cx="1050" cy="580" r="3" fill="#c8f04e" opacity="0.15"/>
+    <circle cx="1090" cy="560" r="3.5" fill="#c8f04e" opacity="0.18"/>
+    <circle cx="1130" cy="530" r="2.5" fill="#c8f04e" opacity="0.15"/>
+    <circle cx="1080" cy="300" r="6" fill="#c8f04e" opacity="0.4"/>
+
+    <!-- Social media abstract shapes -->
+    <!-- Instagram-like rounded square -->
+    <rect x="810" y="160" width="50" height="50" rx="14" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+    <circle cx="835" cy="185" r="10" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.2"/>
+    <circle cx="849" cy="172" r="3" fill="rgba(200,240,78,0.25)"/>
+
+    <!-- Twitter-like bird silhouette abstract -->
+    <path d="M 890 150 Q 910 140 920 155 Q 910 148 900 165 Q 920 155 935 160 Q 920 175 905 172 Q 895 180 885 175 Q 880 165 890 150Z" fill="rgba(200,240,78,0.12)"/>
+
+    <!-- Corner brackets -->
+    <path d="M 40 40 L 40 90 M 40 40 L 90 40" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+    <path d="M 1160 710 L 1160 660 M 1160 710 L 1110 710" fill="none" stroke="rgba(200,240,78,0.2)" stroke-width="1.5"/>
+
+    <!-- Top horizontal rule -->
+    <line x1="80" y1="108" x2="360" y2="108" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  </svg>
+
+  <div class="logo">
+    <div class="logo-wordmark">QUANTUN<em>.</em></div>
+    <div class="logo-sub">Digital Agency</div>
+  </div>
+
+  <!-- Right stat cards -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-val">3.2x</div>
+      <div class="stat-label">Más conversiones</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">68%</div>
+      <div class="stat-label">Leads calificados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">ROI+</div>
+      <div class="stat-label">Retorno medible</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="category">
+      <div class="cat-bar"></div>
+      <span class="category-label">Marketing Digital</span>
+    </div>
+    <h1 class="title">
+      Redes Sociales<br>
+      para <span class="word-accent">Captar</span><br>
+      Leads
+    </h1>
+    <p class="desc">Estrategias probadas para convertir seguidores en oportunidades reales de negocio.</p>
+  </div>
+
+</div>
+</body>
+</html>
