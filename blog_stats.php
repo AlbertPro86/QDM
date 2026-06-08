@@ -70,7 +70,7 @@ include __DIR__ . '/includes/header.php';
             </svg>
             Actualizar
         </button>
-        <a href="https://quantundigital.com/blog/" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+        <a href="https://quantundigital.com/blog.html" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
             </svg>
@@ -123,7 +123,7 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <script>
-const API = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '') + '/api/blog_visitas.php';
+const API = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '/crm') + '/api/blog_visitas.php';
 
 // Títulos legibles por slug (fallback si no vienen de la BD)
 const TITULOS = {
