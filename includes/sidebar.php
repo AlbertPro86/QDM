@@ -151,6 +151,13 @@ try {
             <span class="nav-link-text">Servicios</span>
         </a>
 
+        <a href="blog_stats.php" class="nav-link <?= $currentPage === 'blog_stats' ? 'active' : '' ?>" id="nav-blog-stats" title="Blog · Estadísticas">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span class="nav-link-text">Blog · Stats</span>
+        </a>
+
         <div style="height:1px;background:var(--color-border);margin:6px 14px"></div>
 
         <a href="configuraciones.php" class="nav-link <?= $currentPage === 'configuraciones' ? 'active' : '' ?>" id="nav-configuraciones" title="Configuraciones">
