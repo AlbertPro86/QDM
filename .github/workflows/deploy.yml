@@ -18,8 +18,32 @@ jobs:
           port: 65002
           username: u260705801
           password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: 120s
+          debug: true
           script: |
-            cd ~/quantun-repo && git pull origin master
-            rsync -av --delete --exclude='.git' --exclude='crm/' ~/quantun-repo/quantun-web/ ~/domains/quantundigital.com/public_html/
-            rsync -av --delete --exclude='.git' --exclude='quantun-web/' --exclude='backups/' --exclude='.env' --exclude='uploads/' ~/quantun-repo/ ~/domains/quantundigital.com/public_html/crm/
-            echo "Deploy completado."
+            set -e
+            echo "=== Verificando repositorio ==="
+            if [ ! -d "$HOME/quantun-repo/.git" ]; then
+              echo "Repositorio no encontrado, clonando..."
+              git clone https://github.com/AlbertPro86/QDM.git "$HOME/quantun-repo"
+            fi
+            echo "=== Git pull ==="
+            cd "$HOME/quantun-repo"
+            git fetch origin master
+            git reset --hard origin/master
+            echo "=== Desplegando sitio web ==="
+            rsync -av --delete \
+              --exclude='.git' \
+              --exclude='crm/' \
+              "$HOME/quantun-repo/quantun-web/" \
+              "$HOME/domains/quantundigital.com/public_html/"
+            echo "=== Desplegando CRM ==="
+            rsync -av --delete \
+              --exclude='.git' \
+              --exclude='quantun-web/' \
+              --exclude='backups/' \
+              --exclude='.env' \
+              --exclude='uploads/' \
+              "$HOME/quantun-repo/" \
+              "$HOME/domains/quantundigital.com/public_html/crm/"
+            echo "=== Deploy completado exitosamente ==="
