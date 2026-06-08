@@ -80,21 +80,10 @@ include __DIR__ . '/includes/header.php';
 @media(max-width:560px){.blog-stat-grid{grid-template-columns:1fr 1fr}.dv-header{flex-wrap:wrap}}
 </style>
 
-<!-- ══ CABECERA DE PÁGINA ══ -->
-<div class="page-header">
-    <div class="page-header-left">
-        <h1 class="page-title">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" style="vertical-align:middle;margin-right:6px">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            Estadísticas de Blog
-        </h1>
-        <?php if (!empty($pageBreadcrumb)): ?>
-            <div class="page-breadcrumb"><?= $pageBreadcrumb ?></div>
-        <?php endif; ?>
-    </div>
+<!-- ══ BARRA DE ACCIONES ══ -->
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:20px">
     <!-- Botones vista stats -->
-    <div class="page-header-right" id="phStats">
+    <div id="phStats" style="display:flex;gap:8px">
         <button class="btn btn-secondary btn-sm" id="btnRefresh" onclick="cargarStats()">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -109,7 +98,7 @@ include __DIR__ . '/includes/header.php';
         </a>
     </div>
     <!-- Botón vista detalle -->
-    <div class="page-header-right" id="phDetalle" style="display:none">
+    <div id="phDetalle" style="display:none">
         <button class="btn btn-secondary btn-sm" onclick="cerrarDetalle()">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
@@ -406,6 +395,19 @@ setInterval(actualizarLive, 30000);
 /* ══ VISTA DETALLE ══ */
 var _dSlug = '', _dTitulo = '', _dPage = 1, _dPages = 1, _dTotal = 0;
 
+// Miga de pan base (la del topbar al cargar la página)
+var _breadcrumbBase = (function(){
+    var el = document.getElementById('topbarBreadcrumb');
+    return el ? el.innerHTML : '';
+})();
+
+function setBreadcrumb(html){
+    var el = document.getElementById('topbarBreadcrumb');
+    if (el) el.innerHTML = html;
+}
+
+var SEP = '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>';
+
 function verDetalle(slug, titulo, total){
     _dSlug   = slug;
     _dTitulo = titulo;
@@ -418,7 +420,13 @@ function verDetalle(slug, titulo, total){
     document.getElementById('dvPager').style.display = 'none';
     document.getElementById('dvPagerInfo').textContent = '';
 
-    // Cambiar vistas
+    // Miga de pan: Dashboard › Blog · Estadísticas › Título del artículo
+    setBreadcrumb(
+        _breadcrumbBase +
+        SEP +
+        '<span style="font-weight:700;color:var(--color-text)">' + titulo + '</span>'
+    );
+
     document.getElementById('statsView').style.display   = 'none';
     document.getElementById('detalleView').style.display = 'block';
     document.getElementById('phStats').style.display     = 'none';
@@ -433,6 +441,7 @@ function cerrarDetalle(){
     document.getElementById('statsView').style.display   = 'block';
     document.getElementById('phDetalle').style.display   = 'none';
     document.getElementById('phStats').style.display     = 'flex';
+    setBreadcrumb(_breadcrumbBase);   // restaurar miga original
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

@@ -54,9 +54,9 @@ $flash = getFlash();
                         <h1 class="topbar-title"><?= sanitize($pageTitle) ?></h1>
                         <?php if (!empty($pageTitleSuffix)): ?><?= $pageTitleSuffix ?><?php endif; ?>
                         <?php if (!empty($pageBreadcrumb)): ?>
-                            <p class="topbar-subtitle"><?= $pageBreadcrumb ?></p>
+                            <p class="topbar-subtitle" id="topbarBreadcrumb"><?= $pageBreadcrumb ?></p>
                         <?php elseif ($pageSubtitle): ?>
-                            <p class="topbar-subtitle"><?= sanitize($pageSubtitle) ?></p>
+                            <p class="topbar-subtitle" id="topbarBreadcrumb"><?= sanitize($pageSubtitle) ?></p>
                         <?php endif; ?>
                     </div>
                 </div>
