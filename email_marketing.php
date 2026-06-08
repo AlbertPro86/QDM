@@ -915,9 +915,9 @@ const DEFAULT_TPL = `<!DOCTYPE html>
 <style>
   body{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;background:#f4f4f4}
   .wrapper{max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-  .header{background:#0f172a;padding:32px 40px;text-align:center}
-  .header h1{color:#c9f31d;margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
-  .header p{color:rgba(255,255,255,.55);margin:6px 0 0;font-size:13px}
+  .header{background:#ffffff;padding:32px 40px;text-align:center;border-bottom:4px solid #C6F24E}
+  .header h1{color:#0E0E0C;margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .header p{color:#57544D;margin:6px 0 0;font-size:13px}
   .body{padding:36px 40px}
   .body h2{color:#0f172a;font-size:20px;font-weight:800;margin:0 0 16px}
   .body p{color:#475569;font-size:14px;line-height:1.7;margin:0 0 16px}
