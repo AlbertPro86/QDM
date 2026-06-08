@@ -170,14 +170,13 @@ function getCfg($pdo, $clave, $default = '') {
  * Prioridad:
  *   1. URL externa válida (no localhost) pasada como parámetro
  *   2. URL externa válida (no localhost) guardada en crm_configuraciones.notif_logo_url
- *   3. Base64 embebido del archivo local — funciona en TODOS los clientes de correo
- *      sin depender de conectividad al servidor.
+ *   3. URL del sitio web derivada de APP_URL (funciona en producción sin base64)
+ *   4. Base64 embebido del archivo local (fallback para localhost/desarrollo)
  */
 function getLogoEmailSrc(PDO $pdo, string $logoUrlParam = ''): string {
     $isExternal = function(string $url): bool {
         $url = trim($url);
         if (!$url) return false;
-        // Rechazar localhost / IPs privadas
         if (stripos($url, 'localhost') !== false) return false;
         if (stripos($url, '127.0.0.1') !== false) return false;
         if (stripos($url, '::1')       !== false) return false;
@@ -195,11 +194,29 @@ function getLogoEmailSrc(PDO $pdo, string $logoUrlParam = ''): string {
         if ($isExternal($dbUrl)) return trim($dbUrl);
     } catch (PDOException $e) {}
 
-    // 3. Base64 embebido (siempre visible, sin red)
-    $logoFile = BASE_PATH . '/Assets/logo_quantun_digital_blanco.png';
-    if (file_exists($logoFile)) {
-        return 'data:image/png;base64,' . base64_encode(file_get_contents($logoFile));
+    // 3. Derivar URL del sitio web desde APP_URL
+    //    APP_URL en producción = https://quantundigital.com/crm
+    //    El logo del sitio está en  https://quantundigital.com/assets/quantun-logo.png
+    $siteBase = rtrim(preg_replace('#/crm/?$#i', '', rtrim(defined('APP_URL') ? APP_URL : '', '/')), '/');
+    $siteLogoUrl = $siteBase . '/assets/quantun-logo.png';
+    if ($isExternal($siteLogoUrl)) return $siteLogoUrl;
+
+    // 4. Base64 embebido (fallback para localhost / desarrollo)
+    foreach (['logo_quantun_digital_negro.png', 'logo_quantun_digital_blanco.png'] as $f) {
+        $path = BASE_PATH . '/Assets/' . $f;
+        if (file_exists($path)) {
+            return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+        }
     }
 
     return '';
+}
+
+/**
+ * Retorna la URL pública del logo del sitio derivada de APP_URL.
+ * Útil para mostrar previsualizaciones en el CRM.
+ */
+function getSiteLogoUrl(): string {
+    $siteBase = rtrim(preg_replace('#/crm/?$#i', '', rtrim(defined('APP_URL') ? APP_URL : '', '/')), '/');
+    return $siteBase . '/assets/quantun-logo.png';
 }

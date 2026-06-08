@@ -89,16 +89,22 @@ include __DIR__ . '/includes/header.php';
             <!-- Columna Derecha -->
             <div style="display:grid;gap:12px">
                 <!-- Logo URL -->
+                <?php $defaultLogoUrl = getSiteLogoUrl(); ?>
                 <div class="form-group" style="margin:0">
-                    <label class="form-label" style="font-size:11px">Logo del correo (URL)</label>
-                    <input id="notif_logo_url" class="form-input" type="text" placeholder="https://tudominio.com/logo.png" oninput="previewLogoNotif()" style="padding:6px 10px;font-size:12px">
-                    <div id="notifLogoPreview" style="display:none;margin-top:6px;padding:8px 10px;background:#EFECE5;border:1px solid #E8E5DD;border-radius:3px;display:inline-flex;align-items:center;gap:8px">
-                        <img id="notifLogoImg" src="" alt="Logo" style="height:32px;max-width:150px;object-fit:contain"
-                            onload="document.getElementById('notifLogoStatus').textContent='✓ Logo cargado';document.getElementById('notifLogoStatus').style.color='#4ade80'"
-                            onerror="document.getElementById('notifLogoStatus').textContent='✗ No se pudo cargar';document.getElementById('notifLogoStatus').style.color='#f87171'">
+                    <label class="form-label" style="font-size:11px">Logo del correo</label>
+                    <!-- Vista previa activa -->
+                    <div style="margin-bottom:8px;padding:10px 12px;background:#EFECE5;border:1px solid #E8E5DD;border-radius:6px;display:flex;align-items:center;gap:10px">
+                        <img id="notifLogoImg" src="<?= htmlspecialchars($defaultLogoUrl) ?>" alt="Logo QUANTUN"
+                            style="height:34px;max-width:160px;object-fit:contain"
+                            onload="document.getElementById('notifLogoStatus').textContent='✓';document.getElementById('notifLogoStatus').style.color='#4ade80'"
+                            onerror="document.getElementById('notifLogoStatus').textContent='✗ No cargó';document.getElementById('notifLogoStatus').style.color='#f87171'">
                         <span id="notifLogoStatus" style="font-size:10px;color:#8A867C"></span>
                     </div>
-                    <p style="margin:3px 0 0;font-size:10px;color:#8A867C">Si está vacío se usa el logo local</p>
+                    <input id="notif_logo_url" class="form-input" type="text"
+                        placeholder="<?= htmlspecialchars($defaultLogoUrl) ?>"
+                        oninput="previewLogoNotif()"
+                        style="padding:6px 10px;font-size:12px">
+                    <p style="margin:3px 0 0;font-size:10px;color:#8A867C">Si está vacío se usa el logo del sitio web (por defecto)</p>
                 </div>
 
                 <!-- Qué incluir -->
@@ -392,20 +398,14 @@ async function guardarConfig() {
 }
 
 // ── Preview logo ─────────────────────────────────────────────────────────────
+const DEFAULT_LOGO_URL = <?= json_encode($defaultLogoUrl) ?>;
 function previewLogoNotif() {
-    const url     = document.getElementById('notif_logo_url').value.trim();
-    const preview = document.getElementById('notifLogoPreview');
-    const img     = document.getElementById('notifLogoImg');
-    const status  = document.getElementById('notifLogoStatus');
-    if (url) {
-        preview.style.display = 'inline-flex';
-        status.textContent    = 'Cargando...';
-        status.style.color    = '#8A867C';
-        img.src               = url;
-    } else {
-        preview.style.display = 'none';
-        img.src               = '';
-    }
+    const url    = document.getElementById('notif_logo_url').value.trim();
+    const img    = document.getElementById('notifLogoImg');
+    const status = document.getElementById('notifLogoStatus');
+    status.textContent = 'Cargando…';
+    status.style.color = '#8A867C';
+    img.src = url || DEFAULT_LOGO_URL;
 }
 
 // ── Guardar datos de empresa ──────────────────────────────────────────────────
