@@ -265,10 +265,11 @@ include __DIR__ . '/includes/header.php';
                 <div style="font-size:12px;font-weight:700;color:#0E0E0C;margin-bottom:4px">Tarea programada automática</div>
                 <div id="infoTarea" style="font-size:11px;color:#57544D;line-height:1.6">Cargando configuración...</div>
                 <div style="margin-top:8px;font-size:10px;color:#8A867C">
-                    El resumen se envía ejecutando:<br>
-                    <code style="background:#EFECE5;color:#0E0E0C;padding:3px 6px;border-radius:3px;font-size:9px;display:inline-block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;word-break:break-all">
-                        C:\xampp\php\php.exe C:\xampp\htdocs\CRM-QUANTUN-Digital\api\notificacion_resumen.php
+                    Cron Hostinger (hPanel → Cron Jobs):<br>
+                    <code style="background:#EFECE5;color:#0E0E0C;padding:3px 6px;border-radius:3px;font-size:9px;display:inline-block;margin-top:3px;word-break:break-all">
+                        php /home/u260705801/domains/quantundigital.com/public_html/crm/cron/resumen_diario.php
                     </code>
+                    <br>Frecuencia: <strong>0 8 * * 1-5</strong> (lun–vie 8 AM)
                 </div>
             </div>
         </div>
