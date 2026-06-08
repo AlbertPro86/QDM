@@ -107,11 +107,36 @@ switch ($method) {
             ORDER BY dia ASC
         ")->fetchAll();
 
+        // Top fuentes (referer) — agrupa por dominio origen
+        $fuentes = $pdo->query("
+            SELECT
+                CASE
+                    WHEN referer IS NULL OR referer = ''          THEN 'Directo / Sin fuente'
+                    WHEN referer LIKE '%facebook.com%'            THEN 'Facebook'
+                    WHEN referer LIKE '%instagram.com%'           THEN 'Instagram'
+                    WHEN referer LIKE '%t.co%' OR referer LIKE '%twitter.com%' OR referer LIKE '%x.com%' THEN 'X / Twitter'
+                    WHEN referer LIKE '%linkedin.com%'            THEN 'LinkedIn'
+                    WHEN referer LIKE '%whatsapp.com%' OR referer LIKE '%wa.me%' THEN 'WhatsApp'
+                    WHEN referer LIKE '%google.com%' OR referer LIKE '%google.co%' THEN 'Google'
+                    WHEN referer LIKE '%bing.com%'                THEN 'Bing'
+                    WHEN referer LIKE '%youtube.com%'             THEN 'YouTube'
+                    WHEN referer LIKE '%tiktok.com%'              THEN 'TikTok'
+                    WHEN referer LIKE '%quantundigital.com%'      THEN 'Sitio propio'
+                    ELSE CONCAT('Otro: ', SUBSTRING_INDEX(REPLACE(REPLACE(referer,'https://',''),'http://',''),'/',1))
+                END AS fuente,
+                COUNT(*) AS visitas
+            FROM blog_visitas
+            GROUP BY fuente
+            ORDER BY visitas DESC
+            LIMIT 10
+        ")->fetchAll();
+
         jsonResponse([
-            'success'  => true,
+            'success'   => true,
             'articulos' => $rows,
-            'totales'  => $totales,
-            'diario'   => $diario,
+            'totales'   => $totales,
+            'diario'    => $diario,
+            'fuentes'   => $fuentes,
         ]);
         break;
 

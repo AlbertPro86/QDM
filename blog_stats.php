@@ -47,7 +47,7 @@ include __DIR__ . '/includes/header.php';
 .mini-bar-col span{display:block;width:100%;background:var(--color-border);border-radius:3px 3px 0 0;min-height:2px;transition:height .4s ease}
 .mini-bar-col span.has-data{background:var(--color-text)}
 .mini-bar-col small{font-size:8px;color:var(--color-text-muted);white-space:nowrap}
-@media(max-width:900px){.blog-stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.blog-stat-grid{grid-template-columns:repeat(2,1fr)}#chartFuentesGrid{grid-template-columns:1fr}}
 @media(max-width:560px){.blog-stat-grid{grid-template-columns:1fr 1fr}}
 </style>
 
@@ -103,11 +103,19 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<!-- Gráfico diario -->
-<div class="chart-wrap">
-    <h3>Visitas diarias — últimos 30 días</h3>
-    <div class="mini-bars" id="miniChart">
-        <div style="width:100%;text-align:center;color:var(--color-text-muted);font-size:12px;padding:16px 0">Cargando…</div>
+<!-- Gráfico diario + Fuentes -->
+<div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:28px" id="chartFuentesGrid">
+    <div class="chart-wrap" style="margin-bottom:0">
+        <h3>Visitas diarias — últimos 30 días</h3>
+        <div class="mini-bars" id="miniChart">
+            <div style="width:100%;text-align:center;color:var(--color-text-muted);font-size:12px;padding:16px 0">Cargando…</div>
+        </div>
+    </div>
+    <div class="chart-wrap" style="margin-bottom:0">
+        <h3>Fuentes de tráfico</h3>
+        <div id="fuentesWrap">
+            <div style="text-align:center;color:var(--color-text-muted);font-size:12px;padding:16px 0">Cargando…</div>
+        </div>
     </div>
 </div>
 
@@ -198,6 +206,41 @@ function renderTable(articulos){
         + '</tbody></table>';
 }
 
+const FUENTE_ICONS = {
+    'Facebook':          '🟦',
+    'Instagram':         '🟣',
+    'X / Twitter':       '⬛',
+    'LinkedIn':          '🔵',
+    'WhatsApp':          '🟢',
+    'Google':            '🔴',
+    'Bing':              '🟡',
+    'YouTube':           '🔴',
+    'TikTok':            '⬛',
+    'Sitio propio':      '🌐',
+    'Directo / Sin fuente': '🔗',
+};
+
+function renderFuentes(fuentes){
+    const wrap = document.getElementById('fuentesWrap');
+    if(!fuentes || !fuentes.length){
+        wrap.innerHTML = '<div style="text-align:center;color:var(--color-text-muted);font-size:12px;padding:16px 0">Sin datos todavía</div>';
+        return;
+    }
+    const maxV = Math.max(1, ...fuentes.map(function(f){ return parseInt(f.visitas); }));
+    wrap.innerHTML = fuentes.map(function(f){
+        var pct = Math.round((parseInt(f.visitas) / maxV) * 100);
+        var icon = FUENTE_ICONS[f.fuente] || '🌍';
+        return '<div style="margin-bottom:10px">'
+            + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">'
+            + '<span style="font-size:12px;font-weight:600;color:var(--color-text)">' + icon + ' ' + f.fuente + '</span>'
+            + '<span style="font-size:12px;font-weight:700;color:var(--color-text);font-family:\'JetBrains Mono\',monospace">' + fmt(f.visitas) + '</span>'
+            + '</div>'
+            + '<div style="height:5px;border-radius:99px;background:var(--color-border);overflow:hidden">'
+            + '<div style="height:100%;width:' + pct + '%;background:var(--color-text);border-radius:99px;transition:width .5s ease"></div>'
+            + '</div></div>';
+    }).join('');
+}
+
 async function cargarStats(){
     const btn = document.getElementById('btnRefresh');
     if(btn){ btn.disabled = true; btn.textContent = 'Actualizando…'; }
@@ -213,6 +256,7 @@ async function cargarStats(){
         document.getElementById('num30d').textContent    = fmt(t.ultimos_30d);
 
         renderChart(d.diario);
+        renderFuentes(d.fuentes || []);
         renderTable(d.articulos || []);
     } catch(e){
         document.getElementById('artTableWrap').innerHTML = '<div style="padding:30px;text-align:center;color:var(--color-danger,#ef4444)">Error al cargar estadísticas: ' + e.message + '</div>';
