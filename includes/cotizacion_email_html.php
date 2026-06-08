@@ -137,7 +137,7 @@ function generarEmailCotizacion(
                     <!-- Logo + Empresa -->
                     <td style="vertical-align:top;width:55%">
                         ' . ($logoSrc
-                            ? '<img src="' . $logoSrc . '" alt="' . $empNombre . '" height="40" style="display:block;height:40px;max-width:180px;object-fit:contain;margin-bottom:10px;filter:brightness(0)">'
+                            ? '<img src="' . $logoSrc . '" alt="' . $empNombre . '" height="40" style="display:block;height:40px;max-width:180px;object-fit:contain;margin-bottom:10px">'
                             : '<div style="font-size:20px;font-weight:900;color:' . $colPrim . ';margin-bottom:10px;letter-spacing:-0.5px">' . $empNombre . '</div>') . '
                         <div style="font-size:13px;font-weight:700;color:#0E0E0C;margin-bottom:2px">' . $empNombre . '</div>
                         ' . $empInfoRows . '

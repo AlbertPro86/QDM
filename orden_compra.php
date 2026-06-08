@@ -238,16 +238,16 @@ enrichWithPaquete($servicios, $pdo);
     <style>
         body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #0E0E0C; line-height: 1.5; margin: 0; padding: 40px; background: #FAFAF7; }
         .invoice { background: white; max-width: 900px; margin: auto; }
-        .header-dark { background: <?= $template['color_primario'] ?>; padding: 0; }
-        .header-accent { background: <?= $template['color_secundario'] ?>; height: 6px; }
+        .header-dark { background: #ffffff; padding: 0; border-bottom: 4px solid <?= $template['color_secundario'] ?>; }
+        .header-accent { display: none; }
         .header-content { padding: 28px 36px; display: flex; justify-content: space-between; align-items: flex-end; }
         .logo-section { }
-        .logo-section h2 { margin: 0; color: white; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-        .company-details { margin-top: 14px; font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.8; }
+        .logo-section h2 { margin: 0; color: #0E0E0C; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+        .company-details { margin-top: 14px; font-size: 11px; color: #57544D; line-height: 1.8; }
         .order-info { text-align: right; }
-        .order-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; color: <?= $template['color_secundario'] ?>; }
-        .order-number { font-size: 26px; font-weight: 700; color: white; letter-spacing: -1px; margin-top: 4px; }
-        .order-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .order-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .15em; color: <?= $template['color_primario'] ?>; }
+        .order-number { font-size: 26px; font-weight: 700; color: #0E0E0C; letter-spacing: -1px; margin-top: 4px; }
+        .order-date { font-size: 11px; color: #8A867C; margin-top: 4px; }
         .client-section { background: #FAFAF7; padding: 20px 36px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #E8E5DD; }
         .client-info h3 { margin: 0; font-size: 14px; font-weight: 700; color: #0E0E0C; }
         .client-info p { margin: 3px 0; font-size: 11px; color: #57544D; }
@@ -295,7 +295,7 @@ enrichWithPaquete($servicios, $pdo);
             <div class="header-content">
                 <div class="logo-section">
                     <?php if ($logoSrc): ?>
-                    <img src="<?= $logoSrc ?>" alt="Logo" style="max-height:48px;max-width:180px;object-fit:contain;filter:brightness(0) invert(1)">
+                    <img src="<?= $logoSrc ?>" alt="Logo" style="max-height:48px;max-width:180px;object-fit:contain">
                     <?php else: ?>
                     <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px"><?= htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') ?></div>
                     <?php endif; ?>

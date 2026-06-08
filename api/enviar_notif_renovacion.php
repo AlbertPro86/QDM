@@ -123,7 +123,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
 
     $logoTag = $logoSrc
         ? "<img src='{$logoSrc}' alt='QUANTUN Digital' style='height:32px;max-width:160px;object-fit:contain;display:block'>"
-        : "<span style='font-size:16px;font-weight:900;color:#c9f31d'>QUANTUN Digital</span>";
+        : "<span style='font-size:16px;font-weight:900;color:#0E0E0C'>QUANTUN Digital</span>";
 
     $whatsappBtn = '';
     if ($whatsappOrg) {
@@ -141,11 +141,11 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
 <table width='100%' cellpadding='0' cellspacing='0' style='background:#f8fafc;padding:32px 16px'>
 <tr><td align='center'>
 <table width='600' cellpadding='0' cellspacing='0' style='max-width:600px;width:100%'>
-  <tr><td style='background:#0f172a;border-radius:16px 16px 0 0;padding:24px 32px;text-align:left'>
+  <tr><td style='background:#ffffff;border-radius:16px 16px 0 0;padding:24px 32px;text-align:left;border-bottom:3px solid #C6F24E'>
     <table width='100%'><tr>
       <td style='vertical-align:middle'>{$logoTag}</td>
       <td align='right' style='vertical-align:middle;text-align:right'>
-        <div style='font-size:11px;color:#c9f31d;font-weight:700;letter-spacing:1px;margin-bottom:8px'>AVISO DE RENOVACIÓN</div>
+        <div style='font-size:11px;color:#57544D;font-weight:700;letter-spacing:1px;margin-bottom:8px'>AVISO DE RENOVACIÓN</div>
         {$whatsappBtn}
       </td>
     </tr></table>

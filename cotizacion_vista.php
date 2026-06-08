@@ -342,7 +342,7 @@ $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
             <img src="<?= $logoVistaUrl ? $logoVistaSafe : $logoFallbackSafe ?>"
                  alt="<?= sanitize($pNombreEmp) ?>"
                  onerror="this.onerror=null;this.src='<?= $logoFallbackSafe ?>'"
-                 style="height:40px;object-fit:contain;display:block;filter:brightness(0)">
+                 style="height:40px;object-fit:contain;display:block">
         </div>
         <div class="company-info">
             <div style="font-weight:800;margin-bottom:4px;color:<?= sanitize($pColPrim) ?>"><?= sanitize($pNombreEmp) ?></div>

@@ -51,7 +51,7 @@ $nombreCliente = htmlspecialchars($cliente['nombre_comercial'] ?? '', ENT_QUOTES
 $logoSrc  = getLogoEmailSrc($pdo, $logoUrl);
 $logoHtml = $logoSrc
     ? '<img src="' . $logoSrc . '" alt="QUANTUN Digital" height="38" style="display:block;height:38px;max-width:200px;object-fit:contain">'
-    : '<span style="font-size:16px;font-weight:900;color:#c9f31d">QUANTUN Digital</span>';
+    : '<span style="font-size:16px;font-weight:900;color:#0E0E0C">QUANTUN Digital</span>';
 
 // Imagen adjunta (si existe)
 $imagenHtml = '';
@@ -83,7 +83,7 @@ $htmlFinal = '<!DOCTYPE html>
 
     <!-- HEADER -->
     <tr>
-        <td style="background:#0f172a;padding:18px 32px;border-radius:12px 12px 0 0">
+        <td style="background:#ffffff;padding:18px 32px;border-radius:12px 12px 0 0;border-bottom:3px solid #C6F24E">
             <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="vertical-align:middle">
