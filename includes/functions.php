@@ -174,23 +174,31 @@ function getCfg($pdo, $clave, $default = '') {
  *   4. Base64 embebido del archivo local (fallback para localhost/desarrollo)
  */
 function getLogoEmailSrc(PDO $pdo, string $logoUrlParam = ''): string {
+    // URL es externa válida y no es una ruta heredada/rota
     $isExternal = function(string $url): bool {
         $url = trim($url);
         if (!$url) return false;
-        if (stripos($url, 'localhost') !== false) return false;
-        if (stripos($url, '127.0.0.1') !== false) return false;
-        if (stripos($url, '::1')       !== false) return false;
+        if (stripos($url, 'localhost')    !== false) return false;
+        if (stripos($url, '127.0.0.1')   !== false) return false;
+        if (stripos($url, '::1')          !== false) return false;
+        if (stripos($url, '/wp-content/') !== false) return false; // URLs de WordPress heredadas
+        if (stripos($url, '/wp-admin/')   !== false) return false;
         return filter_var($url, FILTER_VALIDATE_URL) !== false;
     };
 
     // 1. Parámetro directo
     if ($isExternal($logoUrlParam)) return trim($logoUrlParam);
 
-    // 2. Configuración en BD
+    // 2. Configuración en BD (auto-limpia URLs rotas de WordPress)
     try {
         $stmt = $pdo->prepare("SELECT valor FROM crm_configuraciones WHERE clave = 'notif_logo_url'");
         $stmt->execute();
         $dbUrl = (string)($stmt->fetchColumn() ?: '');
+        if (stripos($dbUrl, '/wp-content/') !== false || stripos($dbUrl, '/wp-admin/') !== false) {
+            // Limpiar URL obsoleta de WordPress
+            $pdo->prepare("UPDATE crm_configuraciones SET valor = '' WHERE clave = 'notif_logo_url'")->execute();
+            $dbUrl = '';
+        }
         if ($isExternal($dbUrl)) return trim($dbUrl);
     } catch (PDOException $e) {}
 

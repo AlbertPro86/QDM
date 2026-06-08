@@ -61,6 +61,10 @@ $pTelEmp    = $plantilla['empresa_tel']    ?? crmConfig('empresa_tel',    '333 2
 $pDirEmp    = $plantilla['empresa_dir']    ?? '';
 $pNitEmp    = $plantilla['empresa_nit']    ?? '';
 $pLogoUrl   = $plantilla['logo_url']       ?? '';
+// Descartar URLs heredadas de WordPress que ya no existen
+if (stripos($pLogoUrl, '/wp-content/') !== false || stripos($pLogoUrl, '/wp-admin/') !== false) {
+    $pLogoUrl = '';
+}
 $pNotasPie  = $plantilla['notas_pie']      ?? '';
 $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
 ?>
@@ -330,13 +334,15 @@ $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
     <div style="height:4px;background:linear-gradient(90deg,<?= sanitize($pColPrim) ?> 0%,<?= sanitize($pColSec) ?> 100%);margin:-40px -40px 32px;border-radius:10px 10px 0 0"></div>
     <div class="header">
         <div class="logo">
-            <?php if ($pLogoUrl): ?>
-                <img src="<?= sanitize($pLogoUrl) ?>" alt="<?= sanitize($pNombreEmp) ?>"
-                     style="height:40px;object-fit:contain;display:block;filter:brightness(0)">
-            <?php else: ?>
-                <img src="Assets/logo_quantun_digital_negro.png" alt="QUANTUN Digital"
-                     style="height:36px;object-fit:contain;display:block;filter:brightness(0)">
-            <?php endif; ?>
+            <?php
+                $logoVistaUrl = $pLogoUrl ?: getSiteLogoUrl();
+                $logoVistaSafe = sanitize($logoVistaUrl);
+                $logoFallbackSafe = sanitize(getSiteLogoUrl());
+            ?>
+            <img src="<?= $logoVistaUrl ? $logoVistaSafe : $logoFallbackSafe ?>"
+                 alt="<?= sanitize($pNombreEmp) ?>"
+                 onerror="this.onerror=null;this.src='<?= $logoFallbackSafe ?>'"
+                 style="height:40px;object-fit:contain;display:block;filter:brightness(0)">
         </div>
         <div class="company-info">
             <div style="font-weight:800;margin-bottom:4px;color:<?= sanitize($pColPrim) ?>"><?= sanitize($pNombreEmp) ?></div>
