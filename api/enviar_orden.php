@@ -342,20 +342,20 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 <tr><td>
 
 <!-- Encabezado -->
-<table class="hdr-tbl" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:' . $cpri . '">
-<tr><td colspan="2" style="background:' . $csec . ';height:5px;font-size:0;line-height:0">&nbsp;</td></tr>
+<table class="hdr-tbl" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff">
+<tr><td colspan="2" style="background:' . $csec . ';height:4px;font-size:0;line-height:0">&nbsp;</td></tr>
 <tr>
-<td class="hdr-logo" style="padding:22px 28px;width:55%;vertical-align:bottom">
+<td class="hdr-logo" style="padding:22px 28px;width:55%;vertical-align:middle">
 ' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" style="display:block;max-width:140px;max-height:46px;height:auto;border:0">' : '') . '
-<div class="hdr-meta" style="margin-top:10px;font-size:10px;color:#94a3b8;line-height:1.8">
+<div class="hdr-meta" style="margin-top:10px;font-size:10px;color:#57544D;line-height:1.8">
 ' . (isset($template['empresa_nit']) && $template['empresa_nit'] ? 'NIT: ' . htmlspecialchars($template['empresa_nit']) . ' &nbsp;&middot;&nbsp; ' : '') . htmlspecialchars($template['empresa_email'] ?? '') . '<br>
 ' . htmlspecialchars($template['empresa_tel'] ?? '') . ' &nbsp;&middot;&nbsp; ' . htmlspecialchars($template['empresa_dir'] ?? '') . '
 </div>
 </td>
-<td class="hdr-info" style="padding:22px 28px;width:45%;vertical-align:bottom;text-align:right">
-<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:' . $csec . '">' . htmlspecialchars($docTipoLabel) . '</div>
-<div style="font-size:22px;font-weight:900;color:#ffffff;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
-<div style="font-size:11px;color:#94a3b8;margin-top:4px">' . $fechaEmision . '</div>
+<td class="hdr-info" style="padding:22px 28px;width:45%;vertical-align:middle;text-align:right">
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#57544D;margin-bottom:4px">' . htmlspecialchars($docTipoLabel) . '</div>
+<div style="font-size:22px;font-weight:900;color:#0E0E0C;margin-top:4px">' . htmlspecialchars($orderNumber) . '</div>
+<div style="font-size:11px;color:#8A867C;margin-top:4px">' . $fechaEmision . '</div>
 </td>
 </tr>
 </table>
