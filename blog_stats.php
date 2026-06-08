@@ -91,8 +91,6 @@ include __DIR__ . '/includes/header.php';
         </button>
         <!-- Miga de pan -->
         <nav style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--color-text-muted);flex-wrap:wrap">
-            <a href="dashboard.php" style="color:var(--color-text-muted);text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--color-text)'" onmouseleave="this.style.color='var(--color-text-muted)'">Dashboard</a>
-            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="opacity:.4;flex-shrink:0"><path d="M9 5l7 7-7 7"/></svg>
             <span id="bcStats" style="cursor:default;transition:color .15s">Blog · Estadísticas</span>
             <span id="bcSep" style="display:none;align-items:center">
                 <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="opacity:.4;margin:0 2px"><path d="M9 5l7 7-7 7"/></svg>
