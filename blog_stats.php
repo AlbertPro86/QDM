@@ -49,6 +49,38 @@ include __DIR__ . '/includes/header.php';
 .mini-bar-col small{font-size:8px;color:var(--color-text-muted);white-space:nowrap}
 @media(max-width:900px){.blog-stat-grid{grid-template-columns:repeat(2,1fr)}#chartFuentesGrid{grid-template-columns:1fr}}
 @media(max-width:560px){.blog-stat-grid{grid-template-columns:1fr 1fr}}
+
+/* ── Modal detalle visitas ── */
+.vmodal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
+.vmodal{width:100%;max-width:900px;background:var(--color-surface);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:vmodalpop .22s ease}
+@keyframes vmodalpop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.vmodal__head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--color-border)}
+.vmodal__head h3{font-size:14px;font-weight:700;margin:0;color:var(--color-text)}
+.vmodal__head-sub{font-size:12px;color:var(--color-text-muted);margin-top:2px}
+.vmodal__close{background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--color-text-muted);line-height:0;transition:background .15s}
+.vmodal__close:hover{background:var(--color-bg-hover,rgba(0,0,0,.06))}
+.vmodal__body{padding:0}
+.vdetail-table{width:100%;border-collapse:collapse}
+.vdetail-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+.vdetail-table td{padding:11px 14px;border-bottom:1px solid var(--color-border);font-size:12px;color:var(--color-text);vertical-align:middle}
+.vdetail-table tr:last-child td{border-bottom:none}
+.vdetail-table tr:hover td{background:var(--color-bg-hover,rgba(0,0,0,.02))}
+.vd-time{font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap}
+.vd-ip{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--color-text-muted)}
+.vd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.vd-badge--mobile{background:rgba(99,102,241,.1);color:#4338ca}
+.vd-badge--desktop{background:rgba(34,197,94,.1);color:#15803d}
+.vd-badge--tablet{background:rgba(245,158,11,.1);color:#b45309}
+.vd-src{font-size:11px;color:var(--color-text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vmodal__pager{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--color-border);font-size:12px;color:var(--color-text-muted)}
+.vmodal__pager-btns{display:flex;gap:6px}
+.vmodal__pager-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);font-size:12px;cursor:pointer;color:var(--color-text);transition:background .15s}
+.vmodal__pager-btn:hover:not(:disabled){background:var(--color-bg-hover,rgba(0,0,0,.05))}
+.vmodal__pager-btn:disabled{opacity:.4;cursor:default}
+.art-table tr[data-slug]{cursor:pointer}
+.art-table tr[data-slug]:hover td{background:var(--color-bg-hover,rgba(0,0,0,.025))}
+.art-ver-btn{font-size:11px;font-weight:600;padding:4px 10px;border-radius:7px;border:1px solid var(--color-border);background:transparent;color:var(--color-text-muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.art-ver-btn:hover{background:var(--color-text);color:var(--color-surface,#fff);border-color:var(--color-text)}
 </style>
 
 <div class="page-header">
@@ -143,6 +175,31 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Modal detalle visitas -->
+<div id="vmodal" style="display:none" class="vmodal-overlay" onclick="if(event.target===this)cerrarDetalle()">
+    <div class="vmodal">
+        <div class="vmodal__head">
+            <div>
+                <h3 id="vmodalTitle">Visitas</h3>
+                <div class="vmodal__head-sub" id="vmodalSub"></div>
+            </div>
+            <button class="vmodal__close" onclick="cerrarDetalle()" aria-label="Cerrar">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="vmodal__body" id="vmodalBody">
+            <div style="padding:40px;text-align:center;color:var(--color-text-muted)">Cargando…</div>
+        </div>
+        <div class="vmodal__pager" id="vmodalPager" style="display:none">
+            <span id="vmodalPagerInfo"></span>
+            <div class="vmodal__pager-btns">
+                <button class="vmodal__pager-btn" id="vmodalPrev" onclick="cambiarPagina(-1)">← Anterior</button>
+                <button class="vmodal__pager-btn" id="vmodalNext" onclick="cambiarPagina(1)">Siguiente →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 const API = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '/crm') + '/api/blog_visitas.php';
 
@@ -182,6 +239,45 @@ function renderChart(diario){
     }).join('');
 }
 
+function fmtDt(ts){
+    if (!ts) return '—';
+    return new Date(ts.replace(' ','T') + '-05:00').toLocaleString('es-CO',{
+        day:'2-digit', month:'short', year:'numeric',
+        hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+}
+
+function parseFuente(ref){
+    if (!ref) return 'Directo';
+    if (/facebook\.com/i.test(ref))  return 'Facebook';
+    if (/instagram\.com/i.test(ref)) return 'Instagram';
+    if (/t\.co|twitter\.com|x\.com/i.test(ref)) return 'X / Twitter';
+    if (/linkedin\.com/i.test(ref))  return 'LinkedIn';
+    if (/whatsapp\.com|wa\.me/i.test(ref)) return 'WhatsApp';
+    if (/google\./i.test(ref))       return 'Google';
+    if (/bing\.com/i.test(ref))      return 'Bing';
+    if (/youtube\.com/i.test(ref))   return 'YouTube';
+    if (/tiktok\.com/i.test(ref))    return 'TikTok';
+    if (/quantundigital\.com/i.test(ref)) return 'Sitio propio';
+    try { return new URL(ref).hostname.replace('www.',''); } catch(e){ return ref.slice(0,30); }
+}
+
+function parseDevice(ua){
+    if (!ua) return { label:'Desconocido', cls:'' };
+    if (/iPad|Tablet/i.test(ua))              return { label:'Tablet', cls:'vd-badge--tablet' };
+    if (/Mobile|Android|iPhone|iPod|IEMobile|Opera Mini/i.test(ua)) return { label:'Móvil', cls:'vd-badge--mobile' };
+    return { label:'Escritorio', cls:'vd-badge--desktop' };
+}
+
+function parseBrowser(ua){
+    if (!ua) return '';
+    if (/Edg\//i.test(ua))    return ' · Edge';
+    if (/Chrome/i.test(ua))   return ' · Chrome';
+    if (/Firefox/i.test(ua))  return ' · Firefox';
+    if (/Safari/i.test(ua))   return ' · Safari';
+    return '';
+}
+
 function renderTable(articulos){
     const wrap = document.getElementById('artTableWrap');
     document.getElementById('artCount').textContent = articulos.length + ' artículo' + (articulos.length !== 1 ? 's' : '');
@@ -193,17 +289,21 @@ function renderTable(articulos){
     const maxTotal = Math.max(1, ...articulos.map(function(a){ return parseInt(a.total); }));
 
     wrap.innerHTML = '<table class="art-table"><thead><tr>'
-        + '<th>Artículo</th><th style="width:90px;text-align:right">Total</th>'
-        + '<th style="width:90px;text-align:right">Únicos</th>'
-        + '<th style="width:90px;text-align:right">7 días</th>'
-        + '<th style="width:90px;text-align:right">30 días</th>'
-        + '<th style="width:140px">Última visita</th>'
+        + '<th>Artículo</th>'
+        + '<th style="width:80px;text-align:right">Total</th>'
+        + '<th style="width:80px;text-align:right">Únicos</th>'
+        + '<th style="width:80px;text-align:right">7 días</th>'
+        + '<th style="width:80px;text-align:right">30 días</th>'
+        + '<th style="width:130px">Última visita</th>'
+        + '<th style="width:80px"></th>'
         + '</tr></thead><tbody>'
-        + articulos.map(function(a, i){
+        + articulos.map(function(a){
             var titulo = a.titulo || TITULOS[a.slug] || a.slug;
-            var pct = Math.round((parseInt(a.total) / maxTotal) * 100);
-            var fecha = a.ultima_visita ? new Date(a.ultima_visita).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-            return '<tr>'
+            var pct    = Math.round((parseInt(a.total) / maxTotal) * 100);
+            var fecha  = fmtDt(a.ultima_visita);
+            var slug   = a.slug.replace(/'/g,"\\'");
+            var tit    = titulo.replace(/'/g,"\\'");
+            return '<tr data-slug="' + a.slug + '" onclick="verDetalle(\'' + slug + '\',\'' + tit + '\',' + a.total + ')">'
                 + '<td><div class="art-title">' + titulo + '</div>'
                 + '<div class="art-slug">' + a.slug + '</div>'
                 + '<div class="art-bar"><span style="width:' + pct + '%"></span></div></td>'
@@ -213,10 +313,102 @@ function renderTable(articulos){
                 + (parseInt(a.ultimos_7d) > 0 ? '<span class="art-badge art-badge--up">+' + fmt(a.ultimos_7d) + '</span>' : '<span style="color:var(--color-text-muted)">0</span>')
                 + '</td>'
                 + '<td style="text-align:right;color:var(--color-text-muted)">' + fmt(a.ultimos_30d) + '</td>'
-                + '<td style="font-size:12px;color:var(--color-text-muted)">' + fecha + '</td>'
+                + '<td style="font-size:11px;color:var(--color-text-muted)">' + fecha + '</td>'
+                + '<td><button class="art-ver-btn" onclick="event.stopPropagation();verDetalle(\'' + slug + '\',\'' + tit + '\',' + a.total + ')">Ver visitas</button></td>'
                 + '</tr>';
         }).join('')
         + '</tbody></table>';
+}
+
+/* ── Modal de detalle ── */
+var _dSlug = '', _dTitulo = '', _dPage = 1, _dPages = 1, _dTotal = 0;
+
+async function verDetalle(slug, titulo, total){
+    _dSlug   = slug;
+    _dTitulo = titulo;
+    _dTotal  = total;
+    _dPage   = 1;
+    document.getElementById('vmodalTitle').textContent = titulo;
+    document.getElementById('vmodalSub').textContent   = fmt(total) + ' visita' + (total !== 1 ? 's' : '') + ' · ' + slug;
+    document.getElementById('vmodalBody').innerHTML    = '<div style="padding:40px;text-align:center;color:var(--color-text-muted)">Cargando…</div>';
+    document.getElementById('vmodalPager').style.display = 'none';
+    document.getElementById('vmodal').style.display   = 'flex';
+    document.body.style.overflow = 'hidden';
+    await cargarDetalle();
+}
+
+function cerrarDetalle(){
+    document.getElementById('vmodal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+async function cambiarPagina(dir){
+    var np = _dPage + dir;
+    if (np < 1 || np > _dPages) return;
+    _dPage = np;
+    document.getElementById('vmodalBody').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-muted)">Cargando…</div>';
+    document.getElementById('vmodal').querySelector('.vmodal').scrollTop = 0;
+    await cargarDetalle();
+}
+
+async function cargarDetalle(){
+    try {
+        var url = API + '?action=detalle&slug=' + encodeURIComponent(_dSlug) + '&page=' + _dPage;
+        var r = await fetch(url, { credentials: 'include' });
+        var d = await r.json();
+        if (!d.success) throw new Error(d.error || 'Error');
+
+        _dPages = d.pages || 1;
+        var visitas = d.visitas || [];
+        var body = document.getElementById('vmodalBody');
+        var pager = document.getElementById('vmodalPager');
+
+        if (!visitas.length) {
+            body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-muted)">Sin visitas registradas.</div>';
+            pager.style.display = 'none';
+            return;
+        }
+
+        body.innerHTML = '<div style="overflow-x:auto"><table class="vdetail-table"><thead><tr>'
+            + '<th style="width:28px;text-align:right">#</th>'
+            + '<th>Fecha y hora</th>'
+            + '<th>IP</th>'
+            + '<th>Dispositivo</th>'
+            + '<th>Fuente</th>'
+            + '<th>Referencia completa</th>'
+            + '</tr></thead><tbody>'
+            + visitas.map(function(v, i){
+                var num    = (_dPage - 1) * 50 + i + 1;
+                var dt     = fmtDt(v.created_at);
+                var ip     = v.ip_address || '—';
+                var dev    = parseDevice(v.user_agent);
+                var brow   = parseBrowser(v.user_agent);
+                var fuente = parseFuente(v.referer);
+                var refFull = v.referer
+                    ? '<span class="vd-src" title="' + v.referer.replace(/"/g,'&quot;') + '">' + v.referer + '</span>'
+                    : '<span style="color:var(--color-text-muted);font-style:italic">Sin referencia</span>';
+                return '<tr>'
+                    + '<td style="text-align:right;color:var(--color-text-muted);font-size:11px">' + num + '</td>'
+                    + '<td><span class="vd-time">' + dt + '</span></td>'
+                    + '<td><span class="vd-ip">' + ip + '</span></td>'
+                    + '<td><span class="vd-badge ' + dev.cls + '">' + dev.label + brow + '</span></td>'
+                    + '<td><span style="font-size:11px;font-weight:600">' + fuente + '</span></td>'
+                    + '<td>' + refFull + '</td>'
+                    + '</tr>';
+            }).join('')
+            + '</tbody></table></div>';
+
+        /* paginador */
+        var start = (_dPage - 1) * 50 + 1;
+        var end   = Math.min(_dPage * 50, d.total);
+        document.getElementById('vmodalPagerInfo').textContent = start + '–' + end + ' de ' + fmt(d.total) + ' visitas · Pág. ' + _dPage + ' / ' + _dPages;
+        document.getElementById('vmodalPrev').disabled = _dPage <= 1;
+        document.getElementById('vmodalNext').disabled = _dPage >= _dPages;
+        pager.style.display = d.total > 50 ? 'flex' : 'none';
+
+    } catch(e){
+        document.getElementById('vmodalBody').innerHTML = '<div style="padding:30px;text-align:center;color:var(--color-danger,#ef4444)">Error: ' + e.message + '</div>';
+    }
 }
 
 const FUENTE_ICONS = {
@@ -304,6 +496,8 @@ async function actualizarLive(){
 
 actualizarLive();
 setInterval(actualizarLive, 30000); // cada 30s
+
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') cerrarDetalle(); });
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

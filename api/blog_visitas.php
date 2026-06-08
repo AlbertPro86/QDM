@@ -84,6 +84,34 @@ if ($method === 'POST' && $action === 'ping') {
     jsonResponse(['success' => true]);
 }
 
+// ── GET detalle (autenticado) — visitas individuales de un slug ───────────
+if ($method === 'GET' && $action === 'detalle') {
+    if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
+    $slug  = trim($_GET['slug'] ?? '');
+    $page  = max(1, (int)($_GET['page'] ?? 1));
+    $limit = 50;
+    $off   = ($page - 1) * $limit;
+    if (!$slug) jsonResponse(['error' => 'slug requerido'], 400);
+
+    $stC = $pdo->prepare("SELECT COUNT(*) FROM blog_visitas WHERE slug = ?");
+    $stC->execute([$slug]);
+    $total = (int)$stC->fetchColumn();
+
+    $stV = $pdo->prepare("SELECT id, created_at, ip_address, user_agent, referer
+                           FROM blog_visitas WHERE slug = ?
+                           ORDER BY id DESC LIMIT ? OFFSET ?");
+    $stV->execute([$slug, $limit, $off]);
+    $visitas = $stV->fetchAll();
+
+    jsonResponse([
+        'success' => true,
+        'visitas' => $visitas,
+        'total'   => $total,
+        'page'    => $page,
+        'pages'   => (int)ceil($total / $limit),
+    ]);
+}
+
 switch ($method) {
 
     /* ── POST: público — registra visita ─────────────────────────── */
