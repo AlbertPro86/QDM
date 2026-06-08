@@ -90,20 +90,24 @@ $nRenovProx   = 0;
 $nLeadsNuevos = 0;
 
 try {
-    $nTareas = (int)$pdo->query("SELECT COUNT(*) FROM tareas WHERE estado IN ('pendiente','en_progreso')")->fetchColumn();
-} catch (Exception $e) {}
+    $nTareas = (int)$pdo->query("SELECT COUNT(*) FROM tareas WHERE estado IN ('pendiente','en_progreso','revision')")->fetchColumn();
+} catch (Exception $e) { $log('ERROR tareas: ' . $e->getMessage()); }
 
 try {
-    $hoy       = date('Y-m-d');
-    $finMes    = date('Y-m-t');
-    $inicioProx= date('Y-m-01', strtotime('+1 month'));
-    $finProx   = date('Y-m-t',  strtotime('+1 month'));
-    $st = $pdo->prepare("SELECT COUNT(*) FROM servicios WHERE fecha_renovacion BETWEEN ? AND ?");
-    $st->execute([$hoy, $finMes]);
+    $hoy        = date('Y-m-d');
+    $inicioMes  = date('Y-m-01');
+    $finMes     = date('Y-m-t');
+    $inicioProx = date('Y-m-01', strtotime('+1 month'));
+    $finProx    = date('Y-m-t',  strtotime('+1 month'));
+
+    $st = $pdo->prepare("SELECT COUNT(*) FROM cliente_servicios
+                          WHERE estado = 'activo' AND fecha_vencimiento BETWEEN ? AND ?");
+    $st->execute([$inicioMes, $finMes]);
     $nRenovActual = (int)$st->fetchColumn();
+
     $st->execute([$inicioProx, $finProx]);
     $nRenovProx = (int)$st->fetchColumn();
-} catch (Exception $e) {}
+} catch (Exception $e) { $log('ERROR renovaciones: ' . $e->getMessage()); }
 
 try {
     $hoy7 = date('Y-m-d', strtotime('-7 days'));

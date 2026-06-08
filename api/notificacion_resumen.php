@@ -42,20 +42,24 @@ $nRenovacionesActual = 0;
 $nRenovacionesProx   = 0;
 
 try {
-    $st = $pdo->query("SELECT COUNT(*) FROM tareas WHERE estado IN ('pendiente','en_progreso')");
+    $st = $pdo->query("SELECT COUNT(*) FROM tareas WHERE estado IN ('pendiente','en_progreso','revision')");
     $nTareas = (int)$st->fetchColumn();
 } catch (Exception $e) {}
 
 try {
-    $hoy       = date('Y-m-d');
-    $finMes    = date('Y-m-t');
-    $inicioProx= date('Y-m-01', strtotime('+1 month'));
-    $finProx   = date('Y-m-t',  strtotime('+1 month'));
+    $hoy        = date('Y-m-d');
+    $inicioMes  = date('Y-m-01');           // 1ro del mes actual
+    $finMes     = date('Y-m-t');            // último día del mes actual
+    $inicioProx = date('Y-m-01', strtotime('+1 month'));
+    $finProx    = date('Y-m-t',  strtotime('+1 month'));
 
-    $st = $pdo->prepare("SELECT COUNT(*) FROM servicios WHERE fecha_renovacion BETWEEN ? AND ?");
-    $st->execute([$hoy, $finMes]);
+    // Renovaciones del mes actual (todos los servicios activos que vencen este mes)
+    $st = $pdo->prepare("SELECT COUNT(*) FROM cliente_servicios
+                          WHERE estado = 'activo' AND fecha_vencimiento BETWEEN ? AND ?");
+    $st->execute([$inicioMes, $finMes]);
     $nRenovacionesActual = (int)$st->fetchColumn();
 
+    // Renovaciones del próximo mes
     $st->execute([$inicioProx, $finProx]);
     $nRenovacionesProx = (int)$st->fetchColumn();
 } catch (Exception $e) {}
