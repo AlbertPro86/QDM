@@ -636,6 +636,7 @@ include __DIR__ . '/includes/header.php';
         'Entiendo perfectamente tu necesidad. Déjame consultar esa información para ti.',
         'Para brindarte una atención más personalizada, ¿podrías compartirme tu número de WhatsApp?',
         'Tenemos planes y servicios que se ajustan muy bien a lo que buscas. ¿Te gustaría recibir una cotización?',
+        '¿Eres cliente de QUANTUN Digital? Con gusto revisamos tu cuenta y te damos seguimiento personalizado.',
         '¿Tienes alguna pregunta adicional antes de finalizar? Estoy aquí para ayudarte.',
         'Voy a hacer un seguimiento por correo. ¡Que tengas un excelente día!',
     ];
