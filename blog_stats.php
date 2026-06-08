@@ -81,9 +81,28 @@ include __DIR__ . '/includes/header.php';
 </style>
 
 <!-- ══ BARRA DE ACCIONES ══ -->
-<div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:20px">
-    <!-- Botones vista stats -->
-    <div id="phStats" style="display:flex;gap:8px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px">
+
+    <!-- Izquierda: retroceder + miga de pan -->
+    <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <!-- Icono retroceder (solo visible en detalle) -->
+        <button id="btnBack" onclick="cerrarDetalle()" title="Volver" style="display:none;width:30px;height:30px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);cursor:pointer;display:none;align-items:center;justify-content:center;flex-shrink:0;color:var(--color-text);transition:background .15s" onmouseenter="this.style.background='var(--color-bg-hover)'" onmouseleave="this.style.background='var(--color-surface)'">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <!-- Miga de pan -->
+        <nav style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--color-text-muted);flex-wrap:wrap">
+            <a href="dashboard.php" style="color:var(--color-text-muted);text-decoration:none;transition:color .15s" onmouseenter="this.style.color='var(--color-text)'" onmouseleave="this.style.color='var(--color-text-muted)'">Dashboard</a>
+            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="opacity:.4;flex-shrink:0"><path d="M9 5l7 7-7 7"/></svg>
+            <span id="bcStats" style="cursor:default;transition:color .15s">Blog · Estadísticas</span>
+            <span id="bcSep" style="display:none;align-items:center">
+                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="opacity:.4;margin:0 2px"><path d="M9 5l7 7-7 7"/></svg>
+            </span>
+            <span id="bcArticulo" style="display:none;font-weight:700;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px"></span>
+        </nav>
+    </div>
+
+    <!-- Derecha: botones de acción -->
+    <div style="display:flex;gap:8px;flex-shrink:0">
         <button class="btn btn-secondary btn-sm" id="btnRefresh" onclick="cargarStats()">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -97,15 +116,7 @@ include __DIR__ . '/includes/header.php';
             Ver blog
         </a>
     </div>
-    <!-- Botón vista detalle -->
-    <div id="phDetalle" style="display:none">
-        <button class="btn btn-secondary btn-sm" onclick="cerrarDetalle()">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-            </svg>
-            Volver a estadísticas
-        </button>
-    </div>
+
 </div>
 
 <!-- ══ VISTA ESTADÍSTICAS ══ -->
@@ -420,28 +431,49 @@ function verDetalle(slug, titulo, total){
     document.getElementById('dvPager').style.display = 'none';
     document.getElementById('dvPagerInfo').textContent = '';
 
-    // Miga de pan: Dashboard › Blog · Estadísticas › Título del artículo
-    setBreadcrumb(
-        _breadcrumbBase +
-        SEP +
-        '<span style="font-weight:700;color:var(--color-text)">' + titulo + '</span>'
-    );
+    // Miga de pan inline
+    var bcStats = document.getElementById('bcStats');
+    bcStats.style.cursor = 'pointer';
+    bcStats.style.color  = 'var(--color-text-muted)';
+    bcStats.onclick = cerrarDetalle;
+    bcStats.onmouseenter = function(){ this.style.color='var(--color-text)'; };
+    bcStats.onmouseleave = function(){ this.style.color='var(--color-text-muted)'; };
+    document.getElementById('bcSep').style.display      = 'inline-flex';
+    document.getElementById('bcArticulo').style.display = 'inline';
+    document.getElementById('bcArticulo').textContent   = titulo;
+
+    // Miga de pan topbar
+    setBreadcrumb(_breadcrumbBase + SEP + '<span style="font-weight:700;color:var(--color-text)">' + titulo + '</span>');
+
+    // Icono retroceder
+    var btn = document.getElementById('btnBack');
+    btn.style.display = 'inline-flex';
 
     document.getElementById('statsView').style.display   = 'none';
     document.getElementById('detalleView').style.display = 'block';
-    document.getElementById('phStats').style.display     = 'none';
-    document.getElementById('phDetalle').style.display   = 'flex';
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
     cargarDetalle();
 }
 
 function cerrarDetalle(){
+    // Restaurar miga inline
+    var bcStats = document.getElementById('bcStats');
+    bcStats.style.cursor = 'default';
+    bcStats.style.color  = '';
+    bcStats.onclick = null;
+    bcStats.onmouseenter = null;
+    bcStats.onmouseleave = null;
+    document.getElementById('bcSep').style.display      = 'none';
+    document.getElementById('bcArticulo').style.display = 'none';
+
+    // Restaurar miga topbar
+    setBreadcrumb(_breadcrumbBase);
+
+    // Ocultar icono retroceder
+    document.getElementById('btnBack').style.display = 'none';
+
     document.getElementById('detalleView').style.display = 'none';
     document.getElementById('statsView').style.display   = 'block';
-    document.getElementById('phDetalle').style.display   = 'none';
-    document.getElementById('phStats').style.display     = 'flex';
-    setBreadcrumb(_breadcrumbBase);   // restaurar miga original
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
