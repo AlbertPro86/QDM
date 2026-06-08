@@ -96,14 +96,24 @@ include __DIR__ . '/includes/header.php';
                     <div style="margin-bottom:8px;padding:10px 12px;background:#EFECE5;border:1px solid #E8E5DD;border-radius:6px;display:flex;align-items:center;gap:10px">
                         <img id="notifLogoImg" src="<?= htmlspecialchars($defaultLogoUrl) ?>" alt="Logo QUANTUN"
                             style="height:34px;max-width:160px;object-fit:contain"
-                            onload="document.getElementById('notifLogoStatus').textContent='✓';document.getElementById('notifLogoStatus').style.color='#4ade80'"
-                            onerror="document.getElementById('notifLogoStatus').textContent='✗ No cargó';document.getElementById('notifLogoStatus').style.color='#f87171'">
+                            onload="document.getElementById('notifLogoStatus').textContent='✓ Logo cargado';document.getElementById('notifLogoStatus').style.color='#4ade80'"
+                            onerror="logoFallback(this)">
                         <span id="notifLogoStatus" style="font-size:10px;color:#8A867C"></span>
                     </div>
-                    <input id="notif_logo_url" class="form-input" type="text"
-                        placeholder="<?= htmlspecialchars($defaultLogoUrl) ?>"
-                        oninput="previewLogoNotif()"
-                        style="padding:6px 10px;font-size:12px">
+                    <!-- Campo URL + botón reset -->
+                    <div style="display:flex;gap:6px;align-items:center">
+                        <input id="notif_logo_url" class="form-input" type="text"
+                            placeholder="<?= htmlspecialchars($defaultLogoUrl) ?>"
+                            oninput="previewLogoNotif()"
+                            style="padding:6px 10px;font-size:12px;flex:1">
+                        <button type="button" title="Usar logo del sitio web"
+                            onclick="usarLogoSitio()"
+                            style="padding:6px 10px;border-radius:6px;border:1px solid #E8E5DD;background:#FAFAF7;font-size:11px;font-weight:600;color:#57544D;cursor:pointer;white-space:nowrap;transition:all .15s"
+                            onmouseenter="this.style.background='#0E0E0C';this.style.color='#fff'"
+                            onmouseleave="this.style.background='#FAFAF7';this.style.color='#57544D'">
+                            Usar logo del sitio
+                        </button>
+                    </div>
                     <p style="margin:3px 0 0;font-size:10px;color:#8A867C">Si está vacío se usa el logo del sitio web (por defecto)</p>
                 </div>
 
@@ -399,6 +409,20 @@ async function guardarConfig() {
 
 // ── Preview logo ─────────────────────────────────────────────────────────────
 const DEFAULT_LOGO_URL = <?= json_encode($defaultLogoUrl) ?>;
+
+function logoFallback(img) {
+    var status = document.getElementById('notifLogoStatus');
+    if (img.src !== DEFAULT_LOGO_URL) {
+        // La URL personalizada falló → intentar con el logo del sitio
+        status.textContent = 'URL inválida, usando logo del sitio';
+        status.style.color = '#f59e0b';
+        img.src = DEFAULT_LOGO_URL;
+    } else {
+        status.textContent = '✗ Logo no disponible';
+        status.style.color = '#f87171';
+    }
+}
+
 function previewLogoNotif() {
     const url    = document.getElementById('notif_logo_url').value.trim();
     const img    = document.getElementById('notifLogoImg');
@@ -406,6 +430,11 @@ function previewLogoNotif() {
     status.textContent = 'Cargando…';
     status.style.color = '#8A867C';
     img.src = url || DEFAULT_LOGO_URL;
+}
+
+function usarLogoSitio() {
+    document.getElementById('notif_logo_url').value = DEFAULT_LOGO_URL;
+    previewLogoNotif();
 }
 
 // ── Guardar datos de empresa ──────────────────────────────────────────────────
