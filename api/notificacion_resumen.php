@@ -61,11 +61,14 @@ try {
 } catch (Exception $e) {}
 
 // ── Construir HTML del correo ─────────────────────────────────────────────
-$fecha   = date('d/m/Y');
-$hora    = date('H:i');
-$logoTag = $logoUrl
-    ? '<img src="' . htmlspecialchars($logoUrl) . '" alt="QUANTUN Digital" height="36" style="display:block;filter:brightness(0)">'
-    : '<span style="font-size:18px;font-weight:900;color:#0E0E0C">QUANTUN Digital</span>';
+$fecha    = date('d/m/Y');
+$hora     = date('H:i');
+// Resolver logo: usa getLogoEmailSrc para filtrar URLs de WP y derivar la URL del sitio
+$logoSrc  = getLogoEmailSrc($pdo, $logoUrl);
+// Fondo del header es oscuro (#0E0E0C) → invert(1) para mostrar logo blanco
+$logoTag  = $logoSrc
+    ? '<img src="' . htmlspecialchars($logoSrc) . '" alt="QUANTUN Digital" height="36" style="display:block;filter:invert(1)">'
+    : '<span style="font-size:18px;font-weight:900;color:#ffffff;letter-spacing:-0.5px">QUANTUN Digital</span>';
 
 $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#ECEAE3;font-family:Segoe UI,Arial,sans-serif">
@@ -124,7 +127,15 @@ if ($result['ok']) {
         'renovaciones_mes_actual'=> $nRenovacionesActual,
         'renovaciones_prox_mes'  => $nRenovacionesProx,
         'enviado_a'              => $emailDest,
+        'smtp_host'              => env('MAIL_HOST', ''),
+        'nota'                   => 'Revisa también la carpeta de Spam si no ves el correo.',
     ]);
 } else {
-    jsonResponse(['error' => 'Error al enviar: ' . $result['error']], 500);
+    $smtpInfo = env('MAIL_HOST','?') . ':' . env('MAIL_PORT','?') . ' (' . env('MAIL_ENCRYPTION','?') . ')';
+    jsonResponse([
+        'error'     => $result['error'],
+        'smtp_info' => $smtpInfo,
+        'enviado_a' => $emailDest,
+        'ayuda'     => 'Verifica las credenciales SMTP en Configuraciones → Correo.',
+    ], 500);
 }

@@ -141,6 +141,16 @@ include __DIR__ . '/includes/header.php';
 
         </div>
 
+        <!-- Cron info -->
+        <div style="margin:0 14px 12px;padding:10px 14px;background:#F5F5F2;border-radius:6px;font-size:11px;color:#57544D;line-height:1.6">
+            <div style="font-weight:700;color:#0E0E0C;margin-bottom:4px">Cron en Hostinger (resumen automático diario)</div>
+            <div style="margin-bottom:4px">En hPanel → Cron Jobs, agrega este comando:</div>
+            <code style="display:block;background:#fff;border:1px solid #E8E5DD;border-radius:4px;padding:6px 10px;font-size:10.5px;word-break:break-all;color:#0E0E0C">
+                php /home/u260705801/domains/quantundigital.com/public_html/crm/cron/resumen_diario.php
+            </code>
+            <div style="margin-top:6px">Frecuencia sugerida: <strong>0 8 * * 1-5</strong> (lun–vie a las 8:00 AM)</div>
+        </div>
+
         <div style="padding:12px 14px;border-top:1px solid #EFECE5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
             <button onclick="enviarPrueba()" id="btnPrueba"
                 style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#FAFAF7;color:#57544D;border:1.5px solid #E8E5DD;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
@@ -501,8 +511,13 @@ async function enviarPrueba() {
     try {
         const r = await fetch('api/notificacion_resumen.php', { credentials: 'include' });
         const d = await r.json();
-        if (d.success) showToast(`✓ Prueba enviada · ${d.tareas} tareas · ${(d.renovaciones_mes_actual||0)+(d.renovaciones_prox_mes||0)} renovaciones`, 'success');
-        else showToast(d.error || 'Error al enviar', 'error');
+        if (d.success) {
+            const dest = d.enviado_a ? ` → ${d.enviado_a}` : '';
+            showToast(`✓ Correo enviado${dest}. Si no lo ves, revisa Spam.`, 'success', 8000);
+        } else {
+            const smtp = d.smtp_info ? ` [SMTP: ${d.smtp_info}]` : '';
+            showToast((d.error || 'Error al enviar') + smtp, 'error', 10000);
+        }
     } catch(e) {
         showToast('Error de conexión', 'error');
     } finally {
