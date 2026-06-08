@@ -79,6 +79,19 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Conectados ahora -->
+<div id="liveBar" style="display:flex;align-items:center;gap:10px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px;padding:14px 20px;margin-bottom:20px">
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2);flex-shrink:0;animation:livePulse 1.8s ease-in-out infinite"></span>
+    <span style="font-size:13px;color:var(--color-text-muted)">En el sitio ahora mismo:</span>
+    <span id="liveCount" style="font-size:18px;font-weight:800;color:var(--color-text);font-family:'JetBrains Mono',monospace">—</span>
+    <span style="font-size:13px;color:var(--color-text-muted)">visitante(s) activo(s)</span>
+    <div id="livePaginas" style="margin-left:8px;display:flex;gap:6px;flex-wrap:wrap"></div>
+    <span id="liveUpdate" style="margin-left:auto;font-size:11px;color:var(--color-text-muted)"></span>
+</div>
+<style>
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.2)}50%{box-shadow:0 0 0 6px rgba(34,197,94,.05)}}
+</style>
+
 <!-- Tarjetas resumen -->
 <div class="blog-stat-grid" id="statCards">
     <div class="bstat-card">
@@ -266,6 +279,31 @@ async function cargarStats(){
 }
 
 cargarStats();
+
+// ── Contador en tiempo real ────────────────────────────────────────────────
+const API_LIVE = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '/crm') + '/api/blog_visitas.php?action=activos';
+const PAGINA_LABELS = { home:'Inicio', blog:'Blog', 'ecosistema-digital':'Ecosistema digital', 'redes-sociales-leads':'Redes sociales', 'ia-para-negocios':'IA para negocios', 'seo-ia-visibilidad':'SEO e IA', 'correos-profesionales':'Correos profesionales' };
+
+async function actualizarLive(){
+    try {
+        const r = await fetch(API_LIVE, { credentials: 'include' });
+        const d = await r.json();
+        if (!d.success) return;
+        document.getElementById('liveCount').textContent = d.activos;
+        // Chips de páginas activas
+        const chips = (d.paginas || []).map(function(p){
+            var label = PAGINA_LABELS[p.pagina] || p.pagina;
+            return '<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:rgba(34,197,94,.1);color:#15803d">'
+                + label + ' (' + p.n + ')</span>';
+        }).join('');
+        document.getElementById('livePaginas').innerHTML = chips;
+        var now = new Date();
+        document.getElementById('liveUpdate').textContent = 'Actualizado ' + now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    } catch(e){}
+}
+
+actualizarLive();
+setInterval(actualizarLive, 30000); // cada 30s
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 $pdo = db();
 
-// Auto-migración
+// Auto-migración tablas
 try {
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS blog_visitas (
@@ -40,7 +40,49 @@ try {
     ");
 } catch (PDOException $e) {}
 
+try {
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS blog_activos (
+            session_id  VARCHAR(80)   NOT NULL PRIMARY KEY,
+            pagina      VARCHAR(150)  NOT NULL DEFAULT 'home',
+            ip_address  VARCHAR(45)   DEFAULT NULL,
+            updated_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_updated (updated_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+} catch (PDOException $e) {}
+
 $method = $_SERVER['REQUEST_METHOD'];
+$action = $_GET['action'] ?? '';
+
+// ── GET activos (público rápido, sin auth) ─────────────────────────────────
+if ($method === 'GET' && $action === 'activos') {
+    try {
+        // Limpiar sesiones viejas (>90s)
+        $pdo->exec("DELETE FROM blog_activos WHERE updated_at < DATE_SUB(NOW(), INTERVAL 90 SECOND)");
+        $total  = (int)$pdo->query("SELECT COUNT(*) FROM blog_activos")->fetchColumn();
+        $paginas = $pdo->query("SELECT pagina, COUNT(*) AS n FROM blog_activos GROUP BY pagina ORDER BY n DESC")->fetchAll();
+        jsonResponse(['success' => true, 'activos' => $total, 'paginas' => $paginas]);
+    } catch (Exception $e) {
+        jsonResponse(['success' => true, 'activos' => 0, 'paginas' => []]);
+    }
+}
+
+// ── POST ping (público) ────────────────────────────────────────────────────
+if ($method === 'POST' && $action === 'ping') {
+    $in  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $sid = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', $in['session_id'] ?? ''), 0, 80);
+    $pag = substr(trim($in['pagina'] ?? 'home'), 0, 150);
+    $ip  = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if ($sid) {
+        try {
+            $pdo->prepare("INSERT INTO blog_activos (session_id, pagina, ip_address) VALUES (?,?,?)
+                           ON DUPLICATE KEY UPDATE pagina=VALUES(pagina), ip_address=VALUES(ip_address), updated_at=NOW()")
+                ->execute([$sid, $pag, $ip]);
+        } catch (Exception $e) {}
+    }
+    jsonResponse(['success' => true]);
+}
 
 switch ($method) {
 
