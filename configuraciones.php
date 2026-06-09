@@ -177,6 +177,11 @@ include __DIR__ . '/includes/header.php';
                 <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Credenciales para envío de correos</p>
             </div>
         </div>
+        <!-- Campo trampa para evitar autorrelleno del navegador -->
+        <div style="display:none" aria-hidden="true">
+            <input type="text" name="fake_user" tabindex="-1" autocomplete="username">
+            <input type="password" name="fake_pass" tabindex="-1" autocomplete="current-password">
+        </div>
         <div class="card-body" style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div style="display:flex;flex-direction:column;gap:4px">
                 <label class="form-label" style="font-size:10px">Host SMTP</label>
@@ -200,12 +205,12 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
                 <label class="form-label" style="font-size:10px">Correo / Usuario</label>
-                <input id="smtp_username" class="form-input" type="email" placeholder="contacto@tudominio.com" style="padding:6px 10px;font-size:12px">
+                <input id="smtp_username" class="form-input" type="email" autocomplete="off" placeholder="contacto@tudominio.com" style="padding:6px 10px;font-size:12px">
             </div>
             <div style="display:flex;flex-direction:column;gap:4px">
                 <label class="form-label" style="font-size:10px">Contraseña / App password</label>
                 <div style="position:relative">
-                    <input id="smtp_password" class="form-input" type="password" placeholder="••••••••••••" style="padding:6px 10px;font-size:12px;width:100%;box-sizing:border-box;padding-right:36px">
+                    <input id="smtp_password" class="form-input" type="password" autocomplete="new-password" placeholder="Ingresa contraseña o App Password" style="padding:6px 10px;font-size:12px;width:100%;box-sizing:border-box;padding-right:36px">
                     <button type="button" onclick="toggleSmtpPass()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:2px;color:#8A867C">
                         <svg id="iconEye" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </button>
@@ -585,11 +590,14 @@ async function guardarBanco() {
         document.getElementById('smtp_encryption').value  = c.encryption   || 'tls';
         document.getElementById('smtp_username').value    = c.username      || '';
         document.getElementById('smtp_from_name').value   = c.from_name     || 'QUANTUN Digital';
+        // Siempre limpiar el campo contraseña (el navegador puede haber autollenado uno viejo)
+        document.getElementById('smtp_password').value = '';
         if (c.configured) {
-            document.getElementById('smtpStatus').textContent = '✓ SMTP configurado';
+            document.getElementById('smtpStatus').textContent = '✓ Contraseña guardada — ingresa una nueva solo si quieres cambiarla';
             document.getElementById('smtpStatus').style.color = '#2D8F5A';
+            document.getElementById('smtp_password').placeholder = '(contraseña guardada — dejar en blanco para no cambiar)';
         } else {
-            document.getElementById('smtpStatus').textContent = '⚠ Contraseña no guardada';
+            document.getElementById('smtpStatus').textContent = '⚠ Contraseña no configurada';
             document.getElementById('smtpStatus').style.color = '#D97706';
         }
     } catch(e) {}
