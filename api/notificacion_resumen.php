@@ -95,8 +95,8 @@ $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
         <td style="width:4%"></td>
         <td style="padding:12px 16px;background:#F5F5F2;border-radius:6px;width:48%">
           <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#57544D;margin-bottom:5px">Renovaciones</div>
-          <div style="font-size:26px;font-weight:900;color:#0E0E0C">' . ($nRenovacionesActual + $nRenovacionesProx) . '</div>
-          <div style="font-size:10px;color:#57544D;margin-top:2px">Este mes y el próximo</div>
+          <div style="font-size:26px;font-weight:900;color:#0E0E0C">' . $nRenovacionesActual . '</div>
+          <div style="font-size:10px;color:#57544D;margin-top:2px">Este mes</div>
         </td>
       </tr>
     </table>

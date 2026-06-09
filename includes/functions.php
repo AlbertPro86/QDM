@@ -202,18 +202,29 @@ function getLogoEmailSrc(PDO $pdo, string $logoUrlParam = ''): string {
         if ($isExternal($dbUrl)) return trim($dbUrl);
     } catch (PDOException $e) {}
 
-    // 3. Derivar URL del sitio web desde APP_URL
-    //    APP_URL en producción = https://quantundigital.com/crm
-    //    El logo del sitio está en  https://quantundigital.com/assets/quantun-logo.png
-    $siteBase = rtrim(preg_replace('#/crm/?$#i', '', rtrim(defined('APP_URL') ? APP_URL : '', '/')), '/');
-    $siteLogoUrl = $siteBase . '/assets/quantun-logo.png';
-    if ($isExternal($siteLogoUrl)) return $siteLogoUrl;
+    // 3. Derivar URL del sitio web desde APP_URL (solo si no es localhost)
+    $appUrl = defined('APP_URL') ? APP_URL : '';
+    if ($appUrl && stripos($appUrl, 'localhost') === false && stripos($appUrl, '127.0.0.1') === false) {
+        $siteBase    = rtrim(preg_replace('#/crm/?$#i', '', rtrim($appUrl, '/')), '/');
+        $siteLogoUrl = $siteBase . '/assets/quantun-logo.png';
+        if ($isExternal($siteLogoUrl)) return $siteLogoUrl;
+    }
 
-    // 4. Base64 embebido (fallback para localhost / desarrollo)
-    foreach (['logo_quantun_digital_negro.png', 'logo_quantun_digital_blanco.png'] as $f) {
-        $path = BASE_PATH . '/Assets/' . $f;
-        if (file_exists($path)) {
-            return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+    // 3b. Fallback: usar HTTP_HOST del servidor actual (contexto web)
+    $httpHost = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '');
+    if ($httpHost && stripos($httpHost, 'localhost') === false) {
+        $proto       = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $siteLogoUrl = $proto . '://' . $httpHost . '/assets/quantun-logo.png';
+        if ($isExternal($siteLogoUrl)) return $siteLogoUrl;
+    }
+
+    // 4. Base64 embebido (fallback para localhost / CLI sin HTTP_HOST)
+    foreach (['Assets', 'assets'] as $dir) {
+        foreach (['logo_quantun_digital_negro.png', 'logo_quantun_digital_blanco.png'] as $f) {
+            $path = BASE_PATH . '/' . $dir . '/' . $f;
+            if (file_exists($path)) {
+                return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+            }
         }
     }
 
