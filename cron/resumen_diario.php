@@ -116,11 +116,26 @@ try {
     $nLeadsNuevos = (int)$st->fetchColumn();
 } catch (Exception $e) {}
 
-// ── Logo ──────────────────────────────────────────────────────────────────────
-$logoSrc = getLogoEmailSrc($pdo, $logoUrl);
-$logoTag = $logoSrc
-    ? '<img src="' . htmlspecialchars($logoSrc) . '" alt="QUANTUN Digital" height="36" style="display:block">'
-    : '<span style="font-size:18px;font-weight:900;color:#0E0E0C;letter-spacing:-0.5px">QUANTUN Digital</span>';
+// ── Logo inline ───────────────────────────────────────────────────────────────
+$inlineImages = [];
+$logoPaths = [
+    BASE_PATH . '/../assets/quantun-logo.png',
+    BASE_PATH . '/Assets/logo_quantun_digital_negro.png',
+    BASE_PATH . '/assets/logo_quantun_digital_negro.png',
+];
+$logoFile = '';
+foreach ($logoPaths as $p) {
+    if (file_exists($p)) { $logoFile = $p; break; }
+}
+if ($logoFile) {
+    $inlineImages[] = ['path' => $logoFile, 'cid' => 'qd_logo', 'mime' => 'image/png'];
+    $logoTag = '<img src="cid:qd_logo" alt="QUANTUN Digital" height="36" style="display:block;max-width:180px">';
+} else {
+    $logoSrc = getLogoEmailSrc($pdo, $logoUrl);
+    $logoTag = $logoSrc
+        ? '<img src="' . htmlspecialchars($logoSrc) . '" alt="QUANTUN Digital" height="36" style="display:block;max-width:180px">'
+        : '<span style="font-size:18px;font-weight:900;color:#0E0E0C;letter-spacing:-0.5px">QUANTUN Digital</span>';
+}
 
 // ── HTML del correo ───────────────────────────────────────────────────────────
 $fecha = date('d/m/Y');
@@ -177,7 +192,9 @@ $mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     'CRM Admin <' . $emailDest . '>',
     'Resumen del día — CRM QUANTUN · ' . $fecha,
-    $html
+    $html,
+    [],
+    $inlineImages
 );
 
 if ($result['ok']) {
