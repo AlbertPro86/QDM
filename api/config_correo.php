@@ -139,8 +139,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ── Probar ────────────────────────────────────────────────────────────────
     if ($accion === 'probar') {
+        // Si no enviaron contraseña, usar la guardada en BD o .env
         if (!$password) {
-            jsonResponse(['error' => 'Debes ingresar la contraseña para probar'], 400);
+            $password = getCfg($pdo, 'smtp_password', '');
+        }
+        if (!$password) {
+            $env = leerEnv($envPath);
+            $password = $env['MAIL_PASSWORD'] ?? '';
+        }
+        if (!$password) {
+            jsonResponse(['error' => 'No hay contraseña guardada. Ingresa una contraseña primero y guárdala.'], 400);
         }
         $cfg = compact('host', 'port', 'encryption', 'username', 'from_name', 'from_address');
         $cfg['from_address'] = $from_addr;
