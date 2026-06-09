@@ -166,6 +166,75 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
+    <!-- ── Servidor de Correo SMTP ─────────────────────────────────────── -->
+    <div class="card animate-fade-up">
+        <div class="card-header" style="padding:8px 12px;display:flex;align-items:center;gap:6px">
+            <div style="width:28px;height:28px;border-radius:4px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="14" height="14" fill="none" stroke="#D97706" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+                <h3 class="card-title" style="margin:0;font-size:11px;font-weight:700">Servidor de Correo SMTP</h3>
+                <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Credenciales para envío de correos</p>
+            </div>
+        </div>
+        <div class="card-body" style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Host SMTP</label>
+                <input id="smtp_host" class="form-input" type="text" value="smtp.zoho.com" placeholder="smtp.zoho.com" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Puerto</label>
+                <input id="smtp_port" class="form-input" type="number" value="587" placeholder="587" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Cifrado</label>
+                <select id="smtp_encryption" class="form-input" style="padding:6px 10px;font-size:12px">
+                    <option value="tls">TLS (recomendado · puerto 587)</option>
+                    <option value="ssl">SSL (puerto 465)</option>
+                    <option value="">Sin cifrado</option>
+                </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Nombre remitente</label>
+                <input id="smtp_from_name" class="form-input" type="text" placeholder="QUANTUN Digital" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Correo / Usuario</label>
+                <input id="smtp_username" class="form-input" type="email" placeholder="contacto@tudominio.com" style="padding:6px 10px;font-size:12px">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label class="form-label" style="font-size:10px">Contraseña / App password</label>
+                <div style="position:relative">
+                    <input id="smtp_password" class="form-input" type="password" placeholder="••••••••••••" style="padding:6px 10px;font-size:12px;width:100%;box-sizing:border-box;padding-right:36px">
+                    <button type="button" onclick="toggleSmtpPass()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:2px;color:#8A867C">
+                        <svg id="iconEye" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div style="padding:8px 14px;background:#FFFBEB;border-top:1px solid #FDE68A;font-size:10px;color:#92400E;line-height:1.5">
+            Si usas Zoho con verificación en dos pasos, genera una <strong>contraseña de aplicación</strong> en
+            <a href="https://accounts.zoho.com" target="_blank" style="color:#D97706">accounts.zoho.com</a>
+            → Seguridad → Contraseñas de aplicación y úsala aquí.
+        </div>
+        <div style="padding:10px 14px;border-top:1px solid #EFECE5;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div id="smtpStatus" style="font-size:11px;color:#8A867C"></div>
+            <div style="display:flex;gap:8px">
+                <button onclick="probarSmtp()" id="btnProbarSmtp"
+                    style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#FAFAF7;color:#57544D;border:1.5px solid #E8E5DD;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s"
+                    onmouseenter="this.style.borderColor='#8A867C'" onmouseleave="this.style.borderColor='#E8E5DD'">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Probar conexión
+                </button>
+                <button onclick="guardarSmtp()" id="btnGuardarSmtp"
+                    class="btn btn-primary btn-sm">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Guardar SMTP
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ── Datos de la Empresa ───────────────────────────────────────────── -->
     <div class="card animate-fade-up">
         <div class="card-header" style="padding:8px 12px;display:flex;align-items:center;gap:6px">
@@ -501,6 +570,96 @@ async function guardarBanco() {
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Guardar datos bancarios';
+    }
+}
+
+// ── SMTP ──────────────────────────────────────────────────────────────────────
+(async function cargarSmtp() {
+    try {
+        const r = await fetch('api/config_correo.php', { credentials: 'include' });
+        const d = await r.json();
+        if (!d.success) return;
+        const c = d.data;
+        document.getElementById('smtp_host').value        = c.host         || 'smtp.zoho.com';
+        document.getElementById('smtp_port').value        = c.port         || '587';
+        document.getElementById('smtp_encryption').value  = c.encryption   || 'tls';
+        document.getElementById('smtp_username').value    = c.username      || '';
+        document.getElementById('smtp_from_name').value   = c.from_name     || 'QUANTUN Digital';
+        if (c.configured) {
+            document.getElementById('smtpStatus').textContent = '✓ SMTP configurado';
+            document.getElementById('smtpStatus').style.color = '#2D8F5A';
+        } else {
+            document.getElementById('smtpStatus').textContent = '⚠ Contraseña no guardada';
+            document.getElementById('smtpStatus').style.color = '#D97706';
+        }
+    } catch(e) {}
+})();
+
+function toggleSmtpPass() {
+    const inp = document.getElementById('smtp_password');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function guardarSmtp() {
+    const btn = document.getElementById('btnGuardarSmtp');
+    btn.disabled = true;
+    const payload = {
+        accion:       'guardar',
+        host:         document.getElementById('smtp_host').value.trim(),
+        port:         document.getElementById('smtp_port').value.trim(),
+        encryption:   document.getElementById('smtp_encryption').value,
+        username:     document.getElementById('smtp_username').value.trim(),
+        password:     document.getElementById('smtp_password').value,
+        from_address: document.getElementById('smtp_username').value.trim(),
+        from_name:    document.getElementById('smtp_from_name').value.trim() || 'QUANTUN Digital',
+    };
+    try {
+        const r = await fetch('api/config_correo.php', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            showToast('✓ Configuración SMTP guardada', 'success');
+            document.getElementById('smtpStatus').textContent = '✓ SMTP configurado';
+            document.getElementById('smtpStatus').style.color = '#2D8F5A';
+            if (payload.password) document.getElementById('smtp_password').value = '';
+        } else {
+            showToast(d.error || 'Error al guardar', 'error');
+        }
+    } catch(e) { showToast('Error de conexión', 'error'); }
+    finally { btn.disabled = false; }
+}
+
+async function probarSmtp() {
+    const btn = document.getElementById('btnProbarSmtp');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Probando...';
+    const payload = {
+        accion:       'probar',
+        host:         document.getElementById('smtp_host').value.trim(),
+        port:         document.getElementById('smtp_port').value.trim(),
+        encryption:   document.getElementById('smtp_encryption').value,
+        username:     document.getElementById('smtp_username').value.trim(),
+        password:     document.getElementById('smtp_password').value,
+        from_address: document.getElementById('smtp_username').value.trim(),
+        from_name:    document.getElementById('smtp_from_name').value.trim() || 'QUANTUN Digital',
+        test_email:   document.getElementById('smtp_username').value.trim(),
+    };
+    try {
+        const r = await fetch('api/config_correo.php', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) showToast(`✓ Correo de prueba enviado a ${payload.test_email}`, 'success', 8000);
+        else showToast(d.error || 'Error SMTP', 'error', 10000);
+    } catch(e) { showToast('Error de conexión', 'error'); }
+    finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Probar conexión';
     }
 }
 
