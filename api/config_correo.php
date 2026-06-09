@@ -96,7 +96,8 @@ function aplicarEnvSmtp(array $cfg, string $pass): void {
 // ── GET: devolver config actual ────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $cfg = cargarSmtpConfig($pdo, $envPath);
-    jsonResponse(['success' => true, 'data' => [
+    $debug = ($_GET['debug'] ?? '') === '1';
+    $resp = ['success' => true, 'data' => [
         'host'         => $cfg['host'],
         'port'         => $cfg['port'],
         'encryption'   => $cfg['encryption'],
@@ -104,7 +105,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         'from_address' => $cfg['from_address'],
         'from_name'    => $cfg['from_name'],
         'configured'   => $cfg['has_password'],
-    ]]);
+    ]];
+    if ($debug) {
+        $env = leerEnv($envPath);
+        $resp['debug'] = [
+            'env_path'         => $envPath,
+            'env_exists'       => file_exists($envPath),
+            'env_writable'     => is_writable($envPath),
+            'env_mail_host'    => $env['MAIL_HOST'] ?? '(no)',
+            'env_mail_user'    => $env['MAIL_USERNAME'] ?? '(no)',
+            'env_has_pass'     => !empty($env['MAIL_PASSWORD']) ? 'SI (' . strlen($env['MAIL_PASSWORD']) . ' chars)' : 'NO',
+            'db_smtp_host'     => getCfg($pdo, 'smtp_host', '(no)'),
+            'db_smtp_user'     => getCfg($pdo, 'smtp_username', '(no)'),
+            'db_has_pass'      => getCfg($pdo, 'smtp_password', '') !== '' ? 'SI (' . strlen(getCfg($pdo, 'smtp_password', '')) . ' chars)' : 'NO',
+            'php_version'      => PHP_VERSION,
+        ];
+    }
+    jsonResponse($resp);
 }
 
 // ── POST: guardar o probar ─────────────────────────────────────────────────────

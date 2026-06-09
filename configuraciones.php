@@ -634,17 +634,21 @@ async function guardarSmtp() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        const d = await r.json();
+        const txt = await r.text();
+        let d;
+        try { d = JSON.parse(txt); } catch(pe) {
+            showToast('Error del servidor: ' + txt.substring(0, 200), 'error', 15000);
+            return;
+        }
         if (d.success) {
-            showToast('✓ Configuración SMTP guardada', 'success');
+            showToast('Configuración SMTP guardada' + (payload.password ? ' (con contraseña)' : ' (sin cambiar contraseña)'), 'success', 8000);
             document.getElementById('smtpStatus').textContent = '✓ SMTP configurado';
             document.getElementById('smtpStatus').style.color = '#2D8F5A';
-            // No borrar la contraseña para poder probar inmediatamente
         } else {
-            showToast(d.error || 'Error al guardar', 'error', 10000);
+            showToast('Error: ' + (d.error || 'Error desconocido'), 'error', 10000);
         }
     } catch(e) {
-        showToast('Error: ' + (e.message || 'No se pudo conectar con la API'), 'error', 10000);
+        showToast('Error red: ' + (e.message || 'No se pudo conectar'), 'error', 10000);
     }
     finally { btn.disabled = false; }
 }
