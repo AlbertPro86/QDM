@@ -698,16 +698,21 @@ async function enviarPrueba() {
     btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Enviando...';
     try {
         const r = await fetch('api/notificacion_resumen.php', { credentials: 'include' });
-        const d = await r.json();
+        const txt = await r.text();
+        let d;
+        try { d = JSON.parse(txt); } catch(pe) {
+            showToast('Error del servidor: ' + txt.substring(0, 300), 'error', 15000);
+            return;
+        }
         if (d.success) {
             const dest = d.enviado_a ? ` → ${d.enviado_a}` : '';
-            showToast(`✓ Correo enviado${dest}. Si no lo ves, revisa Spam.`, 'success', 8000);
+            showToast(`Correo enviado${dest}. Si no lo ves, revisa Spam.`, 'success', 10000);
         } else {
             const smtp = d.smtp_info ? ` [SMTP: ${d.smtp_info}]` : '';
-            showToast((d.error || 'Error al enviar') + smtp, 'error', 10000);
+            showToast((d.error || 'Error al enviar') + smtp, 'error', 15000);
         }
     } catch(e) {
-        showToast('Error de conexión', 'error');
+        showToast('Error red: ' + (e.message || 'sin detalle'), 'error', 10000);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Enviar prueba ahora';

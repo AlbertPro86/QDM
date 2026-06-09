@@ -133,11 +133,15 @@ if ($result['ok']) {
         'nota'                   => 'Revisa también la carpeta de Spam si no ves el correo.',
     ]);
 } else {
-    $smtpInfo = env('MAIL_HOST','?') . ':' . env('MAIL_PORT','?') . ' (' . env('MAIL_ENCRYPTION','?') . ')';
+    $smtpHost = getCfg($pdo, 'smtp_host', env('MAIL_HOST', '?'));
+    $smtpPort = getCfg($pdo, 'smtp_port', env('MAIL_PORT', '?'));
+    $smtpEnc  = getCfg($pdo, 'smtp_encryption', env('MAIL_ENCRYPTION', '?'));
+    $smtpUser = getCfg($pdo, 'smtp_username', env('MAIL_USERNAME', '?'));
+    $smtpInfo = "$smtpHost:$smtpPort ($smtpEnc) usuario: $smtpUser";
     jsonResponse([
         'error'     => $result['error'],
         'smtp_info' => $smtpInfo,
         'enviado_a' => $emailDest,
-        'ayuda'     => 'Verifica las credenciales SMTP en Configuraciones → Correo.',
+        'ayuda'     => 'Ve a Configuraciones → Servidor de Correo SMTP y verifica las credenciales.',
     ], 500);
 }
