@@ -372,7 +372,7 @@ if ($method === 'POST') {
 
         // Send emails  (insert → get ID → inject pixel → send → update)
         set_time_limit(120);
-        $mailer   = new Mailer();
+        $mailer   = Mailer::fromDb($pdo);
         $enviados = 0;
         $fallidos = 0;
         $errors   = [];

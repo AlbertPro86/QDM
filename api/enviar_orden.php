@@ -512,7 +512,7 @@ if (!empty($input['preview_only'])) {
 }
 
 // Enviar correo — logo como CID inline para compatibilidad universal
-$mailer       = new Mailer();
+$mailer       = Mailer::fromDb($pdo);
 $inlineImages = [];
 if ($logoFilePath && @file_exists($logoFilePath)) {
     $inlineImages[] = ['path' => $logoFilePath, 'cid' => $logoCid, 'mime' => $logoMime];

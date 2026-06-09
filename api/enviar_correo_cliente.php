@@ -140,7 +140,7 @@ $htmlFinal = '<!DOCTYPE html>
 </html>';
 
 // Enviar
-$mailer = new Mailer();
+$mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     $cliente['nombre_comercial'] . ' <' . $emailDest . '>',
     $asunto,

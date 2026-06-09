@@ -76,7 +76,7 @@ if (!$logoUrl) {
 $htmlFinal = generarEmailCotizacion($cot, $mensaje, $imagenPath ?: null, $logoUrl ?: null, null, $plantilla ?: null);
 
 // Enviar (sin adjuntos — imagen va embebida en el HTML)
-$mailer = new Mailer();
+$mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     $cot['nombre_cliente'] . ' <' . $emailDest . '>',
     $asunto,

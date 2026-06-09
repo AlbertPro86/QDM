@@ -17,14 +17,36 @@ class Mailer {
     private $socket = false;
     private array $log = [];
 
-    public function __construct() {
-        $this->host        = env('MAIL_HOST',         'smtp.gmail.com');
-        $this->port        = (int) env('MAIL_PORT',   587);
-        $this->encryption  = strtolower(env('MAIL_ENCRYPTION', 'tls'));
-        $this->user        = env('MAIL_USERNAME',     '');
-        $this->pass        = env('MAIL_PASSWORD',     '');
-        $this->fromAddress = env('MAIL_FROM_ADDRESS', $this->user);
-        $this->fromName    = env('MAIL_FROM_NAME',    'CRM QUANTUN');
+    public function __construct(array $config = []) {
+        $this->host        = $config['host']         ?? env('MAIL_HOST',         'smtp.gmail.com');
+        $this->port        = (int)($config['port']   ?? env('MAIL_PORT',         587));
+        $this->encryption  = strtolower($config['encryption'] ?? env('MAIL_ENCRYPTION', 'tls'));
+        $this->user        = $config['username']     ?? env('MAIL_USERNAME',     '');
+        $this->pass        = $config['password']     ?? env('MAIL_PASSWORD',     '');
+        $this->fromAddress = $config['from_address'] ?? env('MAIL_FROM_ADDRESS', $this->user);
+        $this->fromName    = $config['from_name']    ?? env('MAIL_FROM_NAME',    'CRM QUANTUN');
+    }
+
+    /**
+     * Crea un Mailer leyendo config SMTP desde crm_configuraciones (BD).
+     * Usa como fallback las variables de entorno.
+     */
+    public static function fromDb(PDO $pdo): self {
+        $get = function(string $k) use ($pdo): string {
+            $st = $pdo->prepare("SELECT valor FROM crm_configuraciones WHERE clave = ?");
+            $st->execute([$k]);
+            $v = $st->fetchColumn();
+            return ($v !== false && $v !== '') ? (string)$v : '';
+        };
+        $cfg = [];
+        if ($h = $get('smtp_host'))        $cfg['host']         = $h;
+        if ($p = $get('smtp_port'))        $cfg['port']         = $p;
+        if ($e = $get('smtp_encryption'))  $cfg['encryption']   = $e;
+        if ($u = $get('smtp_username'))    $cfg['username']     = $u;
+        if ($pw = $get('smtp_password'))   $cfg['password']     = $pw;
+        if ($fa = $get('smtp_from_address')) $cfg['from_address'] = $fa;
+        if ($fn = $get('smtp_from_name'))  $cfg['from_name']    = $fn;
+        return new self($cfg);
     }
 
     // ── API pública ────────────────────────────────────────────────────────────

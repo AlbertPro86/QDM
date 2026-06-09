@@ -198,7 +198,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
         return ['ok' => false, 'error' => 'SMTP no configurado'];
     }
 
-    $mailer = new Mailer();
+    $mailer = Mailer::fromDb($pdo);
     $result = $mailer->send($emailDest, $asunto, $html);
     return $result;
 }

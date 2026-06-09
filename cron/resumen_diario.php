@@ -173,7 +173,7 @@ $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
 </body></html>';
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
-$mailer = new Mailer();
+$mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     'CRM Admin <' . $emailDest . '>',
     'Resumen del día — CRM QUANTUN · ' . $fecha,
