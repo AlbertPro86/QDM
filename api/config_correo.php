@@ -18,13 +18,7 @@ $pdo     = db();
 $envPath = BASE_PATH . '/.env';
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
-
-function getCfg(PDO $pdo, string $clave, string $default = ''): string {
-    $st = $pdo->prepare("SELECT valor FROM crm_configuraciones WHERE clave = ?");
-    $st->execute([$clave]);
-    $v = $st->fetchColumn();
-    return ($v !== false && $v !== null) ? (string)$v : $default;
-}
+// Nota: getCfg() ya está definida en includes/functions.php — no redeclarar
 
 function setCfg(PDO $pdo, string $clave, string $valor): void {
     $st = $pdo->prepare("INSERT INTO crm_configuraciones (clave, valor)
