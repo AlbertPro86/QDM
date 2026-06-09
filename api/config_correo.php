@@ -27,6 +27,14 @@ function leerEnv(string $path): array {
 }
 
 function escribirEnv(string $path, array $nuevos): void {
+    // Verificar permisos
+    if (file_exists($path) && !is_writable($path)) {
+        throw new RuntimeException('El archivo .env no tiene permisos de escritura. En Hostinger: Administrador de archivos → clic derecho en .env → Permisos → 644.');
+    }
+    if (!file_exists($path) && !is_writable(dirname($path))) {
+        throw new RuntimeException('No se puede crear el archivo .env. Verifica los permisos del directorio.');
+    }
+
     $lineas = file_exists($path) ? file($path, FILE_IGNORE_NEW_LINES) : [];
     $escritos = [];
     $resultado = [];
@@ -47,7 +55,10 @@ function escribirEnv(string $path, array $nuevos): void {
     foreach ($nuevos as $k => $v) {
         if (!in_array($k, $escritos)) $resultado[] = "$k=$v";
     }
-    file_put_contents($path, implode("\n", $resultado) . "\n");
+    $bytes = file_put_contents($path, implode("\n", $resultado) . "\n");
+    if ($bytes === false) {
+        throw new RuntimeException('Error al escribir el archivo .env. Verifica permisos del servidor.');
+    }
 }
 
 // GET: devolver config actual
@@ -117,8 +128,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($input['password'])) {
         $nuevos['MAIL_PASSWORD'] = $input['password'];
     }
-    escribirEnv($envPath, $nuevos);
-    jsonResponse(['success' => true, 'message' => 'Configuración guardada']);
+    try {
+        escribirEnv($envPath, $nuevos);
+        jsonResponse(['success' => true, 'message' => 'Configuración guardada', 'env_path' => $envPath]);
+    } catch (RuntimeException $e) {
+        jsonResponse(['error' => $e->getMessage(), 'env_path' => $envPath], 500);
+    }
 }
 
 jsonResponse(['error' => 'Método no permitido'], 405);
