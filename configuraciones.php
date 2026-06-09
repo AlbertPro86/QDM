@@ -624,15 +624,21 @@ async function guardarSmtp() {
             showToast('✓ Configuración SMTP guardada', 'success');
             document.getElementById('smtpStatus').textContent = '✓ SMTP configurado';
             document.getElementById('smtpStatus').style.color = '#2D8F5A';
-            if (payload.password) document.getElementById('smtp_password').value = '';
+            // No borrar la contraseña para poder probar inmediatamente
         } else {
-            showToast(d.error || 'Error al guardar', 'error');
+            showToast(d.error || 'Error al guardar', 'error', 10000);
         }
     } catch(e) { showToast('Error de conexión', 'error'); }
     finally { btn.disabled = false; }
 }
 
 async function probarSmtp() {
+    const pass = document.getElementById('smtp_password').value;
+    if (!pass) {
+        showToast('Ingresa la contraseña SMTP para probar la conexión', 'error');
+        document.getElementById('smtp_password').focus();
+        return;
+    }
     const btn = document.getElementById('btnProbarSmtp');
     btn.disabled = true;
     btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Probando...';
@@ -642,7 +648,7 @@ async function probarSmtp() {
         port:         document.getElementById('smtp_port').value.trim(),
         encryption:   document.getElementById('smtp_encryption').value,
         username:     document.getElementById('smtp_username').value.trim(),
-        password:     document.getElementById('smtp_password').value,
+        password:     pass,
         from_address: document.getElementById('smtp_username').value.trim(),
         from_name:    document.getElementById('smtp_from_name').value.trim() || 'QUANTUN Digital',
         test_email:   document.getElementById('smtp_username').value.trim(),
@@ -654,8 +660,13 @@ async function probarSmtp() {
             body: JSON.stringify(payload)
         });
         const d = await r.json();
-        if (d.success) showToast(`✓ Correo de prueba enviado a ${payload.test_email}`, 'success', 8000);
-        else showToast(d.error || 'Error SMTP', 'error', 10000);
+        if (d.success) {
+            showToast(`✓ Correo de prueba enviado a ${payload.test_email}`, 'success', 8000);
+            // Ahora sí limpiar la contraseña tras prueba exitosa
+            document.getElementById('smtp_password').value = '';
+        } else {
+            showToast(d.error || 'Error SMTP', 'error', 10000);
+        }
     } catch(e) { showToast('Error de conexión', 'error'); }
     finally {
         btn.disabled = false;
