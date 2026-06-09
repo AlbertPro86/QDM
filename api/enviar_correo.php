@@ -74,13 +74,16 @@ if (!$logoUrl) {
 
 // Generar HTML completo con el nuevo diseño usando datos de la plantilla
 $htmlFinal = generarEmailCotizacion($cot, $mensaje, $imagenPath ?: null, $logoUrl ?: null, null, $plantilla ?: null);
+$cotInlineImages = $GLOBALS['_cotizacion_inline_images'] ?? [];
 
 // Enviar (sin adjuntos — imagen va embebida en el HTML)
 $mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     $cot['nombre_cliente'] . ' <' . $emailDest . '>',
     $asunto,
-    $htmlFinal
+    $htmlFinal,
+    [],
+    $cotInlineImages
 );
 
 if ($result['ok']) {

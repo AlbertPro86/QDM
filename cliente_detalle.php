@@ -4069,9 +4069,8 @@ function _buildMsgEmailPreview(nombre, texto, imagenUrl, logoUrl) {
         : '';
     const parrafos = (texto || '').split('\n').filter(l => l.trim()).map(l =>
         '<p style="margin:0 0 8px;color:#0f172a;font-size:13px;line-height:1.6">' + _hesc(l) + '</p>').join('');
-    const logoBlock = logoUrl
-        ? '<img src="' + logoUrl + '" alt="Logo" style="height:36px;max-width:180px;object-fit:contain;display:block">'
-        : '<span style="font-size:15px;font-weight:800;color:#0E0E0C">QUANTUN Digital</span>';
+    const logoSrc = logoUrl || 'https://quantundigital.com/assets/quantun-logo.png';
+    const logoBlock = '<img src="' + logoSrc + '" alt="QUANTUN Digital" style="height:36px;max-width:180px;object-fit:contain;display:block">';
     return '<div style="font-family:\'Segoe UI\',Arial,sans-serif;background:#f1f5f9;padding:16px">'
         + '<div style="background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0">'
         + '<div style="background:#ffffff;padding:14px 20px;border-bottom:3px solid #C6F24E">' + logoBlock + '</div>'

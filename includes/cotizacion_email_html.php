@@ -41,9 +41,12 @@ function generarEmailCotizacion(
     // Logo: plantilla tiene prioridad, luego parámetro logoUrl
     $logoResolved = $plantilla['logo_url'] ?? $logoUrl ?? '';
 
-    // ── Logo base64 embebido ──────────────────────────────────────────────────
-    $pdo     = db();
-    $logoSrc = getLogoEmailSrc($pdo, $logoResolved);
+    // ── Logo inline CID (visible en Gmail y todos los clientes) ──────────────
+    $pdo = db();
+    [$logoSrc, $_cotInlineImages] = getLogoEmailInline($pdo, $logoResolved, '40');
+    // Exponemos las inline images para que el caller las pase a $mailer->send()
+    if (!isset($GLOBALS['_cotizacion_inline_images'])) $GLOBALS['_cotizacion_inline_images'] = [];
+    $GLOBALS['_cotizacion_inline_images'] = $_cotInlineImages;
 
     // ── Formato de moneda ─────────────────────────────────────────────────────
     $fmt = fn($n) => $moneda . ' ' . number_format($n, 0, ',', '.');
@@ -136,9 +139,7 @@ function generarEmailCotizacion(
                 <tr>
                     <!-- Logo + Empresa -->
                     <td style="vertical-align:top;width:55%">
-                        ' . ($logoSrc
-                            ? '<img src="' . $logoSrc . '" alt="' . $empNombre . '" height="40" style="display:block;height:40px;max-width:180px;object-fit:contain;margin-bottom:10px">'
-                            : '<div style="font-size:20px;font-weight:900;color:' . $colPrim . ';margin-bottom:10px;letter-spacing:-0.5px">' . $empNombre . '</div>') . '
+                        ' . $logoSrc . '
                         <div style="font-size:13px;font-weight:700;color:#0E0E0C;margin-bottom:2px">' . $empNombre . '</div>
                         ' . $empInfoRows . '
                     </td>

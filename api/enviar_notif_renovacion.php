@@ -113,17 +113,13 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
         </tr>";
     }
 
-    $logoSrc = getLogoEmailSrc($pdo);
+    [$logoTag, $logoInline] = getLogoEmailInline($pdo, '', '32');
     $whatsappOrg = '';
     try {
         $sc_ws = $pdo->prepare("SELECT valor FROM crm_configuraciones WHERE clave = 'notif_whatsapp'");
         $sc_ws->execute();
         $whatsappOrg = $sc_ws->fetchColumn() ?: '';
     } catch (PDOException $e) {}
-
-    $logoTag = $logoSrc
-        ? "<img src='{$logoSrc}' alt='QUANTUN Digital' style='height:32px;max-width:160px;object-fit:contain;display:block'>"
-        : "<span style='font-size:16px;font-weight:900;color:#0E0E0C'>QUANTUN Digital</span>";
 
     $whatsappBtn = '';
     if ($whatsappOrg) {
@@ -199,7 +195,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
     }
 
     $mailer = Mailer::fromDb($pdo);
-    $result = $mailer->send($emailDest, $asunto, $html);
+    $result = $mailer->send($emailDest, $asunto, $html, [], $logoInline);
     return $result;
 }
 

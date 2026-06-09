@@ -55,10 +55,7 @@ if (!$smtpUser || $smtpUser === 'tu_correo@gmail.com' || !$smtpPass || $smtpPass
 }
 
 // Logo
-$logoSrc  = getLogoEmailSrc($pdo, '');
-$logoHtml = $logoSrc
-    ? '<img src="' . $logoSrc . '" alt="QUANTUN Digital" height="38" style="display:block;height:38px;max-width:200px;object-fit:contain">'
-    : '<span style="font-size:16px;font-weight:900;color:#0E0E0C">QUANTUN Digital</span>';
+[$logoHtml, $logoInline] = getLogoEmailInline($pdo, '', '38');
 
 $nombreCliente = htmlspecialchars($cliente['nombre_comercial'] ?? '', ENT_QUOTES);
 $nombreArchivo = htmlspecialchars($archivo['nombre_archivo'] ?? basename($filePath), ENT_QUOTES);
@@ -150,7 +147,8 @@ $result = $mailer->send(
         'path' => $filePath,
         'name' => $archivo['nombre_archivo'] ?? basename($filePath),
         'mime' => $archivo['tipo_archivo']   ?? 'application/octet-stream',
-    ]]
+    ]],
+    $logoInline
 );
 
 if ($result['ok']) {

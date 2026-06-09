@@ -47,11 +47,8 @@ if (!$smtpUser || $smtpUser === 'tu_correo@gmail.com' || !$smtpPass || $smtpPass
 // Generar HTML del correo
 $nombreCliente = htmlspecialchars($cliente['nombre_comercial'] ?? '', ENT_QUOTES);
 
-// ── Logo — Base64 embebido (visible en TODOS los clientes de correo) ──────────
-$logoSrc  = getLogoEmailSrc($pdo, $logoUrl);
-$logoHtml = $logoSrc
-    ? '<img src="' . $logoSrc . '" alt="QUANTUN Digital" height="38" style="display:block;height:38px;max-width:200px;object-fit:contain">'
-    : '<span style="font-size:16px;font-weight:900;color:#0E0E0C">QUANTUN Digital</span>';
+// ── Logo inline CID (visible en Gmail y todos los clientes de correo) ──────────
+[$logoHtml, $logoInline] = getLogoEmailInline($pdo, $logoUrl, '38');
 
 // Imagen adjunta (si existe)
 $imagenHtml = '';
@@ -144,7 +141,9 @@ $mailer = Mailer::fromDb($pdo);
 $result = $mailer->send(
     $cliente['nombre_comercial'] . ' <' . $emailDest . '>',
     $asunto,
-    $htmlFinal
+    $htmlFinal,
+    [],
+    $logoInline
 );
 
 if ($result['ok']) {

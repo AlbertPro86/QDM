@@ -239,3 +239,38 @@ function getSiteLogoUrl(): string {
     $siteBase = rtrim(preg_replace('#/crm/?$#i', '', rtrim(defined('APP_URL') ? APP_URL : '', '/')), '/');
     return $siteBase . '/assets/quantun-logo.png';
 }
+
+/**
+ * Devuelve el tag HTML del logo + array para imágenes inline (CID).
+ * Usar en TODOS los emails para que el logo se vea en Gmail y cualquier cliente.
+ *
+ * Uso:
+ *   [$logoTag, $inlineImages] = getLogoEmailInline($pdo, $logoUrl);
+ *   $mailer->send($to, $subject, $html, [], $inlineImages);
+ *
+ * @return array{0: string, 1: array}  [htmlTag, inlineImages]
+ */
+function getLogoEmailInline(PDO $pdo, string $logoUrlParam = '', string $height = '36'): array {
+    // Rutas donde buscar el logo en disco (en orden de preferencia)
+    $paths = [
+        BASE_PATH . '/../assets/quantun-logo.png',           // sitio web en producción
+        BASE_PATH . '/Assets/logo_quantun_digital_negro.png',
+        BASE_PATH . '/assets/logo_quantun_digital_negro.png',
+        BASE_PATH . '/Assets/logo_quantun_digital_blanco.png',
+    ];
+    foreach ($paths as $p) {
+        if (file_exists($p)) {
+            $inlineImages = [['path' => $p, 'cid' => 'qd_logo_cid', 'mime' => 'image/png']];
+            $tag = '<img src="cid:qd_logo_cid" alt="QUANTUN Digital" height="' . $height . '" style="display:block;max-width:220px;height:' . $height . 'px;object-fit:contain">';
+            return [$tag, $inlineImages];
+        }
+    }
+    // Fallback: URL externa (puede no cargarse en algunos clientes)
+    $src = getLogoEmailSrc($pdo, $logoUrlParam);
+    if ($src) {
+        $tag = '<img src="' . htmlspecialchars($src) . '" alt="QUANTUN Digital" height="' . $height . '" style="display:block;max-width:220px;height:' . $height . 'px;object-fit:contain">';
+        return [$tag, []];
+    }
+    // Último fallback: texto
+    return ['<span style="font-size:18px;font-weight:900;color:#0E0E0C;letter-spacing:-0.5px">QUANTUN Digital</span>', []];
+}
