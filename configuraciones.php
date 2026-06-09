@@ -590,14 +590,21 @@ async function guardarBanco() {
         document.getElementById('smtp_encryption').value  = c.encryption   || 'tls';
         document.getElementById('smtp_username').value    = c.username      || '';
         document.getElementById('smtp_from_name').value   = c.from_name     || 'QUANTUN Digital';
-        // Siempre limpiar el campo contraseña (el navegador puede haber autollenado uno viejo)
-        document.getElementById('smtp_password').value = '';
+        // Limpiar campo contraseña ahora y con retraso (el browser autorrellena tarde)
+        const passEl = document.getElementById('smtp_password');
+        passEl.value = '';
+        passEl.setAttribute('data-smtp-loaded', '1');
+        [100, 300, 600, 1000].forEach(ms => setTimeout(() => {
+            if (!passEl.getAttribute('data-user-typed')) passEl.value = '';
+        }, ms));
+        passEl.addEventListener('input', () => passEl.setAttribute('data-user-typed', '1'), { once: true });
+
         if (c.configured) {
-            document.getElementById('smtpStatus').textContent = '✓ Contraseña guardada — ingresa una nueva solo si quieres cambiarla';
+            document.getElementById('smtpStatus').textContent = '✓ Contraseña guardada — ingresa una nueva solo si deseas cambiarla';
             document.getElementById('smtpStatus').style.color = '#2D8F5A';
-            document.getElementById('smtp_password').placeholder = '(contraseña guardada — dejar en blanco para no cambiar)';
+            passEl.placeholder = 'Dejar vacío para no cambiar la contraseña guardada';
         } else {
-            document.getElementById('smtpStatus').textContent = '⚠ Contraseña no configurada';
+            document.getElementById('smtpStatus').textContent = '⚠ Contraseña no configurada — ingresa una App Password';
             document.getElementById('smtpStatus').style.color = '#D97706';
         }
     } catch(e) {}
@@ -636,7 +643,9 @@ async function guardarSmtp() {
         } else {
             showToast(d.error || 'Error al guardar', 'error', 10000);
         }
-    } catch(e) { showToast('Error de conexión', 'error'); }
+    } catch(e) {
+        showToast('Error: ' + (e.message || 'No se pudo conectar con la API'), 'error', 10000);
+    }
     finally { btn.disabled = false; }
 }
 
