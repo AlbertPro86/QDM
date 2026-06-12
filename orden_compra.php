@@ -184,12 +184,22 @@ $logoUrl = trim($template['logo_url'] ?? '');
 if ($logoUrl !== '') {
     // URL http/https
     if (preg_match('#^https?://#i', $logoUrl)) {
-        $ctx  = stream_context_create(['http' => ['timeout' => 3], 'ssl' => ['verify_peer' => false]]);
+        $ctx  = stream_context_create(['http' => ['timeout' => 4, 'ignore_errors' => true], 'ssl' => ['verify_peer' => false]]);
         $data = @file_get_contents($logoUrl, false, $ctx);
-        if ($data !== false) {
-            $ext  = strtolower(pathinfo(parse_url($logoUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
-            $mime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp','svg'=>'image/svg+xml'][$ext] ?? 'image/png';
-            $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($data);
+        if ($data !== false && strlen($data) > 8) {
+            // Validar que el contenido sea realmente una imagen (magic bytes)
+            $isPng  = substr($data, 0, 4) === "\x89PNG";
+            $isJpeg = substr($data, 0, 2) === "\xFF\xD8";
+            $isGif  = substr($data, 0, 3) === 'GIF';
+            $isWebp = strlen($data) > 12 && substr($data, 8, 4) === 'WEBP';
+            $isSvg  = stripos(substr($data, 0, 200), '<svg') !== false;
+            if ($isPng || $isJpeg || $isGif || $isWebp || $isSvg) {
+                $ext  = strtolower(pathinfo(parse_url($logoUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+                $mime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp','svg'=>'image/svg+xml'][$ext] ?? 'image/png';
+                if ($isSvg) $mime = 'image/svg+xml';
+                $logoSrc = 'data:' . $mime . ';base64,' . base64_encode($data);
+            }
+            // Si llegó HTML/texto en vez de imagen → $logoSrc queda vacío → usa fallback local
         }
     } else {
         // Ruta relativa al directorio del proyecto
@@ -199,10 +209,11 @@ if ($logoUrl !== '') {
     }
 }
 
-// Fallback: logo local del proyecto
-if (!$logoSrc) {
-    $logoSrc = fileToBase64(__DIR__ . '/Assets/logo_quantun_digital_negro.png');
-}
+// Fallback: logo local del proyecto (negro y blanco, mayúsculas y minúsculas)
+if (!$logoSrc) $logoSrc = fileToBase64(__DIR__ . '/Assets/logo_quantun_digital_negro.png');
+if (!$logoSrc) $logoSrc = fileToBase64(__DIR__ . '/assets/logo_quantun_digital_negro.png');
+if (!$logoSrc) $logoSrc = fileToBase64(__DIR__ . '/Assets/logo_quantun_digital_blanco.png');
+if (!$logoSrc) $logoSrc = fileToBase64(__DIR__ . '/assets/logo_quantun_digital_blanco.png');
 
 // ── Enriquecer servicios con datos del paquete (si aplica) ────────────────
 function enrichWithPaquete(array &$servicios, PDO $pdo): void {
@@ -297,7 +308,7 @@ enrichWithPaquete($servicios, $pdo);
                     <?php if ($logoSrc): ?>
                     <img src="<?= $logoSrc ?>" alt="Logo" style="max-height:48px;max-width:180px;object-fit:contain">
                     <?php else: ?>
-                    <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px"><?= htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') ?></div>
+                    <div style="font-size:20px;font-weight:800;color:#0E0E0C;letter-spacing:-0.5px"><?= htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') ?></div>
                     <?php endif; ?>
                     <div class="company-details">
                         <?php if(!empty($template['empresa_nit'])): ?>
