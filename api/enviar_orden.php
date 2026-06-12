@@ -173,95 +173,83 @@ $template['empresa_tel']    = $_pick(['empresa_tel','empresa_telefono'], '+57 (3
 $template['empresa_dir']    = $_pick(['empresa_dir','empresa_direccion'], 'Montería, Córdoba');
 
 // ── Logo para email: CID inline attachment ───────────────────────────────────
-// Gmail bloquea data: URIs y las URLs externas requieren clic del usuario.
+// Gmail bloquea data: URIs y URLs externas requieren clic del usuario.
 // CID embebe la imagen como parte MIME → visible en TODOS los clientes sin clic.
+//
+// Estrategia: usar getLogoEmailInline() centralizada (misma que cotizaciones
+// y notificaciones), que busca archivos locales y embebe como CID.
+// Así TODOS los emails del CRM usan la misma lógica robusta.
+$logoCid      = 'logo_qd@quantun.digital';
 $logoFilePath = '';
 $logoMime     = 'image/png';
-$logoCid      = 'logo_qd@quantun.digital';   // formato addr para máxima compatibilidad
 $tmpLogo      = '';
+$logoSrc      = '';
+
+// Buscar logo en disco: primero el negro (fondo del email siempre es blanco)
+$_logoCandidates = [
+    BASE_PATH . '/Assets/logo_quantun_digital_negro.png',
+    BASE_PATH . '/assets/logo_quantun_digital_negro.png',
+    BASE_PATH . '/../assets/quantun-logo.png',
+    BASE_PATH . '/Assets/logo_quantun_digital_blanco.png',
+    BASE_PATH . '/assets/logo_quantun_digital_blanco.png',
+];
+
+// Si la plantilla tiene un logo_url local, intentar primero
 $logoUrlTemplate = !empty($template['logo_url']) ? trim($template['logo_url']) : '';
+if ($logoUrlTemplate !== '' && !preg_match('#^https?://#i', $logoUrlTemplate)) {
+    $localPath = BASE_PATH . DIRECTORY_SEPARATOR . ltrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $logoUrlTemplate), DIRECTORY_SEPARATOR);
+    array_unshift($_logoCandidates, $localPath);
+}
 
-// Helper: detectar si un color HEX es oscuro (para elegir logo con contraste adecuado)
-$_bgDark = (function(string $hex): bool {
-    $hex = ltrim($hex, '#');
-    if (strlen($hex) === 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
-    $r = hexdec(substr($hex,0,2)); $g = hexdec(substr($hex,2,2)); $b = hexdec(substr($hex,4,2));
-    return (0.299*$r + 0.587*$g + 0.114*$b) / 255 < 0.5;
-})(trim($template['color_primario'] ?? '#0f172a'));
+// Buscar el primer archivo que exista
+foreach ($_logoCandidates as $_lf) {
+    if (@is_file($_lf) && @filesize($_lf) > 100) {
+        $logoFilePath = $_lf;
+        $ext = strtolower(pathinfo($_lf, PATHINFO_EXTENSION));
+        $logoMime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'][$ext] ?? 'image/png';
+        break;
+    }
+}
 
-// 1. Intentar usar el logo configurado en la plantilla
-if ($logoUrlTemplate !== '') {
-    if (preg_match('#^https?://#i', $logoUrlTemplate)) {
-        // URL remota → descargar y escribir en archivo temporal
-        $rawImg = false;
-        if (function_exists('curl_init')) {
-            $ch = curl_init($logoUrlTemplate);
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT        => 6,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_USERAGENT      => 'CRM-QUANTUN/1.0',
-            ]);
-            $rawImg = curl_exec($ch);
-            $ctype  = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/png';
-            curl_close($ch);
-        }
-        if ($rawImg && strlen($rawImg) > 100) {
-            // Validar que sea realmente una imagen: content-type + magic bytes
-            $ctypeLower = strtolower(trim(explode(';', $ctype)[0]));
-            $isPng  = substr($rawImg, 0, 4) === "\x89PNG";
-            $isJpeg = substr($rawImg, 0, 2) === "\xFF\xD8";
-            $isGif  = substr($rawImg, 0, 3) === 'GIF';
-            $isWebp = strlen($rawImg) > 12 && substr($rawImg, 8, 4) === 'WEBP';
-            $isSvg  = stripos(substr($rawImg, 0, 200), '<svg') !== false;
-            $isImage = (strpos($ctypeLower, 'image/') === 0) || $isPng || $isJpeg || $isGif || $isWebp || $isSvg;
-            if ($isImage) {
-                $logoMime = $ctypeLower ?: 'image/png';
-                if ($isSvg) $logoMime = 'image/svg+xml';
-                $extMap  = ['image/png'=>'png','image/jpeg'=>'jpg','image/gif'=>'gif','image/webp'=>'webp','image/svg+xml'=>'svg'];
-                $ext     = $extMap[$logoMime] ?? 'png';
-                $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.' . $ext;
-                if (file_put_contents($tmpLogo, $rawImg) !== false) {
-                    $logoFilePath = $tmpLogo;
-                }
-            }
-            // Si llegó HTML en vez de imagen → $logoFilePath sigue vacío → usa fallback local
-        }
-    } else {
-        // Ruta local relativa (p.ej. "uploads/facturas/logo.png" o "/Assets/logo.png")
-        $localPath = BASE_PATH . DIRECTORY_SEPARATOR . ltrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $logoUrlTemplate), DIRECTORY_SEPARATOR);
-        foreach ([$localPath, $logoUrlTemplate] as $_lp) {
-            if ($_lp && @is_file($_lp)) {
-                $logoFilePath = $_lp;
-                $ext = strtolower(pathinfo($_lp, PATHINFO_EXTENSION));
-                $logoMime = ['png'=>'image/png','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','gif'=>'image/gif','webp'=>'image/webp'][$ext] ?? 'image/png';
-                break;
+// Si no hay archivo local y la plantilla tiene URL remota, descargar
+if (!$logoFilePath && $logoUrlTemplate !== '' && preg_match('#^https?://#i', $logoUrlTemplate)) {
+    $rawImg = false;
+    if (function_exists('curl_init')) {
+        $ch = curl_init($logoUrlTemplate);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 6,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_USERAGENT      => 'CRM-QUANTUN/1.0',
+        ]);
+        $rawImg = curl_exec($ch);
+        $ctype  = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/png';
+        curl_close($ch);
+    }
+    if ($rawImg && strlen($rawImg) > 100) {
+        $ctypeLower = strtolower(trim(explode(';', $ctype)[0]));
+        $isPng  = substr($rawImg, 0, 4) === "\x89PNG";
+        $isJpeg = substr($rawImg, 0, 2) === "\xFF\xD8";
+        $isGif  = substr($rawImg, 0, 3) === 'GIF';
+        $isWebp = strlen($rawImg) > 12 && substr($rawImg, 8, 4) === 'WEBP';
+        $isSvg  = stripos(substr($rawImg, 0, 200), '<svg') !== false;
+        $isImage = ($isPng || $isJpeg || $isGif || $isWebp || $isSvg) || (strpos($ctypeLower, 'image/') === 0);
+        $isHtml  = stripos(substr($rawImg, 0, 300), '<html') !== false || stripos(substr($rawImg, 0, 300), '<!doctype') !== false;
+        if ($isImage && !$isHtml) {
+            $logoMime = $ctypeLower ?: 'image/png';
+            if ($isSvg) $logoMime = 'image/svg+xml';
+            $extMap  = ['image/png'=>'png','image/jpeg'=>'jpg','image/gif'=>'gif','image/webp'=>'webp','image/svg+xml'=>'svg'];
+            $ext     = $extMap[$logoMime] ?? 'png';
+            $tmpLogo = tempnam(sys_get_temp_dir(), 'qlogo_') . '.' . $ext;
+            if (file_put_contents($tmpLogo, $rawImg) !== false) {
+                $logoFilePath = $tmpLogo;
             }
         }
     }
 }
 
-// 2. Fallback: logo propio según contraste del fondo del encabezado
-if (!$logoFilePath) {
-    $logoPrefer = $_bgDark ? 'logo_quantun_digital_blanco.png' : 'logo_quantun_digital_negro.png';
-    $logoAlt    = $_bgDark ? 'logo_quantun_digital_negro.png'  : 'logo_quantun_digital_blanco.png';
-    $candidates = [
-        BASE_PATH . '/Assets/' . $logoPrefer,
-        BASE_PATH . '/assets/' . $logoPrefer,
-        BASE_PATH . '/Assets/' . $logoAlt,
-        BASE_PATH . '/assets/' . $logoAlt,
-    ];
-    foreach ($candidates as $_lf) {
-        if (@is_file($_lf)) {
-            $logoFilePath = $_lf;
-            $logoMime     = 'image/png';
-            break;
-        }
-    }
-}
-
-// En el HTML se referencia como cid:logo_qd@quantun.digital
+// Armar la referencia CID para el HTML
 $logoSrc = $logoFilePath ? 'cid:' . $logoCid : '';
 
 // Obtener WhatsApp de configuración
