@@ -53,6 +53,14 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS agenda_adjuntos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 
+$pdo->exec("CREATE TABLE IF NOT EXISTS agenda_comentarios (
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    tarjeta_id INT NOT NULL,
+    autor      VARCHAR(100) NOT NULL DEFAULT 'Usuario',
+    texto      TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
 // Seed columnas iniciales si la tabla está vacía
 $count = $pdo->query("SELECT COUNT(*) FROM agenda_columnas")->fetchColumn();
 if ((int)$count === 0) {
@@ -98,7 +106,10 @@ if ($method === 'GET' && $r === 'detail') {
     $adj = $pdo->prepare("SELECT * FROM agenda_adjuntos WHERE tarjeta_id = ? ORDER BY created_at DESC");
     $adj->execute([$id]);
 
-    jsonResponse(['success' => true, 'card' => $card, 'checklist' => $chk->fetchAll(), 'adjuntos' => $adj->fetchAll()]);
+    $com = $pdo->prepare("SELECT * FROM agenda_comentarios WHERE tarjeta_id = ? ORDER BY created_at ASC");
+    $com->execute([$id]);
+
+    jsonResponse(['success' => true, 'card' => $card, 'checklist' => $chk->fetchAll(), 'adjuntos' => $adj->fetchAll(), 'comentarios' => $com->fetchAll()]);
 }
 
 // ── COLUMNAS ─────────────────────────────────────────────────────────────
@@ -143,9 +154,10 @@ if ($r === 'col') {
     if ($method === 'DELETE') {
         $id = intval($_GET['id'] ?? 0);
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
-        $pdo->prepare("DELETE FROM agenda_checklist WHERE tarjeta_id IN (SELECT id FROM agenda_tarjetas WHERE columna_id=?)")->execute([$id]);
-        $pdo->prepare("DELETE FROM agenda_adjuntos   WHERE tarjeta_id IN (SELECT id FROM agenda_tarjetas WHERE columna_id=?)")->execute([$id]);
-        $pdo->prepare("DELETE FROM agenda_tarjetas   WHERE columna_id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_checklist    WHERE tarjeta_id IN (SELECT id FROM agenda_tarjetas WHERE columna_id=?)")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_adjuntos    WHERE tarjeta_id IN (SELECT id FROM agenda_tarjetas WHERE columna_id=?)")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_comentarios WHERE tarjeta_id IN (SELECT id FROM agenda_tarjetas WHERE columna_id=?)")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_tarjetas    WHERE columna_id=?")->execute([$id]);
         $pdo->prepare("DELETE FROM agenda_columnas   WHERE id=?")->execute([$id]);
         jsonResponse(['success' => true]);
     }
@@ -202,9 +214,10 @@ if ($r === 'card') {
                 }
             }
         }
-        $pdo->prepare("DELETE FROM agenda_checklist WHERE tarjeta_id=?")->execute([$id]);
-        $pdo->prepare("DELETE FROM agenda_adjuntos   WHERE tarjeta_id=?")->execute([$id]);
-        $pdo->prepare("DELETE FROM agenda_tarjetas   WHERE id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_checklist    WHERE tarjeta_id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_adjuntos    WHERE tarjeta_id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_comentarios WHERE tarjeta_id=?")->execute([$id]);
+        $pdo->prepare("DELETE FROM agenda_tarjetas    WHERE id=?")->execute([$id]);
         jsonResponse(['success' => true]);
     }
 }
@@ -238,6 +251,31 @@ if ($r === 'chk') {
         $id = intval($_GET['id'] ?? 0);
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
         $pdo->prepare("DELETE FROM agenda_checklist WHERE id=?")->execute([$id]);
+        jsonResponse(['success' => true]);
+    }
+}
+
+// ── COMENTARIOS ───────────────────────────────────────────────────────────
+if ($r === 'comment') {
+    $input = in_array($method, ['POST']) ? (json_decode(file_get_contents('php://input'), true) ?: []) : [];
+
+    if ($method === 'POST') {
+        $tid   = intval($input['tarjeta_id'] ?? 0);
+        $texto = trim($input['texto'] ?? '');
+        $autor = trim($input['autor'] ?? 'Usuario');
+        if (!$tid || !$texto) jsonResponse(['error' => 'tarjeta_id y texto requeridos'], 400);
+        $stmt = $pdo->prepare("INSERT INTO agenda_comentarios (tarjeta_id, autor, texto) VALUES (?,?,?)");
+        $stmt->execute([$tid, substr($autor, 0, 100), substr($texto, 0, 2000)]);
+        $newId = $pdo->lastInsertId();
+        $row = $pdo->prepare("SELECT * FROM agenda_comentarios WHERE id=?");
+        $row->execute([$newId]);
+        jsonResponse(['success' => true, 'comentario' => $row->fetch()]);
+    }
+
+    if ($method === 'DELETE') {
+        $id = intval($_GET['id'] ?? 0);
+        if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
+        $pdo->prepare("DELETE FROM agenda_comentarios WHERE id=?")->execute([$id]);
         jsonResponse(['success' => true]);
     }
 }

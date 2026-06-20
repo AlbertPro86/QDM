@@ -5,6 +5,8 @@ require_once __DIR__ . '/includes/functions.php';
 requireAuth();
 
 $pageTitle = 'Agenda';
+$_agendaUser = getCurrentUser();
+$_agendaAutor = $_agendaUser ? sanitize($_agendaUser['nombre']) : 'Usuario';
 include __DIR__ . '/includes/header.php';
 ?>
 <style>
@@ -371,6 +373,40 @@ include __DIR__ . '/includes/header.php';
 .ag-side-btn:hover { background: #D6D2C7; }
 .ag-side-btn.danger:hover { background: #FEE2E2; color: #ef4444; }
 
+/* Comentarios */
+.ag-comment {
+    display: flex; gap: 8px; margin-bottom: 10px;
+}
+.ag-comment-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #0E0E0C; color: #C6F24E;
+    font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-family: var(--font-secondary, monospace);
+}
+.ag-comment-body { flex: 1; min-width: 0; }
+.ag-comment-meta {
+    display: flex; align-items: baseline; gap: 6px; margin-bottom: 3px;
+}
+.ag-comment-autor { font-size: 11px; font-weight: 700; color: #0E0E0C; }
+.ag-comment-date  { font-size: 10px; color: #C6C2BB; }
+.ag-comment-text  {
+    font-size: 13px; color: #374151; line-height: 1.5;
+    background: #fff; border-radius: 6px;
+    padding: 8px 10px; border: 1px solid #E8E5DD;
+    word-break: break-word; white-space: pre-wrap;
+    position: relative;
+}
+.ag-comment-del {
+    position: absolute; top: 4px; right: 6px;
+    width: 20px; height: 20px; border-radius: 4px; border: none;
+    background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #C6C2BB; opacity: 0; transition: all .12s;
+}
+.ag-comment-text:hover .ag-comment-del { opacity: 1; }
+.ag-comment-del:hover { background: #FEE2E2; color: #ef4444; }
+
 /* Responsive */
 @media(max-width: 640px) {
     .ag-modal-body { flex-direction: column; }
@@ -482,6 +518,22 @@ include __DIR__ . '/includes/header.php';
                     </div>
                 </div>
 
+                <div class="ag-section">
+                    <div class="ag-section-title">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Comentarios
+                    </div>
+                    <div id="mCommentList"></div>
+                    <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-end">
+                        <textarea id="mCommentInput" placeholder="Escribe un comentario..."
+                            style="flex:1;min-height:60px;resize:vertical;border-radius:6px;border:1.5px solid #E8E5DD;background:#fff;padding:8px 10px;font-size:13px;font-family:inherit;line-height:1.5;box-sizing:border-box;transition:border-color .15s"
+                            onfocus="this.style.borderColor='#0E0E0C'" onblur="this.style.borderColor='#E8E5DD'"
+                            onkeydown="if(event.key==='Enter'&&(event.ctrlKey||event.metaKey))submitComment()"></textarea>
+                        <button onclick="submitComment()" style="padding:8px 14px;border-radius:6px;border:none;background:#0E0E0C;color:#C6F24E;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Enviar</button>
+                    </div>
+                    <div style="font-size:10px;color:#C6C2BB;margin-top:4px">Ctrl+Enter para enviar</div>
+                </div>
+
             </div>
             <div class="ag-modal-side">
 
@@ -531,9 +583,11 @@ let _cols   = [];
 let _cards  = {};
 let _modal  = null;
 let _chk    = [];
-let _adj    = [];
-let _drag   = null;
-let _saveTmr = {};
+let _adj      = [];
+let _comments = [];
+let _drag     = null;
+let _saveTmr  = {};
+const AUTOR = '<?= addslashes($_agendaAutor) ?>';
 
 /* ── Load ── */
 async function loadBoard() {
@@ -805,7 +859,7 @@ async function openModal(cardId) {
     const d=await r.json();
     if(!d.success) return;
     _modal=d.card; _modal.etiquetas=_modal.etiquetas||[];
-    _chk=d.checklist; _adj=d.adjuntos;
+    _chk=d.checklist; _adj=d.adjuntos; _comments=d.comentarios||[];
     const ta=document.getElementById('mTitle');
     ta.value=_modal.titulo; autoResize(ta);
     const col=_cols.find(c=>c.id==_modal.columna_id);
@@ -813,7 +867,7 @@ async function openModal(cardId) {
     document.getElementById('mDesc').value=_modal.descripcion||'';
     document.getElementById('mFecha').value=_modal.fecha_venc?_modal.fecha_venc.slice(0,10):'';
     document.getElementById('mCompleteBtn').textContent=_modal.completada?'Desmarcar completada':'Marcar completada';
-    renderModalLabels(); renderModalChk(); renderModalAdj();
+    renderModalLabels(); renderModalChk(); renderModalAdj(); renderModalComments();
     document.getElementById('agModal').classList.add('show');
 }
 function closeModal(){
@@ -1032,6 +1086,64 @@ async function deleteCard(){
 }
 
 function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+
+/* ── COMENTARIOS ── */
+function renderModalComments(){
+    const el=document.getElementById('mCommentList');
+    if(!el) return;
+    if(!_comments.length){el.innerHTML='<div style="font-size:12px;color:#C6C2BB;padding:4px 0 8px">Sin comentarios aún.</div>';return;}
+    el.innerHTML=_comments.map(c=>{
+        const initials=(c.autor||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const dt=new Date(c.created_at.replace(' ','T'));
+        const ago=formatTimeAgo(dt);
+        return `<div class="ag-comment">
+            <div class="ag-comment-avatar">${esc(initials)}</div>
+            <div class="ag-comment-body">
+                <div class="ag-comment-meta">
+                    <span class="ag-comment-autor">${esc(c.autor)}</span>
+                    <span class="ag-comment-date">${ago}</span>
+                </div>
+                <div class="ag-comment-text">${esc(c.texto).replace(/\n/g,'<br>')}
+                    <button class="ag-comment-del" onclick="deleteComment(${c.id})">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function formatTimeAgo(dt){
+    const diff=Math.floor((Date.now()-dt.getTime())/1000);
+    if(diff<60) return 'ahora';
+    if(diff<3600) return Math.floor(diff/60)+'m';
+    if(diff<86400) return Math.floor(diff/3600)+'h';
+    return dt.toLocaleDateString('es-CO',{day:'numeric',month:'short'});
+}
+
+async function submitComment(){
+    if(!_modal) return;
+    const inp=document.getElementById('mCommentInput');
+    const texto=(inp.value||'').trim();
+    if(!texto) return;
+    inp.disabled=true;
+    const r=await fetch(`${API}?r=comment`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({tarjeta_id:_modal.id,texto,autor:AUTOR})});
+    const d=await r.json();
+    inp.disabled=false;
+    if(d.success){
+        _comments.push(d.comentario);
+        inp.value='';
+        renderModalComments();
+        document.getElementById('mCommentList').lastElementChild?.scrollIntoView({behavior:'smooth'});
+    }
+}
+
+async function deleteComment(id){
+    await fetch(`${API}?r=comment&id=${id}`,{method:'DELETE'});
+    _comments=_comments.filter(c=>c.id!=id);
+    renderModalComments();
+}
 
 loadBoard();
 </script>
