@@ -107,11 +107,15 @@ if ($r === 'col') {
 
     if ($method === 'POST') {
         $maxPos = $pdo->query("SELECT COALESCE(MAX(posicion),0)+1 FROM agenda_columnas")->fetchColumn();
+        $color = $input['color'] ?? null;
+        if ($color !== null && !preg_match('/^#[0-9a-fA-F]{3,8}$|^[a-zA-Z]{3,30}$/', $color)) {
+            $color = null;
+        }
         $stmt = $pdo->prepare("INSERT INTO agenda_columnas (nombre, posicion, color) VALUES (?,?,?)");
         $stmt->execute([
             substr(trim($input['nombre'] ?? 'Nueva lista'), 0, 100),
             (int)($input['posicion'] ?? $maxPos),
-            $input['color'] ?? null,
+            $color,
         ]);
         $newId = $pdo->lastInsertId();
         $col = $pdo->prepare("SELECT * FROM agenda_columnas WHERE id = ?");
@@ -124,7 +128,13 @@ if ($r === 'col') {
         if (!$id) jsonResponse(['error' => 'ID requerido'], 400);
         $fields = []; $vals = [];
         foreach (['nombre','posicion','color'] as $f) {
-            if (array_key_exists($f, $input)) { $fields[] = "$f=?"; $vals[] = $input[$f]; }
+            if (array_key_exists($f, $input)) {
+                $val = $input[$f];
+                if ($f === 'color' && $val !== null && !preg_match('/^#[0-9a-fA-F]{3,8}$|^[a-zA-Z]{3,30}$/', $val)) {
+                    $val = null;
+                }
+                $fields[] = "$f=?"; $vals[] = $val;
+            }
         }
         if ($fields) { $vals[] = $id; $pdo->prepare("UPDATE agenda_columnas SET ".implode(',',$fields)." WHERE id=?")->execute($vals); }
         jsonResponse(['success' => true]);
@@ -148,6 +158,9 @@ if ($r === 'card') {
     if ($method === 'POST') {
         $colId = intval($input['columna_id'] ?? 0);
         if (!$colId) jsonResponse(['error' => 'columna_id requerido'], 400);
+        $colExists = $pdo->prepare("SELECT 1 FROM agenda_columnas WHERE id = ?");
+        $colExists->execute([$colId]);
+        if (!$colExists->fetchColumn()) jsonResponse(['error' => 'Columna no existe'], 404);
         $maxPos = $pdo->prepare("SELECT COALESCE(MAX(posicion),0)+1 FROM agenda_tarjetas WHERE columna_id=?");
         $maxPos->execute([$colId]);
         $pos = $maxPos->fetchColumn();
@@ -182,8 +195,11 @@ if ($r === 'card') {
         $adjs->execute([$id]);
         foreach ($adjs->fetchAll() as $a) {
             if ($a['tipo'] === 'archivo') {
-                $path = __DIR__ . '/../' . $a['url'];
-                if (file_exists($path)) unlink($path);
+                $realBase = realpath(__DIR__ . '/../uploads');
+                $realPath = realpath(__DIR__ . '/../' . $a['url']);
+                if ($realBase && $realPath && str_starts_with($realPath, $realBase)) {
+                    unlink($realPath);
+                }
             }
         }
         $pdo->prepare("DELETE FROM agenda_checklist WHERE tarjeta_id=?")->execute([$id]);
