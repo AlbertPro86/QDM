@@ -22,6 +22,33 @@ switch ($method) {
             if ($file['error'] !== UPLOAD_ERR_OK) jsonResponse(['error' => 'Error en la subida del archivo'], 400);
             if ($file['size'] > 20 * 1024 * 1024) jsonResponse(['error' => 'Archivo supera 20 MB'], 400);
 
+            $allowedExt = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv',
+                           'jpg','jpeg','png','gif','webp','svg','mp4','mp3','zip','rar'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION) ?: 'bin');
+            if (!in_array($ext, $allowedExt, true)) {
+                jsonResponse(['error' => 'Tipo de archivo no permitido'], 400);
+            }
+
+            // Validar MIME real del archivo (no el reportado por el cliente)
+            $finfo    = new finfo(FILEINFO_MIME_TYPE);
+            $realMime = $finfo->file($file['tmp_name']);
+            $allowedMime = [
+                'application/pdf','application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'text/plain','text/csv',
+                'image/jpeg','image/png','image/gif','image/webp','image/svg+xml',
+                'video/mp4','audio/mpeg',
+                'application/zip','application/x-rar-compressed','application/octet-stream',
+            ];
+            if (!in_array($realMime, $allowedMime, true)) {
+                jsonResponse(['error' => 'Tipo de archivo no permitido'], 400);
+            }
+            $mime = $realMime; // usar el MIME real, no el del cliente
+
             // Verificar que la tarjeta existe
             $exists = $pdo->prepare("SELECT 1 FROM agenda_tarjetas WHERE id = ?");
             $exists->execute([$tid]);
@@ -31,7 +58,6 @@ switch ($method) {
             $dir     = __DIR__ . '/../uploads/agenda/' . $year . '/' . $month . '/';
             if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-            $ext     = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION) ?: 'bin');
             $newName = 'ag_' . uniqid() . '.' . $ext;
             $relPath = 'uploads/agenda/' . $year . '/' . $month . '/' . $newName;
 
@@ -40,7 +66,7 @@ switch ($method) {
             }
 
             $stmt = $pdo->prepare("INSERT INTO agenda_adjuntos (tarjeta_id, tipo, nombre, url, mime, peso) VALUES (?,?,?,?,?,?)");
-            $stmt->execute([$tid, 'archivo', $file['name'], $relPath, $file['type'], $file['size']]);
+            $stmt->execute([$tid, 'archivo', $file['name'], $relPath, $mime, $file['size']]);
             $id = $pdo->lastInsertId();
             $row = $pdo->prepare("SELECT * FROM agenda_adjuntos WHERE id=?"); $row->execute([$id]);
             jsonResponse(['success' => true, 'adjunto' => $row->fetch()]);
