@@ -7,11 +7,11 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
 requireAuth();
 
-$pageTitle      = 'Estadísticas de Blog';
+$pageTitle      = 'Estadísticas del Sitio';
 $pageSubtitle   = '';
 $pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
     . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
-    . '<span style="font-weight:700;color:var(--color-text)">Blog · Estadísticas</span>';
+    . '<span style="font-weight:700;color:var(--color-text)">Estadísticas del Sitio</span>';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -91,7 +91,7 @@ include __DIR__ . '/includes/header.php';
         </button>
         <!-- Miga de pan -->
         <nav style="display:flex;align-items:center;gap:3px;font-size:12px;color:var(--color-text-muted);flex-wrap:wrap">
-            <span id="bcStats" style="cursor:default;transition:color .15s">Blog · Estadísticas</span>
+            <span id="bcStats" style="cursor:default;transition:color .15s">Estadísticas del Sitio</span>
             <span id="bcSep" style="display:none;align-items:center">
                 <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="opacity:.4;margin:0 2px"><path d="M9 5l7 7-7 7"/></svg>
             </span>
@@ -107,11 +107,11 @@ include __DIR__ . '/includes/header.php';
             </svg>
             Actualizar
         </button>
-        <a href="https://quantundigital.com/blog.html" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+        <a href="https://quantundigital.com" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
             </svg>
-            Ver blog
+            Ver sitio
         </a>
     </div>
 
@@ -170,10 +170,10 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <!-- Tabla de artículos -->
+    <!-- Tabla de páginas -->
     <div class="card" style="padding:0;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--color-border)">
-            <h2 style="font-size:15px;font-weight:700;margin:0">Artículos</h2>
+            <h2 style="font-size:15px;font-weight:700;margin:0">Páginas del sitio</h2>
             <span id="artCount" style="font-size:12px;color:var(--color-text-muted)"></span>
         </div>
         <div id="artTableWrap">
@@ -215,6 +215,8 @@ include __DIR__ . '/includes/header.php';
 const API = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '/crm') + '/api/blog_visitas.php';
 
 const TITULOS = {
+    'home':                  'Inicio — Página principal',
+    'blog':                  'Blog — Listado de artículos',
     'ecosistema-digital':    'Por qué tu empresa necesita un ecosistema digital',
     'redes-sociales-leads':  'Cómo usar las redes sociales para captar prospectos',
     'ia-para-negocios':      'Inteligencia Artificial para tu negocio: guía práctica',
@@ -317,9 +319,9 @@ function renderFuentes(fuentes){
 
 function renderTable(articulos){
     const wrap = document.getElementById('artTableWrap');
-    document.getElementById('artCount').textContent = articulos.length + ' artículo' + (articulos.length !== 1 ? 's' : '');
+    document.getElementById('artCount').textContent = articulos.length + ' página' + (articulos.length !== 1 ? 's' : '');
     if(!articulos.length){
-        wrap.innerHTML = '<div class="no-data"><svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><p>Aún no hay visitas registradas.<br>Publica un artículo y comparte el link.</p></div>';
+        wrap.innerHTML = '<div class="no-data"><svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><p>Aún no hay visitas registradas.<br>Comparte el sitio para empezar a ver datos.</p></div>';
         return;
     }
     const maxTotal = Math.max(1, ...articulos.map(function(a){ return parseInt(a.total); }));
@@ -381,7 +383,7 @@ cargarStats();
 
 /* ── Contador en tiempo real ── */
 const API_LIVE = (location.hostname === 'localhost' ? '/CRM-QUANTUN-Digital' : '/crm') + '/api/blog_visitas.php?action=activos';
-const PAGINA_LABELS = { home:'Inicio', blog:'Blog', 'ecosistema-digital':'Ecosistema digital', 'redes-sociales-leads':'Redes sociales', 'ia-para-negocios':'IA para negocios', 'seo-ia-visibilidad':'SEO e IA', 'correos-profesionales':'Correos profesionales' };
+const PAGINA_LABELS = { home:'Inicio', blog:'Blog', 'ecosistema-digital':'Ecosistema digital', 'redes-sociales-leads':'Redes sociales', 'ia-para-negocios':'IA para negocios', 'seo-ia-visibilidad':'SEO e IA', 'correos-profesionales':'Correos profesionales', 'Inicio — Página principal':'Inicio', 'Blog — Listado de artículos':'Blog' };
 
 async function actualizarLive(){
     try {

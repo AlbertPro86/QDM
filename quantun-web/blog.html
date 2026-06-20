@@ -241,6 +241,8 @@
 </footer>
 
 <script src="script.js"></script>
+<script src="ping.js"></script>
+<script>(function(){var b=location.hostname==='localhost'?'/CRM-QUANTUN-Digital':'/crm';fetch(b+'/api/blog_visitas.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug:'blog',titulo:'Blog — Listado de artículos'})}).catch(function(){});})();</script>
 <script>
   /* ── Filtros de categoría ── */
   var chips = document.querySelectorAll('.blogchip');
