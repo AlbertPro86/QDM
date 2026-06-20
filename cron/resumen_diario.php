@@ -116,6 +116,19 @@ try {
     $nLeadsNuevos = (int)$st->fetchColumn();
 } catch (Exception $e) {}
 
+$agendaVencidas = [];
+$nAgendaVencidas = 0;
+try {
+    $st = $pdo->prepare(
+        "SELECT titulo, fecha_venc FROM agenda_tarjetas
+         WHERE archivada = 0 AND completada = 0 AND fecha_venc IS NOT NULL AND fecha_venc <= CURDATE()
+         ORDER BY fecha_venc ASC LIMIT 10"
+    );
+    $st->execute();
+    $agendaVencidas = $st->fetchAll(PDO::FETCH_ASSOC);
+    $nAgendaVencidas = count($agendaVencidas);
+} catch (Exception $e) {}
+
 // ── Logo inline ───────────────────────────────────────────────────────────────
 $inlineImages = [];
 $logoPaths = [
@@ -174,8 +187,28 @@ $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
       </tr>
     </table>
   </td></tr>
+  ' . ($nAgendaVencidas > 0 ? '
+  <tr><td style="padding:0 28px 16px">
+    <div style="background:#FEF2F2;border-radius:8px;padding:14px 16px;border-left:3px solid #B91C1C">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#B91C1C;margin-bottom:10px">
+        Agenda — ' . $nAgendaVencidas . ' tarjeta' . ($nAgendaVencidas === 1 ? '' : 's') . ' vencida' . ($nAgendaVencidas === 1 ? '' : 's') . '
+      </div>
+      ' . implode('', array_map(function($t) {
+          $fv = new DateTime($t['fecha_venc']);
+          $fmtd = $fv->format('d/m/Y');
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(185,28,28,.1)">
+            <span style="font-size:12px;color:#0E0E0C;font-weight:500">' . htmlspecialchars($t['titulo'], ENT_QUOTES, 'UTF-8') . '</span>
+            <span style="font-size:10px;font-weight:700;color:#B91C1C;white-space:nowrap;margin-left:10px">' . $fmtd . '</span>
+          </div>';
+      }, $agendaVencidas)) . '
+    </div>
+  </td></tr>' : '') . '
   <tr><td style="padding:16px 28px 24px">
-    <a href="https://quantundigital.com/crm/dashboard.php" style="display:inline-block;background:#0E0E0C;color:#C6F24E;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:12px;font-weight:700">
+    <a href="https://quantundigital.com/crm/agenda.php" style="display:inline-block;background:#0E0E0C;color:#C6F24E;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:12px;font-weight:700">
+      Ver Agenda
+    </a>
+    &nbsp;&nbsp;
+    <a href="https://quantundigital.com/crm/dashboard.php" style="display:inline-block;background:#F5F5F2;color:#0E0E0C;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:12px;font-weight:700">
       Ver CRM
     </a>
   </td></tr>
