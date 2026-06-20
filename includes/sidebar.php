@@ -11,9 +11,9 @@ try {
     $newLeadsCount = 0;
 }
 try {
-    $mejorasPendientes = db()->query("SELECT COUNT(*) FROM mejoras_plataforma WHERE completada = 0")->fetchColumn();
+    $agendaVencidas = db()->query("SELECT COUNT(*) FROM agenda_tarjetas WHERE archivada = 0 AND completada = 0 AND fecha_venc IS NOT NULL AND fecha_venc <= CURDATE()")->fetchColumn();
 } catch (Exception $e) {
-    $mejorasPendientes = 0;
+    $agendaVencidas = 0;
 }
 try {
     $newSolicitudesWeb = db()->query("SELECT COUNT(*) FROM crm_solicitudes_web WHERE estado = 'nuevo'")->fetchColumn();
@@ -182,16 +182,19 @@ try {
             <span class="nav-link-text">Portal Cliente</span>
         </a>
 
-        <a href="mejoras.php" class="nav-link <?= $currentPage === 'mejoras' ? 'active' : '' ?>" id="nav-mejoras" title="Mejoras" style="opacity:<?= $currentPage === 'mejoras' ? '1' : '.5' ?>;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity='<?= $currentPage === 'mejoras' ? '1' : '.5' ?>'">
+        <a href="agenda.php" class="nav-link <?= $currentPage === 'agenda' ? 'active' : '' ?>" id="nav-agenda" title="Agenda">
             <span style="position:relative;display:inline-flex;flex-shrink:0">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" width="20" height="20">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 11h.01"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <?php if ($mejorasPendientes > 0): ?>
-                    <span style="position:absolute;top:-5px;right:-6px;min-width:15px;height:15px;border-radius:100px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;letter-spacing:0;font-family:inherit;border:1.5px solid var(--sidebar-bg,#0E0E0C)"><?= $mejorasPendientes ?></span>
+                <?php if (!empty($agendaVencidas) && $agendaVencidas > 0): ?>
+                    <span style="position:absolute;top:-5px;right:-6px;min-width:15px;height:15px;border-radius:100px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;letter-spacing:0;font-family:inherit;border:1.5px solid var(--sidebar-bg,#0E0E0C)"><?= (int)$agendaVencidas ?></span>
                 <?php endif; ?>
             </span>
-            <span class="nav-link-text">Mejoras</span>
+            <span class="nav-link-text">Agenda</span>
         </a>
     </nav>
 
