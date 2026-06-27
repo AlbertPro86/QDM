@@ -47,7 +47,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
     $hoy         = date('Y-m-d');
 
     $ss = $pdo->prepare("
-        SELECT cs.*, s.nombre AS servicio_nombre
+        SELECT cs.*, s.nombre AS servicio_nombre, s.descripcion AS servicio_descripcion, s.categoria AS servicio_categoria
         FROM   cliente_servicios cs
         JOIN   servicios s ON s.id = cs.servicio_id
         WHERE  cs.cliente_id   = ?
@@ -64,7 +64,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
 
     if ($esPrueba && !$servicios) {
         $ss2 = $pdo->prepare("
-            SELECT cs.*, s.nombre AS servicio_nombre
+            SELECT cs.*, s.nombre AS servicio_nombre, s.descripcion AS servicio_descripcion, s.categoria AS servicio_categoria
             FROM   cliente_servicios cs
             JOIN   servicios s ON s.id = cs.servicio_id
             WHERE  cs.cliente_id = ? AND cs.estado = 'activo'
@@ -87,6 +87,30 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
         } catch (PDOException $e) {}
     }
     $mensajeBase   = $mensajePlantilla ?: ($cfg['mensaje_personalizado'] ?? '');
+
+    // Reemplazar variables en el mensaje de plantilla
+    if ($mensajeBase && $servicios) {
+        $sv0        = $servicios[0]; // primer servicio como referencia
+        $totalMonto = array_sum(array_column($servicios, 'monto_renovacion'));
+        $periodoMap = ['mensual'=>'Mensual','trimestral'=>'Trimestral','semestral'=>'Semestral',
+                       'anual'=>'Anual','bianual'=>'Bianual','unico'=>'Único'];
+        $varsReplace = [
+            '{{cliente_nombre}}'    => $cliente['nombre_comercial'] ?? '',
+            '{{servicio}}'          => $sv0['servicio_nombre'] ?? '',
+            '{{plan}}'              => $sv0['nombre_display'] ?: ($sv0['servicio_categoria'] ?? $sv0['servicio_nombre'] ?? ''),
+            '{{precio_plan}}'       => '$ ' . number_format($sv0['monto_renovacion'] ?? 0, 0, ',', '.') . ' COP',
+            '{{descripcion}}'       => $sv0['servicio_descripcion'] ?: ($sv0['notas'] ?? ''),
+            '{{periodo}}'           => $periodoMap[$sv0['frecuencia'] ?? ''] ?? ($sv0['frecuencia'] ?? ''),
+            '{{forma_pago}}'        => '',
+            '{{total}}'             => '$ ' . number_format($totalMonto, 0, ',', '.') . ' COP',
+            '{{moneda}}'            => 'COP',
+            '{{fecha}}'             => $sv0['fecha_vencimiento'] ? date('d/m/Y', strtotime($sv0['fecha_vencimiento'])) : '',
+            '{{vigencia}}'          => $diasAntes,
+            '{{numero_cotizacion}}' => '',
+        ];
+        $mensajeBase = str_replace(array_keys($varsReplace), array_values($varsReplace), $mensajeBase);
+    }
+
     $mensajeExtra  = $mensajeBase
         ? '<p style="color:#475569;font-size:14px;margin:0 0 20px">' . nl2br(htmlspecialchars($mensajeBase)) . '</p>'
         : '';
