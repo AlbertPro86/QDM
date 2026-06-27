@@ -203,7 +203,7 @@ include __DIR__ . '/includes/header.php';
             <div style="padding:10px 12px;background:#FAFAF7;border-radius:4px;border:1.5px solid #E8E5DD">
                 <div style="font-size:10px;font-weight:700;color:#57544D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Variables disponibles</div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
-                    <?php foreach(['cliente_nombre','numero_cotizacion','total','moneda','fecha','vigencia'] as $v): ?>
+                    <?php foreach(['cliente_nombre','numero_cotizacion','servicio','plan','precio_plan','descripcion','periodo','forma_pago','total','moneda','fecha','vigencia'] as $v): ?>
                     <code onclick="insertarVariable('{{<?=$v?>}}')" style="padding:3px 8px;background:#EFECE5;color:#2A2926;border-radius:3px;font-size:11px;cursor:pointer;font-weight:600" title="Clic para insertar">{{<?=$v?>}}</code>
                     <?php endforeach; ?>
                 </div>
@@ -487,7 +487,7 @@ async function clonarPlantilla(id) {
 }
 
 // Variables disponibles en plantillas
-const VARS_PLANTILLA = ['cliente_nombre','numero_cotizacion','total','moneda','fecha','vigencia'];
+const VARS_PLANTILLA = ['cliente_nombre','numero_cotizacion','servicio','plan','precio_plan','descripcion','periodo','forma_pago','total','moneda','fecha','vigencia'];
 
 // Detecta qué variables usa el contenido
 function detectarVariables(contenido) {
@@ -514,6 +514,12 @@ function reemplazarVariables(texto) {
 const VAR_LABELS = {
     cliente_nombre:      'Nombre del cliente',
     numero_cotizacion:   'Número de cotización',
+    servicio:            'Servicio',
+    plan:                'Plan',
+    precio_plan:         'Precio del plan',
+    descripcion:         'Descripción del servicio',
+    periodo:             'Periodo (mensual/anual)',
+    forma_pago:          'Forma de pago',
     total:               'Total',
     moneda:              'Moneda',
     fecha:               'Fecha',
