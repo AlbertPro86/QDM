@@ -296,23 +296,45 @@ function logNotif(string $msg, string $file): void {
     file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
 }
 
+// Auto-migración: crear tabla si no existe (por si el cron corre antes que el modal)
+try {
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS crm_cliente_notif_config (
+            cliente_id INT NOT NULL PRIMARY KEY, activa TINYINT(1) NOT NULL DEFAULT 1,
+            dias_antes INT NOT NULL DEFAULT 15, hora_envio TIME NOT NULL DEFAULT '08:00:00',
+            r1_dias INT NOT NULL DEFAULT 15, r1_hora TIME NOT NULL DEFAULT '08:00:00',
+            r2_dias INT NOT NULL DEFAULT 7,  r2_hora TIME NOT NULL DEFAULT '08:00:00',
+            r3_dias INT NOT NULL DEFAULT 2,  r3_hora TIME NOT NULL DEFAULT '08:00:00',
+            r1_plantilla_id INT NULL DEFAULT NULL, r2_plantilla_id INT NULL DEFAULT NULL, r3_plantilla_id INT NULL DEFAULT NULL,
+            r1_fecha DATETIME NULL DEFAULT NULL, r2_fecha DATETIME NULL DEFAULT NULL, r3_fecha DATETIME NULL DEFAULT NULL,
+            asunto_personalizado VARCHAR(255) NOT NULL DEFAULT '', mensaje_personalizado TEXT NOT NULL DEFAULT '',
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+} catch (\PDOException $e) {}
+
 $horaActual = date('H:i');
 $hoy        = date('Y-m-d');
 
-$stmt = $pdo->query("
-    SELECT c.id, c.nombre_comercial,
-           n.activa, n.r1_dias, n.r1_hora, n.r2_dias, n.r2_hora, n.r3_dias, n.r3_hora,
-           n.r1_fecha, n.r2_fecha, n.r3_fecha
-    FROM   clientes c
-    JOIN   crm_cliente_notif_config n ON n.cliente_id = c.id
-    WHERE  c.estado = 'activo'
-      AND  (
-          n.activa = 1
-          OR n.r1_fecha IS NOT NULL
-          OR n.r2_fecha IS NOT NULL
-          OR n.r3_fecha IS NOT NULL
-      )
-");
+try {
+    $stmt = $pdo->query("
+        SELECT c.id, c.nombre_comercial,
+               n.activa, n.r1_dias, n.r1_hora, n.r2_dias, n.r2_hora, n.r3_dias, n.r3_hora,
+               n.r1_fecha, n.r2_fecha, n.r3_fecha
+        FROM   clientes c
+        JOIN   crm_cliente_notif_config n ON n.cliente_id = c.id
+        WHERE  c.estado = 'activo'
+          AND  (
+              n.activa = 1
+              OR n.r1_fecha IS NOT NULL
+              OR n.r2_fecha IS NOT NULL
+              OR n.r3_fecha IS NOT NULL
+          )
+    ");
+} catch (\PDOException $e) {
+    logNotif('[FATAL] Error en consulta principal: ' . $e->getMessage(), $logFile);
+    exit(1);
+}
 
 $enviados = 0; $errores = 0;
 
