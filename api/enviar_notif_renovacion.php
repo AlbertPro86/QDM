@@ -16,6 +16,15 @@ require_once __DIR__ . '/../includes/crm_config.php';
 
 $isCli = php_sapi_name() === 'cli';
 
+// Modo URL con token para crons en Hostinger/cPanel (no requiere sesión)
+if (!$isCli && isset($_GET['cron_token'])) {
+    $cronToken = env('CRON_SECRET', '');
+    if (!$cronToken || $_GET['cron_token'] !== $cronToken) {
+        http_response_code(403); echo 'Forbidden'; exit;
+    }
+    $isCli = true;
+}
+
 if (!$isCli) {
     header('Content-Type: application/json; charset=utf-8');
     if (!isAuthenticated()) jsonResponse(['error' => 'No autorizado'], 401);
@@ -280,6 +289,13 @@ if (!$isCli) {
 }
 
 // ── Modo CLI (cron diario) ────────────────────────────────────────────────────
+$logFile = __DIR__ . '/../logs/notif_cron.log';
+function logNotif(string $msg, string $file): void {
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . PHP_EOL;
+    echo $line;
+    file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
+}
+
 $horaActual = date('H:i');
 $hoy        = date('Y-m-d');
 
@@ -340,8 +356,9 @@ while ($row = $stmt->fetch()) {
             if ($diasRestantes > $r['dias']) continue;
         }
 
-        // Enviar
-        $res = enviarNotifCliente($pdo, $clienteId, $num, false);
+        // Cuando hay fecha programada explícita, forzar envío aunque no haya servicios en la ventana de días
+        $esFechaProg = ($fechaProg !== null);
+        $res = enviarNotifCliente($pdo, $clienteId, $num, $esFechaProg);
         if (($res['ok'] ?? false) && !($res['skipped'] ?? false)) {
             // Actualizar notif_count y fecha en TODOS los servicios activos del cliente
             $dateField = "notif_r{$num}_at";
@@ -351,19 +368,25 @@ while ($row = $stmt->fetch()) {
                        {$dateField} = COALESCE({$dateField}, NOW())
                 WHERE  cliente_id = ? AND estado = 'activo' AND frecuencia != 'unico'
             ")->execute([$num, $clienteId]);
+            // Limpiar la r{N}_fecha ya ejecutada para no re-verificar en futuras ejecuciones
+            if ($esFechaProg) {
+                $fecField = "r{$num}_fecha";
+                $pdo->prepare("UPDATE crm_cliente_notif_config SET {$fecField} = NULL WHERE cliente_id = ?")
+                    ->execute([$clienteId]);
+            }
             // Registrar nota
             $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, 0, ?)")
                 ->execute([$clienteId, "🔔 Recordatorio {$num}/3 enviado automáticamente ({$svc['fecha_vencimiento']})"]);
-            echo "[OK R{$num}] {$row['nombre_comercial']}\n";
+            logNotif("[OK R{$num}] {$row['nombre_comercial']}", $logFile);
             $enviados++;
         } elseif ($res['skipped'] ?? false) {
-            echo "[SKIP R{$num}] {$row['nombre_comercial']}: sin servicios en período\n";
+            logNotif("[SKIP R{$num}] {$row['nombre_comercial']}: sin servicios en período", $logFile);
         } else {
-            echo "[ERR R{$num}] {$row['nombre_comercial']}: " . ($res['error'] ?? '?') . "\n";
+            logNotif("[ERR R{$num}] {$row['nombre_comercial']}: " . ($res['error'] ?? '?'), $logFile);
             $errores++;
         }
         break; // solo un recordatorio por ejecución por cliente
     }
 }
 
-echo "Fin: {$enviados} enviados, {$errores} errores.\n";
+logNotif("Fin: {$enviados} enviados, {$errores} errores.", $logFile);
