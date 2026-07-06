@@ -1985,6 +1985,7 @@ async function resetNotifTokens(svcId, svcNombre) {
         showToast('Recordatorios reiniciados', 'success');
         loadServices();
         loadNotes();
+        loadNotifConfig();
     } catch(e) { showToast('Error al reiniciar', 'error'); }
 }
 
