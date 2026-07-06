@@ -32,12 +32,11 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           command_timeout: 90s
           script: |
-            set -e
-            cd "$HOME/domains/quantundigital.com/public_html/crm"
-            echo "=== $(date '+%Y-%m-%d %H:%M:%S %Z') — ejecutando recordatorios ==="
-            if command -v /usr/bin/php >/dev/null 2>&1; then
-              /usr/bin/php api/enviar_notif_renovacion.php
-            else
-              php api/enviar_notif_renovacion.php
-            fi
-            echo "=== fin ==="
+            cd "$HOME/domains/quantundigital.com/public_html/crm" || { echo "CD FAILED"; exit 1; }
+            echo "=== $(date '+%Y-%m-%d %H:%M:%S %Z') — diagnostico PHP ==="
+            echo "which php: $(which php 2>&1)"
+            echo "php -v: $(php -v 2>&1 | head -1)"
+            echo "/usr/bin/php -v: $(/usr/bin/php -v 2>&1 | head -1)"
+            echo "=== ejecutando recordatorios (errores visibles) ==="
+            php -d display_errors=1 -d error_reporting=E_ALL api/enviar_notif_renovacion.php 2>&1
+            echo "=== EXIT: $? ==="
