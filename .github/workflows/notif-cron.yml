@@ -33,10 +33,21 @@ jobs:
           command_timeout: 90s
           script: |
             cd "$HOME/domains/quantundigital.com/public_html/crm" || { echo "CD FAILED"; exit 1; }
-            echo "=== $(date '+%Y-%m-%d %H:%M:%S %Z') — diagnostico PHP ==="
-            echo "which php: $(which php 2>&1)"
-            echo "php -v: $(php -v 2>&1 | head -1)"
-            echo "/usr/bin/php -v: $(/usr/bin/php -v 2>&1 | head -1)"
-            echo "=== ejecutando recordatorios (errores visibles) ==="
-            php -d display_errors=1 -d error_reporting=E_ALL api/enviar_notif_renovacion.php 2>&1
-            echo "=== EXIT: $? ==="
+            # El CLI por defecto es PHP 7.4, pero el sitio corre en PHP 8.3.
+            # El codigo requiere PHP 8+, asi que buscamos el binario correcto.
+            PHPBIN=""
+            for c in /opt/alt/php83/usr/bin/php /opt/alt/php82/usr/bin/php \
+                     /opt/alt/php81/usr/bin/php /opt/alt/php80/usr/bin/php \
+                     php8.3 php8.2 php8.1 php8.0; do
+              if "$c" -r 'exit(version_compare(PHP_VERSION,"8.0",">=")?0:1);' >/dev/null 2>&1; then
+                PHPBIN="$c"; break
+              fi
+            done
+            if [ -z "$PHPBIN" ]; then
+              echo "ERROR: no se encontro PHP 8.x en el servidor"; exit 1
+            fi
+            echo "=== $(date '+%Y-%m-%d %H:%M:%S %Z') — usando $PHPBIN ($("$PHPBIN" -v | head -1)) ==="
+            "$PHPBIN" api/enviar_notif_renovacion.php
+            rc=$?
+            echo "=== EXIT: $rc ==="
+            exit $rc
