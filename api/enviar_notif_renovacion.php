@@ -361,14 +361,17 @@ while ($row = $stmt->fetch()) {
     ];
 
     foreach ($recordatorios as $num => $r) {
-        // Ya se envió este recordatorio o uno posterior
-        if ($notifCount >= $num) continue;
-
-        // Verificar si es momento de enviar: usar r{N}_fecha si está configurada
+        // Verificar si hay fecha explícita programada para este recordatorio
         $fechaClave  = "r{$num}_fecha";
         $fechaProg   = $row[$fechaClave] ?? null;
-        if ($fechaProg) {
-            // Enviar si la fecha programada ya llegó (dentro del minuto actual)
+        $esFechaProg = ($fechaProg !== null);
+
+        // Si ya se envió este recordatorio o uno posterior, omitir
+        // EXCEPCIÓN: si hay fecha programada explícita, siempre intentar
+        if ($notifCount >= $num && !$esFechaProg) continue;
+
+        if ($esFechaProg) {
+            // Enviar si la fecha programada ya llegó (tolerancia de 5 minutos hacia atrás)
             $ts = strtotime($fechaProg);
             if ($ts === false || $ts > time() + 60) continue;
         } else {
@@ -377,9 +380,6 @@ while ($row = $stmt->fetch()) {
             $diasRestantes = (int)ceil((strtotime($svc['fecha_vencimiento']) - time()) / 86400);
             if ($diasRestantes > $r['dias']) continue;
         }
-
-        // Cuando hay fecha programada explícita, forzar envío aunque no haya servicios en la ventana de días
-        $esFechaProg = ($fechaProg !== null);
         $res = enviarNotifCliente($pdo, $clienteId, $num, $esFechaProg);
         if (($res['ok'] ?? false) && !($res['skipped'] ?? false)) {
             // Actualizar notif_count y fecha en TODOS los servicios activos del cliente
@@ -396,9 +396,12 @@ while ($row = $stmt->fetch()) {
                 $pdo->prepare("UPDATE crm_cliente_notif_config SET {$fecField} = NULL WHERE cliente_id = ?")
                     ->execute([$clienteId]);
             }
-            // Registrar nota
-            $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, 0, ?)")
-                ->execute([$clienteId, "🔔 Recordatorio {$num}/3 enviado automáticamente ({$svc['fecha_vencimiento']})"]);
+            // Registrar nota (usa MIN(id) de usuarios para evitar FK violation en producción)
+            try {
+                $sysUid = (int)($pdo->query("SELECT MIN(id) FROM usuarios")->fetchColumn() ?: 1);
+                $pdo->prepare("INSERT INTO clientes_notas (cliente_id, usuario_id, nota) VALUES (?, ?, ?)")
+                    ->execute([$clienteId, $sysUid, "Recordatorio {$num}/3 enviado automaticamente ({$svc['fecha_vencimiento']})"]);
+            } catch (\Throwable $e) { /* nota no crítica */ }
             logNotif("[OK R{$num}] {$row['nombre_comercial']}", $logFile);
             $enviados++;
         } elseif ($res['skipped'] ?? false) {
@@ -407,7 +410,9 @@ while ($row = $stmt->fetch()) {
             logNotif("[ERR R{$num}] {$row['nombre_comercial']}: " . ($res['error'] ?? '?'), $logFile);
             $errores++;
         }
-        break; // solo un recordatorio por ejecución por cliente
+        // Con fecha explícita: procesar todos los recordatorios pendientes en una sola ejecución
+        // Sin fecha: solo uno por ejecución para evitar spam
+        if (!$esFechaProg) break;
     }
 }
 

@@ -1,0 +1,43 @@
+name: Notificaciones automaticas (cron)
+
+# Programador confiable (GitHub Actions) que ejecuta el script de
+# recordatorios de renovacion en el servidor via SSH cada 5 minutos.
+# Reutiliza el mismo secret SSH_PASSWORD que usa deploy.yml, por lo que
+# NO requiere configuracion adicional.
+#
+# Nota: el cron de GitHub Actions esta en UTC y puede tener retrasos de
+# algunos minutos bajo carga. Para recordatorios de renovacion (dias antes
+# del vencimiento) esa precision es mas que suficiente.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # cada 5 minutos
+  workflow_dispatch:          # permite ejecutar manualmente desde la pestana Actions
+
+# Evita solapamiento si una ejecucion tarda mas de lo normal
+concurrency:
+  group: notif-cron
+  cancel-in-progress: false
+
+jobs:
+  enviar-notificaciones:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ejecutar script de recordatorios via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 195.179.239.212
+          port: 65002
+          username: u260705801
+          password: ${{ secrets.SSH_PASSWORD }}
+          command_timeout: 90s
+          script: |
+            set -e
+            cd "$HOME/domains/quantundigital.com/public_html/crm"
+            echo "=== $(date '+%Y-%m-%d %H:%M:%S %Z') — ejecutando recordatorios ==="
+            if command -v /usr/bin/php >/dev/null 2>&1; then
+              /usr/bin/php api/enviar_notif_renovacion.php
+            else
+              php api/enviar_notif_renovacion.php
+            fi
+            echo "=== fin ==="
