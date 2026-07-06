@@ -96,8 +96,14 @@ switch ($method) {
             if(!$id) jsonResponse(['error' => 'ID es requerido'], 400);
 
             $fields = ['monto_renovacion', 'descuento', 'costo_servicio', 'fecha_inicio', 'fecha_vencimiento', 'frecuencia', 'estado', 'nombre_display', 'notif_count', 'notif_r1_at', 'notif_r2_at', 'notif_r3_at'];
+            // Campos que aceptan NULL explícito (para reiniciar recordatorios). El resto ignora null.
+            $nullable = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'];
             $up = []; $vals = [];
-            foreach($fields as $f) { if(isset($input[$f])) { $up[] = "$f = ?"; $vals[] = $input[$f]; } }
+            foreach($fields as $f) {
+                if (array_key_exists($f, $input) && ($input[$f] !== null || in_array($f, $nullable, true))) {
+                    $up[] = "$f = ?"; $vals[] = $input[$f];
+                }
+            }
             $vals[] = $id;
 
             if (empty($up)) jsonResponse(['error' => 'No hay campos para actualizar'], 400);

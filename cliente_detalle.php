@@ -1967,10 +1967,21 @@ async function resetNotifTokens(svcId, svcNombre) {
             body: JSON.stringify({ cliente_id: clienteId,
                 nota: `Recordatorios reiniciados — ciclo de notificaciones reseteado (${svcNombre}).` })
         });
-        await fetch('api/cliente_servicios.php', {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: svcId, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
+        // Limpiar fechas programadas en la config del cliente
+        await fetch('api/cliente_notif_config.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId, r1_fecha: null, r2_fecha: null, r3_fecha: null })
         });
+        // Resetear tokens en TODOS los servicios activos recurrentes (no solo uno)
+        const rsAll = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
+        const dsAll = await rsAll.json();
+        const activosAll = (dsAll.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+        for (const s of activosAll) {
+            await fetch('api/cliente_servicios.php', {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: s.id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
+            });
+        }
         showToast('Recordatorios reiniciados', 'success');
         loadServices();
         loadNotes();
@@ -5318,10 +5329,8 @@ async function resetearFilaNotif(rid) {
         const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
         const ds = await rs.json();
         const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
-        if (activos.length) {
-            activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
-            const svc = activos[0];
-            const newCount = Math.max(0, num - 1);
+        const newCount = Math.max(0, num - 1);
+        for (const svc of activos) {
             const upd = { id: svc.id, notif_count: newCount };
             for (let n = num; n <= 3; n++) upd[`notif_r${n}_at`] = null;
             await fetch('api/cliente_servicios.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(upd) });
@@ -5350,10 +5359,9 @@ async function resetearTodasNotif() {
         const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
         const ds = await rs.json();
         const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
-        if (activos.length) {
-            activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+        for (const s of activos) {
             await fetch('api/cliente_servicios.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: activos[0].id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null }) });
+                body: JSON.stringify({ id: s.id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null }) });
         }
         ['r1','r2','r3'].forEach(rid => {
             const f = document.getElementById(`notif_${rid}_fecha`); if (f) f.value = '';
