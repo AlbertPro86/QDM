@@ -67,7 +67,7 @@ function renderTable(leads) {
                 style="width:15px;height:15px;cursor:pointer;accent-color:#dc2626">
         </td>
         <td><div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--color-surface);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--color-text-muted);flex-shrink:0">${l.nombre.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}</div><div><div class="cell-primary">${escapeHtml(l.nombre)}</div><div style="font-size:12px;color:var(--color-text-light)">${l.email||''}</div></div></div></td>
-        <td><a href="https://wa.me/${l.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="color:#25d366;font-weight:600">${escapeHtml(l.whatsapp)}</a></td>
+        <td><a href="${waLink(l.whatsapp)}" target="_blank" style="color:#25d366;font-weight:600">${escapeHtml(l.whatsapp)}</a></td>
         <td>${escapeHtml(l.servicio_interes)}</td>
         <td class="cell-primary">${formatMoney(l.presupuesto)}</td>
         <td><span class="badge ${statusBadges[l.estado]}">${statusLabels[l.estado]}</span></td>

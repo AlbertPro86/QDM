@@ -159,6 +159,31 @@
         });
     }
 
+    // ── WhatsApp: punto único para todo el CRM ───────────────────────────────
+    // Antes cada módulo armaba la URL a mano: unos anteponían '57' siempre
+    // (duplicándolo si el número ya lo traía) y otros no lo ponían nunca.
+    window.waNumero = function(tel) {
+        const d = String(tel || '').replace(/\D/g, '');
+        if (!d) return '';
+        if (d.length === 10) return '57' + d;                    // móvil colombiano sin indicativo
+        if (d.length === 12 && d.indexOf('57') === 0) return d;  // ya trae indicativo
+        return d;                                                // número internacional
+    };
+
+    window.waLink = function(tel, texto) {
+        const n = waNumero(tel);
+        if (!n) return '';
+        return 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '');
+    };
+
+    // Abre WhatsApp Web/app en otra pestaña. Devuelve false si no hay número.
+    window.waAbrir = function(tel, texto) {
+        const url = waLink(tel, texto);
+        if (!url) { showToast('No hay número de WhatsApp registrado', 'warning'); return false; }
+        window.open(url, '_blank');
+        return true;
+    };
+
     // ── Cerrar cualquier modal-overlay al hacer clic en el fondo ──────────────
     document.addEventListener('click', function(e) {
         // Detecta clic directo sobre el overlay (no sobre el modal interior)

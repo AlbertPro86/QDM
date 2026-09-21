@@ -126,7 +126,7 @@ function fnMsgConfirmarWA() {
     const tel = (_fnMsgCliente.telefono || '').replace(/\D/g,'');
     if (!tel) { showToast('Este cliente no tiene teléfono registrado', 'error'); return; }
     const texto = fnMsgReemplazarVars(_fnMsgPlantilla.contenido);
-    window.open('https://wa.me/57' + tel + '?text=' + encodeURIComponent(texto), '_blank');
+    if (!waAbrir(tel, texto)) return;
     fnCerrarMsgModal();
 }
 

@@ -302,9 +302,8 @@ async function eliminarSolicitud(id) {
 
 function contactarWhatsapp() {
     if (!swCurrent) return;
-    const num = swCurrent.telefono.replace(/\D/g, '');
-    const msg = encodeURIComponent(`Hola ${swCurrent.nombre}, soy de QUANTUN Digital. Recibimos tu solicitud sobre "${swCurrent.servicio_solicitado}". ¿En qué momento podemos hablar?`);
-    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+    const msg = `Hola ${swCurrent.nombre}, soy de QUANTUN Digital. Recibimos tu solicitud sobre "${swCurrent.servicio_solicitado}". ¿En qué momento podemos hablar?`;
+    waAbrir(swCurrent.telefono, msg);
 }
 
 function crearClienteDesde() {

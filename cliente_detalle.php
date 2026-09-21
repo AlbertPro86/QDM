@@ -91,7 +91,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Datos inline -->
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;flex:1;min-width:0">
             <?php if($cliente['telefono']): ?>
-            <a href="https://wa.me/<?= preg_replace('/\D/','',$cliente['telefono']) ?>" target="_blank" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+            <a href="https://wa.me/<?= waNum($cliente['telefono'] ?? '') ?>" target="_blank" style="display:flex;align-items:center;gap:6px;text-decoration:none">
                 <svg width="13" height="13" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
                 <span style="font-size:12px;color:#25D366;font-weight:700"><?= sanitize($cliente['telefono']) ?></span>
             </a>
@@ -428,20 +428,6 @@ include __DIR__ . '/includes/header.php';
                 </div>
             </div>
         </div>
-
-        <!-- Notificaciones de renovación -->
-        <button type="button" onclick="openNotifModal()"
-            style="display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:var(--radius-md);cursor:pointer;transition:all .15s;text-align:left"
-            onmouseenter="this.style.borderColor='#8A867C';this.style.background='#FAFAF7'" onmouseleave="this.style.borderColor='#E8E5DD';this.style.background='#ffffff'">
-            <div style="width:32px;height:32px;background:#E3F1E8;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <svg width="15" height="15" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            </div>
-            <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:#0E0E0C">Programar recordatorios</div>
-                <div id="notifStatusLabel" style="font-size:10px;color:#8A867C">Cargando configuración...</div>
-            </div>
-            <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </button>
 
         <!-- Agregar Tarea -->
         <button type="button" class="btn btn-outline" onclick="openTareasModal()" style="width:100%;justify-content:center;gap:8px;font-size:12px">
@@ -1227,7 +1213,7 @@ async function deleteSvc(id) {
 async function sendPaymentLink(enlace, servicioNombre) {
     const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
     const msg = `Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n${enlace}`;
-    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+    if (!waAbrir(tel, msg)) return;
 
     try {
         await fetch('api/cliente_notas.php', {
@@ -1741,49 +1727,7 @@ async function saveSvc(e) {
 
 function abrirChatCliente() {
     const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
-    if (!tel) { showToast('El cliente no tiene número registrado', 'warning'); return; }
-    window.open(`https://wa.me/${tel}`, '_blank');
-}
-
-async function sendPrompt(type) {
-    let msg = "";
-    let actionLabel = "";
-    if(type === 'reminder') { msg = `Hola, te recordamos que tu servicio con QUANTUN Digital se aproxima a renovarse.`; actionLabel = "Recordatorio de Pago enviado"; }
-    else if(type === 'update') { msg = `Te compartimos una novedad sobre tu servicio...`; actionLabel = "Novedad enviada"; }
-    else if(type === 'invoice') { msg = `Adjuntamos el comprobante de tu último pago. ¡Gracias por confiar en nosotros!`; actionLabel = "Factura Pagada enviada"; }
-
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
-    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
-
-    try {
-        await fetch('api/cliente_notas.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cliente_id: clienteId, nota: actionLabel })
-        });
-        // Si es recordatorio, incrementar notif_count en TODOS los servicios activos del cliente
-        if (type === 'reminder') {
-            const rs = await fetch(`api/cliente_servicios.php?cliente_id=${clienteId}`);
-            const ds = await rs.json();
-            const activos = (ds.data || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
-            if (activos.length) {
-                activos.sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
-                const maxCount = Math.max(...activos.map(s => parseInt(s.notif_count) || 0));
-                const newCount = Math.min(3, maxCount + 1);
-                const dateField = ['notif_r1_at', 'notif_r2_at', 'notif_r3_at'][newCount - 1];
-                const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                await Promise.all(activos.map(svc =>
-                    fetch('api/cliente_servicios.php', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: svc.id, notif_count: newCount, [dateField]: nowStr })
-                    })
-                ));
-            }
-        }
-        loadNotes();
-        loadServices();
-    } catch(e) {}
+    waAbrir(tel);
 }
 
 function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -1867,6 +1811,7 @@ function renderNotifProgressCard(svcs) {
         return (parseInt(b.notif_count)||0) - (parseInt(a.notif_count)||0);
     });
     const svc   = activos[0];
+    window._notifSvc = svc;   // lo usa enviarRecordatorioWA() para armar el mensaje
     const count = Math.min(3, parseInt(svc.notif_count) || 0);
     // Calcular días restantes comparando fechas completas desde medianoche (evita desfase por hora del día)
     const _hoy   = new Date(); _hoy.setHours(0, 0, 0, 0);
@@ -1878,23 +1823,27 @@ function renderNotifProgressCard(svcs) {
     const bell  = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>';
     const check = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>';
 
+    const wa = '<path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>';
+
     const dotsHtml = steps.map((lbl, i) => {
         const done   = i < count;
         const active = i === count && count < 3;
-        const dateStr = done && dates[i] ? `${lbl} — Enviado el ${_fmtNotifDate(dates[i])}` : (active ? `${lbl} — Pendiente de envío` : `${lbl} — Sin enviar aún`);
+        // Solo el siguiente aviso pendiente es enviable: no se manda el 3ro antes del 2do.
+        const dateStr = done && dates[i] ? `${lbl} — Enviado el ${_fmtNotifDate(dates[i])}`
+                      : (active ? `${lbl} — Clic para enviar por WhatsApp` : `${lbl} — Se habilita al enviar el anterior`);
         const sublabel = done ? 'Enviado' : (active ? 'Enviar' : '...');
+        const icon = done ? check : (active ? wa : bell);
         const dot = `
-            <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto;position:relative;cursor:${done?'default':'pointer'}" title="${dateStr}" ${done?'':'onclick="openMensajesModal()"'}>
+            <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto;position:relative;cursor:${active?'pointer':'default'}" title="${dateStr}" ${active?`onclick="enviarRecordatorioWA(${svc.id},${i+1},'${escapeJs(svc.servicio_nombre)}')"`:''}>
                 <div style="width:26px;height:26px;border-radius:50%;
-                    background:${done?'#dcfce7':active?'#FEF9C3':'#F1EEE8'};
-                    border:1.5px solid ${done?'#16a34a':active?'#ca8a04':'#D6D2C7'};
+                    background:${done?'#dcfce7':active?'#dcfce7':'#F1EEE8'};
+                    border:1.5px solid ${done?'#16a34a':active?'#25D366':'#D6D2C7'};
                     display:flex;align-items:center;justify-content:center;
                     transition:box-shadow .15s"
-                    onmouseenter="this.style.boxShadow='0 0 0 3px ${done?'rgba(22,163,74,.2)':active?'rgba(202,138,4,.2)':'rgba(0,0,0,.06)'}'"
-                    onmouseleave="this.style.boxShadow='none'">
-                    <svg width="11" height="11" fill="none" stroke="${done?'#16a34a':active?'#ca8a04':'#B0AB9F'}" viewBox="0 0 24 24" stroke-width="2.2">${done ? check : bell}</svg>
+                    ${active?`onmouseenter="this.style.boxShadow='0 0 0 3px rgba(37,211,102,.25)'" onmouseleave="this.style.boxShadow='none'"`:''}>
+                    <svg width="11" height="11" ${active?'fill="#25D366" stroke="none"':`fill="none" stroke="${done?'#16a34a':'#B0AB9F'}"`} viewBox="0 0 24 24" stroke-width="2.2">${icon}</svg>
                 </div>
-                <div style="font-size:9px;color:${done?'#16a34a':active?'#ca8a04':'#B0AB9F'};font-weight:${done?700:400};margin-top:3px;white-space:nowrap">${sublabel}</div>
+                <div style="font-size:9px;color:${done?'#16a34a':active?'#25D366':'#B0AB9F'};font-weight:${done||active?700:400};margin-top:3px;white-space:nowrap">${sublabel}</div>
             </div>`;
         const line = i < 2 ? `<div style="height:1.5px;flex:1;min-width:6px;background:${i+1<=count?'#2D8F5A':'#E8E5DD'};margin-bottom:16px"></div>` : '';
         return dot + line;
@@ -1928,6 +1877,52 @@ function renderNotifProgressCard(svcs) {
         <div style="display:flex;align-items:center">${dotsHtml}</div>
         ${exitoBtn}
     </div>`;
+}
+
+// Envía el aviso N por WhatsApp y lo marca como enviado. Reemplaza al envío
+// automático por correo: el mensaje lo manda el usuario desde el navegador.
+async function enviarRecordatorioWA(svcId, paso, svcNombre) {
+    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
+    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
+
+    const svc    = window._notifSvc || {};
+    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+
+    let vence = '', enDias = '';
+    if (svc.fecha_vencimiento) {
+        const v = new Date(svc.fecha_vencimiento + 'T00:00:00');
+        const h = new Date(); h.setHours(0,0,0,0);
+        const d = Math.round((v - h) / 864e5);
+        vence  = v.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+        enDias = d > 0 ? ` (en ${d} día${d===1?'':'s'})` : (d === 0 ? ' (vence hoy)' : ' (ya vencido)');
+    }
+
+    const msg = `Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
+              + `Te recordamos que tu servicio *${svcNombre}*`
+              + (vence ? ` vence el ${vence}${enDias}` : ' está próximo a vencer')
+              + `.\n\nEscríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros!`;
+
+    if (!waAbrir(tel, msg)) return;
+
+    try {
+        const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const payload = { id: svcId, notif_count: paso };
+        payload['notif_r' + paso + '_at'] = nowStr;
+        await fetch('api/cliente_servicios.php', {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        await fetch('api/cliente_notas.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId,
+                nota: `[WhatsApp] Recordatorio ${paso} de 3 enviado — ${svcNombre}.` })
+        });
+        showToast(`Recordatorio ${paso} de 3 marcado como enviado`, 'success');
+        loadServices();
+        loadNotes();
+    } catch(e) {
+        showToast('WhatsApp se abrió, pero no se pudo registrar el envío', 'warning');
+    }
 }
 
 async function cerrarNotifConExito(svcId, count, svcNombre) {
@@ -4051,9 +4046,9 @@ function seleccionarMsgPlantilla(p) {
 
     if (_msgCanal === 'whatsapp') {
         const tel = "<?= preg_replace('/\D/', '', $cliente['telefono'] ?? '') ?>";
-        if (!tel) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
+        if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
         closeMensajesModal();
-        window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(texto || p.nombre), '_blank');
+        waAbrir(tel, texto || p.nombre);
         fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
             body: JSON.stringify({ cliente_id: clienteId, nota: '[📱] WhatsApp: ' + p.nombre })
         }).then(() => loadNotes());

@@ -34,6 +34,5 @@ function crmConfig(string $key, string $default = ''): string {
  * "+57 333 274 7801" → "573332747801"
  */
 function crmWaNum(string $key, string $default = ''): string {
-    $raw = crmConfig($key, $default);
-    return preg_replace('/\D/', '', $raw);
+    return waNum(crmConfig($key, $default));
 }

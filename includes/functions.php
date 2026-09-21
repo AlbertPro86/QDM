@@ -152,6 +152,17 @@ function getFlash() {
 }
 
 /**
+ * Normaliza un teléfono para enlaces wa.me. Espejo de waNumero() en
+ * includes/footer.php: 10 dígitos = móvil colombiano sin indicativo → 57.
+ */
+function waNum($tel): string {
+    $d = preg_replace('/\D/', '', (string) $tel);
+    if ($d === '') return '';
+    if (strlen($d) === 10) return '57' . $d;
+    return $d;
+}
+
+/**
  * Obtener valor de configuración desde crm_configuraciones
  */
 function getCfg($pdo, $clave, $default = '') {
