@@ -66,6 +66,11 @@ define('UPLOAD_DIR', env('UPLOAD_DIR', 'uploads/facturas/'));
 // corrompen a "�" en el cliente antes de llegar a WhatsApp/donde sea.
 if (PHP_SAPI !== 'cli' && !headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
+    // Evita que el navegador reutilice una copia vieja de la pagina despues
+    // de un deploy (ej. el fix de los emojis: sin esto el usuario puede
+    // seguir viendo el HTML corrupto de antes hasta que recargue a la fuerza).
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Pragma: no-cache');
 }
 
 // ─── Configuración de Sesión ───
