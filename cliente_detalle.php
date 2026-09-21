@@ -1212,8 +1212,8 @@ async function deleteSvc(id) {
 
 async function sendPaymentLink(enlace, servicioNombre) {
     const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
-    const msg = `💳 Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n🔗 ${enlace}`
-              + `\n\n_🤖 Este es un mensaje automático del CRM de QUANTUN Digital._`;
+    const msg = `\u{1F4B3} Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n\u{1F517} ${enlace}`
+              + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
     if (!waAbrir(tel, msg)) return;
 
     try {
@@ -1899,11 +1899,15 @@ async function enviarRecordatorioWA(svcId, paso, svcNombre) {
             .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    const msg = `👋 Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
-              + `📅 Te recordamos que tu servicio *${svcNombre}*`
+    // Emojis como escapes \u{...} (ASCII puro en el archivo): así el navegador
+    // los arma en memoria y no dependen de la codificación del archivo ni de
+    // la cabecera HTTP. Con el emoji literal se corrompían a "?" en WhatsApp,
+    // mientras que las tildes (2 bytes) pasaban bien.
+    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{1F4C5} Te recordamos que tu servicio *${svcNombre}*`
               + (vence ? ` tiene fecha de renovación el ${vence}` : ' tiene su renovación próxima')
-              + `.\n\n💬 Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! 🙌`
-              + `\n\n_🤖 Este es un mensaje automático del CRM de QUANTUN Digital._`;
+              + `.\n\n\u{1F4AC} Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! \u{1F64C}`
+              + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
     if (!waAbrir(tel, msg)) return;
 
