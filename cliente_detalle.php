@@ -1817,7 +1817,8 @@ function renderNotifProgressCard(svcs) {
     const _hoy   = new Date(); _hoy.setHours(0, 0, 0, 0);
     const _vence = new Date(svc.fecha_vencimiento + 'T00:00:00');
     const days   = Math.round((_vence - _hoy) / 864e5);
-    const daysLabel = days > 0 ? `Vence en ${days}d` : (days === 0 ? 'Vence hoy' : 'Vencido');
+    const _venceFmt = _vence.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+    const daysLabel = days === 0 ? 'Vence hoy' : (days < 0 ? 'Vencido' : `Vence ${_venceFmt}`);
     const dates = [svc.notif_r1_at, svc.notif_r2_at, svc.notif_r3_at];
     const steps = ['1er aviso', '2do aviso', '3er aviso'];
     const bell  = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>';
