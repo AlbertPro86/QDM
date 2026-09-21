@@ -81,6 +81,45 @@ $stmt = $pdo->query("
 ");
 $rows = $stmt->fetchAll();
 
+// ── Pagos REALES (tabla transacciones) ──────────────────────────────────────
+// "Ingreso" en este módulo debe reflejar dinero efectivamente registrado como
+// pagado (vía botón "Registrar Pago"), no el monto contratado de servicios
+// activos. Antes se usaba monto_renovacion de cliente_servicios para todo,
+// lo que hacía ver como "ingreso" a un servicio que solo fue renovado
+// (fecha movida) sin que el cliente hubiera pagado.
+$pagosParams = [];
+$pagosFechaSql = '';
+if ($fechaDesde && $fechaHasta) {
+    $pagosFechaSql = ' AND t.fecha_pago BETWEEN ? AND ? ';
+    $pagosParams   = [$fechaDesde, $fechaHasta];
+}
+$stmtPagos = $pdo->prepare("
+    SELECT t.cliente_id, t.servicio_id, t.fecha_pago,
+           SUM(t.monto - COALESCE(t.descuento, 0)) AS pagado
+    FROM transacciones t
+    WHERE t.tipo = 'ingreso' AND t.estado = 'pagado' AND t.cliente_id IS NOT NULL
+    $pagosFechaSql
+    GROUP BY t.cliente_id, t.servicio_id, t.fecha_pago
+");
+$stmtPagos->execute($pagosParams);
+
+$pagosPorCliente  = [];  // cliente_id  => total pagado
+$pagosPorServicio = [];  // servicio_id => total pagado (excluye pagos multi-servicio con servicio_id NULL)
+$pagosMesActual   = 0;
+$mesActualPagos   = date('Y-m');
+foreach ($stmtPagos->fetchAll() as $p) {
+    $cid   = (int)$p['cliente_id'];
+    $sid   = $p['servicio_id'] !== null ? (int)$p['servicio_id'] : null;
+    $monto = (float)$p['pagado'];
+    $pagosPorCliente[$cid] = ($pagosPorCliente[$cid] ?? 0) + $monto;
+    if ($sid !== null) {
+        $pagosPorServicio[$sid] = ($pagosPorServicio[$sid] ?? 0) + $monto;
+    }
+    if ($p['fecha_pago'] && substr($p['fecha_pago'], 0, 7) === $mesActualPagos) {
+        $pagosMesActual += $monto;
+    }
+}
+
 // Calcular período para mostrar
 $periodoText = ($fechaDesde && $fechaHasta)
     ? date('d M Y', strtotime($fechaDesde)) . ' - ' . date('d M Y', strtotime($fechaHasta))
@@ -108,22 +147,23 @@ $porCliente     = [];
 $porServicio    = [];
 
 foreach ($rows as $cs) {
+    // $ingreso = monto CONTRATADO (proyección), no dinero recibido. Se usa
+    // solo para MRR y para "Próximas Renovaciones" (cuánto se cobrará al
+    // vencer, explícitamente a futuro). El "Ingreso" real de cada cliente/
+    // servicio se calcula más abajo a partir de $pagosPorCliente/$pagosPorServicio.
     $ingreso = max(0, floatval($cs['monto_renovacion']) - floatval($cs['descuento']));
     $egreso  = max(0, floatval($cs['costo_servicio']));
     $freq    = strtolower(trim($cs['frecuencia'] ?? 'mes'));
     $esUnico = $freq === 'unico';
     $factor  = $mrrFactor[$freq] ?? 1;
 
-    // Los pagos únicos se contabilizan en ingresos totales pero NO en MRR ni renovaciones
-    $totalIngresos += $ingreso;
     $totalEgresos  += $egreso;
     $mrr           += $ingreso * $factor; // factor=0 para 'unico', ya excluido
 
-    // Ingresos/egresos del mes en curso (por fecha_vencimiento)
+    // Egresos del mes en curso (por fecha_vencimiento del contrato)
     if ($cs['fecha_vencimiento']) {
         $venceMes = substr($cs['fecha_vencimiento'], 0, 7);
         if ($venceMes === $mesActual) {
-            $ingresosMes += $ingreso;
             $egresosMes  += $egreso;
         }
 
@@ -172,7 +212,6 @@ foreach ($rows as $cs) {
             'proxima_renovacion' => null,
         ];
     }
-    $porCliente[$cid]['ingresos'] += $ingreso;
     $porCliente[$cid]['egresos']  += $egreso;
     $porCliente[$cid]['mrr']      += $ingreso * $factor;
     $porCliente[$cid]['servicios']++;
@@ -199,10 +238,21 @@ foreach ($rows as $cs) {
             'clientes' => 0,
         ];
     }
-    $porServicio[$sid]['ingresos'] += $ingreso;
     $porServicio[$sid]['egresos']  += $egreso;
     $porServicio[$sid]['clientes']++;
 }
+
+// Asignar ingresos REALES (pagos registrados), no el monto contratado
+foreach ($porCliente as $cid => &$pc) {
+    $pc['ingresos'] = $pagosPorCliente[$cid] ?? 0;
+}
+unset($pc);
+foreach ($porServicio as $sid => &$ps) {
+    $ps['ingresos'] = $pagosPorServicio[$sid] ?? 0;
+}
+unset($ps);
+$totalIngresos = array_sum($pagosPorCliente);
+$ingresosMes   = $pagosMesActual;
 
 // Calcular balances y márgenes por cliente
 foreach ($porCliente as &$pc) {
