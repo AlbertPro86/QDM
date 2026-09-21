@@ -13,14 +13,14 @@ $pdo = db();
 if($cs_ids) {
     $idArray = explode(',', $cs_ids);
     $placeholders = implode(',', array_fill(0, count($idArray), '?'));
-    $stmt = $pdo->prepare("SELECT cs.*, c.nombre_comercial, c.nit_cedula, c.direccion, c.email_facturacion, c.telefono, s.nombre as servicio_nombre FROM cliente_servicios cs JOIN clientes c ON cs.cliente_id = c.id JOIN servicios s ON cs.servicio_id = s.id WHERE cs.id IN ($placeholders)");
+    $stmt = $pdo->prepare("SELECT cs.*, c.nombre_comercial, c.persona_contacto, c.nit_cedula, c.direccion, c.email_facturacion, c.telefono, s.nombre as servicio_nombre FROM cliente_servicios cs JOIN clientes c ON cs.cliente_id = c.id JOIN servicios s ON cs.servicio_id = s.id WHERE cs.id IN ($placeholders)");
     $stmt->execute($idArray);
     $servicios = $stmt->fetchAll();
     if(empty($servicios)) die("Servicios no encontrados");
     $cliente = $servicios[0];
     $id = $cliente['cliente_id'];
 } else if($cs_id) {
-    $stmt = $pdo->prepare("SELECT cs.*, c.nombre_comercial, c.nit_cedula, c.direccion, c.email_facturacion, c.telefono, s.nombre as servicio_nombre FROM cliente_servicios cs JOIN clientes c ON cs.cliente_id = c.id JOIN servicios s ON cs.servicio_id = s.id WHERE cs.id = ?");
+    $stmt = $pdo->prepare("SELECT cs.*, c.nombre_comercial, c.persona_contacto, c.nit_cedula, c.direccion, c.email_facturacion, c.telefono, s.nombre as servicio_nombre FROM cliente_servicios cs JOIN clientes c ON cs.cliente_id = c.id JOIN servicios s ON cs.servicio_id = s.id WHERE cs.id = ?");
     $stmt->execute([$cs_id]);
     $data = $stmt->fetch();
     if(!$data) die("Servicio no encontrado");
@@ -92,6 +92,15 @@ $docTipoLabels = [
 ];
 $docTipoLabel = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
 $orderNumber  = 'QD-' . date('Ymd');
+
+// Nombre sugerido al descargar/guardar el PDF: empresa - contacto - QUANTUN Digital
+// (antes solo decía "Orden de Renovación - Empresa", sin el contacto ni Quantun al final).
+$pdfTitleParts = array_filter([
+    trim($cliente['nombre_comercial'] ?? ''),
+    trim($cliente['persona_contacto'] ?? ''),
+    'QUANTUN Digital',
+]);
+$pdfTitle = implode(' - ', $pdfTitleParts);
 
 // Fetch template (by ID if provided, else default)
 if ($plantillaIdOverride > 0) {
@@ -246,7 +255,7 @@ enrichWithPaquete($servicios, $pdo);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><?= $docTipoLabel ?> - <?= sanitize($cliente['nombre_comercial'] ?? '') ?></title>
+    <title><?= sanitize($pdfTitle) ?></title>
     <style>
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #0E0E0C; line-height: 1.5; margin: 0; padding: 40px; background: #FAFAF7; }

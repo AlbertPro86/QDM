@@ -1212,7 +1212,8 @@ async function deleteSvc(id) {
 
 async function sendPaymentLink(enlace, servicioNombre) {
     const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
-    const msg = `Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n${enlace}`;
+    const msg = `💳 Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n🔗 ${enlace}`
+              + `\n\n_🤖 Este es un mensaje automático del CRM de QUANTUN Digital._`;
     if (!waAbrir(tel, msg)) return;
 
     try {
@@ -1898,10 +1899,11 @@ async function enviarRecordatorioWA(svcId, paso, svcNombre) {
             .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    const msg = `Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
-              + `Te recordamos que tu servicio *${svcNombre}*`
+    const msg = `👋 Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
+              + `📅 Te recordamos que tu servicio *${svcNombre}*`
               + (vence ? ` tiene fecha de renovación el ${vence}` : ' tiene su renovación próxima')
-              + `.\n\nEscríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros!`;
+              + `.\n\n💬 Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! 🙌`
+              + `\n\n_🤖 Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
     if (!waAbrir(tel, msg)) return;
 
