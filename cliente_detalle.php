@@ -1888,18 +1888,15 @@ async function enviarRecordatorioWA(svcId, paso, svcNombre) {
     const svc    = window._notifSvc || {};
     const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
 
-    let vence = '', enDias = '';
+    let vence = '';
     if (svc.fecha_vencimiento) {
-        const v = new Date(svc.fecha_vencimiento + 'T00:00:00');
-        const h = new Date(); h.setHours(0,0,0,0);
-        const d = Math.round((v - h) / 864e5);
-        vence  = v.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
-        enDias = d > 0 ? ` (en ${d} día${d===1?'':'s'})` : (d === 0 ? ' (vence hoy)' : ' (ya vencido)');
+        vence = new Date(svc.fecha_vencimiento + 'T00:00:00')
+            .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     const msg = `Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
               + `Te recordamos que tu servicio *${svcNombre}*`
-              + (vence ? ` vence el ${vence}${enDias}` : ' está próximo a vencer')
+              + (vence ? ` tiene fecha de renovación el ${vence}` : ' tiene su renovación próxima')
               + `.\n\nEscríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros!`;
 
     if (!waAbrir(tel, msg)) return;
