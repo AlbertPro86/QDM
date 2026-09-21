@@ -311,6 +311,20 @@ foreach ($servicios as $svc) {
 }
 $totalFinal = $totalOriginal - $totalDescuento;
 
+// Fecha de renovación: la más próxima entre los servicios de la orden
+// (la nueva fecha de vencimiento tras pagar), distinta de "Últ. pago".
+$fechaRenovacion = '';
+foreach ($servicios as $svc) {
+    if (empty($svc['fecha_vencimiento'])) continue;
+    if ($fechaRenovacion === '' || $svc['fecha_vencimiento'] < $fechaRenovacion) {
+        $fechaRenovacion = $svc['fecha_vencimiento'];
+    }
+}
+if ($fechaRenovacion !== '') {
+    $d = DateTime::createFromFormat('Y-m-d', $fechaRenovacion);
+    $fechaRenovacion = $d ? $d->format('d/m/Y') : '';
+}
+
 // Generar tabla de servicios (con sub-ítems y features si es paquete)
 $tablasServicios = '';
 foreach ($servicios as $idx => $svc) {
@@ -459,6 +473,7 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
     </tr></table>
     <div style="font-size:20px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;margin-top:8px">' . htmlspecialchars($orderNumber) . '</div>
     <div style="font-size:11px;color:#8A867C;margin-top:4px">' . $fechaEmision . '</div>
+    ' . ($fechaRenovacion ? '<div style="font-size:10px;color:#8A867C;margin-top:2px">Renovación: ' . htmlspecialchars($fechaRenovacion) . '</div>' : '') . '
     ' . ($fechaUltPago ? '<div style="font-size:10px;color:#8A867C;margin-top:2px">Últ. pago: ' . htmlspecialchars($fechaUltPago) . '</div>' : '') . '
   </td>
 </tr>
