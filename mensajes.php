@@ -591,7 +591,9 @@ function actualizarPreviewWA(base) {
 function abrirWhatsApp() {
     const p = _store[_waPlantillaId]; if (!p) return;
     const texto = reemplazarVariables(p.contenido);
-    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+    // web.whatsapp.com en vez de wa.me: el redirect de wa.me pasa por
+    // api.whatsapp.com/send, que corrompe los emojis del texto.
+    window.open('https://web.whatsapp.com/send?text=' + encodeURIComponent(texto), '_blank');
     cerrarModalWA();
 }
 

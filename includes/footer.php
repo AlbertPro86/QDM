@@ -173,7 +173,14 @@
     window.waLink = function(tel, texto) {
         const n = waNumero(tel);
         if (!n) return '';
-        return 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '');
+        const t = texto ? '&text=' + encodeURIComponent(texto) : '';
+        // NO usar wa.me: su redirect pasa por la pagina api.whatsapp.com/send,
+        // que corrompe los emojis a "?" aun cuando la URL llega perfectamente
+        // codificada (verificado: %F0%9F%91%8B entra bien y sale como U+FFFD).
+        // web.whatsapp.com los respeta; en movil se abre la app directamente.
+        const esMovil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+        if (esMovil) return 'whatsapp://send?phone=' + n + t;
+        return 'https://web.whatsapp.com/send?phone=' + n + t;
     };
 
     // Abre WhatsApp Web/app en otra pestaña. Devuelve false si no hay número.
