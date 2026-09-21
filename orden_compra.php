@@ -292,11 +292,27 @@ enrichWithPaquete($servicios, $pdo);
         .footer-dark { background: <?= $template['color_primario'] ?>; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; }
         .footer-text { font-size: 11px; color: rgba(255,255,255,.5); }
         .footer-accent { width: 40px; height: 4px; background: <?= $template['color_secundario'] ?>; border-radius: 2px; }
-        @page { size: auto; margin: 10mm; }
+        @page { size: auto; margin: 6mm; }
         @media print {
             html, body { padding: 0; background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .invoice { box-shadow: none; max-width: 100%; }
             .logo-section img { filter: none !important; }
+            /* Compactar espaciados verticales para que quepa en una sola hoja */
+            .header-content { padding: 16px 30px; }
+            .company-details { margin-top: 8px; line-height: 1.5; }
+            .client-section { padding: 12px 30px; }
+            .items-section { padding: 12px 0; }
+            .items-table th { padding: 7px 12px; }
+            .items-table td { padding: 7px 12px; }
+            .totals { margin-top: 10px; padding: 0 30px; }
+            .total-row { padding: 4px 12px; }
+            .total-final { padding: 9px 12px; margin-top: 6px; }
+            .footer-dark { padding: 9px 30px; }
+            .bank-block { margin-bottom: 12px !important; }
+            .bank-header { padding: 8px 30px !important; }
+            .bank-grid { padding: 12px 30px !important; gap: 8px 30px !important; }
+            .pay-link-block { padding: 0 30px 12px !important; }
+            .pay-link-block a { padding: 8px 28px !important; }
         }
     </style>
 </head>
@@ -467,14 +483,14 @@ enrichWithPaquete($servicios, $pdo);
         $bancFiltered = array_filter($bancarios, fn($v) => !empty($v));
         if (!empty($bancFiltered)):
         ?>
-        <div style="margin-bottom:28px">
+        <div class="bank-block" style="margin-bottom:28px">
             <!-- Header -->
-            <div style="display:flex;align-items:center;gap:10px;padding:13px 36px;background:<?= $template['color_primario'] ?>">
+            <div class="bank-header" style="display:flex;align-items:center;gap:10px;padding:13px 36px;background:<?= $template['color_primario'] ?>">
                 <svg width="15" height="15" fill="none" stroke="<?= $template['color_secundario'] ?>" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 <span style="font-size:12px;font-weight:700;color:<?= $template['color_secundario'] ?>">Datos para el pago</span>
             </div>
             <!-- Grid de campos -->
-            <div style="background:#fff;padding:20px 36px;display:grid;grid-template-columns:1fr 1fr;gap:16px 40px">
+            <div class="bank-grid" style="background:#fff;padding:20px 36px;display:grid;grid-template-columns:1fr 1fr;gap:16px 40px">
                 <?php foreach($bancFields as $key => $cfg):
                     if (empty($bancarios[$key])) continue; ?>
                 <div style="display:flex;align-items:center;gap:12px">
@@ -493,7 +509,7 @@ enrichWithPaquete($servicios, $pdo);
 
         <!-- Enlace de Pago -->
         <?php if ($linkPago): ?>
-        <div style="padding:0 36px 24px;text-align:center">
+        <div class="pay-link-block" style="padding:0 36px 24px;text-align:center">
             <a href="<?= htmlspecialchars($linkPago ?? '') ?>" target="_blank" style="display:inline-block;padding:14px 36px;background:<?= $template['color_primario'] ?>;color:<?= $template['color_secundario'] ?>;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;border-radius:6px">
                 💳 Pagar Ahora
             </a>

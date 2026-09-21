@@ -4413,15 +4413,6 @@ async function confirmarEnvioMsgEmail() {
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                 Guardar datos
             </button>
-            <button onclick="saveOrdenDraft()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 18px;background:#f8fafc;color:#475569;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.background='#f1f5f9'" onmouseleave="this.style.background='#f8fafc'" title="Guardar borrador">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                Guardar Borrador
-                <span id="draftBadge" style="display:none;width:8px;height:8px;background:#f59e0b;border-radius:50%;flex-shrink:0" title=""></span>
-            </button>
-            <button onclick="refreshOrdenPreview()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:#f1f5f9;color:#0f172a;border:1.5px solid #e2e8f0;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.background='#e2e8f0'" onmouseleave="this.style.background='#f1f5f9'">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Vista Previa
-            </button>
             <button onclick="downloadOrdenPDF()" style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:#1e293b;color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s" onmouseenter="this.style.filter='brightness(.9)'" onmouseleave="this.style.filter=''">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 Descargar PDF
