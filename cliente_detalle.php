@@ -1849,7 +1849,7 @@ function renderNotifProgressCard(svcs) {
         return dot + line;
     }).join('');
 
-    const exitoBtn = count === 3
+    const reiniciarBtn = count > 0
         ? `<div style="margin-top:6px;text-align:right">
                <span onclick="resetNotifTokens(${svc.id},'${escapeJs(svc.servicio_nombre)}')"
                    style="font-size:9px;color:#D6D2C7;cursor:pointer;transition:color .15s"
@@ -1857,7 +1857,9 @@ function renderNotifProgressCard(svcs) {
                    reiniciar
                </span>
            </div>`
-        : count > 0
+        : '';
+
+    const exitoBtn = (count > 0 && count < 3)
         ? `<button onclick="cerrarNotifConExito(${svc.id},${count},'${escapeJs(svc.servicio_nombre)}')"
             style="margin-top:8px;width:100%;padding:6px 10px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:6px;
                    font-size:11px;font-weight:700;color:#16a34a;cursor:pointer;text-align:center;transition:all .15s"
@@ -1876,6 +1878,7 @@ function renderNotifProgressCard(svcs) {
         </div>
         <div style="display:flex;align-items:center">${dotsHtml}</div>
         ${exitoBtn}
+        ${reiniciarBtn}
     </div>`;
 }
 
