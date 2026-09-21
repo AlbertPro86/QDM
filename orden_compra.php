@@ -84,21 +84,6 @@ foreach($servicios as $s) {
 }
 $totalFinal = $totalOriginal - $totalDescuento;
 
-// Fecha de renovación: la más próxima entre los servicios de la orden
-// (la nueva fecha de vencimiento tras pagar). No es lo mismo que
-// "Último pago" (fecha en que se pagó la vez anterior).
-$fechaRenovacion = '';
-foreach ($servicios as $s) {
-    if (empty($s['fecha_vencimiento'])) continue;
-    if ($fechaRenovacion === '' || $s['fecha_vencimiento'] < $fechaRenovacion) {
-        $fechaRenovacion = $s['fecha_vencimiento'];
-    }
-}
-if ($fechaRenovacion !== '') {
-    $d = DateTime::createFromFormat('Y-m-d', $fechaRenovacion);
-    $fechaRenovacion = $d ? $d->format('d/m/Y') : '';
-}
-
 $docTipoLabels = [
     'orden_renovacion' => 'Orden de Renovación',
     'orden_compra'     => 'Orden de Compra',
@@ -375,15 +360,9 @@ enrichWithPaquete($servicios, $pdo);
                     <div class="label-small">Emisión</div>
                     <div class="date-value"><?= $fechaEmision ?></div>
                 </div>
-                <?php if($fechaRenovacion): ?>
-                <div class="date-item">
-                    <div class="label-small">Renovación</div>
-                    <div class="date-value"><?= $fechaRenovacion ?></div>
-                </div>
-                <?php endif; ?>
                 <?php if($fechaUltPago): ?>
                 <div class="date-item">
-                    <div class="label-small">Último Pago</div>
+                    <div class="label-small">Renovación</div>
                     <div class="date-value"><?= $fechaUltPago ?></div>
                 </div>
                 <?php endif; ?>

@@ -4286,7 +4286,7 @@ async function confirmarEnvioMsgEmail() {
                                 <input id="ordenFechaEmision" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
                             </div>
                             <div>
-                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha Último Pago</label>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha de Renovación</label>
                                 <input id="ordenFechaUltPago" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none" onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'" onchange="scheduleOrdenPreview()">
                             </div>
                         </div>
