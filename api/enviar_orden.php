@@ -559,21 +559,56 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 $clienteNombreCorto = $data['nombre_comercial'] ?? '';
 $emailAsunto = $asuntoOver ?: ($docTipoLabel . ' lista para ' . $clienteNombreCorto . ' · ' . $orderNumber);
 
-// Bloque de mensaje personalizado (va antes del documento)
-$mensajeHtml = '';
+// ── Mensaje de apertura (va antes del documento) ─────────────────────────────
+// Si el usuario escribió un mensaje en el modal se usa ese; si no, se arma uno
+// por defecto según el tipo de documento. Antes el correo abría directo con el
+// documento, sin saludo ni contexto.
+$saludoNombre = trim($data['nombre_comercial'] ?? '');
+$saludo = $saludoNombre !== '' ? '¡Hola, ' . htmlspecialchars($saludoNombre) . '!' : '¡Hola!';
+
 if ($mensajeOver) {
-    $mensajeHtml = '<table class="msg-pre" width="620" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:620px;margin:0 auto">'
-        . '<tr><td style="padding:16px 10px 0 10px;font-family:' . $cfont . ',system-ui,sans-serif">'
-        . '<div style="background:#f8fafc;border-left:4px solid ' . $cpri . ';padding:14px 18px;border-radius:0 6px 6px 0;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap">'
-        . htmlspecialchars($mensajeOver)
-        . '</div></td></tr></table>';
-    // Insertar antes del bloque principal del email
-    $htmlFinal = str_replace(
-        '<table class="wrap"',
-        $mensajeHtml . "\n" . '<table class="wrap"',
-        $htmlFinal
-    );
+    // Mensaje escrito a mano: se respeta tal cual (con saltos de línea)
+    $cuerpoIntro = '<p style="margin:0;font-size:13px;color:#57544D;line-height:1.65;white-space:pre-wrap">'
+                 . htmlspecialchars($mensajeOver) . '</p>';
+} else {
+    $lineas = [];
+    if ($docTipo === 'orden_renovacion') {
+        $lineas[] = $fechaUltPago
+            ? 'Tu servicio con nosotros está próximo a renovarse el <strong style="color:#0E0E0C">' . htmlspecialchars($fechaUltPago) . '</strong>.'
+            : 'Tu servicio con nosotros está próximo a renovarse.';
+        $lineas[] = 'Abajo encuentras el detalle de tu <strong style="color:#0E0E0C">' . htmlspecialchars($docTipoLabel) . ' ' . htmlspecialchars($orderNumber) . '</strong>: los servicios incluidos y el valor a pagar.';
+    } elseif ($docTipo === 'cotizacion') {
+        $lineas[] = 'Gracias por tu interés en nuestros servicios. Te compartimos la cotización que nos solicitaste.';
+        $lineas[] = 'Abajo encuentras el detalle de la <strong style="color:#0E0E0C">' . htmlspecialchars($docTipoLabel) . ' ' . htmlspecialchars($orderNumber) . '</strong>, con todo lo que incluye y su valor.';
+    } else {
+        $lineas[] = 'Te compartimos el detalle de tu <strong style="color:#0E0E0C">' . htmlspecialchars($docTipoLabel) . ' ' . htmlspecialchars($orderNumber) . '</strong>.';
+        if ($fechaUltPago) {
+            $lineas[] = 'Fecha de renovación: <strong style="color:#0E0E0C">' . htmlspecialchars($fechaUltPago) . '</strong>.';
+        }
+    }
+    $lineas[] = 'Si todo está correcto, puedes realizar el pago con los datos que aparecen más abajo. Y si tienes cualquier duda, respóndenos este correo y con gusto te ayudamos.';
+
+    $cuerpoIntro = '';
+    foreach ($lineas as $i => $l) {
+        $margen = ($i === count($lineas) - 1) ? '0' : '0 0 10px';
+        $cuerpoIntro .= '<p style="margin:' . $margen . ';font-size:13px;color:#57544D;line-height:1.65">' . $l . '</p>';
+    }
 }
+
+// Emoji como entidad HTML (&#128075; = 👋): ASCII puro, no depende del charset.
+$mensajeHtml = '<table class="msg-pre" width="620" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:620px;margin:0 auto">'
+    . '<tr><td style="padding:16px 10px 0 10px;font-family:' . $cfont . ',system-ui,sans-serif">'
+    . '<div style="background:#ffffff;border:1px solid #E8E5DD;border-left:4px solid ' . $cpri . ';border-radius:0 6px 6px 0;padding:18px 20px">'
+    . '<div style="font-size:15px;font-weight:700;color:#0E0E0C;margin-bottom:10px">' . $saludo . ' &#128075;</div>'
+    . $cuerpoIntro
+    . '</div></td></tr></table>';
+
+// Insertar antes del bloque principal del email
+$htmlFinal = str_replace(
+    '<table class="wrap"',
+    $mensajeHtml . "\n" . '<table class="wrap"',
+    $htmlFinal
+);
 
 // Previsualización en navegador (no envía): cid: → ruta web del logo
 if (!empty($input['preview_only'])) {
