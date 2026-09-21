@@ -247,6 +247,7 @@ enrichWithPaquete($servicios, $pdo);
     <meta charset="UTF-8">
     <title><?= $docTipoLabel ?> - <?= sanitize($cliente['nombre_comercial'] ?? '') ?></title>
     <style>
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         body { font-family:'<?= $template['fuente'] ?>', system-ui, sans-serif; color: #0E0E0C; line-height: 1.5; margin: 0; padding: 40px; background: #FAFAF7; }
         .invoice { background: white; max-width: 900px; margin: auto; }
         .header-dark { background: #ffffff; padding: 0; border-bottom: 4px solid <?= $template['color_secundario'] ?>; }
@@ -291,9 +292,10 @@ enrichWithPaquete($servicios, $pdo);
         .footer-dark { background: <?= $template['color_primario'] ?>; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; }
         .footer-text { font-size: 11px; color: rgba(255,255,255,.5); }
         .footer-accent { width: 40px; height: 4px; background: <?= $template['color_secundario'] ?>; border-radius: 2px; }
+        @page { size: auto; margin: 10mm; }
         @media print {
-            body { padding: 0; background: white; }
-            .invoice { box-shadow: none; }
+            html, body { padding: 0; background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .invoice { box-shadow: none; max-width: 100%; }
             .logo-section img { filter: none !important; }
         }
     </style>
