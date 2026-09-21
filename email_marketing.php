@@ -716,7 +716,7 @@ textarea.form-control { resize: vertical; font-family: 'Courier New', monospace;
                 <div style="display:flex;gap:6px">
                     <label id="lbl-modo-fact" style="flex:1;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;border:1.5px solid #C6F24E;background:#C6F24E;cursor:pointer;font-size:12px;font-weight:700;color:#0E0E0C;transition:all .15s">
                         <input type="radio" name="cp-email-modo" value="facturacion" id="cp-modo-fact" checked style="accent-color:#0E0E0C" onchange="actualizarEstiloModoEmail()">
-                        Facturación
+                        Orden de Compra
                     </label>
                     <label id="lbl-modo-cont" style="flex:1;display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:4px;border:1.5px solid #E8E5DD;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:#57544D;transition:all .15s">
                         <input type="radio" name="cp-email-modo" value="contacto" id="cp-modo-cont" style="accent-color:#0E0E0C" onchange="actualizarEstiloModoEmail()">

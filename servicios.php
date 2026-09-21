@@ -72,7 +72,7 @@ include __DIR__ . '/includes/header.php';
                         <span id="svcGananciaPct" style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px">0%</span>
                     </div>
                 </div>
-                <div class="form-group"><label class="form-label">Facturación</label>
+                <div class="form-group"><label class="form-label">Frecuencia de Cobro</label>
                     <select class="form-select" id="svcFrecuencia">
                         <option value="mes">Mensual</option>
                         <option value="trimestre">Trimestral</option>
@@ -162,7 +162,7 @@ include __DIR__ . '/includes/header.php';
                         <span id="subGananciaPct" style="font-size:11px;font-weight:700;background:#E3F1E8;color:#2D8F5A;padding:2px 8px;border-radius:100px">0%</span>
                     </div>
                 </div>
-                <div class="form-group"><label class="form-label">Facturación</label>
+                <div class="form-group"><label class="form-label">Frecuencia de Cobro</label>
                     <select class="form-select" id="subFrecuencia">
                         <option value="mes">Mensual</option>
                         <option value="trimestre">Trimestral</option>
@@ -256,9 +256,9 @@ include __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <!-- Facturación -->
+                        <!-- Frecuencia de Cobro -->
                         <div class="form-group">
-                            <label class="form-label">Facturación</label>
+                            <label class="form-label">Frecuencia de Cobro</label>
                             <select class="form-select" id="pkgFrecuencia">
                                 <option value="mes">Mensual</option>
                                 <option value="trimestre">Trimestral</option>
@@ -902,7 +902,7 @@ function previewSub(ss) {
                 </div>` : ''}
                 ${ss.frecuencia !== 'ninguna' ? `<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;background:#FAFAF7;border:1px solid #E8E5DD;border-radius:4px;margin-bottom:14px">
                     <svg width="15" height="15" fill="none" stroke="#57544D" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style="font-size:14px;color:#57544D;font-weight:600">Facturación: <strong style="color:#0E0E0C">${freq[ss.frecuencia] || ss.frecuencia}</strong></span>
+                    <span style="font-size:14px;color:#57544D;font-weight:600">Frecuencia de Cobro: <strong style="color:#0E0E0C">${freq[ss.frecuencia] || ss.frecuencia}</strong></span>
                 </div>` : ''}
                 <div style="padding:20px 24px;background:${gBg};border:1.5px solid ${gBorder};border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:16px">
                     <div>

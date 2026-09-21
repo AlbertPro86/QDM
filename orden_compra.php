@@ -87,7 +87,7 @@ $docTipoLabels = [
     'orden_renovacion' => 'Orden de Renovación',
     'orden_compra'     => 'Orden de Compra',
     'cotizacion'       => 'Cotización',
-    'factura'          => 'Factura',
+    'factura'          => 'Orden de Cobro',
 ];
 $docTipoLabel = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
 $orderNumber  = 'QD-' . date('Ymd');
@@ -331,7 +331,7 @@ enrichWithPaquete($servicios, $pdo);
         <!-- Cliente + Fechas -->
         <div class="client-section">
             <div class="client-info">
-                <div class="label-small">Facturado a</div>
+                <div class="label-small">Cliente</div>
                 <h3><?= htmlspecialchars($cliente['nombre_comercial'] ?? '') ?></h3>
                 <?php if(!empty($cliente['nit_cedula'])): ?>
                 <p style="font-size:12px;font-weight:700;color:#0E0E0C;margin:2px 0">NIT / Cédula: <?= htmlspecialchars($cliente['nit_cedula'] ?? '') ?></p>

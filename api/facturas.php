@@ -92,10 +92,10 @@ switch ($method) {
             $filepath = BASE_PATH . '/' . $factura['archivo_url'];
             if (file_exists($filepath)) unlink($filepath);
             $pdo->prepare("DELETE FROM facturas WHERE id = ?")->execute([$id]);
-            logActivity($_SESSION['user_id'], 'eliminar', 'facturas', $id, "Factura eliminada");
+            logActivity($_SESSION['user_id'], 'eliminar', 'facturas', $id, "Orden de Compra eliminada");
         }
 
-        jsonResponse(['success' => true, 'message' => 'Factura eliminada']);
+        jsonResponse(['success' => true, 'message' => 'Orden de Compra eliminada']);
         break;
 
     default:

@@ -166,7 +166,7 @@ if ($action === 'papelera') {
         ");
         foreach ($s2->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $colMap = [
-                'factura_path'   => ['transacciones_factura','Factura'],
+                'factura_path'   => ['transacciones_factura','Orden de Compra'],
                 'documento_path' => ['transacciones_doc','Documento'],
                 'imagen_path'    => ['transacciones_img','Imagen'],
             ];
@@ -327,7 +327,7 @@ try {
     $s2->execute($params2);
     foreach ($s2->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $colMap = [
-            'factura_path'   => ['transacciones_factura', 'Factura'],
+            'factura_path'   => ['transacciones_factura', 'Orden de Compra'],
             'documento_path' => ['transacciones_doc',     'Documento'],
             'imagen_path'    => ['transacciones_img',     'Imagen'],
         ];

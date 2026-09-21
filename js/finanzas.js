@@ -2147,7 +2147,7 @@ function renderComprobante() {
 
     // Archivos adjuntos
     const archivos = [];
-    if (tx.factura_path)   archivos.push({ tipo:'factura',   path: tx.factura_path,   label:'Factura / Recibo', ext:'PDF' });
+    if (tx.factura_path)   archivos.push({ tipo:'factura',   path: tx.factura_path,   label:'Orden de Compra / Recibo', ext:'PDF' });
     if (tx.imagen_path)    archivos.push({ tipo:'imagen',    path: tx.imagen_path,    label:'Imagen adjunta',   ext: tx.imagen_path.split('.').pop().toUpperCase() });
     if (tx.documento_path) archivos.push({ tipo:'documento', path: tx.documento_path, label:'Documento',        ext: tx.documento_path.split('.').pop().toUpperCase() });
 
@@ -2544,7 +2544,7 @@ function renderArchivosTab(data) {
     };
 
     const cards = data.map(tx => [
-        fileEntry(tx, 'factura',   tx.factura_path,   'Factura / PDF'),
+        fileEntry(tx, 'factura',   tx.factura_path,   'Orden de Compra / PDF'),
         fileEntry(tx, 'imagen',    tx.imagen_path,    'Imagen'),
         fileEntry(tx, 'documento', tx.documento_path, 'Documento'),
     ].join('')).join('');

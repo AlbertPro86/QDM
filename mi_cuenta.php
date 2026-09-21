@@ -987,7 +987,7 @@ async function loadPerfil(){
             ${pf('Persona de contacto',p.persona_contacto)}
             ${pf('Teléfono',p.telefono)}
             ${pf('Correo de contacto',p.email_contacto,true)}
-            ${pf('Correo de facturación',p.email_facturacion,true)}
+            ${pf('Correo de Orden de Compra',p.email_facturacion,true)}
             ${pf('Dirección',p.direccion,true)}
             <div class="pf-field full"><div class="pf-label">Sitio web</div><div class="pf-value ${!p.sitio_web?'empty':''}">${p.sitio_web?`<a href="${/^https?:\/\//i.test(p.sitio_web)?esc(p.sitio_web):'https://'+esc(p.sitio_web)}" target="_blank" rel="noopener" style="color:#0d9488;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600" onmouseenter="this.style.textDecoration='underline'" onmouseleave="this.style.textDecoration='none'"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>${esc(p.sitio_web)}</a>`:'No registrado'}</div></div>
             <div class="pf-field full"><div class="pf-label">Acceso al portal</div><div class="pf-value">${acceso}</div></div>

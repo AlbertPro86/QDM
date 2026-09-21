@@ -248,7 +248,7 @@ include __DIR__ . '/includes/header.php';
         <select id="fnArchivosFiltroFile" onchange="filtrarArchivos()"
             style="padding:8px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;font-family:inherit;background:#FFFFFF;outline:none">
             <option value="todos">Todos los archivos</option>
-            <option value="factura">Facturas (PDF)</option>
+            <option value="factura">Órdenes de Compra (PDF)</option>
             <option value="imagen">Imágenes</option>
             <option value="documento">Documentos</option>
         </select>

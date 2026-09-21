@@ -248,7 +248,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div>
                 <h3 class="card-title" style="margin:0;font-size:11px;font-weight:700">Datos de la empresa</h3>
-                <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Se usan en órdenes, facturas y documentos</p>
+                <p style="margin:0;font-size:9px;color:#8A867C;line-height:1.2">Se usan en órdenes de compra y documentos</p>
             </div>
         </div>
         <div class="card-body" style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px">

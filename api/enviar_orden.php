@@ -104,7 +104,7 @@ if (!$smtpUser || $smtpUser === 'tu_correo@gmail.com' || !$smtpPass || $smtpPass
 }
 
 // Generar número de orden
-$docTipoLabels = ['orden_renovacion'=>'Orden de Renovación','orden_compra'=>'Orden de Compra','cotizacion'=>'Cotización','factura'=>'Factura'];
+$docTipoLabels = ['orden_renovacion'=>'Orden de Renovación','orden_compra'=>'Orden de Compra','cotizacion'=>'Cotización','factura'=>'Orden de Cobro'];
 $docTipoLabel  = $docTipoLabels[$docTipo] ?? 'Orden de Compra';
 $orderNumber   = 'QD-' . date('Ymd');
 

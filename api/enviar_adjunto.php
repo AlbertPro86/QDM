@@ -38,7 +38,7 @@ if (!$cliente) jsonResponse(['error' => 'Cliente no encontrado'], 404);
 
 $emailDest = trim($cliente['email_facturacion'] ?? '');
 if (!$emailDest || !filter_var($emailDest, FILTER_VALIDATE_EMAIL)) {
-    jsonResponse(['error' => 'El cliente no tiene un correo de facturación válido registrado'], 422);
+    jsonResponse(['error' => 'El cliente no tiene un correo de orden de compra válido registrado'], 422);
 }
 
 // Ruta física del archivo

@@ -290,7 +290,7 @@ $leadsToConvert = $stmt->fetchAll();
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div class="form-group"><label class="form-label">WhatsApp</label><input type="text" class="form-input" id="clientTel" placeholder="Número del nuevo negocio"></div>
-                    <div class="form-group"><label class="form-label">Email Facturación</label><input type="email" class="form-input" id="clientEmail"></div>
+                    <div class="form-group"><label class="form-label">Email Orden de Compra</label><input type="email" class="form-input" id="clientEmail"></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                     <div class="form-group"><label class="form-label">Responsable</label><input type="text" class="form-input" id="clientResp"></div>

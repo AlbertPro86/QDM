@@ -100,7 +100,7 @@ function renderKpisFac(resumen, total) {
     document.getElementById('kpiTotal').textContent      = total;
     const cIng = parseInt(resumen.count_ingresos || 0);
     const cEgr = parseInt(resumen.count_egresos  || 0);
-    document.getElementById('kpiIngresosCount').textContent = `${cIng} factura${cIng !== 1 ? 's' : ''}`;
+    document.getElementById('kpiIngresosCount').textContent = `${cIng} orden${cIng !== 1 ? 'es' : ''}`;
     document.getElementById('kpiEgresosCount').textContent  = `${cEgr} egreso${cEgr !== 1 ? 's' : ''}`;
     document.getElementById('kpiPagadas').textContent = `${total} registradas`;
 }
@@ -148,7 +148,7 @@ function renderFacturas(rows, total) {
         let icons = '';
         const facUrl = row.factura_url || row.factura_path;
         if (facUrl) icons += `
-            <a href="${facUrl}" target="_blank" title="Factura PDF"
+            <a href="${facUrl}" target="_blank" title="Orden de Compra PDF"
                style="color:#6366f1;display:inline-flex" onclick="event.stopPropagation()">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -763,7 +763,7 @@ function facUpdateBulkBar() {
     if (ids.length > 0) {
         bar.style.display = 'flex';
         document.getElementById('facBulkCount').textContent =
-            ids.length === 1 ? '1 factura seleccionada' : `${ids.length} facturas seleccionadas`;
+            ids.length === 1 ? '1 orden seleccionada' : `${ids.length} órdenes seleccionadas`;
     } else {
         bar.style.display = 'none';
     }
@@ -780,7 +780,7 @@ async function deleteSelectedFac() {
     const ids = facGetChecked();
     if (!ids.length) return;
 
-    const label = ids.length === 1 ? '1 factura' : `${ids.length} facturas`;
+    const label = ids.length === 1 ? '1 orden' : `${ids.length} órdenes`;
     const confirmed = await confirmAction('Esta acción no se puede deshacer.', { title: `¿Eliminar ${label}?` });
     if (!confirmed) return;
 
@@ -793,7 +793,7 @@ async function deleteSelectedFac() {
         } catch { fail++; }
     }
 
-    if (ok) showToast(`${ok} factura${ok > 1 ? 's' : ''} eliminada${ok > 1 ? 's' : ''}`, 'success');
+    if (ok) showToast(`${ok} orden${ok > 1 ? 'es' : ''} eliminada${ok > 1 ? 's' : ''}`, 'success');
     if (fail) showToast(`${fail} no pudo${fail > 1 ? 'ron' : ''} eliminarse`, 'error');
     cargarFacturas();
 }
@@ -802,7 +802,7 @@ async function editSelectedFac() {
     const ids = facGetChecked();
     if (!ids.length) return;
     if (ids.length > 1) {
-        if (typeof showToast === 'function') showToast('Selecciona solo una factura para editar', 'warning');
+        if (typeof showToast === 'function') showToast('Selecciona solo una orden para editar', 'warning');
         return;
     }
     await editarFactura(ids[0]);
@@ -815,7 +815,7 @@ function switchFacMode(mode) {
     document.getElementById('facEditPanel').style.display    = isView ? 'none'  : 'flex';
     document.getElementById('facViewFooter').style.display   = isView ? 'flex'  : 'none';
     document.getElementById('facEditFooter').style.display   = isView ? 'none'  : 'flex';
-    document.getElementById('modalFacturaTitle').textContent = isView ? 'Ver Factura' : 'Editar Factura';
+    document.getElementById('modalFacturaTitle').textContent = isView ? 'Ver Orden de Compra' : 'Editar Orden de Compra';
 }
 
 async function verFactura(id) {
@@ -914,12 +914,12 @@ function renderFacTemplate() {
         const fmt = v => '$ ' + parseFloat(v||0).toLocaleString('es-CO');
         content.innerHTML = `
             <div style="padding:40px;font-family:sans-serif">
-                <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">Factura</div>
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">Orden de Compra</div>
                 <div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">${data.cliente}</div>
                 <div style="font-size:13px;color:#94a3b8;margin-bottom:20px">${data.numero}</div>
                 <div style="font-size:32px;font-weight:900;color:#0f172a">${fmt(_facActual.monto)}</div>
                 <div style="font-size:11px;color:#94a3b8;margin-bottom:20px">COP · Vence: ${data.vence}</div>
-                <p style="font-size:13px;color:#64748b">Crea una plantilla en <strong>Plantillas de Factura</strong> para ver el diseño completo.</p>
+                <p style="font-size:13px;color:#64748b">Crea una plantilla en <strong>Plantillas de Cobro</strong> para ver el diseño completo.</p>
             </div>`;
     }
 }
@@ -936,7 +936,7 @@ function imprimirFactura() {
     if (!html) return;
     const win = window.open('', '_blank', 'width=920,height=780');
     win.document.write(`<!DOCTYPE html><html><head>
-        <meta charset="UTF-8"><title>Factura</title>
+        <meta charset="UTF-8"><title>Orden de Compra</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
         <style>*{box-sizing:border-box}body{margin:0}@media print{body{margin:0}}</style>
@@ -1046,7 +1046,7 @@ function populateFacView(fac) {
     const filesC = document.getElementById('facViewFilesContainer');
     const files  = [];
     const facUrl = fac.factura_url || fac.factura_path;
-    if (facUrl)             files.push(['Factura PDF', facUrl]);
+    if (facUrl)             files.push(['Orden de Compra PDF', facUrl]);
     if (fac.imagen_path)    files.push(['Imagen', fac.imagen_path]);
     if (fac.documento_path) files.push(['Documento', fac.documento_path]);
     if (files.length) {
@@ -1065,13 +1065,13 @@ function populateFacView(fac) {
 
 async function deleteFactura(id) {
     if (!id) return;
-    const confirmed = await confirmAction('Esta acción no se puede deshacer.', { title: '¿Eliminar esta factura?' });
+    const confirmed = await confirmAction('Esta acción no se puede deshacer.', { title: '¿Eliminar esta orden?' });
     if (!confirmed) return;
     try {
         const r = await fetch(`api/transacciones.php?id=${id}`, { method: 'DELETE' });
         const d = await r.json();
         if (!d.success) throw new Error(d.error || 'Error al eliminar');
-        if (typeof showToast === 'function') showToast('Factura eliminada', 'success');
+        if (typeof showToast === 'function') showToast('Orden eliminada', 'success');
         cerrarModalFactura();
         cargarFacturas();
     } catch (err) {
@@ -1112,7 +1112,7 @@ async function guardarFactura() {
         const d = await r.json();
         if (!d.success) throw new Error(d.error || 'Error al guardar');
 
-        if (typeof showToast === 'function') showToast('Factura actualizada ✓', 'success');
+        if (typeof showToast === 'function') showToast('Orden actualizada ✓', 'success');
         if (d.data) { _facActual = d.data; renderFacTemplate(); }
         switchFacMode('view');
         cargarFacturas();

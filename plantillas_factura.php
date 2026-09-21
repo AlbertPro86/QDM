@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/functions.php';
 requireAuth();
 $pageTitle    = 'Plantillas de Cobro';
 $pageSubtitle = '';
-$pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;opacity:.65;text-decoration:none;transition:opacity .12s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a> › <a href="facturacion.php" style="color:inherit;opacity:.65;text-decoration:none;transition:opacity .12s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Facturación</a> › <span style="font-weight:700;color:var(--color-text)">Plantillas de Cobro</span>';
+$pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;opacity:.65;text-decoration:none;transition:opacity .12s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a> › <a href="facturacion.php" style="color:inherit;opacity:.65;text-decoration:none;transition:opacity .12s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Orden de Compra</a> › <span style="font-weight:700;color:var(--color-text)">Plantillas de Cobro</span>';
 include __DIR__ . '/includes/header.php';
 ?>
 

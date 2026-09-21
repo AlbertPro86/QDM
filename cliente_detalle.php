@@ -162,7 +162,7 @@ include __DIR__ . '/includes/header.php';
                 <div style="display:flex;gap:8px;align-items:center">
                     <button class="btn btn-outline sm" onclick="generateSelectedOrder()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #e2e8f0;color:#0f172a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f1f5f9';this.style.borderColor='#cbd5e1'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Facturar Seleccionados
+                        Generar Orden de Compra
                     </button>
                     <button id="btnRegistrarPago" onclick="openRegistrarPagoModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;border-radius:6px;border:1.5px solid #16a34a;color:#16a34a;background:#fff;cursor:pointer;transition:all .15s" onmouseenter="this.style.background='#f0fdf4';this.style.borderColor='#15803d'" onmouseleave="this.style.background='#fff';this.style.borderColor='#16a34a'">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -416,7 +416,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Adjuntos -->
         <div class="card animate-fade-up stagger-4">
             <div class="card-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-                <h3 class="card-title" style="font-size:13px">Adjuntos <span style="font-size:10px;font-weight:400;color:var(--color-text-muted)">(Facturas, Docs)</span></h3>
+                <h3 class="card-title" style="font-size:13px">Adjuntos <span style="font-size:10px;font-weight:400;color:var(--color-text-muted)">(Órdenes de Compra, Docs)</span></h3>
                 <label class="btn btn-primary btn-sm" style="cursor:pointer;gap:4px">
                     <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg> Subir
                     <input type="file" id="mediaUpload" style="display:none" onchange="uploadMedia(this)">
@@ -970,7 +970,7 @@ include __DIR__ . '/includes/header.php';
                         <input type="tel" class="form-input" id="editTelefono" placeholder="+57 300 123 4567">
                     </div>
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Email Facturación</label>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Email Orden de Compra</label>
                         <input type="email" class="form-input" id="editEmailFacturacion" placeholder="email@empresa.com">
                     </div>
                 </div>
@@ -1300,7 +1300,7 @@ async function _loadOrdenPlantillas() {
         const [dP, dC] = await Promise.all([rP.json(), rC.json()]);
 
         // Plantillas — todas, agrupadas por categoría legible
-        const catLabel = { orden_renovacion:'Renovación', cotizacion:'Cotización', orden_compra:'Compra', factura:'Factura' };
+        const catLabel = { orden_renovacion:'Renovación', cotizacion:'Cotización', orden_compra:'Compra', factura:'Cobro' };
         if (dP.success && dP.data.length) {
             window._ordenPlantillasCache = dP.data;
             sel.innerHTML = dP.data.map(p => {
@@ -1399,7 +1399,7 @@ function onOrdenPlantillaChange() {
                 'orden_compra':     { tipo: 'orden_compra',     label: 'Orden de Compra' },
                 'orden_renovacion': { tipo: 'orden_renovacion', label: 'Orden de Renovación' },
                 'cotizacion':       { tipo: 'cotizacion',       label: 'Cotización' },
-                'factura':          { tipo: 'factura',          label: 'Factura' },
+                'factura':          { tipo: 'factura',          label: 'Orden de Cobro' },
             };
             const mapped = catMap[p.categoria];
             if (mapped) {
@@ -1415,7 +1415,7 @@ function onOrdenPlantillaChange() {
 function generateSelectedOrder() {
     let ids = Array.from(document.querySelectorAll('.svc-check:checked')).map(c => c.value);
     if (!ids.length) {
-        showToast('Selecciona al menos un servicio para facturar.', 'warning');
+        showToast('Selecciona al menos un servicio para generar la orden.', 'warning');
         return;
     }
     window._ordenModalTipo = 'orden_renovacion';
@@ -2305,7 +2305,7 @@ function sendOrdenByEmail() {
 
     // Construir opciones de correo disponibles
     const opciones = [];
-    if (clienteEmails.facturacion) opciones.push({ label: 'Facturación', email: clienteEmails.facturacion });
+    if (clienteEmails.facturacion) opciones.push({ label: 'Orden de Compra', email: clienteEmails.facturacion });
     if (clienteEmails.contacto)    opciones.push({ label: 'Encargado / Persona', email: clienteEmails.contacto });
 
     const opcionesHTML = opciones.map((o, i) => `

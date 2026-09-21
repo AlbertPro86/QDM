@@ -4,11 +4,11 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
 requireAuth();
 $pdo = db();
-$pageTitle    = 'Facturación';
+$pageTitle    = 'Orden de Compra';
 $pageSubtitle = '';
 $pageBreadcrumb = '<a href="dashboard.php" style="color:inherit;text-decoration:none;opacity:.65;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.65">Dashboard</a>'
     . '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin:0 4px;opacity:.4"><path d="M9 5l7 7-7 7"/></svg>'
-    . '<span style="font-weight:700;color:var(--color-text)">Facturación</span>';
+    . '<span style="font-weight:700;color:var(--color-text)">Orden de Compra</span>';
 
 include __DIR__ . '/includes/header.php';
 ?>
@@ -19,7 +19,7 @@ include __DIR__ . '/includes/header.php';
         style="padding:10px 20px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2.5px solid #0E0E0C;color:#0E0E0C;margin-bottom:-2px;border-radius:4px 4px 0 0;transition:all .15s"
         onclick="switchFacTab('facturas',this)">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:5px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Facturas
+        Órdenes de Compra
     </button>
     <button class="facTab" data-tab="proveedores"
         style="padding:10px 20px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2.5px solid transparent;color:#8A867C;margin-bottom:-2px;border-radius:4px 4px 0 0;transition:all .15s"
@@ -43,7 +43,7 @@ include __DIR__ . '/includes/header.php';
             <div style="font-size:26px;font-weight:900;color:#0E0E0C;line-height:1" id="kpiIngresos">$ 0</div>
             <div style="font-size:10px;color:#8A867C;margin-top:5px">COP</div>
             <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:11px;color:#57544D" id="kpiIngresosCount">0 facturas</span>
+                <span style="font-size:11px;color:#57544D" id="kpiIngresosCount">0 órdenes</span>
                 <span style="font-size:10px;font-weight:700;background:#C8EAD3;color:#1B5A39;padding:2px 8px;border-radius:100px">Total</span>
             </div>
         </div>
@@ -272,7 +272,7 @@ include __DIR__ . '/includes/header.php';
 
     <!-- Header compartido -->
     <div style="padding:18px 24px 14px;border-bottom:1.5px solid #E8E5DD;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#FFFFFF;z-index:1;border-radius:6px 6px 0 0">
-      <h2 style="font-size:15px;font-weight:700;color:#0E0E0C;margin:0" id="modalFacturaTitle">Ver Factura</h2>
+      <h2 style="font-size:15px;font-weight:700;color:#0E0E0C;margin:0" id="modalFacturaTitle">Ver Orden de Compra</h2>
       <button onclick="cerrarModalFactura()" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:4px;color:#8A867C" onmouseenter="this.style.background='#FAFAF7'" onmouseleave="this.style.background='none'">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
@@ -323,7 +323,7 @@ include __DIR__ . '/includes/header.php';
       </div>
       <div>
         <label style="font-size:11px;font-weight:700;color:#57544D;display:block;margin-bottom:5px;text-transform:uppercase">Título / Concepto *</label>
-        <input type="text" id="facTitulo" placeholder="Descripción de la factura" style="width:100%;padding:8px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;outline:none;box-sizing:border-box">
+        <input type="text" id="facTitulo" placeholder="Descripción de la orden" style="width:100%;padding:8px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;outline:none;box-sizing:border-box">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>

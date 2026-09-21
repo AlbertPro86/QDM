@@ -42,7 +42,7 @@ function enviarNotifCliente(PDO $pdo, int $clienteId, int $numRecordatorio, bool
 
     $emailDest = trim($cliente['email_facturacion'] ?? '');
     if (!$emailDest || !filter_var($emailDest, FILTER_VALIDATE_EMAIL)) {
-        return ['ok' => false, 'error' => 'El cliente no tiene email de facturación válido'];
+        return ['ok' => false, 'error' => 'El cliente no tiene email de orden de compra válido'];
     }
 
     $sc2 = $pdo->prepare("SELECT * FROM crm_cliente_notif_config WHERE cliente_id = ?");

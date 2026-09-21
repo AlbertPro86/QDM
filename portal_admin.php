@@ -777,7 +777,7 @@ const PA_SECCIONES = [
     { key:'pagos',          icon:'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z', name:'Historial de pagos', desc:'Transacciones e ingresos' },
     { key:'tareas',         icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', name:'Tareas',             desc:'Tareas asignadas al cliente' },
     { key:'notificaciones', icon:'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', name:'Notificaciones',    desc:'Recordatorios enviados' },
-    { key:'documentos',     icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', name:'Documentos',        desc:'Archivos y facturas' },
+    { key:'documentos',     icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', name:'Documentos',        desc:'Archivos y órdenes de compra' },
     { key:'accesos',        icon:'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z', name:'Accesos',           desc:'Credenciales e inventario' },
     { key:'perfil',         icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', name:'Mi Perfil',         desc:'Datos y cambio de clave' },
 ];
