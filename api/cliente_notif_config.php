@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * CRM QUANTUN Digital — API Configuración de Notificaciones por Cliente
  * GET  ?cliente_id=X  → obtiene configuración

@@ -58,6 +58,16 @@ define('APP_VERSION', max(
 define('MAX_UPLOAD_SIZE', (int) env('MAX_UPLOAD_SIZE', 10485760)); // 10MB
 define('UPLOAD_DIR', env('UPLOAD_DIR', 'uploads/facturas/'));
 
+// ─── Charset de respuesta ───
+// Sin esto, algunos hosts (ej. el AddDefaultCharset del servidor) pueden
+// declarar un charset distinto a UTF-8 en la cabecera HTTP real, que
+// prevalece sobre el <meta charset="UTF-8"> del HTML. El texto normal se
+// ve bien casi siempre, pero emojis (secuencias UTF-8 de 4 bytes) se
+// corrompen a "�" en el cliente antes de llegar a WhatsApp/donde sea.
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header('Content-Type: text/html; charset=UTF-8');
+}
+
 // ─── Configuración de Sesión ───
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

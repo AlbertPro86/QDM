@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * CRM QUANTUN Digital - Sidebar Navigation
  */
