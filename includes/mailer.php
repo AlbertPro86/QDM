@@ -59,15 +59,18 @@ class Mailer {
      * @param array  $attachments [['path'=>'...','name'=>'...','mime'=>'...']]
      * @param array  $inlineImages Imágenes embebidas CID [['path'=>'...','cid'=>'...','mime'=>'image/png']]
      *                             Referenciar en HTML como: <img src="cid:NOMBRE_CID">
+     * @param string|null $fromNameOverride Nombre de remitente solo para este envío
+     *                             (no toca smtp_from_name, que es global y puede estar
+     *                             pensado para otro tipo de correo, ej. el resumen diario).
      * @return array{ok:bool, error:string|null}
      */
-    public function send(string $to, string $subject, string $html, array $attachments = [], array $inlineImages = []): array {
+    public function send(string $to, string $subject, string $html, array $attachments = [], array $inlineImages = [], ?string $fromNameOverride = null): array {
         try {
             $this->conectar();
             $this->ehlo();
             if ($this->encryption === 'tls') $this->starttls();
             $this->autenticar();
-            $this->enviarMensaje($to, $subject, $html, $attachments, $inlineImages);
+            $this->enviarMensaje($to, $subject, $html, $attachments, $inlineImages, $fromNameOverride);
             $this->cmd('QUIT');
             @fclose($this->socket);
             return ['ok' => true, 'error' => null];
@@ -115,7 +118,7 @@ class Mailer {
 
     // ── Construcción y envío del mensaje ──────────────────────────────────────
 
-    private function enviarMensaje(string $to, string $subject, string $html, array $attachments, array $inlineImages = []): void {
+    private function enviarMensaje(string $to, string $subject, string $html, array $attachments, array $inlineImages = [], ?string $fromNameOverride = null): void {
         $toEmail = $this->extraerEmail($to);
         $this->cmd('MAIL FROM:<' . $this->fromAddress . '>', 250);
         $this->cmd('RCPT TO:<'  . $toEmail . '>', [250, 251]);
@@ -127,7 +130,8 @@ class Mailer {
         $hasAtt = !empty($attachments);
         $hasInl = !empty($inlineImages);
 
-        $headers  = "From: =?UTF-8?B?" . base64_encode($this->fromName) . "?= <{$this->fromAddress}>\r\n";
+        $fromName = ($fromNameOverride !== null && $fromNameOverride !== '') ? $fromNameOverride : $this->fromName;
+        $headers  = "From: =?UTF-8?B?" . base64_encode($fromName) . "?= <{$this->fromAddress}>\r\n";
         $headers .= "To: $to\r\n";
         $headers .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
         $headers .= "MIME-Version: 1.0\r\n";

@@ -427,14 +427,6 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 @media only screen and (max-width:640px){
   body{padding:0 !important}
   .wrap,.msg-pre{max-width:100% !important;width:100% !important}
-  .stack-tbl{display:block !important;width:100% !important;table-layout:fixed !important}
-  .stack-tr{display:block !important;width:100% !important}
-  .hdr-l,.hdr-r{display:block !important;width:100% !important;text-align:left !important;padding:16px 20px 8px !important;box-sizing:border-box !important}
-  .hdr-r{text-align:right !important;padding-top:0 !important}
-  .badge-box{float:none !important}
-  .badge-box-td{white-space:normal !important;font-size:9px !important;letter-spacing:.06em !important}
-  .ord-num{font-size:18px !important}
-  .cli-l,.cli-r{display:block !important;width:100% !important;padding:12px 20px !important;white-space:normal !important;box-sizing:border-box !important}
   .itm-td{padding:7px 8px !important;font-size:10px !important}
   .px{padding-left:16px !important;padding-right:16px !important}
   .tot-tbl{width:100% !important}
@@ -447,11 +439,11 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
   style="background:#ffffff;max-width:620px;margin:0 auto;border-radius:3px;overflow:hidden;border:1px solid #E8E5DD">
 <tr><td>
 
-<!-- ═══ ENCABEZADO ═══ -->
-<table class="stack-tbl" width="100%" cellpadding="0" cellspacing="0" border="0"
+<!-- ═══ ENCABEZADO ═══ (siempre apilado, mismo motivo que la sección Cliente) -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
   style="border-bottom:1.5px solid #E8E5DD">
-<tr class="stack-tr">
-  <td class="hdr-l" style="padding:24px 28px;width:55%;vertical-align:middle">
+<tr>
+  <td style="padding:24px 28px 16px">
     ' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" style="display:block;max-width:150px;max-height:48px;height:auto;border:0">' : '<div style="font-size:16px;font-weight:800;color:#0E0E0C">' . htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') . '</div>') . '
     <div style="margin-top:10px;font-size:10px;color:#8A867C;line-height:1.8">
       ' . (!empty($template['empresa_nombre']) ? '<strong style="color:#0E0E0C;font-size:11px">' . htmlspecialchars($template['empresa_nombre']) . '</strong><br>' : '') . '
@@ -459,30 +451,33 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
       ' . htmlspecialchars($template['empresa_tel'] ?? '') . ' &nbsp;&middot;&nbsp; ' . htmlspecialchars($template['empresa_dir'] ?? '') . '
     </div>
   </td>
-  <td class="hdr-r" style="padding:24px 28px;width:45%;vertical-align:top;text-align:right">
-    <!-- Badge tipo documento — tabla para compatibilidad Gmail -->
-    <table class="badge-box" cellpadding="0" cellspacing="0" border="0" align="right">
-      <tr><td class="badge-box-td" style="background:' . $cpri . ';color:' . $csec . ';padding:5px 14px;border-radius:3px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap">' . htmlspecialchars($docTipoLabel) . '</td></tr>
-    </table>
-    <div style="clear:both"></div>
-    <div class="ord-num" style="font-size:22px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;margin-top:8px">' . htmlspecialchars($orderNumber) . '</div>
+</tr>
+<tr>
+  <td style="padding:0 28px 24px">
+    <table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="background:' . $cpri . ';color:' . $csec . ';padding:5px 14px;border-radius:3px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;white-space:normal">' . htmlspecialchars($docTipoLabel) . '</td>
+    </tr></table>
+    <div style="font-size:20px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;margin-top:8px">' . htmlspecialchars($orderNumber) . '</div>
     <div style="font-size:11px;color:#8A867C;margin-top:4px">' . $fechaEmision . '</div>
     ' . ($fechaUltPago ? '<div style="font-size:10px;color:#8A867C;margin-top:2px">Últ. pago: ' . htmlspecialchars($fechaUltPago) . '</div>' : '') . '
   </td>
 </tr>
 </table>
 
-<!-- ═══ CLIENTE ═══ -->
-<table class="stack-tbl" width="100%" cellpadding="0" cellspacing="0" border="0"
+<!-- ═══ CLIENTE ═══ (siempre apilado, una fila por dato -- no depende de que el
+     cliente de correo soporte @media, que muchos ignoran en el celular) -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
   style="border-bottom:1.5px solid #E8E5DD">
-<tr class="stack-tr">
-  <td class="cli-l" style="padding:16px 28px;vertical-align:top">
+<tr>
+  <td style="padding:16px 28px 12px">
     <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:' . $cpri . ';margin-bottom:5px">Cobrado a</div>
     <div style="font-size:13px;font-weight:700;color:#0E0E0C">' . htmlspecialchars($data['nombre_comercial'] ?? '') . '</div>
     ' . (!empty($data['nit_cedula']) ? '<div style="font-size:10px;color:#8A867C;margin-top:2px">NIT: ' . htmlspecialchars($data['nit_cedula']) . '</div>' : '') . '
     <div style="font-size:10px;color:#8A867C;margin-top:2px">' . htmlspecialchars($data['direccion'] ?? '') . '</div>
   </td>
-  <td class="cli-r" style="padding:16px 28px;vertical-align:top;text-align:right;white-space:nowrap">
+</tr>
+<tr>
+  <td style="padding:0 28px 16px">
     <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#8A867C;margin-bottom:3px">Método de Pago</div>
     <div style="font-size:11px;font-weight:700;color:#0E0E0C">' . htmlspecialchars($metodoPagoOver ?? '') . '</div>
   </td>
@@ -558,8 +553,11 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 </body>
 </html>';
 
-// Asunto del correo: personalizado o por defecto
-$emailAsunto = $asuntoOver ?: ($docTipoLabel . ' #' . $orderNumber . ' - QUANTUN Digital');
+// Asunto del correo: personalizado o uno llamativo con los datos del cliente
+// (nunca el nombre_remitente global de crm_configuraciones -- ese es de otro
+// tipo de correo, ej. el resumen diario, y no debe filtrarse aqui).
+$clienteNombreCorto = $data['nombre_comercial'] ?? '';
+$emailAsunto = $asuntoOver ?: ($docTipoLabel . ' lista para ' . $clienteNombreCorto . ' · ' . $orderNumber);
 
 // Bloque de mensaje personalizado (va antes del documento)
 $mensajeHtml = '';
@@ -600,7 +598,8 @@ $result = $mailer->send(
     $emailAsunto,
     $htmlFinal,
     [],
-    $inlineImages
+    $inlineImages,
+    $template['empresa_nombre'] ?? 'QUANTUN Digital'
 );
 // Limpiar archivo temporal del logo si se creó
 if (!empty($tmpLogo) && @file_exists($tmpLogo)) {
