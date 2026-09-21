@@ -292,27 +292,27 @@ enrichWithPaquete($servicios, $pdo);
         .footer-dark { background: <?= $template['color_primario'] ?>; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; }
         .footer-text { font-size: 11px; color: rgba(255,255,255,.5); }
         .footer-accent { width: 40px; height: 4px; background: <?= $template['color_secundario'] ?>; border-radius: 2px; }
-        @page { size: auto; margin: 6mm; }
+        @page { size: letter; margin: 12mm; }
         @media print {
             html, body { padding: 0; background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .invoice { box-shadow: none; max-width: 100%; }
             .logo-section img { filter: none !important; }
-            /* Compactar espaciados verticales para que quepa en una sola hoja */
-            .header-content { padding: 16px 30px; }
-            .company-details { margin-top: 8px; line-height: 1.5; }
-            .client-section { padding: 12px 30px; }
-            .items-section { padding: 12px 0; }
-            .items-table th { padding: 7px 12px; }
-            .items-table td { padding: 7px 12px; }
-            .totals { margin-top: 10px; padding: 0 30px; }
-            .total-row { padding: 4px 12px; }
-            .total-final { padding: 9px 12px; margin-top: 6px; }
-            .footer-dark { padding: 9px 30px; }
-            .bank-block { margin-bottom: 12px !important; }
-            .bank-header { padding: 8px 30px !important; }
-            .bank-grid { padding: 12px 30px !important; gap: 8px 30px !important; }
-            .pay-link-block { padding: 0 30px 12px !important; }
-            .pay-link-block a { padding: 8px 28px !important; }
+            /* Espaciados moderados: usar bien la hoja carta sin desbordar a una 2da pagina */
+            .header-content { padding: 22px 34px; }
+            .company-details { margin-top: 11px; line-height: 1.65; }
+            .client-section { padding: 16px 34px; }
+            .items-section { padding: 20px 0; }
+            .items-table th { padding: 9px 13px; }
+            .items-table td { padding: 9px 13px; }
+            .totals { margin-top: 16px; padding: 0 34px; }
+            .total-row { padding: 5px 12px; }
+            .total-final { padding: 12px 12px; margin-top: 8px; }
+            .footer-dark { padding: 12px 34px; }
+            .bank-block { margin-bottom: 18px !important; }
+            .bank-header { padding: 11px 34px !important; }
+            .bank-grid { padding: 16px 34px !important; gap: 12px 34px !important; }
+            .pay-link-block { padding: 0 34px 18px !important; }
+            .pay-link-block a { padding: 11px 32px !important; }
         }
     </style>
 </head>

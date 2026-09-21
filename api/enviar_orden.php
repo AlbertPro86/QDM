@@ -427,9 +427,14 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 @media only screen and (max-width:640px){
   body{padding:0 !important}
   .wrap,.msg-pre{max-width:100% !important;width:100% !important}
-  .hdr-l,.hdr-r{display:block !important;width:100% !important;text-align:left !important;padding:16px 20px 8px !important}
+  .stack-tbl{display:block !important;width:100% !important;table-layout:fixed !important}
+  .stack-tr{display:block !important;width:100% !important}
+  .hdr-l,.hdr-r{display:block !important;width:100% !important;text-align:left !important;padding:16px 20px 8px !important;box-sizing:border-box !important}
   .hdr-r{text-align:right !important;padding-top:0 !important}
-  .cli-l,.cli-r{display:block !important;width:100% !important;padding:12px 20px !important}
+  .badge-box{float:none !important}
+  .badge-box-td{white-space:normal !important;font-size:9px !important;letter-spacing:.06em !important}
+  .ord-num{font-size:18px !important}
+  .cli-l,.cli-r{display:block !important;width:100% !important;padding:12px 20px !important;white-space:normal !important;box-sizing:border-box !important}
   .itm-td{padding:7px 8px !important;font-size:10px !important}
   .px{padding-left:16px !important;padding-right:16px !important}
   .tot-tbl{width:100% !important}
@@ -443,9 +448,9 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 <tr><td>
 
 <!-- ═══ ENCABEZADO ═══ -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
+<table class="stack-tbl" width="100%" cellpadding="0" cellspacing="0" border="0"
   style="border-bottom:1.5px solid #E8E5DD">
-<tr>
+<tr class="stack-tr">
   <td class="hdr-l" style="padding:24px 28px;width:55%;vertical-align:middle">
     ' . ($logoSrc ? '<img src="' . $logoSrc . '" alt="Logo" style="display:block;max-width:150px;max-height:48px;height:auto;border:0">' : '<div style="font-size:16px;font-weight:800;color:#0E0E0C">' . htmlspecialchars($template['empresa_nombre'] ?? 'QUANTUN Digital') . '</div>') . '
     <div style="margin-top:10px;font-size:10px;color:#8A867C;line-height:1.8">
@@ -456,11 +461,11 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
   </td>
   <td class="hdr-r" style="padding:24px 28px;width:45%;vertical-align:top;text-align:right">
     <!-- Badge tipo documento — tabla para compatibilidad Gmail -->
-    <table cellpadding="0" cellspacing="0" border="0" align="right">
-      <tr><td style="background:' . $cpri . ';color:' . $csec . ';padding:5px 14px;border-radius:3px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap">' . htmlspecialchars($docTipoLabel) . '</td></tr>
+    <table class="badge-box" cellpadding="0" cellspacing="0" border="0" align="right">
+      <tr><td class="badge-box-td" style="background:' . $cpri . ';color:' . $csec . ';padding:5px 14px;border-radius:3px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap">' . htmlspecialchars($docTipoLabel) . '</td></tr>
     </table>
     <div style="clear:both"></div>
-    <div style="font-size:22px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;margin-top:8px">' . htmlspecialchars($orderNumber) . '</div>
+    <div class="ord-num" style="font-size:22px;font-weight:900;color:#0E0E0C;letter-spacing:-1px;margin-top:8px">' . htmlspecialchars($orderNumber) . '</div>
     <div style="font-size:11px;color:#8A867C;margin-top:4px">' . $fechaEmision . '</div>
     ' . ($fechaUltPago ? '<div style="font-size:10px;color:#8A867C;margin-top:2px">Últ. pago: ' . htmlspecialchars($fechaUltPago) . '</div>' : '') . '
   </td>
@@ -468,9 +473,9 @@ img{border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
 </table>
 
 <!-- ═══ CLIENTE ═══ -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
+<table class="stack-tbl" width="100%" cellpadding="0" cellspacing="0" border="0"
   style="border-bottom:1.5px solid #E8E5DD">
-<tr>
+<tr class="stack-tr">
   <td class="cli-l" style="padding:16px 28px;vertical-align:top">
     <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:' . $cpri . ';margin-bottom:5px">Cobrado a</div>
     <div style="font-size:13px;font-weight:700;color:#0E0E0C">' . htmlspecialchars($data['nombre_comercial'] ?? '') . '</div>
@@ -559,15 +564,15 @@ $emailAsunto = $asuntoOver ?: ($docTipoLabel . ' #' . $orderNumber . ' - QUANTUN
 // Bloque de mensaje personalizado (va antes del documento)
 $mensajeHtml = '';
 if ($mensajeOver) {
-    $mensajeHtml = '<table class="em-msg" width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:600px;margin:0 auto">'
+    $mensajeHtml = '<table class="msg-pre" width="620" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:620px;margin:0 auto">'
         . '<tr><td style="padding:16px 10px 0 10px;font-family:' . $cfont . ',system-ui,sans-serif">'
         . '<div style="background:#f8fafc;border-left:4px solid ' . $cpri . ';padding:14px 18px;border-radius:0 6px 6px 0;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap">'
         . htmlspecialchars($mensajeOver)
         . '</div></td></tr></table>';
     // Insertar antes del bloque principal del email
     $htmlFinal = str_replace(
-        '<table class="em-wrap"',
-        $mensajeHtml . "\n" . '<table class="em-wrap"',
+        '<table class="wrap"',
+        $mensajeHtml . "\n" . '<table class="wrap"',
         $htmlFinal
     );
 }
