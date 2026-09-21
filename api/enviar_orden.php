@@ -626,12 +626,23 @@ if ($result['ok']) {
             try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN datos_bancarios LONGTEXT DEFAULT NULL"); } catch(PDOException $e){}
             try { $pdo->exec("ALTER TABLE cotizaciones ADD COLUMN plantilla_id INT DEFAULT NULL"); } catch(PDOException $e){}
 
-            $itemsJson = json_encode($itemsOverride ?: array_map(function($s) {
+            // Mismo esquema de claves que usa cotizador.php/cotizacion_vista.php
+            // (nombre/tipo/frecuencia/cantidad/precio_unit/subtotal). $servicios ya
+            // viene normalizado (con o sin override aplicado más arriba), por lo que
+            // no hay que volver a leer $itemsOverride con sus claves crudas aquí --
+            // antes se guardaba con otro esquema (descripcion/qty/precio/descuento)
+            // y la vista mostraba $0 COP y "N/A" al no encontrar esas claves.
+            $itemsJson = json_encode(array_map(function($s) {
+                $precioU = $s['_precio_unit'] ?? $s['monto_renovacion'];
+                $qty     = $s['_qty'] ?? 1;
+                $desc    = $s['descuento'] ?? 0;
                 return [
-                    'descripcion' => $s['servicio_nombre'],
-                    'qty'         => $s['_qty'] ?? 1,
-                    'precio'      => $s['_precio_unit'] ?? $s['monto_renovacion'],
-                    'descuento'   => $s['descuento'] ?? 0,
+                    'nombre'      => $s['servicio_nombre'] ?? '',
+                    'tipo'        => 'servicio',
+                    'frecuencia'  => $s['frecuencia'] ?? 'N/A',
+                    'cantidad'    => $qty,
+                    'precio_unit' => $precioU,
+                    'subtotal'    => ($precioU * $qty) - $desc,
                 ];
             }, $servicios));
 

@@ -275,7 +275,7 @@ if (empty($cotizaciones)) {
                     <td style="padding:10px 16px">
                         <div style="display:flex;align-items:center;gap:4px;flex-wrap:nowrap">
                             <!-- Ver: abre modal con iframe template -->
-                            <button onclick="verCotizacion(<?php echo $cot['id']; ?>)" title="Ver cotización"
+                            <button onclick="verCotizacion(<?php echo $cot['id']; ?>)" title="Ver <?= htmlspecialchars(mb_strtolower($titulo_singular)) ?>"
                                 style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#EFECE5;color:#2A2926;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:background .12s;white-space:nowrap"
                                 onmouseenter="this.style.background='#E8E5DD'" onmouseleave="this.style.background='#EFECE5'">
                                 <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -332,7 +332,7 @@ if (empty($cotizaciones)) {
     <div class="modal" style="max-width:960px;width:95vw;height:88vh;display:flex;flex-direction:column">
         <div class="modal-header" style="flex-shrink:0">
             <div>
-                <h3 class="modal-title">Cotización</h3>
+                <h3 class="modal-title" id="verModalTitulo"><?= htmlspecialchars($titulo_singular) ?></h3>
                 <p style="font-size:12px;color:#94a3b8;margin:3px 0 0">Vista previa del documento</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px">

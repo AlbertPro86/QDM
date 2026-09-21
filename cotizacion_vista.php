@@ -26,6 +26,19 @@ $total = floatval($cot['total']);
 $subtotal = floatval($cot['subtotal']);
 $descuento = floatval($cot['descuento']);
 
+// Etiquetas según el tipo real del documento -- antes esta vista siempre
+// decía "Cotización" sin importar si era Orden de Compra/Renovación o
+// Cuenta de Cobro. Mismo mapa de nombres que usa cotizador.php.
+$tipoDocReal = $cot['tipo'] ?? 'cotizacion';
+$tipoLabelsDoc = [
+    'cotizacion'       => 'Cotización',
+    'cuenta_cobro'     => 'Cuenta de Cobro',
+    'orden_compra'     => 'Orden de Compra',
+    'orden_renovacion' => 'Orden de Renovación',
+];
+$tituloDocReal = $tipoLabelsDoc[$tipoDocReal] ?? 'Cotización';
+$billingLabel  = ($tipoDocReal === 'cotizacion') ? 'Cotización para:' : 'Cliente:';
+
 // ── Plantilla ─────────────────────────────────────────────────────────────────
 $plantilla = null;
 // Prioridad: GET > guardado en la cotización > default de la categoría > cualquier default
@@ -73,7 +86,7 @@ $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotización <?= $numero ?></title>
+    <title><?= sanitize($tituloDocReal) ?> <?= $numero ?></title>
     <style>
         :root {
             --p-col1: <?= sanitize($pColPrim) ?>;
@@ -354,13 +367,13 @@ $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
     </div>
 
     <div class="title">
-        <h1>COTIZACIÓN</h1>
+        <h1><?= sanitize(mb_strtoupper($tituloDocReal)) ?></h1>
         <p>#<?= sanitize($numero) ?> • Emitida el <?= $fechaEmision ?></p>
     </div>
 
     <div class="billing">
         <div class="billing-column">
-            <div class="billing-label">Cotización para:</div>
+            <div class="billing-label"><?= sanitize($billingLabel) ?></div>
             <div class="billing-value">
                 <strong><?= sanitize($cot['nombre_cliente']) ?></strong><br>
                 <?php if ($cot['email']): ?>
@@ -439,7 +452,7 @@ $pNombrePlan = $plantilla['nombre']        ?? 'Básica';
             <?php if ($pNotasPie): ?>
                 <?= nl2br(sanitize($pNotasPie)) ?>
             <?php else: ?>
-                Esta cotización es válida únicamente para los términos y condiciones especificados.<br>
+                Este documento es válido únicamente para los términos y condiciones especificados.<br>
                 Para más información contáctenos por email o teléfono.
             <?php endif; ?>
         </p>
