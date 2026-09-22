@@ -1,0 +1,22 @@
+# =============================================
+# Capacitacion CMS - QUANTUN Digital
+# =============================================
+Options -Indexes
+AddDefaultCharset UTF-8
+
+<FilesMatch "\.(json|log|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^data/ - [F,L]
+    RewriteRule ^lib/  - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

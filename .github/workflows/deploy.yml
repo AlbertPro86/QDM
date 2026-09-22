@@ -35,6 +35,7 @@ jobs:
             rsync -av --delete \
               --exclude='.git' \
               --exclude='crm/' \
+              --exclude='capacitacion/data/' \
               "$HOME/quantun-repo/quantun-web/" \
               "$HOME/domains/quantundigital.com/public_html/"
             echo "=== Desplegando CRM ==="

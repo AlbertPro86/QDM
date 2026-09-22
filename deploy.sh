@@ -18,6 +18,7 @@ echo ">>> Desplegando sitio web en public_html/..."
 rsync -av --delete \
   --exclude='.git' \
   --exclude='crm/' \
+  --exclude='capacitacion/data/' \
   "$REPO_DIR/quantun-web/" "$WEB_DIR/"
 
 echo ">>> Desplegando CRM en public_html/crm/..."

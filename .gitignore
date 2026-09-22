@@ -6,6 +6,9 @@
 uploads/*
 !uploads/.gitkeep
 
+# Datos del modulo de capacitacion (viven solo en el servidor)
+quantun-web/capacitacion/data/*.json
+
 # Backups locales
 backups/
 
