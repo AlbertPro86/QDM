@@ -114,12 +114,18 @@ if ($vista === 'acceso' || $vista === 'admin'):
           </label>
           <label class="field">
             <span class="field__label">Contraseña</span>
-            <input class="input" type="password" name="clave" minlength="10" required>
+            <span class="field__pass">
+              <input class="input" type="password" name="clave" minlength="10" required>
+              <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+            </span>
             <span class="field__hint">Mínimo 10 caracteres. Usa un gestor de claves.</span>
           </label>
           <label class="field">
             <span class="field__label">Repetir contraseña</span>
-            <input class="input" type="password" name="clave2" minlength="10" required>
+            <span class="field__pass">
+              <input class="input" type="password" name="clave2" minlength="10" required>
+              <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+            </span>
           </label>
           <button class="btn btn--primary btn--block" type="submit">Crear cuenta <?= cap_icono('arrow', 'ico ico--sm') ?></button>
         </form>
@@ -137,7 +143,10 @@ if ($vista === 'acceso' || $vista === 'admin'):
           </label>
           <label class="field">
             <span class="field__label">Contraseña</span>
-            <input class="input" type="password" name="clave" required>
+            <span class="field__pass">
+              <input class="input" type="password" name="clave" required>
+              <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+            </span>
           </label>
           <button class="btn btn--primary btn--block" type="submit">Entrar <?= cap_icono('arrow', 'ico ico--sm') ?></button>
         </form>
@@ -156,7 +165,10 @@ if ($vista === 'acceso' || $vista === 'admin'):
           </label>
           <label class="field">
             <span class="field__label">Contraseña</span>
-            <input class="input" type="password" name="clave" required autocomplete="current-password">
+            <span class="field__pass">
+              <input class="input" type="password" name="clave" required autocomplete="current-password">
+              <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+            </span>
             <span class="field__hint">Es la contraseña que te entregó el instructor. Es personal: no la compartas con nadie.</span>
           </label>
           <button class="btn btn--primary btn--block" type="submit">Entrar <?= cap_icono('arrow', 'ico ico--sm') ?></button>

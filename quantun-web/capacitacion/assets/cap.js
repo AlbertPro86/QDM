@@ -13,7 +13,9 @@
     check: '<svg class="ico" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
     alert: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>',
     trash: '<svg class="ico ico--lg" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
-    ask:   '<svg class="ico ico--lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.8c0 1.7-2.4 2.1-2.4 3.4"/><path d="M12 17h.01"/></svg>'
+    ask:   '<svg class="ico ico--lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.8c0 1.7-2.4 2.1-2.4 3.4"/><path d="M12 17h.01"/></svg>',
+    eye:    '<svg class="ico ico--sm" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+    eyeOff: '<svg class="ico ico--sm" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C4 8.3 2 12 2 12s3.6 7 10 7c1.4 0 2.6-.3 3.7-.8"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/></svg>'
   };
 
   /* ---------- Toasts ---------- */
@@ -117,6 +119,20 @@
     });
     const hash = location.hash.replace('#', '');
     if (hash && $('[data-tab="' + hash + '"]')) { $('[data-tab="' + hash + '"]').click(); }
+  }
+
+  /* ---------- Mostrar/ocultar contraseña ---------- */
+  function togglePass() {
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-toggle-pass]');
+      if (!b) return;
+      const inp = b.previousElementSibling;
+      if (!inp) return;
+      const oculto = inp.type === 'password';
+      inp.type = oculto ? 'text' : 'password';
+      b.innerHTML = oculto ? ICO.eyeOff : ICO.eye;
+      b.setAttribute('aria-label', oculto ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
   }
 
   /* ---------- Copiar al portapapeles ---------- */
@@ -638,7 +654,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     acordeon('.clase__head', '.clase');
     acordeon('.ses__head', '.ses');
-    tabs(); copiar(); checklist(); acuerdo(); quiz();
+    tabs(); copiar(); togglePass(); checklist(); acuerdo(); quiz();
     altaToggle(); altaEstudiante(); cambiarClave(); accionesAdmin(); asistencia(); accesos();
     editorClases(); filtro();
   });

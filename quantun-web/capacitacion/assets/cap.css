@@ -85,6 +85,17 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .select{appearance:none;cursor:pointer;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238A867C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.field__pass{position:relative;display:block}
+.field__pass .input{padding-right:44px}
+.field__eye{
+  position:absolute;top:50%;right:4px;transform:translateY(-50%);
+  display:grid;place-items:center;width:36px;height:36px;border-radius:6px;
+  background:transparent;border:0;cursor:pointer;color:var(--q-ink-4);
+  transition:background .15s var(--ease),color .15s var(--ease);
+}
+.field__eye:hover{background:var(--q-bg-soft);color:var(--q-ink)}
+
+
 .input--code{font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;font-size:17px;font-weight:500}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 

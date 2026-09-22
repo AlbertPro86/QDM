@@ -13,6 +13,8 @@ function cap_icono(string $n, string $clase = 'ico'): string {
         'chevron'   => '<polyline points="6 9 12 15 18 9"/>',
         'arrow'     => '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
         'lock'      => '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+        'eye'       => '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+        'eye-off'   => '<path d="M3 3l18 18"/><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C4 8.3 2 12 2 12s3.6 7 10 7c1.4 0 2.6-.3 3.7-.8"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/>',
         'shield'    => '<path d="M12 3l7 3v5.5c0 4.3-2.9 8.2-7 9.5-4.1-1.3-7-5.2-7-9.5V6l7-3z"/><polyline points="9 12 11 14 15 10"/>',
         'user'      => '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.8 3.4-6.6 7.5-6.6s7.5 2.8 7.5 6.6"/>',
         'users'     => '<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 2.9-6.1 6.5-6.1s6.5 2.6 6.5 6.1"/><path d="M16.5 5.2a3.2 3.2 0 0 1 0 6"/><path d="M18 13.9c2.1.6 3.5 2.3 3.5 4.4"/>',
