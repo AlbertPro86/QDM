@@ -409,7 +409,7 @@ if ($accion === 'guardar_sesion') {
     cap_json([
         'ok'      => true,
         'mensaje' => 'Cambios guardados en la clase ' . $sesion . '.',
-        'hora'    => date('H:i'),
+        'hora'    => cap_hora12(time()),
         'resumen' => $resumen,
     ]);
 }

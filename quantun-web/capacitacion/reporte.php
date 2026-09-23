@@ -74,7 +74,7 @@ header('X-Content-Type-Options: nosniff');
       <p class="rep-head__sub">Programa de capacitación CMS · <?= h(CAP_CLIENTE) ?></p>
     </div>
     <dl class="rep-meta">
-      <div><dt>Generado</dt><dd><?= h(date('d/m/Y H:i')) ?></dd></div>
+      <div><dt>Generado</dt><dd><?= h(date('d/m/Y') . ' ' . cap_hora12(time())) ?></dd></div>
       <div><dt>Por</dt><dd><?= h(cap_admin_nombre()) ?> · <?= h(cap_rol_nombre()) ?></dd></div>
       <div><dt>Estudiantes</dt><dd><?= count($estudiantes) ?></dd></div>
     </dl>
@@ -286,7 +286,7 @@ header('X-Content-Type-Options: nosniff');
 
   <footer class="rep-foot">
     <span>QUANTUN Digital · Capacitación CMS · <?= h(CAP_CLIENTE) ?></span>
-    <span>Documento confidencial · <?= h(date('d/m/Y H:i')) ?></span>
+    <span>Documento confidencial · <?= h(date('d/m/Y') . ' ' . cap_hora12(time())) ?></span>
   </footer>
 </main>
 

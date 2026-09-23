@@ -215,7 +215,7 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
                     <td><span class="badge badge--muted"><?= h($e['cargo']) ?></span></td>
                     <td>
                       <?php if (!empty($e['ultimo_ingreso'])): ?>
-                        <span class="mono" style="font-size:12.5px;color:var(--q-ink-3)"><?= h(date('d/m/Y H:i', strtotime($e['ultimo_ingreso']))) ?></span>
+                        <span class="mono" style="font-size:12.5px;color:var(--q-ink-3)"><?= h(date('d/m/Y', strtotime($e['ultimo_ingreso'])) . ' ' . cap_hora12(strtotime($e['ultimo_ingreso']))) ?></span>
                       <?php else: ?>
                         <span class="badge badge--muted">Nunca entró</span>
                       <?php endif; ?>
@@ -652,7 +652,7 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
                 <span class="callout__ico"><?= cap_icono('key') ?></span>
                 <div>
                   <div class="callout__t">Rol: <?= h($e['accesos']['rol']) ?></div>
-                  <div class="callout__d">Entregados el <?= h(date('d/m/Y H:i', strtotime($e['accesos']['fecha']))) ?><?= !empty($e['accesos']['nota']) ? ' · ' . h($e['accesos']['nota']) : '' ?></div>
+                  <div class="callout__d">Entregados el <?= h(date('d/m/Y', strtotime($e['accesos']['fecha'])) . ' ' . cap_hora12(strtotime($e['accesos']['fecha']))) ?><?= !empty($e['accesos']['nota']) ? ' · ' . h($e['accesos']['nota']) : '' ?></div>
                 </div>
               </div>
             <?php elseif ($m['habilitado']): ?>
@@ -781,7 +781,7 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
             <tbody>
             <?php foreach ($log as $l): ?>
               <tr>
-                <td class="mono" style="font-size:12.5px;color:var(--q-ink-4)"><?= h(date('d/m/Y H:i', strtotime($l['fecha']))) ?></td>
+                <td class="mono" style="font-size:12.5px;color:var(--q-ink-4)"><?= h(date('d/m/Y', strtotime($l['fecha'])) . ' ' . cap_hora12(strtotime($l['fecha']))) ?></td>
                 <td style="font-weight:600"><?= h($l['actor']) ?></td>
                 <td><span class="badge badge--muted"><?= h($l['accion']) ?></span></td>
                 <td><?= h($l['detalle']) ?></td>

@@ -283,7 +283,7 @@ cap_nav('Mi capacitación', [], ['nombre' => cap_nombre_completo($yo)], 'index.p
                 <div>
                   <div class="callout__t">Firmado por <?= h(cap_nombre_completo($yo)) ?></div>
                   <div class="callout__d">
-                    <?= h(date('d/m/Y H:i', strtotime($yo['consentimiento']['fecha']))) ?> ·
+                    <?= h(date('d/m/Y', strtotime($yo['consentimiento']['fecha'])) . ' ' . cap_hora12(strtotime($yo['consentimiento']['fecha']))) ?> ·
                     IP <span class="mono"><?= h($yo['consentimiento']['ip']) ?></span>
                   </div>
                 </div>

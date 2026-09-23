@@ -475,8 +475,16 @@ function cap_tareas_de(array $data, string $id): array {
     return $out;
 }
 
+function cap_hora12(int $ts): string {
+    $h = ltrim(date('h', $ts), '0');
+    if ($h === '') { $h = '12'; }
+    return $h . date(':i', $ts) . ' ' . (date('A', $ts) === 'AM' ? 'a.m.' : 'p.m.');
+}
+
 function cap_fecha_hora(?string $iso): string {
-    return $iso ? date('d/m/Y H:i', strtotime($iso)) : '—';
+    if (!$iso) { return '—'; }
+    $ts = strtotime($iso);
+    return date('d/m/Y', $ts) . ' ' . cap_hora12($ts);
 }
 
 /** Estado de la evaluación de un estudiante a partir de sus métricas. */
