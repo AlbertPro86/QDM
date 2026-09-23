@@ -177,6 +177,41 @@ if ($accion === 'crear_estudiante') {
     ]);
 }
 
+if ($accion === 'cambiar_admin') {
+    $actual  = (string)($_POST['clave_actual'] ?? '');
+    $usuario = trim((string)($_POST['usuario'] ?? ''));
+    $nueva   = (string)($_POST['clave_nueva'] ?? '');
+
+    $d = cap_leer();
+    if (empty($d['admin']['hash']) || !password_verify($actual, $d['admin']['hash'])) {
+        cap_json(['ok' => false, 'error' => 'La contraseña actual no es correcta.'], 403);
+    }
+    if (mb_strlen($usuario, 'UTF-8') < 3) {
+        cap_json(['ok' => false, 'error' => 'El usuario debe tener al menos 3 caracteres.'], 400);
+    }
+    if ($nueva !== '' && mb_strlen($nueva, 'UTF-8') < 10) {
+        cap_json(['ok' => false, 'error' => 'La contraseña nueva debe tener al menos 10 caracteres.'], 400);
+    }
+
+    $r = cap_transaccion(function (array &$dd) use ($usuario, $nueva) {
+        $antes = $dd['admin']['usuario'] ?? '';
+        $dd['admin']['usuario'] = $usuario;
+        if ($nueva !== '') {
+            $dd['admin']['hash'] = password_hash($nueva, PASSWORD_DEFAULT);
+        }
+        $partes = [];
+        if ($antes !== $usuario) { $partes[] = 'usuario: ' . $antes . ' -> ' . $usuario; }
+        if ($nueva !== '')       { $partes[] = 'contraseña actualizada'; }
+        cap_bitacora($dd, $usuario, 'admin', 'Credenciales del instructor · ' . implode(' · ', $partes));
+        return $usuario;
+    });
+
+    // Refrescar la sesión con el usuario nuevo
+    $_SESSION['cap_admin_usuario'] = $r;
+
+    cap_json(['ok' => true, 'mensaje' => 'Credenciales actualizadas.', 'usuario' => $r]);
+}
+
 if ($accion === 'clave_sugerida') {
     cap_json(['ok' => true, 'clave' => cap_clave_sugerida()]);
 }

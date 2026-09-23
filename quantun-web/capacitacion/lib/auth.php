@@ -126,6 +126,58 @@ function cap_login_estudiante(string $email, string $clave): ?array {
     return $encontrado;
 }
 
+/**
+ * Login unificado: un solo formulario para instructor y estudiantes.
+ * Prueba primero las credenciales de administrador y luego las de estudiante,
+ * contando un unico intento fallido (no dos) para el limite de reintentos.
+ *
+ * @return string|null 'admin', 'estudiante' o null si no coincide
+ */
+function cap_login(string $usuario, string $clave): ?string {
+    if (!cap_intento_permitido()) { return null; }
+
+    // 1) Administrador
+    $d = cap_leer();
+    if (!empty($d['admin']['hash'])
+        && !empty($d['admin']['usuario'])
+        && hash_equals(strtolower(trim($d['admin']['usuario'])), strtolower(trim($usuario)))
+        && password_verify($clave, $d['admin']['hash'])) {
+        cap_sesion_iniciar();
+        session_regenerate_id(true);
+        $_SESSION['cap_admin']         = true;
+        $_SESSION['cap_admin_usuario'] = $d['admin']['usuario'];
+        cap_intento_limpiar();
+        return 'admin';
+    }
+
+    // 2) Estudiante
+    $email = strtolower(trim($usuario));
+    $encontrado = cap_transaccion(function (array &$dd) use ($email, $clave) {
+        foreach ($dd['estudiantes'] as $i => $e) {
+            if (strtolower($e['email'] ?? '') !== $email)    { continue; }
+            if (empty($e['activo']))                          { continue; }
+            if (empty($e['clave_hash']))                      { continue; }
+            if (!password_verify($clave, $e['clave_hash']))   { continue; }
+
+            $dd['estudiantes'][$i]['ultimo_ingreso'] = date('c');
+            cap_bitacora($dd, cap_nombre_completo($e), 'ingreso', 'Sesion iniciada');
+            return $dd['estudiantes'][$i];
+        }
+        return null;
+    });
+
+    if ($encontrado) {
+        cap_sesion_iniciar();
+        session_regenerate_id(true);
+        $_SESSION['cap_estudiante'] = $encontrado['id'];
+        cap_intento_limpiar();
+        return 'estudiante';
+    }
+
+    cap_intento_fallido();
+    return null;
+}
+
 function cap_logout(): void {
     cap_sesion_iniciar();
     $_SESSION = [];

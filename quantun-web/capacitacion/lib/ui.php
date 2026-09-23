@@ -46,6 +46,16 @@ function cap_icono(string $n, string $clase = 'ico'): string {
     return '<svg class="' . h($clase) . '" viewBox="0 0 24 24" aria-hidden="true">' . $d . '</svg>';
 }
 
+/**
+ * Version de un asset basada en su fecha de modificacion.
+ * Asi cada cambio genera una URL nueva y el navegador nunca sirve una version vieja.
+ */
+function cap_asset_ver(string $rel): string {
+    $abs = __DIR__ . '/../' . ltrim($rel, '/');
+    $t   = @filemtime($abs);
+    return $t ? (string)$t : CAP_VERSION;
+}
+
 function cap_iniciales(string $nombre): string {
     $partes = preg_split('/\s+/u', trim($nombre));
     $ini = '';
@@ -72,7 +82,7 @@ function cap_head(string $titulo, string $desc = ''): void {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cap.css?v=<?= CAP_VERSION ?>">
+<link rel="stylesheet" href="assets/cap.css?v=<?= cap_asset_ver('assets/cap.css') ?>">
 </head>
 <body data-csrf="<?= h(cap_csrf()) ?>"><?php
 }
@@ -126,7 +136,7 @@ function cap_footer(): void {
     </nav>
   </div>
 </footer>
-<script src="assets/cap.js?v=<?= CAP_VERSION ?>"></script>
+<script src="assets/cap.js?v=<?= cap_asset_ver('assets/cap.js') ?>"></script>
 </body>
 </html>
 <?php

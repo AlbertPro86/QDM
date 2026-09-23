@@ -428,6 +428,32 @@
     });
   }
 
+  /* ---------- Admin: cambiar mis propias credenciales ---------- */
+  function cuentaAdmin() {
+    const form = $('#formCuenta');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('[type=submit]', form);
+      btn.disabled = true;
+      const fd = new FormData(form);
+      try {
+        const r = await api('cambiar_admin', {
+          usuario:      (fd.get('usuario')      || '').toString().trim(),
+          clave_actual: (fd.get('clave_actual') || '').toString(),
+          clave_nueva:  (fd.get('clave_nueva')  || '').toString()
+        });
+        toast(r.mensaje || 'Credenciales actualizadas');
+        form.clave_actual.value = '';
+        form.clave_nueva.value  = '';
+      } catch (err) {
+        toast(err.message, 'err');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
   /* ---------- Admin: cambiar la contraseña de un estudiante ---------- */
   function cambiarClave() {
     document.addEventListener('click', async (e) => {
@@ -655,7 +681,7 @@
     acordeon('.clase__head', '.clase');
     acordeon('.ses__head', '.ses');
     tabs(); copiar(); togglePass(); checklist(); acuerdo(); quiz();
-    altaToggle(); altaEstudiante(); cambiarClave(); accionesAdmin(); asistencia(); accesos();
+    altaToggle(); altaEstudiante(); cambiarClave(); cuentaAdmin(); accionesAdmin(); asistencia(); accesos();
     editorClases(); filtro();
   });
 })();

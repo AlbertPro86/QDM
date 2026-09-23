@@ -60,6 +60,7 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
       <button class="tab<?= $vista === 'asistencia' ? ' is-active' : '' ?>" data-tab="asistencia" type="button"><?= cap_icono('calendar', 'ico ico--sm') ?> Asistencia</button>
       <button class="tab<?= $vista === 'accesos' ? ' is-active' : '' ?>" data-tab="accesos" type="button"><?= cap_icono('key', 'ico ico--sm') ?> Entrega de accesos</button>
       <button class="tab<?= $vista === 'bitacora' ? ' is-active' : '' ?>" data-tab="bitacora" type="button"><?= cap_icono('clipboard', 'ico ico--sm') ?> Bitácora</button>
+      <button class="tab<?= $vista === 'cuenta' ? ' is-active' : '' ?>" data-tab="cuenta" type="button"><?= cap_icono('user', 'ico ico--sm') ?> Mi cuenta</button>
     </nav>
 
     <!-- ============ ESTUDIANTES ============ -->
@@ -472,6 +473,46 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
           </table>
         </div>
         <?php endif; ?>
+      </div>
+    </section>
+
+
+    <!-- ============ MI CUENTA ============ -->
+    <section class="panel<?= $vista === 'cuenta' ? ' is-active' : '' ?>" data-panel="cuenta">
+      <div class="container--narrow" style="padding:0;max-width:640px">
+        <form class="card" id="formCuenta">
+          <div class="card__head">
+            <div><div class="card__title">Mis credenciales</div><div class="card__sub">Usuario y contraseña con los que entras al panel</div></div>
+          </div>
+          <div class="card__body">
+            <label class="field">
+              <span class="field__label">Usuario</span>
+              <input class="input" type="text" name="usuario" required minlength="3" value="<?= h(cap_admin_nombre()) ?>">
+              <span class="field__hint">Puede ser tu correo. Es con lo que inicias sesión.</span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Contraseña actual</span>
+              <span class="field__pass">
+                <input class="input" type="password" name="clave_actual" required autocomplete="current-password">
+                <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+              </span>
+              <span class="field__hint">Se pide siempre para confirmar que eres tú.</span>
+            </label>
+
+            <label class="field" style="margin-bottom:0">
+              <span class="field__label">Contraseña nueva (opcional)</span>
+              <span class="field__pass">
+                <input class="input" type="password" name="clave_nueva" minlength="10" autocomplete="new-password" placeholder="Déjalo vacío para no cambiarla">
+                <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
+              </span>
+              <span class="field__hint">Mínimo 10 caracteres. No se puede recuperar: guárdala en tu gestor de claves.</span>
+            </label>
+          </div>
+          <div class="card__foot" style="display:flex;justify-content:flex-end">
+            <button class="btn btn--primary btn--sm" type="submit"><?= cap_icono('check', 'ico ico--sm') ?> Guardar credenciales</button>
+          </div>
+        </form>
       </div>
     </section>
 

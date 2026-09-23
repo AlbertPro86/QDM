@@ -45,31 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: admin.php');
             exit;
         }
-    } elseif ($accion === 'login_admin') {
-        $vista = 'admin';
-        if (cap_login_admin((string)($_POST['usuario'] ?? ''), (string)($_POST['clave'] ?? ''))) {
-            header('Location: admin.php');
-            exit;
-        }
-        $error = cap_intento_permitido()
-            ? 'Usuario o contraseña incorrectos.'
-            : 'Demasiados intentos. Espera 10 minutos antes de reintentar.';
-    } elseif ($accion === 'login_estudiante') {
+    } elseif ($accion === 'login') {
         $vista = 'acceso';
-        $e = cap_login_estudiante((string)($_POST['email'] ?? ''), (string)($_POST['clave'] ?? ''));
-        if ($e) {
-            header('Location: panel.php');
-            exit;
-        }
+        $rol = cap_login((string)($_POST['email'] ?? ''), (string)($_POST['clave'] ?? ''));
+        if ($rol === 'admin')      { header('Location: admin.php'); exit; }
+        if ($rol === 'estudiante') { header('Location: panel.php'); exit; }
         $error = cap_intento_permitido()
-            ? 'Correo o contraseña incorrectos. Usa el correo y la contraseña que te entregó el instructor.'
+            ? 'Correo o contraseña incorrectos.'
             : 'Demasiados intentos. Espera 10 minutos antes de reintentar.';
     }
 }
 
 /* Redirecciones si ya hay sesión */
-if ($vista === 'acceso' && cap_estudiante_actual()) { header('Location: panel.php'); exit; }
-if ($vista === 'admin'  && cap_es_admin())          { header('Location: admin.php'); exit; }
+if ($vista === 'acceso' || $vista === 'admin') {
+    if (cap_es_admin())            { header('Location: admin.php'); exit; }
+    if (cap_estudiante_actual())   { header('Location: panel.php'); exit; }
+}
 
 $hayAdmin = cap_hay_admin();
 
@@ -79,7 +70,7 @@ $hayAdmin = cap_hay_admin();
 if ($vista === 'acceso' || $vista === 'admin'):
     $esAdmin = ($vista === 'admin');
     $setup   = $esAdmin && !$hayAdmin;
-    cap_head($setup ? 'Configuración inicial' : ($esAdmin ? 'Acceso administrador' : 'Acceso estudiantes'));
+    cap_head($setup ? 'Configuración inicial' : 'Acceso');
 ?>
 <main class="auth">
   <aside class="auth__aside">
@@ -99,7 +90,7 @@ if ($vista === 'acceso' || $vista === 'admin'):
 
   <section class="auth__main">
     <div class="auth__box">
-      <span class="eyebrow"><span class="eyebrow__dot"></span><?= $setup ? 'Configuración inicial' : ($esAdmin ? 'Panel del instructor' : 'Acceso estudiantes') ?></span>
+      <span class="eyebrow"><span class="eyebrow__dot"></span><?= $setup ? 'Configuración inicial' : 'Acceso a la plataforma' ?></span>
 
       <?php if ($setup): ?>
         <h1>Crea tu acceso de administrador</h1>
@@ -130,38 +121,16 @@ if ($vista === 'acceso' || $vista === 'admin'):
           <button class="btn btn--primary btn--block" type="submit">Crear cuenta <?= cap_icono('arrow', 'ico ico--sm') ?></button>
         </form>
 
-      <?php elseif ($esAdmin): ?>
-        <h1>Panel del instructor</h1>
-        <p>Ingresa con tu usuario y contraseña para gestionar estudiantes, asistencia y entrega de accesos.</p>
-        <?php if ($error): ?><div class="alert alert--err"><?= cap_icono('alert', 'ico ico--sm') ?><span><?= h($error) ?></span></div><?php endif; ?>
-        <form method="post" autocomplete="off">
-          <input type="hidden" name="accion" value="login_admin">
-          <input type="hidden" name="csrf" value="<?= h(cap_csrf()) ?>">
-          <label class="field">
-            <span class="field__label">Usuario</span>
-            <input class="input" type="text" name="usuario" required autofocus>
-          </label>
-          <label class="field">
-            <span class="field__label">Contraseña</span>
-            <span class="field__pass">
-              <input class="input" type="password" name="clave" required>
-              <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
-            </span>
-          </label>
-          <button class="btn btn--primary btn--block" type="submit">Entrar <?= cap_icono('arrow', 'ico ico--sm') ?></button>
-        </form>
-        <p class="auth__alt">¿Eres estudiante? <a href="index.php?v=acceso">Ingresa con tu correo</a></p>
-
       <?php else: ?>
-        <h1>Ingresa a tu capacitación</h1>
-        <p>Usa el correo y la contraseña que te entregó el instructor.</p>
+        <h1>Ingresa a la plataforma</h1>
+        <p>Un solo acceso para el instructor y para los estudiantes: usa tu correo y tu contraseña.</p>
         <?php if ($error): ?><div class="alert alert--err"><?= cap_icono('alert', 'ico ico--sm') ?><span><?= h($error) ?></span></div><?php endif; ?>
         <form method="post" autocomplete="off">
-          <input type="hidden" name="accion" value="login_estudiante">
+          <input type="hidden" name="accion" value="login">
           <input type="hidden" name="csrf" value="<?= h(cap_csrf()) ?>">
           <label class="field">
             <span class="field__label">Correo electrónico</span>
-            <input class="input" type="email" name="email" required autofocus placeholder="nombre@empresa.com">
+            <input class="input" type="text" name="email" required autofocus placeholder="nombre@empresa.com" autocomplete="username">
           </label>
           <label class="field">
             <span class="field__label">Contraseña</span>
@@ -169,7 +138,7 @@ if ($vista === 'acceso' || $vista === 'admin'):
               <input class="input" type="password" name="clave" required autocomplete="current-password">
               <button type="button" class="field__eye" data-toggle-pass tabindex="-1" aria-label="Mostrar contraseña"><?= cap_icono('eye', 'ico ico--sm') ?></button>
             </span>
-            <span class="field__hint">Es la contraseña que te entregó el instructor. Es personal: no la compartas con nadie.</span>
+            <span class="field__hint">Si eres estudiante, es la contraseña que te entregó el instructor. Es personal: no la compartas.</span>
           </label>
           <button class="btn btn--primary btn--block" type="submit">Entrar <?= cap_icono('arrow', 'ico ico--sm') ?></button>
         </form>
@@ -178,7 +147,7 @@ if ($vista === 'acceso' || $vista === 'admin'):
     </div>
   </section>
 </main>
-<script src="assets/cap.js?v=<?= CAP_VERSION ?>"></script>
+<script src="assets/cap.js?v=<?= cap_asset_ver('assets/cap.js') ?>"></script>
 </body>
 </html>
 <?php
