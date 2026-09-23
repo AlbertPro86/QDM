@@ -184,7 +184,6 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
                 <thead>
                   <tr>
                     <th>Usuario</th>
-                    <th>Rol</th>
                     <th>Cargo</th>
                     <th>Último ingreso</th>
                     <th>Estado</th>
@@ -204,12 +203,15 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
                       <div class="cell-person">
                         <span class="avatar<?= $esEst ? ($m['quiz_aprobado'] ? ' avatar--lima' : ' avatar--soft') : '' ?>"><?= h(cap_iniciales($nomCompleto)) ?></span>
                         <div class="cell-person__t">
-                          <div class="cell-person__n"><?= h($nomCompleto) ?><?= empty($e['activo']) ? ' <span class="badge badge--danger">suspendido</span>' : '' ?></div>
+                          <div class="cell-person__n">
+                            <?= h($nomCompleto) ?>
+                            <?php if (!$esEst): ?><span class="badge badge--ink" style="margin-left:6px"><?= h(CAP_ROLES[$e['rol']]) ?></span><?php endif; ?>
+                            <?= empty($e['activo']) ? ' <span class="badge badge--danger">suspendido</span>' : '' ?>
+                          </div>
                           <div class="cell-person__s"><?= h($e['email']) ?></div>
                         </div>
                       </div>
                     </td>
-                    <td><span class="badge badge--<?= $esEst ? 'muted' : 'ink' ?>"><?= h(CAP_ROLES[$e['rol']]) ?></span></td>
                     <td><span class="badge badge--muted"><?= h($e['cargo']) ?></span></td>
                     <td>
                       <?php if (!empty($e['ultimo_ingreso'])): ?>
@@ -225,7 +227,7 @@ cap_nav('', [], ['nombre' => cap_admin_nombre()], 'index.php?salir=1');
                         <span class="mono" style="font-size:12px;color:var(--q-ink-4)"><?= $m['general'] ?>% · tareas <?= $te['completadas'] ?>/<?= $te['total'] ?></span>
                       </td>
                     <?php else: ?>
-                      <td><span class="badge badge--info">Asigna y revisa tareas</span></td>
+                      <td><span class="muted">—</span></td>
                       <td><span class="muted">—</span></td>
                     <?php endif; ?>
                     <?php if ($esAdmin): ?>
