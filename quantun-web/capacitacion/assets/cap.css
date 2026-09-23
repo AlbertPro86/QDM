@@ -408,8 +408,32 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .save-state[data-modo="guardando"] .save-state__dot{background:var(--q-ink-4);animation:latido .8s ease-in-out infinite}
 @keyframes latido{0%,100%{opacity:1}50%{opacity:.25}}
 
+/* ===== Tareas ===== */
+.tarea-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.tarea-grid__full{grid-column:1/-1}
+.asignar{margin-top:4px;border:1px solid var(--q-border);border-radius:12px;padding:14px 16px;background:var(--q-surface-2)}
+.asignar__head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.asignar__acciones{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.asignar__lista{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;max-height:340px;overflow:auto}
+.asignar__lista .check-item{padding:10px 8px}
+.prog-stats--4{grid-template-columns:repeat(4,1fr)}
+.tarea-acciones{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-top:16px;margin-top:16px;border-top:1px solid var(--q-border-subtle)}
+.tarea .clase__n .ico{width:18px;height:18px}
+.tarea-est__foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tarea-est__info{display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13.5px;color:var(--q-ink-3)}
+.tarea-est--ok .tarea-est__info{color:var(--q-success-ink)}
+.tarea-est__nota{color:var(--q-ink-3);font-style:italic}
+.alta__grid .alta__accion{grid-column:-2/-1}
+
+/* ===== Reportes (panel) ===== */
+.rep-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rep-card{background:var(--q-surface);border:1px solid var(--q-border);border-radius:16px;padding:22px;display:flex;flex-direction:column}
+.rep-card__t{font-family:var(--heading);font-size:16.5px;font-weight:700;margin-bottom:6px}
+.rep-card__d{font-size:14px;color:var(--q-ink-3);line-height:1.55;flex:1;margin-bottom:16px}
+.rep-card__a{display:flex;gap:8px;flex-wrap:wrap}
+
 /* ===== Alta de estudiante (desplegable) ===== */
-.alta{display:none}
+.alta{display:none;scroll-margin-top:90px}
 .alta.is-open{display:block}
 .alta__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:end}
 .alta__grid .field{margin-bottom:0}
@@ -529,6 +553,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
   .cols{grid-template-columns:1fr}
   .sticky{position:static}
   .stats{grid-template-columns:repeat(2,1fr)}
+  .rep-cards{grid-template-columns:1fr}
+  .prog-stats--4{grid-template-columns:repeat(2,1fr)}
   .alta__grid{grid-template-columns:1fr 1fr;gap:14px 16px}
   .reglas{grid-template-columns:repeat(2,1fr)}
 }
@@ -544,7 +570,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
   .hero{padding:52px 0 44px}
   .stats,.reglas{grid-template-columns:1fr}
   .alta__grid{grid-template-columns:1fr;gap:14px 0}
-  .prog-stats{grid-template-columns:1fr}
+  .prog-stats,.prog-stats--4{grid-template-columns:1fr}
+  .tarea-grid,.asignar__lista{grid-template-columns:1fr}
   .prog-tema__c{margin-left:0;padding-left:0;width:100%;padding-top:6px}
   .check-item--static{flex-wrap:wrap}
   .alta__grid .field{margin-bottom:0}

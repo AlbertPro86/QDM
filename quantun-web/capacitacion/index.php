@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($accion === 'login') {
         $vista = 'acceso';
         $rol = cap_login((string)($_POST['email'] ?? ''), (string)($_POST['clave'] ?? ''));
-        if ($rol === 'admin')      { header('Location: admin.php'); exit; }
+        if ($rol === 'admin' || $rol === 'supervisor') { header('Location: admin.php'); exit; }
         if ($rol === 'estudiante') { header('Location: panel.php'); exit; }
         $error = cap_intento_permitido()
             ? 'Correo o contraseña incorrectos.'
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 /* Redirecciones si ya hay sesión */
 if ($vista === 'acceso' || $vista === 'admin') {
-    if (cap_es_admin())            { header('Location: admin.php'); exit; }
+    if (cap_es_staff())            { header('Location: admin.php'); exit; }
     if (cap_estudiante_actual())   { header('Location: panel.php'); exit; }
 }
 

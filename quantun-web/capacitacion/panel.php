@@ -11,7 +11,10 @@ $clausulas= cap_consentimiento();
 $firmado  = $m['consentimiento'];
 
 $vista = $_GET['v'] ?? ($firmado ? 'progreso' : 'acuerdo');
-$vistasOk = ['progreso', 'temario', 'acuerdo', 'evaluacion', 'accesos'];
+$vistasOk = ['progreso', 'temario', 'tareas', 'acuerdo', 'evaluacion', 'accesos'];
+
+$misTareas  = cap_tareas_de(cap_leer(), $yo['id']);
+$pendientes = count(array_filter($misTareas, fn($x) => $x['asig']['estado'] !== 'completada'));
 if (!in_array($vista, $vistasOk, true)) { $vista = 'progreso'; }
 if (!$firmado) { $vista = 'acuerdo'; }
 
@@ -62,6 +65,7 @@ cap_nav('Mi capacitación', [], ['nombre' => cap_nombre_completo($yo)], 'index.p
     <nav class="tabs">
       <button class="tab<?= $vista === 'progreso' ? ' is-active' : '' ?>" data-tab="progreso" type="button"><?= cap_icono('chart', 'ico ico--sm') ?> Mi progreso</button>
       <button class="tab<?= $vista === 'temario' ? ' is-active' : '' ?>" data-tab="temario" type="button"><?= cap_icono('clipboard', 'ico ico--sm') ?> Temario <span class="tab__n" data-m-pct><?= $m['pct_temas'] ?>%</span></button>
+      <button class="tab<?= $vista === 'tareas' ? ' is-active' : '' ?>" data-tab="tareas" type="button"><?= cap_icono('tasks', 'ico ico--sm') ?> Mis tareas<?php if ($pendientes): ?> <span class="tab__n"><?= $pendientes ?></span><?php endif; ?></button>
       <button class="tab<?= $vista === 'evaluacion' ? ' is-active' : '' ?>" data-tab="evaluacion" type="button"><?= cap_icono('award', 'ico ico--sm') ?> Evaluación</button>
       <button class="tab<?= $vista === 'accesos' ? ' is-active' : '' ?>" data-tab="accesos" type="button"><?= cap_icono('key', 'ico ico--sm') ?> Mis accesos</button>
       <button class="tab<?= $vista === 'acuerdo' ? ' is-active' : '' ?>" data-tab="acuerdo" type="button"><?= cap_icono('signature', 'ico ico--sm') ?> Acuerdo</button>
@@ -190,6 +194,77 @@ cap_nav('Mi capacitación', [], ['nombre' => cap_nombre_completo($yo)], 'index.p
           </div>
         </article>
         <?php endforeach; ?>
+      </div>
+    </section>
+
+    <!-- ============ MIS TAREAS ============ -->
+    <section class="panel<?= $vista === 'tareas' ? ' is-active' : '' ?>" data-panel="tareas">
+      <div class="container--narrow" style="padding:0;max-width:820px">
+        <div class="section-head" style="margin-bottom:20px">
+          <h2 style="font-size:24px">Mis tareas</h2>
+          <p style="font-size:15.5px">Tareas que te asignó el equipo. Márcalas al empezar y al terminar: el tiempo queda registrado.</p>
+        </div>
+
+        <?php if (!$misTareas): ?>
+          <div class="card"><div class="card__body">
+            <div class="empty">
+              <span class="empty__ico"><?= cap_icono('tasks', 'ico ico--lg') ?></span>
+              <h3>No tienes tareas asignadas</h3>
+              <p>Cuando el supervisor o el instructor te asigne una tarea, aparecerá aquí.</p>
+            </div>
+          </div></div>
+        <?php else: ?>
+          <div class="stack">
+            <?php foreach ($misTareas as $it):
+                $t = $it['tarea']; $a = $it['asig'];
+                $venc = cap_asignacion_vencida($t, $a);
+                [$eTxt, $eTono] = cap_estado_tarea($a['estado'], $venc);
+                $prio = $t['prioridad'] ?? 'media';
+            ?>
+            <article class="card tarea-est<?= $a['estado'] === 'completada' ? ' tarea-est--ok' : '' ?>">
+              <div class="card__head">
+                <div style="min-width:0">
+                  <div class="card__title"><?= h($t['titulo']) ?></div>
+                  <div class="card__sub">
+                    Asignada el <?= h(cap_fecha_hora($a['asignada'] ?? null)) ?> por <?= h($t['creada_por'] ?? '') ?>
+                    <?php if (!empty($t['vence'])): ?> · Vence el <?= h(date('d/m/Y', strtotime($t['vence']))) ?><?php endif; ?>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <span class="badge badge--<?= cap_tono_prioridad($prio) ?>">Prioridad <?= h(strtolower(CAP_PRIORIDADES[$prio] ?? 'media')) ?></span>
+                  <span class="badge badge--<?= $eTono ?>"><?= h($eTxt) ?></span>
+                </div>
+              </div>
+              <?php if (!empty($t['descripcion'])): ?>
+                <div class="card__body" style="padding-top:18px;padding-bottom:18px">
+                  <p style="font-size:15px;color:var(--q-ink-2);white-space:pre-line;line-height:1.6"><?= h($t['descripcion']) ?></p>
+                </div>
+              <?php endif; ?>
+              <div class="card__foot tarea-est__foot">
+                <?php if ($a['estado'] === 'completada'): ?>
+                  <span class="tarea-est__info">
+                    <?= cap_icono('check-c', 'ico ico--sm') ?>
+                    Completada el <?= h(cap_fecha_hora($a['completada'])) ?> · tiempo <?= h(cap_duracion_texto(cap_asignacion_duracion($a))) ?>
+                    <?php if ($a['nota'] !== ''): ?><span class="tarea-est__nota">"<?= h($a['nota']) ?>"</span><?php endif; ?>
+                  </span>
+                <?php else: ?>
+                  <span class="tarea-est__info">
+                    <?= $a['estado'] === 'en_progreso'
+                        ? cap_icono('clock', 'ico ico--sm') . ' Iniciada el ' . h(cap_fecha_hora($a['iniciada']))
+                        : cap_icono('clock', 'ico ico--sm') . ' Aún no la inicias' ?>
+                  </span>
+                  <span style="display:flex;gap:8px;flex-wrap:wrap">
+                    <?php if ($a['estado'] === 'pendiente'): ?>
+                      <button class="btn btn--ghost btn--sm" type="button" data-tarea-iniciar="<?= h($t['id']) ?>"><?= cap_icono('arrow', 'ico ico--sm') ?> Empezar</button>
+                    <?php endif; ?>
+                    <button class="btn btn--primary btn--sm" type="button" data-tarea-completar="<?= h($t['id']) ?>" data-titulo="<?= h($t['titulo']) ?>"><?= cap_icono('check', 'ico ico--sm') ?> Marcar como completada</button>
+                  </span>
+                <?php endif; ?>
+              </div>
+            </article>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
       </div>
     </section>
 

@@ -64,9 +64,43 @@ function cap_es_admin(): bool {
     return !empty($_SESSION['cap_admin']);
 }
 
+/** Nombre de quien actúa en el panel (administrador o supervisor), para la bitácora. */
 function cap_admin_nombre(): string {
     cap_sesion_iniciar();
-    return $_SESSION['cap_admin_usuario'] ?? 'Administrador';
+    if (!empty($_SESSION['cap_admin'])) { return $_SESSION['cap_admin_usuario'] ?? 'Administrador'; }
+    $sup = cap_supervisor_actual();
+    if ($sup) { return cap_nombre_completo($sup); }
+    return 'Administrador';
+}
+
+/** Supervisor con sesión activa (cacheado por petición). */
+function cap_supervisor_actual(): ?array {
+    static $cache = [];
+    cap_sesion_iniciar();
+    $id = $_SESSION['cap_supervisor'] ?? null;
+    if (!$id) { return null; }
+    if (array_key_exists($id, $cache)) { return $cache[$id]; }
+    $e = cap_buscar_estudiante(cap_leer(), $id);
+    $ok = $e && !empty($e['activo']) && $e['rol'] === 'supervisor';
+    return $cache[$id] = $ok ? $e : null;
+}
+
+/** Administrador o supervisor. */
+function cap_es_staff(): bool {
+    return cap_es_admin() || cap_supervisor_actual() !== null;
+}
+
+/** Permisos: el administrador puede todo; el supervisor, lo listado en CAP_PERMISOS_SUPERVISOR. */
+function cap_puede(string $permiso): bool {
+    if (cap_es_admin()) { return true; }
+    if (cap_supervisor_actual()) { return in_array($permiso, CAP_PERMISOS_SUPERVISOR, true); }
+    return false;
+}
+
+function cap_rol_nombre(): string {
+    if (cap_es_admin()) { return 'Administrador'; }
+    if (cap_supervisor_actual()) { return 'Supervisor'; }
+    return 'Estudiante';
 }
 
 function cap_estudiante_id(): ?string {
@@ -78,7 +112,7 @@ function cap_estudiante_actual(): ?array {
     $id = cap_estudiante_id();
     if (!$id) { return null; }
     $e = cap_buscar_estudiante(cap_leer(), $id);
-    if (!$e || empty($e['activo'])) { return null; }
+    if (!$e || empty($e['activo']) || $e['rol'] !== 'estudiante') { return null; }
     return $e;
 }
 
@@ -99,33 +133,6 @@ function cap_login_admin(string $usuario, string $clave): bool {
     return true;
 }
 
-function cap_login_estudiante(string $email, string $clave): ?array {
-    if (!cap_intento_permitido()) { return null; }
-    $email = strtolower(trim($email));
-
-    $encontrado = cap_transaccion(function (array &$d) use ($email, $clave) {
-        foreach ($d['estudiantes'] as $i => $e) {
-            if (strtolower($e['email'] ?? '') !== $email) { continue; }
-            if (empty($e['activo']))                      { continue; }
-            if (empty($e['clave_hash']))                  { continue; }
-            if (!password_verify($clave, $e['clave_hash'])) { continue; }
-
-            $d['estudiantes'][$i]['ultimo_ingreso'] = date('c');
-            cap_bitacora($d, cap_nombre_completo($e), 'ingreso', 'Sesión iniciada');
-            return $d['estudiantes'][$i];
-        }
-        return null;
-    });
-
-    if (!$encontrado) { cap_intento_fallido(); return null; }
-
-    cap_sesion_iniciar();
-    session_regenerate_id(true);
-    $_SESSION['cap_estudiante'] = $encontrado['id'];
-    cap_intento_limpiar();
-    return $encontrado;
-}
-
 /**
  * Login unificado: un solo formulario para instructor y estudiantes.
  * Prueba primero las credenciales de administrador y luego las de estudiante,
@@ -144,6 +151,7 @@ function cap_login(string $usuario, string $clave): ?string {
         && password_verify($clave, $d['admin']['hash'])) {
         cap_sesion_iniciar();
         session_regenerate_id(true);
+        unset($_SESSION['cap_supervisor'], $_SESSION['cap_estudiante']);
         $_SESSION['cap_admin']         = true;
         $_SESSION['cap_admin_usuario'] = $d['admin']['usuario'];
         cap_intento_limpiar();
@@ -169,8 +177,13 @@ function cap_login(string $usuario, string $clave): ?string {
     if ($encontrado) {
         cap_sesion_iniciar();
         session_regenerate_id(true);
-        $_SESSION['cap_estudiante'] = $encontrado['id'];
+        unset($_SESSION['cap_admin'], $_SESSION['cap_admin_usuario'], $_SESSION['cap_supervisor'], $_SESSION['cap_estudiante']);
         cap_intento_limpiar();
+        if (($encontrado['rol'] ?? 'estudiante') === 'supervisor') {
+            $_SESSION['cap_supervisor'] = $encontrado['id'];
+            return 'supervisor';
+        }
+        $_SESSION['cap_estudiante'] = $encontrado['id'];
         return 'estudiante';
     }
 
@@ -190,6 +203,10 @@ function cap_logout(): void {
 
 function cap_exigir_admin(): void {
     if (!cap_es_admin()) { header('Location: index.php?v=admin'); exit; }
+}
+
+function cap_exigir_staff(): void {
+    if (!cap_es_staff()) { header('Location: index.php?v=acceso'); exit; }
 }
 
 function cap_exigir_estudiante(): array {

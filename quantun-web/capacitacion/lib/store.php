@@ -25,6 +25,7 @@ function cap_estructura_inicial(): array {
         'admin'        => null,   // ['hash' => ..., 'creado' => ...]
         'estudiantes'  => [],
         'sesiones'     => $sesiones,
+        'tareas'       => [],
         'bitacora'     => [],
     ];
 }
@@ -133,9 +134,10 @@ function cap_progreso_inicial(): array {
     return $p;
 }
 
-function cap_estudiante_nuevo(string $nombre, string $apellidos, string $email, string $cargo, string $clave): array {
+function cap_estudiante_nuevo(string $nombre, string $apellidos, string $email, string $cargo, string $clave, string $rol = 'estudiante'): array {
     return [
         'id'         => cap_uuid(),
+        'rol'        => isset(CAP_ROLES[$rol]) ? $rol : 'estudiante',
         'nombre'     => $nombre,
         'apellidos'  => $apellidos,
         'email'      => strtolower($email),
@@ -170,6 +172,7 @@ function cap_estudiante_nuevo(string $nombre, string $apellidos, string $email, 
 function cap_normalizar_estudiante(array $e): array {
     $e['apellidos']  = (string)($e['apellidos'] ?? '');
     $e['clave_hash'] = (string)($e['clave_hash'] ?? '');
+    $e['rol']        = isset(CAP_ROLES[$e['rol'] ?? '']) ? $e['rol'] : 'estudiante';
 
     $base = cap_progreso_inicial();
     foreach ($base as $n => $def) {
@@ -281,13 +284,14 @@ function cap_metricas_sesion(array $data, int $n): array {
     $ses    = $sesiones[$n];
     $clave  = (string)$n;
     $temas  = $ses['temas'];
-    $total  = count($data['estudiantes']);
+    $alumnos = array_values(array_filter($data['estudiantes'], 'cap_es_estudiante'));
+    $total   = count($alumnos);
 
     $asistieron  = 0;
     $porTema     = array_fill(0, count($temas), 0);
     $marcasTotal = 0;
 
-    foreach ($data['estudiantes'] as $e) {
+    foreach ($alumnos as $e) {
         $e = cap_normalizar_estudiante($e);
         $p = $e['progreso'][$clave];
         if (!empty($p['asistio'])) { $asistieron++; }
@@ -329,4 +333,156 @@ function cap_estado_sesion(array $ms): array {
     if ($ms['es_hoy'])    return ['Hoy', 'accent'];
     if ($ms['es_futura']) return ['Programada', 'muted'];
     return ['Pendiente de cierre', 'warn'];
+}
+
+
+/* =====================================================================
+   ROLES
+   ===================================================================== */
+
+/** true si el usuario es estudiante (los supervisores no toman la capacitación). */
+function cap_es_estudiante(array $e): bool {
+    return (isset(CAP_ROLES[$e['rol'] ?? '']) ? $e['rol'] : 'estudiante') === 'estudiante';
+}
+
+/* =====================================================================
+   TAREAS
+   ===================================================================== */
+
+function cap_tarea_nueva(string $titulo, string $descripcion, string $prioridad, ?string $vence, string $autor): array {
+    return [
+        'id'           => cap_uuid(),
+        'titulo'       => $titulo,
+        'descripcion'  => $descripcion,
+        'prioridad'    => isset(CAP_PRIORIDADES[$prioridad]) ? $prioridad : 'media',
+        'vence'        => $vence ?: null,
+        'creada'       => date('c'),
+        'creada_por'   => $autor,
+        'asignaciones' => [],
+    ];
+}
+
+function cap_asignacion_nueva(): array {
+    return ['estado' => 'pendiente', 'asignada' => date('c'), 'iniciada' => null, 'completada' => null, 'nota' => ''];
+}
+
+function cap_indice_tarea(array $data, string $id): ?int {
+    foreach ($data['tareas'] ?? [] as $i => $t) {
+        if (($t['id'] ?? '') === $id) { return $i; }
+    }
+    return null;
+}
+
+/** Asignación sin completar y con la fecha límite ya pasada. */
+function cap_asignacion_vencida(array $t, array $a): bool {
+    return !empty($t['vence']) && ($a['estado'] ?? '') !== 'completada' && $t['vence'] < date('Y-m-d');
+}
+
+/** Segundos entre la asignación y el cumplimiento; null si no se ha completado. */
+function cap_asignacion_duracion(array $a): ?int {
+    if (empty($a['completada']) || empty($a['asignada'])) { return null; }
+    return max(0, strtotime($a['completada']) - strtotime($a['asignada']));
+}
+
+function cap_duracion_texto(?int $s): string {
+    if ($s === null) { return '—'; }
+    if ($s < 60)     { return 'menos de 1 min'; }
+    $m = intdiv($s, 60);
+    if ($m < 60)     { return $m . ' min'; }
+    $h = intdiv($m, 60); $mr = $m % 60;
+    if ($h < 24)     { return $h . ' h' . ($mr ? ' ' . $mr . ' min' : ''); }
+    $d = intdiv($h, 24); $hr = $h % 24;
+    return $d . ' d' . ($hr ? ' ' . $hr . ' h' : '');
+}
+
+/** Etiqueta y tono del estado de una asignación. */
+function cap_estado_tarea(string $estado, bool $vencida): array {
+    if ($estado === 'completada')  { return ['Completada', 'ok']; }
+    if ($vencida)                  { return ['Vencida', 'danger']; }
+    if ($estado === 'en_progreso') { return ['En progreso', 'info']; }
+    return ['Pendiente', 'muted'];
+}
+
+function cap_tono_prioridad(string $p): string {
+    return ['alta' => 'danger', 'media' => 'warn', 'baja' => 'muted'][$p] ?? 'muted';
+}
+
+/** Acumula conteos de una lista de pares [tarea, asignación]. */
+function cap_resumen_asignaciones(array $pares): array {
+    $tot = 0; $ok = 0; $prog = 0; $venc = 0; $durs = [];
+    foreach ($pares as [$t, $a]) {
+        $tot++;
+        if ($a['estado'] === 'completada') {
+            $ok++;
+            $d = cap_asignacion_duracion($a);
+            if ($d !== null) { $durs[] = $d; }
+        } elseif ($a['estado'] === 'en_progreso') {
+            $prog++;
+        }
+        if (cap_asignacion_vencida($t, $a)) { $venc++; }
+    }
+    return [
+        'total'       => $tot,
+        'completadas' => $ok,
+        'en_progreso' => $prog,
+        'pendientes'  => $tot - $ok - $prog,
+        'vencidas'    => $venc,
+        'pct'         => $tot ? (int)round($ok / $tot * 100) : 0,
+        'promedio'    => $durs ? (int)round(array_sum($durs) / count($durs)) : null,
+    ];
+}
+
+/** Resumen de una tarea sobre todos sus asignados. */
+function cap_resumen_tarea(array $t): array {
+    $pares = [];
+    foreach ($t['asignaciones'] ?? [] as $a) { $pares[] = [$t, $a]; }
+    return cap_resumen_asignaciones($pares);
+}
+
+/** Resumen de las tareas de un estudiante. */
+function cap_resumen_tareas_de(array $data, string $id): array {
+    $pares = [];
+    foreach ($data['tareas'] ?? [] as $t) {
+        if (isset($t['asignaciones'][$id])) { $pares[] = [$t, $t['asignaciones'][$id]]; }
+    }
+    return cap_resumen_asignaciones($pares);
+}
+
+/** Resumen global de todas las tareas. */
+function cap_resumen_tareas_global(array $data): array {
+    $pares = [];
+    foreach ($data['tareas'] ?? [] as $t) {
+        foreach ($t['asignaciones'] ?? [] as $a) { $pares[] = [$t, $a]; }
+    }
+    return cap_resumen_asignaciones($pares);
+}
+
+/** Tareas de un estudiante: primero las abiertas (por fecha límite), luego las completadas. */
+function cap_tareas_de(array $data, string $id): array {
+    $out = [];
+    foreach ($data['tareas'] ?? [] as $t) {
+        if (isset($t['asignaciones'][$id])) { $out[] = ['tarea' => $t, 'asig' => $t['asignaciones'][$id]]; }
+    }
+    usort($out, function ($x, $y) {
+        $cx = $x['asig']['estado'] === 'completada';
+        $cy = $y['asig']['estado'] === 'completada';
+        if ($cx !== $cy) { return $cx ? 1 : -1; }
+        $vx = $x['tarea']['vence'] ?: '9999-99-99';
+        $vy = $y['tarea']['vence'] ?: '9999-99-99';
+        if ($vx !== $vy) { return strcmp($vx, $vy); }
+        return strcmp($y['tarea']['creada'], $x['tarea']['creada']);
+    });
+    return $out;
+}
+
+function cap_fecha_hora(?string $iso): string {
+    return $iso ? date('d/m/Y H:i', strtotime($iso)) : '—';
+}
+
+/** Estado de la evaluación de un estudiante a partir de sus métricas. */
+function cap_estado_evaluacion(array $m): array {
+    if ($m['quiz_aprobado'])      { return ['Aprobada', 'ok']; }
+    if ($m['quiz_intentos'] > 0)  { return [$m['quiz_restantes'] > 0 ? 'No aprobada' : 'Sin intentos', 'danger']; }
+    if ($m['puede_evaluar'])      { return ['Habilitada', 'info']; }
+    return ['Sin habilitar', 'muted'];
 }

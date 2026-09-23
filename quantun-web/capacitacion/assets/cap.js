@@ -300,6 +300,8 @@
     if (!caja) return;
 
     const abrir = () => {
+      const tab = $('[data-tab="usuarios"]');
+      if (tab && !tab.classList.contains('is-active')) tab.click();
       caja.classList.add('is-open');
       const primero = $('input[name="nombre"]', caja);
       if (primero) primero.focus();
@@ -418,6 +420,7 @@
           apellidos: (fd.get('apellidos') || '').toString().trim(),
           email:     (fd.get('email')     || '').toString().trim(),
           cargo:     (fd.get('cargo')     || '').toString().trim(),
+          rol:       (fd.get('rol')       || 'estudiante').toString(),
           clave:     clave
         });
         modalCredenciales({ nombre: r.estudiante.nombre, email: r.estudiante.email, clave: clave });
@@ -480,8 +483,8 @@
 
       if (accion === 'eliminar_estudiante') {
         const ok = await confirmar({
-          titulo: 'Eliminar estudiante',
-          texto: 'Se borran su progreso, su acuerdo firmado y sus intentos de evaluación. Esta acción no se puede deshacer.',
+          titulo: 'Eliminar usuario',
+          texto: 'Se borran su cuenta, su progreso, su acuerdo firmado, sus intentos de evaluación y sus tareas asignadas. Esta acción no se puede deshacer.',
           ok: 'Eliminar',
           cancelar: 'Cancelar'
         });
@@ -493,6 +496,25 @@
           texto: 'Se borran los temas que marcaste como dados, las notas y el cierre de la clase. No afecta la asistencia ni el avance que reportaron los estudiantes.',
           ok: 'Reiniciar clase',
           cancelar: 'Cancelar'
+        });
+        if (!ok) return;
+      }
+      if (accion === 'eliminar_tarea') {
+        const ok = await confirmar({
+          titulo: 'Eliminar tarea',
+          texto: 'Se borra la tarea y el registro de cumplimiento de todos sus asignados. Esta acción no se puede deshacer.',
+          ok: 'Eliminar tarea',
+          cancelar: 'Cancelar'
+        });
+        if (!ok) return;
+      }
+      if (accion === 'reabrir_asignacion') {
+        const ok = await confirmar({
+          titulo: 'Reabrir la tarea para este estudiante',
+          texto: 'Vuelve a quedar pendiente y se borran sus fechas y su nota de cumplimiento.',
+          ok: 'Reabrir',
+          cancelar: 'Cancelar',
+          peligro: false
         });
         if (!ok) return;
       }
@@ -511,9 +533,140 @@
         const extra = {};
         if (b.dataset.sesion) extra.sesion = b.dataset.sesion;
         if (b.dataset.valor)  extra.valor  = b.dataset.valor;
+        if (b.dataset.est)    extra.est    = b.dataset.est;
         const r = await api(accion, Object.assign({ id: id }, extra));
         toast(r.mensaje || 'Listo');
         setTimeout(() => location.reload(), 550);
+      } catch (err) {
+        toast(err.message, 'err');
+        b.disabled = false;
+      }
+    });
+  }
+
+  /* ---------- Equipo: crear, editar y asignar tareas ---------- */
+  function tareasEquipo() {
+    const caja = $('#tareaForm');
+    const form = $('#formTarea');
+    if (!caja || !form) return;
+
+    const checks = () => $$('input[data-asig]', form);
+    const contar = () => {
+      const n = checks().filter((c) => c.checked).length;
+      const lbl = $('[data-asig-n]', form);
+      if (lbl) lbl.textContent = n + ' de ' + checks().length + ' seleccionados';
+    };
+    form.addEventListener('change', (e) => { if (e.target.matches('[data-asig]')) contar(); });
+    const todos = $('[data-asig-todos]', form);
+    const ninguno = $('[data-asig-ninguno]', form);
+    if (todos) todos.addEventListener('click', () => { checks().forEach((c) => { c.checked = true; }); contar(); });
+    if (ninguno) ninguno.addEventListener('click', () => { checks().forEach((c) => { c.checked = false; }); contar(); });
+
+    const btn = $('[data-tarea-submit]', form);
+    const abrir = (t) => {
+      form.reset();
+      form.elements.tarea.value = t ? t.id : '';
+      $('[data-tarea-titulo-form]', form).textContent = t ? 'Editar tarea' : 'Nueva tarea';
+      $('span', btn).textContent = t ? 'Guardar cambios' : 'Crear y asignar';
+      if (t) {
+        form.elements.titulo.value = t.titulo || '';
+        form.elements.prioridad.value = t.prioridad || 'media';
+        form.elements.vence.value = t.vence || '';
+        form.elements.descripcion.value = t.descripcion || '';
+        checks().forEach((c) => { c.checked = (t.asignados || []).indexOf(c.value) !== -1; });
+      }
+      contar();
+      const tab = $('[data-tab="tareas"]');
+      if (tab && !tab.classList.contains('is-active')) tab.click();
+      caja.classList.add('is-open');
+      caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      form.elements.titulo.focus();
+    };
+
+    $$('[data-nueva-tarea]').forEach((b) => b.addEventListener('click', () => abrir(null)));
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-editar-tarea]');
+      if (!b) return;
+      try { abrir(JSON.parse(b.dataset.editarTarea)); } catch (err) { toast('No se pudo abrir la tarea', 'err'); }
+    });
+    $('[data-tarea-cerrar]', form).addEventListener('click', () => caja.classList.remove('is-open'));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const sel = checks().filter((c) => c.checked).map((c) => c.value);
+      if (!sel.length) { toast('Marca al menos un estudiante', 'err'); return; }
+      btn.disabled = true;
+      try {
+        const r = await api('guardar_tarea', {
+          tarea:       form.elements.tarea.value,
+          titulo:      form.elements.titulo.value.trim(),
+          prioridad:   form.elements.prioridad.value,
+          vence:       form.elements.vence.value,
+          descripcion: form.elements.descripcion.value.trim(),
+          asignados:   sel.join(',')
+        });
+        toast(r.mensaje || 'Tarea guardada');
+        setTimeout(() => location.reload(), 650);
+      } catch (err) {
+        toast(err.message, 'err');
+        btn.disabled = false;
+      }
+    });
+    contar();
+  }
+
+  /* ---------- Modal: nota al completar una tarea ---------- */
+  function modalCompletar(titulo) {
+    return new Promise((resolve) => {
+      const m = document.createElement('div');
+      m.className = 'modal is-open';
+      m.innerHTML =
+        '<div class="modal__box" role="dialog" aria-modal="true">' +
+          '<div class="modal__body" style="text-align:left">' +
+            '<div class="modal__ico modal__ico--ask" style="margin-bottom:14px">' + ICO.check + '</div>' +
+            '<div class="modal__t" style="text-align:left"></div>' +
+            '<div class="modal__d" style="text-align:left;margin-bottom:14px">Puedes dejar una nota para el supervisor: qué hiciste, enlaces o pendientes.</div>' +
+            '<label class="field" style="margin-bottom:0">' +
+              '<span class="field__label">Nota (opcional)</span>' +
+              '<textarea class="textarea" data-nota maxlength="1000" rows="3"></textarea>' +
+            '</label>' +
+          '</div>' +
+          '<div class="modal__foot">' +
+            '<button type="button" class="btn btn--ghost btn--sm" data-no>Cancelar</button>' +
+            '<button type="button" class="btn btn--primary btn--sm" data-yes>Marcar completada</button>' +
+          '</div>' +
+        '</div>';
+      $('.modal__t', m).textContent = 'Completar: ' + titulo;
+      document.body.appendChild(m);
+      const nota = $('[data-nota]', m);
+      nota.focus();
+      const cerrar = (v) => { m.remove(); resolve(v); };
+      $('[data-no]', m).addEventListener('click', () => cerrar(null));
+      $('[data-yes]', m).addEventListener('click', () => cerrar(nota.value.trim()));
+      m.addEventListener('click', (e) => { if (e.target === m) cerrar(null); });
+    });
+  }
+
+  /* ---------- Estudiante: iniciar y completar tareas ---------- */
+  function tareasEstudiante() {
+    document.addEventListener('click', async (e) => {
+      const ini = e.target.closest('[data-tarea-iniciar]');
+      const fin = e.target.closest('[data-tarea-completar]');
+      if (!ini && !fin) return;
+      const b = ini || fin;
+      let datos;
+      if (ini) {
+        datos = { tarea: ini.dataset.tareaIniciar, estado: 'en_progreso' };
+      } else {
+        const nota = await modalCompletar(fin.dataset.titulo || 'tarea');
+        if (nota === null) return;
+        datos = { tarea: fin.dataset.tareaCompletar, estado: 'completada', nota: nota };
+      }
+      b.disabled = true;
+      try {
+        const r = await api('tarea_estado', datos);
+        toast(r.mensaje || 'Listo');
+        setTimeout(() => location.reload(), 600);
       } catch (err) {
         toast(err.message, 'err');
         b.disabled = false;
@@ -682,6 +835,6 @@
     acordeon('.ses__head', '.ses');
     tabs(); copiar(); togglePass(); checklist(); acuerdo(); quiz();
     altaToggle(); altaEstudiante(); cambiarClave(); cuentaAdmin(); accionesAdmin(); asistencia(); accesos();
-    editorClases(); filtro();
+    editorClases(); tareasEquipo(); tareasEstudiante(); filtro();
   });
 })();

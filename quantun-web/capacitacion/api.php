@@ -133,12 +133,147 @@ if ($accion === 'enviar_quiz') {
     cap_json(['ok' => true, 'resultado' => $r]);
 }
 
+if ($accion === 'tarea_estado') {
+    if (!$yoId) { cap_json(['ok' => false, 'error' => 'Debes iniciar sesión.'], 401); }
+    $tid    = (string)($_POST['tarea'] ?? '');
+    $estado = (string)($_POST['estado'] ?? '');
+    $nota   = trim((string)($_POST['nota'] ?? ''));
+    if (!in_array($estado, ['en_progreso', 'completada'], true)) {
+        cap_json(['ok' => false, 'error' => 'Estado no válido.'], 400);
+    }
+
+    $r = cap_transaccion(function (array &$d) use ($yoId, $tid, $estado, $nota) {
+        $i = cap_indice_tarea($d, $tid);
+        if ($i === null || !isset($d['tareas'][$i]['asignaciones'][$yoId])) { return null; }
+        $a = $d['tareas'][$i]['asignaciones'][$yoId];
+        if ($a['estado'] === 'completada') { return 'ya'; }
+
+        $ahora = date('c');
+        if ($estado === 'en_progreso') {
+            $a['estado']   = 'en_progreso';
+            $a['iniciada'] = $a['iniciada'] ?: $ahora;
+        } else {
+            $a['estado']     = 'completada';
+            $a['iniciada']   = $a['iniciada'] ?: $ahora;
+            $a['completada'] = $ahora;
+            $a['nota']       = mb_substr($nota, 0, 1000, 'UTF-8');
+        }
+        $d['tareas'][$i]['asignaciones'][$yoId] = $a;
+
+        $est = cap_buscar_estudiante($d, $yoId);
+        cap_bitacora($d, $est ? cap_nombre_completo($est) : 'Estudiante', 'tarea',
+            '"' . $d['tareas'][$i]['titulo'] . '" ' . ($estado === 'completada' ? 'completada' : 'iniciada'));
+        return true;
+    });
+
+    if ($r === null) { cap_json(['ok' => false, 'error' => 'Tarea no encontrada.'], 404); }
+    if ($r === 'ya') { cap_json(['ok' => false, 'error' => 'Esta tarea ya está completada.'], 409); }
+    cap_json(['ok' => true, 'mensaje' => $estado === 'completada' ? 'Tarea completada.' : 'Tarea iniciada.']);
+}
+
 /* =========================================================
-   ACCIONES DEL ADMINISTRADOR
+   ACCIONES DEL EQUIPO (administrador y supervisor)
+   ========================================================= */
+
+if (!cap_es_staff()) {
+    cap_json(['ok' => false, 'error' => 'Acción no permitida.'], 403);
+}
+
+if ($accion === 'guardar_tarea') {
+    if (!cap_puede('tareas')) { cap_json(['ok' => false, 'error' => 'Tu rol no puede gestionar tareas.'], 403); }
+
+    $tid       = trim((string)($_POST['tarea'] ?? ''));
+    $titulo    = trim((string)($_POST['titulo'] ?? ''));
+    $desc      = trim((string)($_POST['descripcion'] ?? ''));
+    $prioridad = (string)($_POST['prioridad'] ?? 'media');
+    $vence     = trim((string)($_POST['vence'] ?? ''));
+    $ids       = array_values(array_unique(array_filter(array_map('trim', explode(',', (string)($_POST['asignados'] ?? ''))))));
+
+    if (mb_strlen($titulo, 'UTF-8') < 3)  { cap_json(['ok' => false, 'error' => 'El título debe tener al menos 3 caracteres.'], 400); }
+    if ($vence !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $vence)) { cap_json(['ok' => false, 'error' => 'La fecha límite no es válida.'], 400); }
+    if (!$ids)                             { cap_json(['ok' => false, 'error' => 'Selecciona al menos un estudiante.'], 400); }
+
+    $r = cap_transaccion(function (array &$d) use ($tid, $titulo, $desc, $prioridad, $vence, $ids) {
+        // Solo estudiantes existentes
+        $validos = [];
+        foreach ($d['estudiantes'] as $e) {
+            if (cap_es_estudiante($e)) { $validos[$e['id']] = true; }
+        }
+        $ids = array_values(array_filter($ids, fn($x) => isset($validos[$x])));
+        if (!$ids) { return 'sin_asignados'; }
+
+        $autor = cap_admin_nombre();
+        if ($tid === '') {
+            $t = cap_tarea_nueva($titulo, mb_substr($desc, 0, 2000, 'UTF-8'), $prioridad, $vence ?: null, $autor);
+            foreach ($ids as $x) { $t['asignaciones'][$x] = cap_asignacion_nueva(); }
+            $d['tareas'][] = $t;
+            cap_bitacora($d, $autor, 'tarea', 'Tarea "' . $titulo . '" asignada a ' . count($ids) . ' estudiante(s)');
+            return ['nueva' => true, 'n' => count($ids)];
+        }
+
+        $i = cap_indice_tarea($d, $tid);
+        if ($i === null) { return null; }
+        $t = $d['tareas'][$i];
+        $t['titulo']      = $titulo;
+        $t['descripcion'] = mb_substr($desc, 0, 2000, 'UTF-8');
+        $t['prioridad']   = isset(CAP_PRIORIDADES[$prioridad]) ? $prioridad : 'media';
+        $t['vence']       = $vence ?: null;
+
+        // Mantiene el historial de quienes siguen asignados; agrega nuevos y quita los desmarcados
+        $nuevas = [];
+        foreach ($ids as $x) { $nuevas[$x] = $t['asignaciones'][$x] ?? cap_asignacion_nueva(); }
+        $agregados = count(array_diff_key($nuevas, $t['asignaciones']));
+        $quitados  = count(array_diff_key($t['asignaciones'], $nuevas));
+        $t['asignaciones'] = $nuevas;
+        $d['tareas'][$i] = $t;
+
+        cap_bitacora($d, $autor, 'tarea', 'Tarea "' . $titulo . '" editada · ' . count($ids) . ' asignado(s)'
+            . ($agregados ? ' · +' . $agregados : '') . ($quitados ? ' · -' . $quitados : ''));
+        return ['nueva' => false, 'n' => count($ids)];
+    });
+
+    if ($r === null)            { cap_json(['ok' => false, 'error' => 'Tarea no encontrada.'], 404); }
+    if ($r === 'sin_asignados') { cap_json(['ok' => false, 'error' => 'Ningún estudiante válido seleccionado.'], 400); }
+    cap_json(['ok' => true, 'mensaje' => ($r['nueva'] ? 'Tarea creada y asignada a ' : 'Tarea actualizada · ') . $r['n'] . ' estudiante(s).']);
+}
+
+if ($accion === 'eliminar_tarea') {
+    if (!cap_puede('tareas')) { cap_json(['ok' => false, 'error' => 'Tu rol no puede gestionar tareas.'], 403); }
+    $tid = (string)($_POST['id'] ?? '');
+    $r = cap_transaccion(function (array &$d) use ($tid) {
+        $i = cap_indice_tarea($d, $tid);
+        if ($i === null) { return null; }
+        $titulo = $d['tareas'][$i]['titulo'];
+        array_splice($d['tareas'], $i, 1);
+        cap_bitacora($d, cap_admin_nombre(), 'tarea', 'Tarea "' . $titulo . '" eliminada');
+        return true;
+    });
+    if (!$r) { cap_json(['ok' => false, 'error' => 'Tarea no encontrada.'], 404); }
+    cap_json(['ok' => true, 'mensaje' => 'Tarea eliminada.']);
+}
+
+if ($accion === 'reabrir_asignacion') {
+    if (!cap_puede('tareas')) { cap_json(['ok' => false, 'error' => 'Tu rol no puede gestionar tareas.'], 403); }
+    $tid = (string)($_POST['id'] ?? '');
+    $est = (string)($_POST['est'] ?? '');
+    $r = cap_transaccion(function (array &$d) use ($tid, $est) {
+        $i = cap_indice_tarea($d, $tid);
+        if ($i === null || !isset($d['tareas'][$i]['asignaciones'][$est])) { return null; }
+        $d['tareas'][$i]['asignaciones'][$est] = cap_asignacion_nueva();
+        $e = cap_buscar_estudiante($d, $est);
+        cap_bitacora($d, cap_admin_nombre(), 'tarea', 'Tarea "' . $d['tareas'][$i]['titulo'] . '" reabierta para ' . ($e ? cap_nombre_completo($e) : $est));
+        return true;
+    });
+    if (!$r) { cap_json(['ok' => false, 'error' => 'Asignación no encontrada.'], 404); }
+    cap_json(['ok' => true, 'mensaje' => 'Tarea reabierta.']);
+}
+
+/* =========================================================
+   ACCIONES SOLO DEL ADMINISTRADOR
    ========================================================= */
 
 if (!$esAdmin) {
-    cap_json(['ok' => false, 'error' => 'Acción no permitida.'], 403);
+    cap_json(['ok' => false, 'error' => 'Tu rol no tiene permiso para esta acción.'], 403);
 }
 
 if ($accion === 'crear_estudiante') {
@@ -147,6 +282,8 @@ if ($accion === 'crear_estudiante') {
     $email     = trim((string)($_POST['email'] ?? ''));
     $cargo     = trim((string)($_POST['cargo'] ?? ''));
     $clave     = (string)($_POST['clave'] ?? '');
+    $rol       = (string)($_POST['rol'] ?? 'estudiante');
+    if (!isset(CAP_ROLES[$rol])) { $rol = 'estudiante'; }
 
     if (mb_strlen($nombre, 'UTF-8') < 2)              { cap_json(['ok' => false, 'error' => 'El nombre es obligatorio.'], 400); }
     if (mb_strlen($apellidos, 'UTF-8') < 2)           { cap_json(['ok' => false, 'error' => 'Los apellidos son obligatorios.'], 400); }
@@ -154,17 +291,17 @@ if ($accion === 'crear_estudiante') {
     if ($cargo === '')                                { cap_json(['ok' => false, 'error' => 'Selecciona un cargo.'], 400); }
     if (mb_strlen($clave, 'UTF-8') < CAP_CLAVE_MIN)   { cap_json(['ok' => false, 'error' => 'La contraseña debe tener al menos ' . CAP_CLAVE_MIN . ' caracteres.'], 400); }
 
-    $r = cap_transaccion(function (array &$d) use ($nombre, $apellidos, $email, $cargo, $clave) {
+    $r = cap_transaccion(function (array &$d) use ($nombre, $apellidos, $email, $cargo, $clave, $rol) {
         foreach ($d['estudiantes'] as $e) {
             if (strtolower($e['email']) === strtolower($email)) { return 'duplicado'; }
         }
-        $nuevo = cap_estudiante_nuevo($nombre, $apellidos, $email, $cargo, $clave);
+        $nuevo = cap_estudiante_nuevo($nombre, $apellidos, $email, $cargo, $clave, $rol);
         $d['estudiantes'][] = $nuevo;
-        cap_bitacora($d, cap_admin_nombre(), 'alta', 'Estudiante ' . cap_nombre_completo($nuevo) . ' (' . $email . ')');
+        cap_bitacora($d, cap_admin_nombre(), 'alta', CAP_ROLES[$rol] . ' ' . cap_nombre_completo($nuevo) . ' (' . $email . ')');
         return $nuevo;
     });
 
-    if ($r === 'duplicado') { cap_json(['ok' => false, 'error' => 'Ya existe un estudiante con ese correo.'], 409); }
+    if ($r === 'duplicado') { cap_json(['ok' => false, 'error' => 'Ya existe un usuario con ese correo.'], 409); }
 
     cap_json([
         'ok' => true,
@@ -173,7 +310,7 @@ if ($accion === 'crear_estudiante') {
             'nombre' => cap_nombre_completo($r),
             'email'  => $r['email'],
         ],
-        'mensaje' => 'Estudiante agregado.',
+        'mensaje' => 'Usuario agregado.',
     ]);
 }
 
@@ -306,11 +443,12 @@ if ($accion === 'eliminar_estudiante') {
         if ($i === null) { return null; }
         $nom = cap_nombre_completo($d['estudiantes'][$i]);
         array_splice($d['estudiantes'], $i, 1);
-        cap_bitacora($d, cap_admin_nombre(), 'baja', 'Estudiante eliminado: ' . $nom);
+        foreach ($d['tareas'] as $k => $t) { unset($d['tareas'][$k]['asignaciones'][$id]); }
+        cap_bitacora($d, cap_admin_nombre(), 'baja', 'Usuario eliminado: ' . $nom);
         return true;
     });
-    if (!$r) { cap_json(['ok' => false, 'error' => 'Estudiante no encontrado.'], 404); }
-    cap_json(['ok' => true, 'mensaje' => 'Estudiante eliminado.']);
+    if (!$r) { cap_json(['ok' => false, 'error' => 'Usuario no encontrado.'], 404); }
+    cap_json(['ok' => true, 'mensaje' => 'Usuario eliminado.']);
 }
 
 if ($accion === 'cambiar_clave') {

@@ -40,6 +40,9 @@ function cap_icono(string $n, string $clase = 'ico'): string {
         'key'       => '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9"/><path d="M17 6l2 2"/><path d="M14.5 8.5l2 2"/>',
         'x'         => '<line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/>',
         'download'  => '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+        'tasks'     => '<path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><polyline points="3 6 4.5 7.5 7 5"/><polyline points="3 12 4.5 13.5 7 11"/><polyline points="3 18 4.5 19.5 7 17"/>',
+        'report'    => '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><polyline points="14 3 14 8 19 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>',
+        'print'     => '<polyline points="6 9 6 3 18 3 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/>',
         'signature' => '<path d="M3 17c3.5 0 4-11 7-11s2.5 11 5.5 11c1.6 0 2.4-1.4 2.5-2.6"/><line x1="3" y1="21" x2="21" y2="21"/>',
     ];
     $d = $p[$n] ?? $p['info'];

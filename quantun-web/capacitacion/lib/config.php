@@ -14,6 +14,21 @@ const CAP_CLAVE_MIN    = 8;   // longitud mínima de la contraseña del estudian
 const CAP_HORA_INICIO  = '4:00 p.m.';  // inicio de cada jornada
 const CAP_HORA_FIN     = '6:00 p.m.';  // fin de cada jornada
 
+/** Roles de usuario (el administrador es una cuenta aparte). */
+const CAP_ROLES = [
+    'estudiante' => 'Estudiante',
+    'supervisor' => 'Supervisor',
+];
+
+/** Lo que puede hacer un supervisor dentro del panel. El administrador puede todo. */
+const CAP_PERMISOS_SUPERVISOR = ['ver_usuarios', 'tareas', 'reportes'];
+
+const CAP_PRIORIDADES = [
+    'alta'  => 'Alta',
+    'media' => 'Media',
+    'baja'  => 'Baja',
+];
+
 const CAP_CARGOS = [
     'Administrador de contenido',
     'Editor de contenido',

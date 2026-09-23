@@ -58,6 +58,31 @@ Si prefieres subirlo a mano por el Administrador de archivos de hPanel:
 
 ---
 
+## Roles, tareas y reportes
+
+Un solo login (correo + contraseña) para todos; el sistema detecta el rol.
+
+| Rol | Qué puede hacer |
+|---|---|
+| **Administrador** (cuenta propia, *Mi cuenta*) | Todo: usuarios y roles, tareas, programa, asistencia, entrega de accesos, reportes, bitácora |
+| **Supervisor** (se crea en *Usuarios*) | Crear, editar, reasignar y eliminar tareas; ver cumplimiento; ver usuarios (solo lectura); reportes |
+| **Estudiante** | Su capacitación (acuerdo, temario, evaluación) y sus tareas: *Empezar* / *Marcar como completada* con nota |
+
+Los permisos del supervisor se definen en `CAP_PERMISOS_SUPERVISOR` (`lib/config.php`) y se validan
+también en `api.php`, no solo en la interfaz.
+
+**Tareas:** título, descripción, prioridad y fecha límite opcional. Se asignan marcando estudiantes
+(o *Todos*). Por cada asignado se registra: asignada, iniciada, completada, tiempo que tomó y nota.
+Las no completadas después de la fecha límite se marcan como *Vencidas*. Una tarea completada se puede
+reabrir para un estudiante. Al eliminar un usuario se limpian sus asignaciones.
+
+**Reportes** (`reporte.php?tipo=tareas|evaluacion|general`): documento A4 con cumplimiento por estudiante,
+detalle de cada tarea, resultado de la evaluación por estudiante, contenido completo de la evaluación
+(preguntas, opciones, respuesta correcta y % de aciertos) y las respuestas de cada intento.
+*Exportar PDF* abre el diálogo de impresión del navegador → *Guardar como PDF* (texto real, sin librerías).
+
+---
+
 ## Programa (definido en `lib/config.php`)
 
 5 clases repartidas en **2 jornadas de 2 horas** (4 horas en total), los dos viernes siguientes al alta del programa:
@@ -99,8 +124,10 @@ capacitacion/
 ├── panel.php        panel del estudiante (progreso, temario, acuerdo, quiz, accesos)
 ├── admin.php        panel del instructor (estudiantes, asistencia, accesos, bitácora)
 ├── api.php          endpoints JSON (POST, CSRF, control de rol)
+├── reporte.php      reportes imprimibles / exportables a PDF
 ├── assets/
 │   ├── cap.css      design system QUANTUN aplicado al módulo
+│   ├── reporte.css  hoja A4 de los reportes (pantalla + impresión)
 │   └── cap.js       checklist en vivo, modal de confirmación, toasts, tabs
 ├── lib/
 │   ├── config.php   PROGRAMA, TEMARIO, ACUERDO Y QUIZ  ← editar aquí
