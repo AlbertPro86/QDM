@@ -1883,14 +1883,12 @@ function renderNotifProgressCard(svcs) {
             ${waIcon}Avisar suspensión
         </button>`
         : '';
-    const renovBtn = days >= 0
-        ? `<button onclick="enviarAvisoRenovacionWA()"
+    const renovBtn = `<button onclick="enviarAvisoRenovacionWA()"
             style="margin-top:8px;width:100%;padding:6px 10px;background:#fff;border:1.5px solid #E8E5DD;border-radius:6px;
                    font-size:11px;font-weight:700;color:#2D8F5A;cursor:pointer;text-align:center;transition:all .15s"
             onmouseenter="this.style.background='#f0fdf4'" onmouseleave="this.style.background='#fff'">
             ${waIcon}Confirmar renovación
-        </button>`
-        : '';
+        </button>`;
 
     card.innerHTML = `
     <div style="padding:10px 12px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:8px;margin-top:2px">
