@@ -1813,6 +1813,7 @@ function renderNotifProgressCard(svcs) {
     });
     const svc   = activos[0];
     window._notifSvc = svc;   // lo usa enviarRecordatorioWA() para armar el mensaje
+    window._notifNombres = _nombresServiciosAviso(svcs);
     const count = Math.min(3, parseInt(svc.notif_count) || 0);
     // Calcular días restantes comparando fechas completas desde medianoche (evita desfase por hora del día)
     const _hoy   = new Date(); _hoy.setHours(0, 0, 0, 0);
@@ -1872,16 +1873,115 @@ function renderNotifProgressCard(svcs) {
         </button>`
         : '';
 
+    // Servicio vencido: aviso de suspensión. Servicio al día: aviso de renovación (gracias).
+    const waIcon = `<svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:-1px;margin-right:4px">${wa}</svg>`;
+    const suspBtn = days < 0
+        ? `<button onclick="enviarAvisoSuspensionWA(${svc.id})"
+            style="margin-top:8px;width:100%;padding:6px 10px;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:6px;
+                   font-size:11px;font-weight:700;color:#dc2626;cursor:pointer;text-align:center;transition:all .15s"
+            onmouseenter="this.style.background='#fee2e2'" onmouseleave="this.style.background='#fef2f2'">
+            ${waIcon}Avisar suspensión
+        </button>`
+        : '';
+    const renovBtn = days >= 0
+        ? `<button onclick="enviarAvisoRenovacionWA()"
+            style="margin-top:8px;width:100%;padding:6px 10px;background:#fff;border:1.5px solid #E8E5DD;border-radius:6px;
+                   font-size:11px;font-weight:700;color:#2D8F5A;cursor:pointer;text-align:center;transition:all .15s"
+            onmouseenter="this.style.background='#f0fdf4'" onmouseleave="this.style.background='#fff'">
+            ${waIcon}Confirmar renovación
+        </button>`
+        : '';
+
     card.innerHTML = `
     <div style="padding:10px 12px;background:#FAFAF7;border:1.5px solid #E8E5DD;border-radius:8px;margin-top:2px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:10px;font-weight:700;color:#2A2926;text-transform:uppercase;letter-spacing:.06em">Recordatorios</span>
-            <span style="font-size:10px;color:${days<=7&&days>=0?'#ca8a04':'#8A867C'};font-weight:${days<=7&&days>=0?700:400}">${daysLabel}</span>
+            <span style="font-size:10px;color:${days<0?'#dc2626':days<=7?'#ca8a04':'#8A867C'};font-weight:${days<=7?700:400}">${daysLabel}</span>
         </div>
         <div style="display:flex;align-items:center">${dotsHtml}</div>
+        ${suspBtn}
         ${exitoBtn}
+        ${renovBtn}
         ${reiniciarBtn}
     </div>`;
+}
+
+// Nombres de los servicios recurrentes activos, para listarlos en los avisos.
+function _nombresServiciosAviso(svcs) {
+    const lista = (svcs || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico')
+                              .map(s => s.servicio_nombre);
+    if (!lista.length) return '';
+    if (lista.length === 1) return `*${lista[0]}*`;
+    return lista.slice(0, -1).map(n => `*${n}*`).join(', ') + ' y ' + `*${lista[lista.length - 1]}*`;
+}
+
+// Aviso de suspensión (servicio vencido). Se envía por WhatsApp, igual que los recordatorios.
+// Los emojis van como escapes \u{...} por la misma razón que en enviarRecordatorioWA().
+async function enviarAvisoSuspensionWA(svcId) {
+    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
+    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
+
+    const svc    = window._notifSvc || {};
+    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+    const nombres = window._notifNombres || `*${svc.servicio_nombre || 'tus servicios'}*`;
+    const vence = svc.fecha_vencimiento
+        ? new Date(svc.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
+        : '';
+
+    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{26A0}\u{FE0F} Tus servicios ${nombres} se encuentran *suspendidos*`
+              + (vence ? ` desde el ${vence}, por falta de renovación` : ' por falta de renovación')
+              + `.\n\n\u{1F512} Mientras estén suspendidos tu sitio web y tu correo dejan de estar disponibles.`
+              + ` Y si la renovación se demora más, *corres el riesgo de perder toda la información, el dominio y el contenido alojado*, y recuperarlos puede no ser posible.`
+              + `\n\n\u{1F4AC} Escríbenos por este medio y reactivamos todo de inmediato. Estamos para ayudarte \u{1F64F}`
+              + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
+
+    if (!waAbrir(tel, msg)) return;
+
+    try {
+        await fetch('api/cliente_notas.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId,
+                nota: `[WhatsApp] Aviso de suspensión enviado — ${svc.servicio_nombre || 'servicios'} (vencido desde ${svc.fecha_vencimiento || '?'}).` })
+        });
+        showToast('Aviso de suspensión registrado en el historial', 'success');
+        loadNotes();
+    } catch(e) {
+        showToast('WhatsApp se abrió, pero no se pudo registrar el envío', 'warning');
+    }
+}
+
+// Aviso de renovación exitosa: confirma al cliente que ya está al día y hasta cuándo.
+async function enviarAvisoRenovacionWA() {
+    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
+    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
+
+    const svc    = window._notifSvc || {};
+    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+    const nombres = window._notifNombres || `*${svc.servicio_nombre || 'tus servicios'}*`;
+    const vence = svc.fecha_vencimiento
+        ? new Date(svc.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
+        : '';
+
+    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{2705} Recibimos tu pago y *renovamos con éxito* tus servicios ${nombres}`
+              + (vence ? `. Quedan activos hasta el ${vence}` : '')
+              + `.\n\n\u{1F680} Todo sigue funcionando con normalidad. ¡Gracias por confiar en nosotros! \u{1F64C}`
+              + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
+
+    if (!waAbrir(tel, msg)) return;
+
+    try {
+        await fetch('api/cliente_notas.php', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: clienteId,
+                nota: `[WhatsApp] Aviso de renovación exitosa enviado — ${svc.servicio_nombre || 'servicios'}${vence ? ' (vigente hasta ' + vence + ')' : ''}.` })
+        });
+        showToast('Aviso de renovación registrado en el historial', 'success');
+        loadNotes();
+    } catch(e) {
+        showToast('WhatsApp se abrió, pero no se pudo registrar el envío', 'warning');
+    }
 }
 
 // Envía el aviso N por WhatsApp y lo marca como enviado. Reemplaza al envío
@@ -3888,8 +3988,12 @@ async function confirmarRegistrarPago() {
             const n = _rpServicios.length;
             showToast(`✓ Pago registrado — ${n} servicio${n > 1 ? 's' : ''} renovado${n > 1 ? 's' : ''}`, 'success');
             closeRegistrarPagoModal();
-            loadServices();
+            await loadServices();   // actualiza la nueva fecha de vencimiento que usa el aviso
             loadNotes();
+            if (await confirmAction('¿Enviar al cliente el aviso de renovación exitosa por WhatsApp?',
+                    { title: 'Avisar renovación', okText: 'Abrir WhatsApp', okColor: '#16a34a', okHover: '#15803d' })) {
+                enviarAvisoRenovacionWA();
+            }
         } else {
             showToast(d.error || 'Error al registrar el pago', 'error');
         }
