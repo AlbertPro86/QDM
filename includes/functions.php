@@ -288,8 +288,9 @@ function getLogoEmailInline(PDO $pdo, string $logoUrlParam = '', string $height 
 
 /**
  * Detalles ("lo que incluye") de un ítem de orden que NO es un paquete.
- * El nombre llega como "Servicio — Sub-servicio" o solo "Servicio".
- * Prioridad: features del sub-servicio; si no tiene, features del servicio.
+ * El nombre llega como "Servicio — Sub-servicio", solo "Servicio" o solo "Sub-servicio".
+ * Prioridad: características del sub-servicio, su descripción, características
+ * del servicio y por último la descripción del servicio.
  */
 function itemFeaturesPorNombre(PDO $pdo, string $nombre): array {
     $nombre = trim($nombre);
@@ -298,25 +299,50 @@ function itemFeaturesPorNombre(PDO $pdo, string $nombre): array {
     $svcNombre = trim($partes[0]);
     $subNombre = isset($partes[1]) ? trim($partes[1]) : '';
 
-    $st = $pdo->prepare("SELECT id FROM servicios WHERE nombre = ? LIMIT 1");
-    $st->execute([$svcNombre]);
-    $svcId = $st->fetchColumn();
-    if (!$svcId) {
-        $st->execute([$nombre]);
-        $svcId = $st->fetchColumn();
-        $subNombre = '';
-    }
-    if (!$svcId) return [];
+    $texto = function (?string $d): array {
+        $d = trim((string)$d);
+        if ($d === '') return [];
+        $lineas = preg_split('/?
++|(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ0-9])/u', $d);
+        return array_values(array_filter(array_map('trim', $lineas), fn($l) => $l !== ''));
+    };
 
-    if ($subNombre !== '') {
-        $st = $pdo->prepare("SELECT sf.texto FROM servicio_features sf
-            JOIN sub_servicios ss ON ss.id = sf.sub_servicio_id
-            WHERE ss.servicio_id = ? AND ss.nombre = ? ORDER BY sf.orden ASC, sf.id ASC");
-        $st->execute([$svcId, $subNombre]);
+    $svc = null; $sub = null;
+    $st = $pdo->prepare("SELECT id, descripcion FROM servicios WHERE nombre = ? LIMIT 1");
+    $st->execute([$svcNombre]);
+    $svc = $st->fetch();
+    if ($svc && $subNombre !== '') {
+        $st = $pdo->prepare("SELECT id, descripcion FROM sub_servicios WHERE servicio_id = ? AND nombre = ? LIMIT 1");
+        $st->execute([$svc['id'], $subNombre]);
+        $sub = $st->fetch() ?: null;
+    }
+    if (!$svc) {
+        // Ítem que es solo un sub-servicio, o un servicio con el nombre completo
+        $st = $pdo->prepare("SELECT id, servicio_id, descripcion FROM sub_servicios WHERE nombre = ? LIMIT 1");
+        $st->execute([$nombre]);
+        $sub = $st->fetch() ?: null;
+        if ($sub) {
+            $st = $pdo->prepare("SELECT id, descripcion FROM servicios WHERE id = ?");
+            $st->execute([$sub['servicio_id']]);
+            $svc = $st->fetch() ?: null;
+        }
+    }
+    if (!$svc && !$sub) return [];
+
+    if ($sub) {
+        $st = $pdo->prepare("SELECT texto FROM servicio_features WHERE sub_servicio_id = ? ORDER BY orden ASC, id ASC");
+        $st->execute([$sub['id']]);
         $f = $st->fetchAll(PDO::FETCH_COLUMN);
         if ($f) return $f;
+        $f = $texto($sub['descripcion'] ?? '');
+        if ($f) return $f;
     }
-    $st = $pdo->prepare("SELECT texto FROM servicio_features WHERE servicio_id = ? AND sub_servicio_id IS NULL ORDER BY orden ASC, id ASC");
-    $st->execute([$svcId]);
-    return $st->fetchAll(PDO::FETCH_COLUMN);
+    if ($svc) {
+        $st = $pdo->prepare("SELECT texto FROM servicio_features WHERE servicio_id = ? AND sub_servicio_id IS NULL ORDER BY orden ASC, id ASC");
+        $st->execute([$svc['id']]);
+        $f = $st->fetchAll(PDO::FETCH_COLUMN);
+        if ($f) return $f;
+        return $texto($svc['descripcion'] ?? '');
+    }
+    return [];
 }
