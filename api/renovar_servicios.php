@@ -125,6 +125,10 @@ if ($method === 'POST') {
             $nuevoFin    = sumarFrecuencia($s['fecha_vencimiento'], $s['frecuencia']);
         }
         $stmt->execute([$nuevoInicio, $nuevoFin, $s['id']]);
+        if ($action !== 'revertir') {
+            // Nuevo ciclo: los recordatorios automáticos vuelven a empezar
+            $pdo->prepare("UPDATE cliente_servicios SET notif_count = 0, notif_r1_at = NULL, notif_r2_at = NULL, notif_r3_at = NULL WHERE id = ?")->execute([$s['id']]);
+        }
         $count++;
     }
 

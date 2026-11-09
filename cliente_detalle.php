@@ -3735,8 +3735,12 @@ async function ejecutarAccionRenovar(action) {
         if (d.success) {
             showToast(d.message, 'success');
             closeRenovarModal();
-            loadServices();
+            await loadServices();   // actualiza la nueva fecha de vencimiento que usa el aviso
             loadNotes();
+            if (action === 'renovar' && await confirmAction('¿Enviar al cliente el aviso de renovación exitosa por WhatsApp?',
+                    { title: 'Avisar renovación', okText: 'Abrir WhatsApp', okColor: '#16a34a', okHover: '#15803d' })) {
+                enviarAvisoRenovacionWA();
+            }
         } else {
             showToast(d.error || 'Error', 'error');
         }
@@ -3828,17 +3832,7 @@ async function registrarPagoDirecto() {
         } catch(e) {}
     }
 
-    // Renovar fechas de todos los servicios pagados
-    const ids = servicios.map(s => s.id);
-    try {
-        await fetch('api/renovar_servicios.php', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ cliente_id: clienteId, ids, action: 'renovar' })
-        });
-    } catch(e) {}
-
-    showToast(`✓ Pago registrado — ${registrados} servicio${registrados > 1 ? 's' : ''} renovado${registrados > 1 ? 's' : ''}`, 'success');
+    showToast(`✓ Pago registrado — ${registrados} servicio${registrados > 1 ? 's' : ''}`, 'success');
     loadServices();
     loadNotes();
 }
@@ -3963,20 +3957,8 @@ async function confirmarRegistrarPago() {
         const d = await r.json();
 
         if (d.success || d.id) {
-            // ── 2. Renovar cada servicio recurrente + resetear recordatorios ──
-            for (const svc of _rpServicios) {
-                if (svc.frecuencia !== 'unico' && svc.cs_id) {
-                    await fetch('api/renovar_servicios.php', {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cliente_id: clienteId, ids: [svc.cs_id], action: 'renovar' })
-                    });
-                    fetch('api/cliente_servicios.php', {
-                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: svc.cs_id, notif_count: 0, notif_r1_at: null, notif_r2_at: null, notif_r3_at: null })
-                    });
-                }
-            }
-            // ── 3. Nota en historial ─────────────────────────────────────────
+            // El pago NO modifica las fechas de vencimiento: eso se hace solo con «Renovar».
+            // ── 2. Nota en historial ─────────────────────────────────────────
             const totalFmt = totalMonto.toLocaleString('es-CO');
             await fetch('api/cliente_notas.php', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3984,14 +3966,10 @@ async function confirmarRegistrarPago() {
                     nota: `Pago registrado: $${totalFmt} COP — ${nombres.join(', ')}` })
             });
             const n = _rpServicios.length;
-            showToast(`✓ Pago registrado — ${n} servicio${n > 1 ? 's' : ''} renovado${n > 1 ? 's' : ''}`, 'success');
+            showToast(`✓ Pago registrado — ${n} servicio${n > 1 ? 's' : ''}`, 'success');
             closeRegistrarPagoModal();
-            await loadServices();   // actualiza la nueva fecha de vencimiento que usa el aviso
+            loadServices();
             loadNotes();
-            if (await confirmAction('¿Enviar al cliente el aviso de renovación exitosa por WhatsApp?',
-                    { title: 'Avisar renovación', okText: 'Abrir WhatsApp', okColor: '#16a34a', okHover: '#15803d' })) {
-                enviarAvisoRenovacionWA();
-            }
         } else {
             showToast(d.error || 'Error al registrar el pago', 'error');
         }
