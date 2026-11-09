@@ -549,5 +549,30 @@ enrichWithPaquete($servicios, $pdo);
             <div class="footer-accent"></div>
         </div>
     </div>
+    <script>
+    // Ajusta el documento para que SIEMPRE quede en una sola hoja carta al imprimir/exportar PDF.
+    // Area imprimible: carta (215.9 x 279.4 mm) menos 12 mm de margen = ~725 x 965 px.
+    (function () {
+        var W = 725, H = 950;
+        function inv() { return document.querySelector('.invoice'); }
+        function reset() {
+            var el = inv(); if (!el) return;
+            el.style.zoom = ''; el.style.width = '';
+        }
+        function fit() {
+            var el = inv(); if (!el) return;
+            reset();
+            el.style.width = W + 'px';
+            if (el.getBoundingClientRect().height <= H) return;
+            for (var z = 0.97; z >= 0.5; z -= 0.02) {
+                el.style.zoom = z;
+                el.style.width = (W / z) + 'px';   // tras el zoom ocupa exactamente el ancho de la hoja
+                if (el.getBoundingClientRect().height <= H) break;
+            }
+        }
+        window.addEventListener('beforeprint', fit);
+        window.addEventListener('afterprint', reset);
+    })();
+    </script>
 </body>
 </html>
