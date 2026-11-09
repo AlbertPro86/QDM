@@ -268,6 +268,7 @@ if (is_array($itemsOverride) && count($itemsOverride) > 0) {
         $precio = floatval($item['precio'] ?? 0);
         return array_merge($base, [
             'servicio_nombre'  => $item['descripcion'] ?? '',
+            'nombre_display'   => $item['descripcion'] ?? '',
             'monto_renovacion' => $precio * $qty,
             'descuento'        => floatval($item['descuento'] ?? 0),
             '_qty'             => $qty,
@@ -360,23 +361,17 @@ foreach ($servicios as $idx => $svc) {
             </tr>';
         }
     } else {
-        $tablasServicios .= '<tr style="background:' . $rowBg . ';border-bottom:1px solid #F0EFEB">
-            <td class="itm-td" style="padding:10px 0;font-size:12px;color:#57544D;word-break:break-word">' . htmlspecialchars($svc['servicio_nombre']) . '</td>
-            <td class="itm-td" style="padding:10px 0;font-size:12px;color:#8A867C;text-align:center">' . $qty . '</td>
-            <td class="itm-td" style="padding:10px 0;font-size:12px;color:#8A867C;text-align:right;white-space:nowrap">$ ' . number_format($precioU, 0, ',', '.') . '</td>
-            <td class="itm-td" style="padding:10px 0;font-size:12px;font-weight:700;color:#0E0E0C;text-align:right;white-space:nowrap">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
-        </tr>';
-        if (!empty($pkgFeats)) {
-            $featHtml = '';
-            foreach ($pkgFeats as $feat) {
-                $featHtml .= '<span style="font-size:10px;color:#57544D;margin-right:14px;white-space:nowrap;display:inline-block">'
-                    . '<svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin-right:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
-                    . htmlspecialchars($feat) . '</span>';
-            }
-            $tablasServicios .= '<tr style="background:' . $rowBg . ';border-bottom:1px solid #E8E5DD">
-                <td colspan="4" class="itm-td" style="padding:0 0 9px 0">' . $featHtml . '</td>
-            </tr>';
+        $featHtml = '';
+        foreach ($pkgFeats as $feat) {
+            $featHtml .= '<div style="font-size:10.5px;line-height:1.45;color:#6B675E;margin-top:3px">'
+                . '<span style="color:#2D8F5A;font-weight:700">&#10003;</span>&nbsp; ' . htmlspecialchars($feat) . '</div>';
         }
+        $tablasServicios .= '<tr style="background:' . $rowBg . ';border-bottom:1px solid #F0EFEB">
+            <td class="itm-td" style="padding:12px 0;font-size:12px;color:#57544D;word-break:break-word;vertical-align:top"><span style="font-weight:600">' . htmlspecialchars($svc['servicio_nombre']) . '</span>' . ($featHtml ? '<div style="margin-top:5px">' . $featHtml . '</div>' : '') . '</td>
+            <td class="itm-td" style="padding:12px 0;font-size:12px;color:#8A867C;text-align:center;vertical-align:top">' . $qty . '</td>
+            <td class="itm-td" style="padding:12px 0;font-size:12px;color:#8A867C;text-align:right;white-space:nowrap;vertical-align:top">$ ' . number_format($precioU, 0, ',', '.') . '</td>
+            <td class="itm-td" style="padding:12px 0;font-size:12px;font-weight:700;color:#0E0E0C;text-align:right;white-space:nowrap;vertical-align:top">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
+        </tr>';
     }
 }
 

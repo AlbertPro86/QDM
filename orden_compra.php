@@ -49,6 +49,7 @@ if (!empty($_POST['items_json'])) {
             $precio = floatval($item['precio'] ?? 0);
             return array_merge($base, [
                 'servicio_nombre'  => $item['descripcion'] ?? '',
+                'nombre_display'   => $item['descripcion'] ?? '',
                 'monto_renovacion' => $precio * $qty,
                 'descuento'        => floatval($item['descuento'] ?? 0),
                 '_qty'             => $qty,
@@ -451,27 +452,25 @@ enrichWithPaquete($servicios, $pdo);
                     </tr>
                     <?php endif; ?>
                     <?php else: ?>
-                    <!-- Fila de servicio simple -->
+                    <!-- Fila de servicio simple (con el detalle dentro de la misma celda) -->
                     <tr>
-                        <td><strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong></td>
-                        <td><?= $qty ?></td>
-                        <td>$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
-                        <td>$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
-                    </tr>
-                    <?php if (!empty($pkgFeats)): ?>
-                    <tr>
-                        <td colspan="4" style="padding:0 14px 10px 14px;border-bottom:1px solid #E8E5DD">
-                            <div style="display:flex;flex-wrap:wrap;gap:4px 16px">
+                        <td style="padding-top:14px;padding-bottom:14px;vertical-align:top">
+                            <strong><?= htmlspecialchars($svc['servicio_nombre'] ?? '') ?></strong>
+                            <?php if (!empty($pkgFeats)): ?>
+                            <div style="margin-top:7px;display:flex;flex-direction:column;gap:3px">
                                 <?php foreach ($pkgFeats as $feat): ?>
-                                <span style="font-size:10px;color:#57544D;display:flex;align-items:center;gap:4px">
-                                    <svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                    <?= htmlspecialchars($feat) ?>
-                                </span>
+                                <div style="display:flex;align-items:flex-start;gap:6px;font-size:10.5px;line-height:1.45;font-weight:400;color:#6B675E">
+                                    <svg width="10" height="10" style="flex-shrink:0;margin-top:3px" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    <span><?= htmlspecialchars($feat) ?></span>
+                                </div>
                                 <?php endforeach; ?>
                             </div>
+                            <?php endif; ?>
                         </td>
+                        <td style="vertical-align:top;padding-top:14px"><?= $qty ?></td>
+                        <td style="vertical-align:top;padding-top:14px">$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
+                        <td style="vertical-align:top;padding-top:14px">$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
-                    <?php endif; ?>
                     <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
