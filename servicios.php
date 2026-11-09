@@ -392,27 +392,56 @@ function _pkgAction(action, pkgId) {
 }
 
 // Toggle / cierre de dropdown
+// El menú se saca de la tarjeta (que tiene overflow:hidden y transform en hover)
+// y se muestra en <body> con position:fixed, para que no lo recorte nada.
+function _hideCardMenu(m) {
+    if (!m) return;
+    m.style.display = 'none';
+    const home = m._home;
+    if (home) {
+        if (home.isConnected) { if (m.parentNode !== home) home.appendChild(m); }
+        else m.remove();
+    }
+}
+function _hideAllCardMenus() {
+    document.querySelectorAll('[id^="cmenu_"]').forEach(_hideCardMenu);
+}
 function toggleCardMenu(menuId, e) {
     e && e.stopPropagation();
     const menu = document.getElementById(menuId);
     if (!menu) return;
     const wasOpen = menu.style.display !== 'none';
-    document.querySelectorAll('[id^="cmenu_"]').forEach(m => m.style.display = 'none');
-    if (!wasOpen) {
-        menu.style.display = 'block';
-        // Asegurar que no se salga de pantalla (derecha)
-        const rect = menu.getBoundingClientRect();
-        if (rect.right > window.innerWidth - 8) menu.style.right = '0';
-    }
+    _hideAllCardMenus();
+    if (wasOpen) return;
+
+    const home = menu.parentNode;
+    const btn  = home.querySelector('button');
+    menu._home = home;
+    document.body.appendChild(menu);
+    menu.style.position = 'fixed';
+    menu.style.right = 'auto';
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+
+    const r  = btn.getBoundingClientRect();
+    const mw = menu.offsetWidth, mh = menu.offsetHeight;
+    let top  = r.bottom + 4;
+    if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 4); // abre hacia arriba si no cabe
+    let left = r.right - mw;
+    left = Math.min(Math.max(8, left), window.innerWidth - mw - 8);
+    menu.style.top  = top + 'px';
+    menu.style.left = left + 'px';
+    menu.style.zIndex = '2000';
+    menu.style.visibility = 'visible';
 }
 function closeCardMenu(menuId) {
-    const m = document.getElementById(menuId); if(m) m.style.display = 'none';
+    _hideCardMenu(document.getElementById(menuId));
 }
 
-// Cierra al hacer clic fuera
-document.addEventListener('click', () => {
-    document.querySelectorAll('[id^="cmenu_"]').forEach(m => m.style.display = 'none');
-});
+// Cierra al hacer clic fuera, al hacer scroll o al cambiar el tamaño
+document.addEventListener('click', _hideAllCardMenus);
+window.addEventListener('scroll', _hideAllCardMenus, true);
+window.addEventListener('resize', _hideAllCardMenus);
 
 /* Genera el botón ⋯ + dropdown.
    items: [{ label, action, icon, danger }] | [{ divider: true }]
