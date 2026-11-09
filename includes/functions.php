@@ -285,3 +285,38 @@ function getLogoEmailInline(PDO $pdo, string $logoUrlParam = '', string $height 
     // Último fallback: texto
     return ['<span style="font-size:18px;font-weight:900;color:#0E0E0C;letter-spacing:-0.5px">QUANTUN Digital</span>', []];
 }
+
+/**
+ * Detalles ("lo que incluye") de un ítem de orden que NO es un paquete.
+ * El nombre llega como "Servicio — Sub-servicio" o solo "Servicio".
+ * Prioridad: features del sub-servicio; si no tiene, features del servicio.
+ */
+function itemFeaturesPorNombre(PDO $pdo, string $nombre): array {
+    $nombre = trim($nombre);
+    if ($nombre === '') return [];
+    $partes = preg_split('/\s+[—–-]\s+/u', $nombre, 2);
+    $svcNombre = trim($partes[0]);
+    $subNombre = isset($partes[1]) ? trim($partes[1]) : '';
+
+    $st = $pdo->prepare("SELECT id FROM servicios WHERE nombre = ? LIMIT 1");
+    $st->execute([$svcNombre]);
+    $svcId = $st->fetchColumn();
+    if (!$svcId) {
+        $st->execute([$nombre]);
+        $svcId = $st->fetchColumn();
+        $subNombre = '';
+    }
+    if (!$svcId) return [];
+
+    if ($subNombre !== '') {
+        $st = $pdo->prepare("SELECT sf.texto FROM servicio_features sf
+            JOIN sub_servicios ss ON ss.id = sf.sub_servicio_id
+            WHERE ss.servicio_id = ? AND ss.nombre = ? ORDER BY sf.orden ASC, sf.id ASC");
+        $st->execute([$svcId, $subNombre]);
+        $f = $st->fetchAll(PDO::FETCH_COLUMN);
+        if ($f) return $f;
+    }
+    $st = $pdo->prepare("SELECT texto FROM servicio_features WHERE servicio_id = ? AND sub_servicio_id IS NULL ORDER BY orden ASC, id ASC");
+    $st->execute([$svcId]);
+    return $st->fetchAll(PDO::FETCH_COLUMN);
+}

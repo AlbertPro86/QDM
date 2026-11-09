@@ -233,7 +233,10 @@ function enrichWithPaquete(array &$servicios, PDO $pdo): void {
         $ps = $pdo->prepare("SELECT id FROM paquetes WHERE nombre = ? AND activo = 1 LIMIT 1");
         $ps->execute([$nombre]);
         $pkg = $ps->fetch();
-        if (!$pkg) continue;
+        if (!$pkg) {
+            $svc['_pkg_features'] = itemFeaturesPorNombre($pdo, $nombre);
+            continue;
+        }
         $pid = $pkg['id'];
         $is = $pdo->prepare("
             SELECT ss.nombre AS ss_nombre, ss.precio, ss.frecuencia, s.nombre AS svc_nombre
@@ -455,6 +458,20 @@ enrichWithPaquete($servicios, $pdo);
                         <td>$&nbsp;<?= number_format($precioU, 0, ',', '.') ?></td>
                         <td>$&nbsp;<?= number_format($subtotal, 0, ',', '.') ?></td>
                     </tr>
+                    <?php if (!empty($pkgFeats)): ?>
+                    <tr>
+                        <td colspan="4" style="padding:0 14px 10px 14px;border-bottom:1px solid #E8E5DD">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px 16px">
+                                <?php foreach ($pkgFeats as $feat): ?>
+                                <span style="font-size:10px;color:#57544D;display:flex;align-items:center;gap:4px">
+                                    <svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    <?= htmlspecialchars($feat) ?>
+                                </span>
+                                <?php endforeach; ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
                     <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>

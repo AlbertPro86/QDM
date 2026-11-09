@@ -286,7 +286,10 @@ foreach ($servicios as &$svc) {
     $ps = $pdo->prepare("SELECT id FROM paquetes WHERE nombre = ? AND activo = 1 LIMIT 1");
     $ps->execute([$nombre]);
     $pkg = $ps->fetch();
-    if (!$pkg) continue;
+    if (!$pkg) {
+        $svc['_pkg_features'] = itemFeaturesPorNombre($pdo, $nombre);
+        continue;
+    }
     $pid = $pkg['id'];
     $is = $pdo->prepare("
         SELECT ss.nombre AS ss_nombre, ss.precio, ss.frecuencia, s.nombre AS svc_nombre
@@ -363,6 +366,17 @@ foreach ($servicios as $idx => $svc) {
             <td class="itm-td" style="padding:10px 0;font-size:12px;color:#8A867C;text-align:right;white-space:nowrap">$ ' . number_format($precioU, 0, ',', '.') . '</td>
             <td class="itm-td" style="padding:10px 0;font-size:12px;font-weight:700;color:#0E0E0C;text-align:right;white-space:nowrap">$ ' . number_format($subtotal, 0, ',', '.') . '</td>
         </tr>';
+        if (!empty($pkgFeats)) {
+            $featHtml = '';
+            foreach ($pkgFeats as $feat) {
+                $featHtml .= '<span style="font-size:10px;color:#57544D;margin-right:14px;white-space:nowrap;display:inline-block">'
+                    . '<svg width="10" height="10" fill="none" stroke="#2D8F5A" viewBox="0 0 24 24" stroke-width="3" style="vertical-align:middle;margin-right:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+                    . htmlspecialchars($feat) . '</span>';
+            }
+            $tablasServicios .= '<tr style="background:' . $rowBg . ';border-bottom:1px solid #E8E5DD">
+                <td colspan="4" class="itm-td" style="padding:0 0 9px 0">' . $featHtml . '</td>
+            </tr>';
+        }
     }
 }
 
