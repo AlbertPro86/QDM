@@ -2412,10 +2412,20 @@ function sendOrdenByEmail() {
     if (clienteEmails.facturacion) opciones.push({ label: 'Orden de Compra', email: clienteEmails.facturacion });
     if (clienteEmails.contacto)    opciones.push({ label: 'Encargado / Persona', email: clienteEmails.contacto });
 
-    const opcionesHTML = opciones.map((o, i) => `
-        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px;transition:border-color .15s"
-               onmouseenter="this.style.borderColor='#0E0E0C'" onmouseleave="this.style.borderColor=document.getElementById('emailOpt${i}').checked?'#0E0E0C':'#E8E5DD'">
-            <input type="radio" id="emailOpt${i}" name="emailDestinatario" value="${o.email}" ${i===0?'checked':''} style="accent-color:#0E0E0C">
+    const _lblStyle = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px';
+    const todosHTML = opciones.length > 1 ? `
+        <label style="${_lblStyle};background:#FAFAF7">
+            <input type="checkbox" id="emailTodos" checked style="accent-color:#0E0E0C"
+                onchange="document.querySelectorAll('[name=emailDestinatario]').forEach(c=>c.checked=this.checked)">
+            <span>
+                <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">Todos</span>
+                <span style="font-size:13px;color:#0f172a">Enviar a los ${opciones.length} correos del cliente</span>
+            </span>
+        </label>` : '';
+    const opcionesHTML = todosHTML + opciones.map((o, i) => `
+        <label style="${_lblStyle}">
+            <input type="checkbox" id="emailOpt${i}" name="emailDestinatario" value="${o.email}" checked style="accent-color:#0E0E0C"
+                onchange="var t=document.getElementById('emailTodos');if(t)t.checked=[...document.querySelectorAll('[name=emailDestinatario]')].every(c=>c.checked)">
             <span>
                 <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">${o.label}</span>
                 <span style="font-size:13px;color:#0f172a">${o.email}</span>
@@ -2438,11 +2448,12 @@ function sendOrdenByEmail() {
             <div style="padding:20px 24px">
                 ${opcionesHTML}
                 <label style="display:block;margin-top:4px">
-                    <span style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;display:block;margin-bottom:6px">Otro correo</span>
-                    <input id="emailPersonalizado" type="email" placeholder="otro@correo.com"
+                    <span style="font-size:11px;font-weight:700;color:#57544D;text-transform:uppercase;display:block;margin-bottom:6px">Otros correos (opcional)</span>
+                    <input id="emailPersonalizado" type="text" placeholder="otro@correo.com, otro2@correo.com"
                         style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #E8E5DD;border-radius:4px;font-size:13px;outline:none"
-                        onfocus="this.style.borderColor='#0E0E0C';document.querySelectorAll('[name=emailDestinatario]').forEach(r=>r.checked=false)"
+                        onfocus="this.style.borderColor='#0E0E0C'"
                         onblur="this.style.borderColor='#E8E5DD'">
+                    <span style="font-size:11px;color:#8A867C;display:block;margin-top:5px">Separa varios correos con coma. Se suman a los seleccionados.</span>
                 </label>
             </div>
             <div style="padding:16px 24px;border-top:1.5px solid #E8E5DD;display:flex;gap:10px;justify-content:flex-end">
@@ -2459,11 +2470,13 @@ function sendOrdenByEmail() {
 }
 
 async function _confirmarEnvioOrden() {
-    const personalizado = document.getElementById('emailPersonalizado')?.value.trim();
-    const seleccionado  = document.querySelector('[name=emailDestinatario]:checked')?.value;
-    const emailDest     = personalizado || seleccionado;
+    const personalizado = (document.getElementById('emailPersonalizado')?.value || '').split(/[,;\s]+/).filter(Boolean);
+    const seleccionados = [...document.querySelectorAll('[name=emailDestinatario]:checked')].map(c => c.value);
+    const emailDest     = [...new Set([...seleccionados, ...personalizado].map(e => e.trim()))];
 
-    if (!emailDest) { showToast('Selecciona o escribe un correo', 'error'); return; }
+    if (!emailDest.length) { showToast('Selecciona o escribe un correo', 'error'); return; }
+    const invalido = emailDest.find(e => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    if (invalido) { showToast('Correo no válido: ' + invalido, 'error'); return; }
 
     document.getElementById('emailSelectorOverlay')?.remove();
 

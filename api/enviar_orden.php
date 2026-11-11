@@ -91,10 +91,20 @@ if ($csIds) {
 }
 
 // Usar el email elegido por el usuario, si no, el de facturación del cliente
-$emailDest = trim($input['email_destino'] ?? $data['email_facturacion'] ?? '');
-if (!$emailDest || !filter_var($emailDest, FILTER_VALIDATE_EMAIL)) {
+// Acepta un string (uno o varios separados por coma/;/espacio) o un array
+$rawDest = $input['email_destino'] ?? $data['email_facturacion'] ?? '';
+if (is_array($rawDest)) $rawDest = implode(',', $rawDest);
+$emailsDest = [];
+foreach (preg_split('/[,;\s]+/', (string)$rawDest, -1, PREG_SPLIT_NO_EMPTY) as $e) {
+    $e = trim($e);
+    if (filter_var($e, FILTER_VALIDATE_EMAIL) && !in_array(strtolower($e), array_map('strtolower', $emailsDest), true)) {
+        $emailsDest[] = $e;
+    }
+}
+if (!$emailsDest) {
     jsonResponse(['error' => 'No hay un correo válido para enviar'], 422);
 }
+$emailDest = implode(', ', $emailsDest);
 
 // Verificar config SMTP
 $smtpUser = env('MAIL_USERNAME', '');
@@ -637,14 +647,27 @@ $inlineImages = [];
 if ($logoFilePath && @file_exists($logoFilePath)) {
     $inlineImages[] = ['path' => $logoFilePath, 'cid' => $logoCid, 'mime' => $logoMime];
 }
-$result = $mailer->send(
-    $data['nombre_comercial'] . ' <' . $emailDest . '>',
-    $emailAsunto,
-    $htmlFinal,
-    [],
-    $inlineImages,
-    $template['empresa_nombre'] ?? 'QUANTUN Digital'
-);
+$result = ['ok' => false, 'error' => 'Sin destinatarios'];
+$fallidos = [];
+$enviados = [];
+foreach ($emailsDest as $dest) {
+    $r = $mailer->send(
+        $data['nombre_comercial'] . ' <' . $dest . '>',
+        $emailAsunto,
+        $htmlFinal,
+        [],
+        $inlineImages,
+        $template['empresa_nombre'] ?? 'QUANTUN Digital'
+    );
+    if (!empty($r['ok'])) $enviados[] = $dest;
+    else $fallidos[] = $dest . ' (' . ($r['error'] ?? 'error') . ')';
+}
+if ($enviados) {
+    $result = ['ok' => true];
+    $emailDest = implode(', ', $enviados);
+} else {
+    $result = ['ok' => false, 'error' => implode('; ', $fallidos)];
+}
 // Limpiar archivo temporal del logo si se creó
 if (!empty($tmpLogo) && @file_exists($tmpLogo)) {
     @unlink($tmpLogo);
@@ -711,7 +734,9 @@ if ($result['ok']) {
         } catch (Exception $e) {}
     }
 
-    jsonResponse(['success' => true, 'message' => "$docTipoLabel enviada a $emailDest"]);
+    $msg = "$docTipoLabel enviada a $emailDest";
+    if ($fallidos) $msg .= '. No se pudo enviar a: ' . implode('; ', $fallidos);
+    jsonResponse(['success' => true, 'message' => $msg]);
 } else {
     jsonResponse(['error' => 'Error al enviar: ' . $result['error']], 500);
 }
