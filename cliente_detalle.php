@@ -1022,8 +1022,9 @@ include __DIR__ . '/includes/header.php';
 <script>
 const clienteId = <?= (int)$id ?>;
 let clienteContactos = <?= json_encode($contactosExtra, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
+const clienteEmpresa = <?= json_encode($cliente['nombre_comercial'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 const clientePrincipal = <?= json_encode([
-    'nombre'   => $cliente['persona_contacto'] ?: $cliente['nombre_comercial'],
+    'nombre'   => $cliente['persona_contacto'] ?: '',
     'telefono' => $cliente['telefono'] ?? '',
 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 const clienteEmails = {
@@ -1236,7 +1237,7 @@ async function deleteSvc(id) {
 }
 
 async function sendPaymentLink(enlace, servicioNombre) {
-    const msg = `\u{1F4B3} Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n\u{1F517} ${enlace}`
+    const msg = d => `\u{1F4B3} Hola ${d.saludo}, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n\u{1F517} ${enlace}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
     if (!(await waAbrirCliente(msg))) return;
 
@@ -1751,13 +1752,20 @@ async function saveSvc(e) {
 }
 
 // ── WhatsApp a uno, varios o todos los contactos ────────────────────────────
+function _primerNombre(n) {
+    return String(n || '').trim().split(/\s+/)[0] || '';
+}
+
+// Texto del mensaje para un destinatario: acepta un string fijo o una función(dest).
+function _textoWA(texto, d) { return typeof texto === 'function' ? texto(d) : texto; }
+
 function waDestinatarios() {
     const lista = [];
     if (waNumero(clientePrincipal.telefono)) {
-        lista.push({ label: 'Encargado principal', nombre: clientePrincipal.nombre, tel: clientePrincipal.telefono });
+        lista.push({ label: 'Encargado principal', nombre: clientePrincipal.nombre || clienteEmpresa, saludo: _primerNombre(clientePrincipal.nombre) || clienteEmpresa, tel: clientePrincipal.telefono });
     }
     clienteContactos.forEach(c => {
-        if (waNumero(c.telefono)) lista.push({ label: c.rol || 'Contacto', nombre: c.nombre, tel: c.telefono });
+        if (waNumero(c.telefono)) lista.push({ label: c.rol || 'Contacto', nombre: c.nombre, saludo: _primerNombre(c.nombre) || c.nombre, tel: c.telefono });
     });
     return lista;
 }
@@ -1767,7 +1775,7 @@ function waDestinatarios() {
 function waAbrirCliente(texto) {
     const dest = waDestinatarios();
     if (!dest.length) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return Promise.resolve(false); }
-    if (dest.length === 1) return Promise.resolve(waAbrir(dest[0].tel, texto));
+    if (dest.length === 1) return Promise.resolve(waAbrir(dest[0].tel, _textoWA(texto, dest[0])));
 
     return new Promise(resolve => {
         const ov = document.createElement('div');
@@ -1811,7 +1819,7 @@ function waAbrirCliente(texto) {
             // bloquee quedan como botones para abrirlas una a una.
             const pendientes = [];
             sel.forEach(d => {
-                const w = window.open(waLink(d.tel, texto), '_blank');
+                const w = window.open(waLink(d.tel, _textoWA(texto, d)), '_blank');
                 if (!w) pendientes.push(d);
             });
             if (!pendientes.length) { cerrar(true); return; }
@@ -1819,10 +1827,10 @@ function waAbrirCliente(texto) {
             ov.querySelector('#waBody').innerHTML =
                 '<p style="margin:0 0 12px;font-size:13px;color:#57544D">El navegador solo abrió algunos chats. Abre el resto uno por uno:</p>' +
                 pendientes.map(d => `
-                <button type="button" data-tel="${escapeHtml(d.tel)}" class="waRest" style="display:block;width:100%;text-align:left;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;margin-bottom:8px;font-size:13px">
+                <button type="button" data-i="${dest.indexOf(d)}" class="waRest" style="display:block;width:100%;text-align:left;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;margin-bottom:8px;font-size:13px">
                     <strong>${escapeHtml(d.nombre || d.label)}</strong> · ${escapeHtml(d.tel)}
                 </button>`).join('');
-            ov.querySelectorAll('.waRest').forEach(b => b.onclick = () => { window.open(waLink(b.dataset.tel, texto), '_blank'); b.style.opacity = '.45'; });
+            ov.querySelectorAll('.waRest').forEach(b => b.onclick = () => { const dd = dest[+b.dataset.i]; window.open(waLink(dd.tel, _textoWA(texto, dd)), '_blank'); b.style.opacity = '.45'; });
             ov.querySelector('#waGo').style.display = 'none';
             ov.querySelector('#waCancel').textContent = 'Listo';
             ov.querySelector('#waCancel').onclick = () => cerrar(true);
@@ -1915,6 +1923,7 @@ function renderNotifProgressCard(svcs) {
     const svc   = activos[0];
     window._notifSvc = svc;   // lo usa enviarRecordatorioWA() para armar el mensaje
     window._notifNombres = _nombresServiciosAviso(svcs);
+    window._notifSvcs = svcs;
     const count = Math.min(3, parseInt(svc.notif_count) || 0);
     // Calcular días restantes comparando fechas completas desde medianoche (evita desfase por hora del día)
     const _hoy   = new Date(); _hoy.setHours(0, 0, 0, 0);
@@ -2005,6 +2014,29 @@ function renderNotifProgressCard(svcs) {
     </div>`;
 }
 
+// Detalle ítem por ítem, igual que la orden: nombre, precio, descuento y total.
+function _fmtCOP(n) { return '$ ' + Math.round(Number(n) || 0).toLocaleString('es-CO'); }
+
+function _detalleServiciosWA(lista, tituloTotal) {
+    lista = (lista || []).filter(s => s && s.servicio_nombre);
+    if (!lista.length) return '';
+    let total = 0;
+    const filas = lista.map(s => {
+        const precio = Number(s.monto_renovacion) || 0;
+        const desc   = Number(s.descuento) || 0;
+        const neto   = Math.max(0, precio - desc);
+        total += neto;
+        let l = `\u2022 *${s.servicio_nombre}*\n   ${_fmtCOP(precio)}`;
+        if (desc > 0) l += ` \u2212 descuento ${_fmtCOP(desc)} = ${_fmtCOP(neto)}`;
+        return l;
+    }).join('\n');
+    return `${filas}\n\n\u{1F4B0} *${tituloTotal}: ${_fmtCOP(total)} COP*`;
+}
+
+function _serviciosRecurrentesActivos() {
+    return (window._notifSvcs || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico');
+}
+
 // Nombres de los servicios recurrentes activos, para listarlos en los avisos.
 function _nombresServiciosAviso(svcs) {
     const lista = (svcs || []).filter(s => s.estado === 'activo' && s.frecuencia !== 'unico')
@@ -2019,17 +2051,19 @@ function _nombresServiciosAviso(svcs) {
 async function enviarAvisoSuspensionWA(svcId) {
 
     const svc    = window._notifSvc || {};
-    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+    const nombre = clienteEmpresa;
     const nombres = window._notifNombres || `*${svc.servicio_nombre || 'tus servicios'}*`;
     const vence = svc.fecha_vencimiento
         ? new Date(svc.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
         : '';
 
-    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
-              + `\u{26A0}\u{FE0F} Tus servicios ${nombres} se encuentran *suspendidos*`
+    const detalle = _detalleServiciosWA(_serviciosRecurrentesActivos(), 'Total por renovar');
+    const msg = d => `\u{1F44B} Hola ${d.saludo}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{26A0}\u{FE0F} Los servicios de *${nombre}* se encuentran *suspendidos*`
               + (vence ? ` desde el ${vence}, por falta de renovación` : ' por falta de renovación')
-              + `.\n\n\u{1F512} Mientras estén suspendidos tu sitio web y tu correo dejan de estar disponibles.`
-              + ` Y si la renovación se demora más, *corres el riesgo de perder toda la información, el dominio y el contenido alojado*, y recuperarlos puede no ser posible.`
+              + (detalle ? `:\n\n${detalle}` : ` (${nombres})`)
+              + `\n\n\u{1F512} Mientras estén suspendidos el sitio web y el correo dejan de estar disponibles.`
+              + ` Y si la renovación se demora más, *se corre el riesgo de perder toda la información, el dominio y el contenido alojado*, y recuperarlos puede no ser posible.`
               + `\n\n\u{1F4AC} Escríbenos por este medio y reactivamos todo de inmediato. Estamos para ayudarte \u{1F64F}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
@@ -2052,16 +2086,18 @@ async function enviarAvisoSuspensionWA(svcId) {
 async function enviarAvisoRenovacionWA() {
 
     const svc    = window._notifSvc || {};
-    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+    const nombre = clienteEmpresa;
     const nombres = window._notifNombres || `*${svc.servicio_nombre || 'tus servicios'}*`;
     const vence = svc.fecha_vencimiento
         ? new Date(svc.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
         : '';
 
-    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
-              + `\u{2705} Recibimos tu pago y *renovamos con éxito* tus servicios ${nombres}`
+    const detalle = _detalleServiciosWA(_serviciosRecurrentesActivos(), 'Total renovado');
+    const msg = d => `\u{1F44B} Hola ${d.saludo}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{2705} Recibimos el pago y *renovamos con éxito* los servicios de *${nombre}*`
               + (vence ? `. Quedan activos hasta el ${vence}` : '')
-              + `.\n\n\u{1F680} Todo sigue funcionando con normalidad. ¡Gracias por confiar en nosotros! \u{1F64C}`
+              + (detalle ? `:\n\n${detalle}` : ` (${nombres})`)
+              + `\n\n\u{1F680} Todo sigue funcionando con normalidad. ¡Gracias por confiar en nosotros! \u{1F64C}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
     if (!(await waAbrirCliente(msg))) return;
@@ -2084,7 +2120,7 @@ async function enviarAvisoRenovacionWA() {
 async function enviarRecordatorioWA(svcId, paso, svcNombre) {
 
     const svc    = window._notifSvc || {};
-    const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
+    const nombre = clienteEmpresa;
 
     let vence = '';
     if (svc.fecha_vencimiento) {
@@ -2096,10 +2132,14 @@ async function enviarRecordatorioWA(svcId, paso, svcNombre) {
     // los arma en memoria y no dependen de la codificación del archivo ni de
     // la cabecera HTTP. Con el emoji literal se corrompían a "?" en WhatsApp,
     // mientras que las tildes (2 bytes) pasaban bien.
-    const msg = `\u{1F44B} Hola ${nombre}, te saludamos de QUANTUN Digital.\n\n`
-              + `\u{1F4C5} Te recordamos que tu servicio *${svcNombre}*`
-              + (vence ? ` tiene fecha de renovación el ${vence}` : ' tiene su renovación próxima')
-              + `.\n\n\u{1F4AC} Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! \u{1F64C}`
+    // Servicios que vencen junto con el del aviso (misma fecha), como en la orden.
+    const grupo = _serviciosRecurrentesActivos().filter(x => x.fecha_vencimiento === svc.fecha_vencimiento);
+    const detalle = _detalleServiciosWA(grupo.length ? grupo : [svc], 'Total a renovar');
+    const msg = d => `\u{1F44B} Hola ${d.saludo}, te saludamos de QUANTUN Digital.\n\n`
+              + `\u{1F4C5} Te recordamos que ${grupo.length > 1 ? 'los servicios' : 'el servicio'} de *${nombre}*`
+              + (vence ? ` ${grupo.length > 1 ? 'tienen' : 'tiene'} fecha de renovación el ${vence}` : ' tiene su renovación próxima')
+              + `:\n\n${detalle}`
+              + `\n\n\u{1F4AC} Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! \u{1F64C}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
     if (!(await waAbrirCliente(msg))) return;
