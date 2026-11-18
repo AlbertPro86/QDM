@@ -14,6 +14,8 @@ $cliente = $stmt->fetch();
 
 if (!$cliente) { header('Location: clientes.php'); exit; }
 
+$contactosExtra = getClienteContactos($pdo, (int)$cliente['id']);
+
 
 $personaDisplay = $cliente['persona_contacto'] ?: $cliente['nombre_comercial'];
 $pageTitle = sanitize($personaDisplay);
@@ -990,6 +992,24 @@ include __DIR__ . '/includes/header.php';
                     <label style="display:block;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Sitio Web</label>
                     <input type="url" class="form-input" id="editSitioWeb" placeholder="https://www.miempresa.com">
                 </div>
+                <!-- Contactos adicionales -->
+                <div style="margin-top:22px;padding-top:18px;border-top:1.5px solid #E8E5DD">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                        <div>
+                            <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">Otros contactos</div>
+                            <div style="font-size:12px;color:#8A867C;margin-top:3px">El principal es el de arriba. Agrega más personas con el rol que quieras; al enviar por correo o WhatsApp eliges a quién.</div>
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="addContactoRow()" style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+                            Agregar
+                        </button>
+                    </div>
+                    <div id="contactosExtraList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
+                    <datalist id="rolesSugeridos">
+                        <option value="Gerente"><option value="Contador"><option value="Compras"><option value="Facturación">
+                        <option value="Soporte técnico"><option value="Marketing"><option value="Administrativo">
+                    </datalist>
+                </div>
             </form>
         </div>
         <div class="modal-footer">
@@ -1001,6 +1021,11 @@ include __DIR__ . '/includes/header.php';
 
 <script>
 const clienteId = <?= (int)$id ?>;
+let clienteContactos = <?= json_encode($contactosExtra, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
+const clientePrincipal = <?= json_encode([
+    'nombre'   => $cliente['persona_contacto'] ?: $cliente['nombre_comercial'],
+    'telefono' => $cliente['telefono'] ?? '',
+], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?>;
 const clienteEmails = {
     facturacion: <?= json_encode($cliente['email_facturacion'] ?? '') ?>,
     contacto:    <?= json_encode($cliente['email_contacto']    ?? '') ?>,
@@ -1211,10 +1236,9 @@ async function deleteSvc(id) {
 }
 
 async function sendPaymentLink(enlace, servicioNombre) {
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
     const msg = `\u{1F4B3} Hola, te compartimos el enlace para realizar el pago del servicio *${servicioNombre}*:\n\u{1F517} ${enlace}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
-    if (!waAbrir(tel, msg)) return;
+    if (!(await waAbrirCliente(msg))) return;
 
     try {
         await fetch('api/cliente_notas.php', {
@@ -1726,10 +1750,87 @@ async function saveSvc(e) {
     }
 }
 
-function abrirChatCliente() {
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono']) ?>";
-    waAbrir(tel);
+// ── WhatsApp a uno, varios o todos los contactos ────────────────────────────
+function waDestinatarios() {
+    const lista = [];
+    if (waNumero(clientePrincipal.telefono)) {
+        lista.push({ label: 'Encargado principal', nombre: clientePrincipal.nombre, tel: clientePrincipal.telefono });
+    }
+    clienteContactos.forEach(c => {
+        if (waNumero(c.telefono)) lista.push({ label: c.rol || 'Contacto', nombre: c.nombre, tel: c.telefono });
+    });
+    return lista;
 }
+
+// Abre WhatsApp con el texto para los contactos que elija el usuario.
+// Devuelve una promesa: true si se abrió al menos un chat, false si se canceló.
+function waAbrirCliente(texto) {
+    const dest = waDestinatarios();
+    if (!dest.length) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return Promise.resolve(false); }
+    if (dest.length === 1) return Promise.resolve(waAbrir(dest[0].tel, texto));
+
+    return new Promise(resolve => {
+        const ov = document.createElement('div');
+        ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2100;display:flex;align-items:center;justify-content:center';
+        const filas = dest.map((d, i) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px">
+                <input type="checkbox" class="waDest" value="${i}" checked style="accent-color:#0E0E0C"
+                    onchange="var t=document.getElementById('waTodos');if(t)t.checked=[...document.querySelectorAll('.waDest')].every(c=>c.checked)">
+                <span>
+                    <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">${escapeHtml(d.label)}</span>
+                    <span style="font-size:13px;color:#0f172a">${escapeHtml(d.nombre || '')} · ${escapeHtml(d.tel)}</span>
+                </span>
+            </label>`).join('');
+        ov.innerHTML = `
+            <div style="background:#fff;border-radius:6px;width:420px;max-width:94vw;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+                <div style="padding:20px 24px;border-bottom:1.5px solid #E8E5DD">
+                    <h3 style="margin:0;font-size:15px;font-weight:700;color:#0E0E0C">Enviar por WhatsApp</h3>
+                    <p style="margin:3px 0 0;font-size:12px;color:#8A867C">Elige a quién escribirle</p>
+                </div>
+                <div id="waBody" style="padding:20px 24px;max-height:60vh;overflow:auto">
+                    <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px;background:#FAFAF7">
+                        <input type="checkbox" id="waTodos" checked style="accent-color:#0E0E0C"
+                            onchange="document.querySelectorAll('.waDest').forEach(c=>c.checked=this.checked)">
+                        <span><span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">Todos</span>
+                        <span style="font-size:13px;color:#0f172a">El mismo mensaje a los ${dest.length} contactos</span></span>
+                    </label>
+                    ${filas}
+                </div>
+                <div style="padding:16px 24px;border-top:1.5px solid #E8E5DD;display:flex;gap:10px;justify-content:flex-end">
+                    <button id="waCancel" style="padding:9px 18px;background:#FAFAF7;border:none;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+                    <button id="waGo" style="padding:9px 20px;background:#16a34a;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer">Abrir WhatsApp</button>
+                </div>
+            </div>`;
+        document.body.appendChild(ov);
+        const cerrar = ok => { ov.remove(); resolve(ok); };
+        ov.querySelector('#waCancel').onclick = () => cerrar(false);
+        ov.querySelector('#waGo').onclick = () => {
+            const sel = [...ov.querySelectorAll('.waDest:checked')].map(c => dest[+c.value]);
+            if (!sel.length) { showToast('Elige al menos un contacto', 'warning'); return; }
+            // El navegador suele dejar abrir una sola ventana por clic: las que
+            // bloquee quedan como botones para abrirlas una a una.
+            const pendientes = [];
+            sel.forEach(d => {
+                const w = window.open(waLink(d.tel, texto), '_blank');
+                if (!w) pendientes.push(d);
+            });
+            if (!pendientes.length) { cerrar(true); return; }
+            if (pendientes.length === sel.length) { cerrar(false); showToast('El navegador bloqueó la ventana de WhatsApp', 'warning'); return; }
+            ov.querySelector('#waBody').innerHTML =
+                '<p style="margin:0 0 12px;font-size:13px;color:#57544D">El navegador solo abrió algunos chats. Abre el resto uno por uno:</p>' +
+                pendientes.map(d => `
+                <button type="button" data-tel="${escapeHtml(d.tel)}" class="waRest" style="display:block;width:100%;text-align:left;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;margin-bottom:8px;font-size:13px">
+                    <strong>${escapeHtml(d.nombre || d.label)}</strong> · ${escapeHtml(d.tel)}
+                </button>`).join('');
+            ov.querySelectorAll('.waRest').forEach(b => b.onclick = () => { window.open(waLink(b.dataset.tel, texto), '_blank'); b.style.opacity = '.45'; });
+            ov.querySelector('#waGo').style.display = 'none';
+            ov.querySelector('#waCancel').textContent = 'Listo';
+            ov.querySelector('#waCancel').onclick = () => cerrar(true);
+        };
+    });
+}
+
+function abrirChatCliente() { waAbrirCliente(''); }
 
 function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function escapeJs(s){if(!s)return'';return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');}
@@ -1916,8 +2017,6 @@ function _nombresServiciosAviso(svcs) {
 // Aviso de suspensión (servicio vencido). Se envía por WhatsApp, igual que los recordatorios.
 // Los emojis van como escapes \u{...} por la misma razón que en enviarRecordatorioWA().
 async function enviarAvisoSuspensionWA(svcId) {
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
-    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
 
     const svc    = window._notifSvc || {};
     const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
@@ -1934,7 +2033,7 @@ async function enviarAvisoSuspensionWA(svcId) {
               + `\n\n\u{1F4AC} Escríbenos por este medio y reactivamos todo de inmediato. Estamos para ayudarte \u{1F64F}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
-    if (!waAbrir(tel, msg)) return;
+    if (!(await waAbrirCliente(msg))) return;
 
     try {
         await fetch('api/cliente_notas.php', {
@@ -1951,8 +2050,6 @@ async function enviarAvisoSuspensionWA(svcId) {
 
 // Aviso de renovación exitosa: confirma al cliente que ya está al día y hasta cuándo.
 async function enviarAvisoRenovacionWA() {
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
-    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
 
     const svc    = window._notifSvc || {};
     const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
@@ -1967,7 +2064,7 @@ async function enviarAvisoRenovacionWA() {
               + `.\n\n\u{1F680} Todo sigue funcionando con normalidad. ¡Gracias por confiar en nosotros! \u{1F64C}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
-    if (!waAbrir(tel, msg)) return;
+    if (!(await waAbrirCliente(msg))) return;
 
     try {
         await fetch('api/cliente_notas.php', {
@@ -1985,8 +2082,6 @@ async function enviarAvisoRenovacionWA() {
 // Envía el aviso N por WhatsApp y lo marca como enviado. Reemplaza al envío
 // automático por correo: el mensaje lo manda el usuario desde el navegador.
 async function enviarRecordatorioWA(svcId, paso, svcNombre) {
-    const tel = "<?= preg_replace('/\D/','',$cliente['telefono'] ?? '') ?>";
-    if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
 
     const svc    = window._notifSvc || {};
     const nombre = "<?= addslashes(sanitize($cliente['nombre_comercial'] ?? '')) ?>";
@@ -2007,7 +2102,7 @@ async function enviarRecordatorioWA(svcId, paso, svcNombre) {
               + `.\n\n\u{1F4AC} Escríbenos por este medio y lo dejamos renovado. ¡Gracias por confiar en nosotros! \u{1F64C}`
               + `\n\n_\u{1F916} Este es un mensaje automático del CRM de QUANTUN Digital._`;
 
-    if (!waAbrir(tel, msg)) return;
+    if (!(await waAbrirCliente(msg))) return;
 
     try {
         const nowStr = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -2411,6 +2506,7 @@ function sendOrdenByEmail() {
     const opciones = [];
     if (clienteEmails.facturacion) opciones.push({ label: 'Orden de Compra', email: clienteEmails.facturacion });
     if (clienteEmails.contacto)    opciones.push({ label: 'Encargado / Persona', email: clienteEmails.contacto });
+    clienteContactos.forEach(c => { if (c.email) opciones.push({ label: (c.rol ? c.rol + ' · ' : '') + c.nombre, email: c.email }); });
 
     const _lblStyle = 'display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:8px';
     const todosHTML = opciones.length > 1 ? `
@@ -2424,11 +2520,11 @@ function sendOrdenByEmail() {
         </label>` : '';
     const opcionesHTML = todosHTML + opciones.map((o, i) => `
         <label style="${_lblStyle}">
-            <input type="checkbox" id="emailOpt${i}" name="emailDestinatario" value="${o.email}" checked style="accent-color:#0E0E0C"
+            <input type="checkbox" id="emailOpt${i}" name="emailDestinatario" value="${escapeHtml(o.email)}" checked style="accent-color:#0E0E0C"
                 onchange="var t=document.getElementById('emailTodos');if(t)t.checked=[...document.querySelectorAll('[name=emailDestinatario]')].every(c=>c.checked)">
             <span>
-                <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">${o.label}</span>
-                <span style="font-size:13px;color:#0f172a">${o.email}</span>
+                <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;display:block">${escapeHtml(o.label)}</span>
+                <span style="font-size:13px;color:#0f172a">${escapeHtml(o.email)}</span>
             </span>
         </label>`).join('');
 
@@ -4021,7 +4117,43 @@ function openEditModal() {
     document.getElementById('editDireccion').value = cliente.direccion;
     document.getElementById('editSitioWeb').value  = cliente.sitio_web;
 
+    renderContactosRows(clienteContactos);
     document.getElementById('editClientModal').classList.add('show');
+}
+
+// ── Contactos adicionales (filas editables) ──────────────────────────────────
+function renderContactosRows(lista) {
+    const box = document.getElementById('contactosExtraList');
+    box.innerHTML = '';
+    (lista || []).forEach(c => addContactoRow(c));
+}
+
+function addContactoRow(c) {
+    c = (c && c.nombre !== undefined) ? c : {};
+    const row = document.createElement('div');
+    row.className = 'contacto-row';
+    row.style.cssText = 'display:grid;grid-template-columns:1.2fr 1fr 1.3fr 1fr 32px;gap:8px;align-items:center';
+    const campo = (cls, ph, val, type, extra) =>
+        `<input type="${type || 'text'}" class="form-input ${cls}" placeholder="${ph}" value="${escapeHtml(val || '').replace(/"/g, '&quot;')}" ${extra || ''}>`;
+    row.innerHTML =
+        campo('ct-nombre', 'Nombre') +
+        campo('ct-rol', 'Rol (ej. Contador)', c.rol, 'text', 'list="rolesSugeridos"') +
+        campo('ct-email', 'correo@empresa.com', c.email, 'email') +
+        campo('ct-tel', 'WhatsApp', c.telefono, 'tel') +
+        `<button type="button" title="Quitar" onclick="this.closest('.contacto-row').remove()" style="background:none;border:none;cursor:pointer;color:#8A867C;padding:6px;display:flex">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>`;
+    row.querySelector('.ct-nombre').value = c.nombre || '';
+    document.getElementById('contactosExtraList').appendChild(row);
+}
+
+function leerContactosRows() {
+    return [...document.querySelectorAll('#contactosExtraList .contacto-row')].map(r => ({
+        nombre:   r.querySelector('.ct-nombre').value.trim(),
+        rol:      r.querySelector('.ct-rol').value.trim(),
+        email:    r.querySelector('.ct-email').value.trim(),
+        telefono: r.querySelector('.ct-tel').value.trim(),
+    })).filter(c => c.nombre || c.email || c.telefono);
 }
 
 function closeEditClientModal() {
@@ -4042,6 +4174,9 @@ async function saveClientData(event) {
         direccion: document.getElementById('editDireccion').value || null,
         sitio_web: document.getElementById('editSitioWeb').value  || null,
     };
+    const contactos = leerContactosRows();
+    const malo = contactos.find(c => !c.nombre);
+    if (malo) { showToast('Cada contacto adicional necesita un nombre', 'warning'); return; }
 
     try {
         const response = await fetch('api/clientes.php', {
@@ -4051,6 +4186,13 @@ async function saveClientData(event) {
         });
         const result = await response.json();
         if (result.success) {
+            const rc = await fetch('api/cliente_contactos.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente_id: clienteId, contactos: contactos })
+            });
+            const dc = await rc.json();
+            if (!dc.success) { showToast(dc.error || 'No se guardaron los contactos', 'error'); return; }
             showToast('Cliente actualizado correctamente', 'success');
             closeEditClientModal();
             // Recargar la página para mostrar cambios
@@ -4145,14 +4287,15 @@ function seleccionarMsgPlantilla(p) {
     const texto = (p.contenido || '').replace(/\{\{cliente_nombre\}\}/g, nombreCliente).replace(/\{\{empresa\}\}/g, nombreCliente);
 
     if (_msgCanal === 'whatsapp') {
-        const tel = "<?= preg_replace('/\D/', '', $cliente['telefono'] ?? '') ?>";
-        if (!waNumero(tel)) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
+        if (!waDestinatarios().length) { showToast('El cliente no tiene número de WhatsApp registrado', 'warning'); return; }
         closeMensajesModal();
-        waAbrir(tel, texto || p.nombre);
-        fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ cliente_id: clienteId, nota: '[📱] WhatsApp: ' + p.nombre })
-        }).then(() => loadNotes());
-        showToast('WhatsApp abierto', 'success');
+        waAbrirCliente(texto || p.nombre).then(ok => {
+            if (!ok) return;
+            fetch('api/cliente_notas.php', { method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ cliente_id: clienteId, nota: '[📱] WhatsApp: ' + p.nombre })
+            }).then(() => loadNotes());
+            showToast('WhatsApp abierto', 'success');
+        });
     } else {
         const email = "<?= addslashes(sanitize($cliente['email_facturacion'] ?? '')) ?>";
         document.getElementById('msgEmailPara').textContent = email ? 'Para: ' + email : '⚠ Sin correo registrado';

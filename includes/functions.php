@@ -346,3 +346,34 @@ function itemFeaturesPorNombre(PDO $pdo, string $nombre): array {
     }
     return [];
 }
+
+
+/**
+ * Contactos adicionales de un cliente (encargados con rol propio).
+ * El encargado principal sigue en clientes.persona_contacto / telefono /
+ * email_contacto; aquí van los demás. La tabla se crea sola si no existe,
+ * así local y producción migran sin pasos manuales.
+ */
+function ensureClienteContactos(PDO $pdo): void {
+    static $hecho = false;
+    if ($hecho) return;
+    $pdo->exec("CREATE TABLE IF NOT EXISTS cliente_contactos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        cliente_id INT NOT NULL,
+        nombre VARCHAR(120) NOT NULL,
+        rol VARCHAR(80) DEFAULT NULL,
+        email VARCHAR(150) DEFAULT NULL,
+        telefono VARCHAR(30) DEFAULT NULL,
+        orden INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        KEY idx_cliente (cliente_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $hecho = true;
+}
+
+function getClienteContactos(PDO $pdo, int $clienteId): array {
+    ensureClienteContactos($pdo);
+    $st = $pdo->prepare("SELECT id, nombre, rol, email, telefono FROM cliente_contactos WHERE cliente_id = ? ORDER BY orden, id");
+    $st->execute([$clienteId]);
+    return $st->fetchAll();
+}

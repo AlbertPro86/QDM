@@ -135,6 +135,7 @@ switch ($method) {
         $pdo->prepare("DELETE FROM cliente_servicios WHERE cliente_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM clientes_notas WHERE cliente_id = ?")->execute([$id]);
         $pdo->prepare("DELETE FROM clientes_archivos WHERE cliente_id = ?")->execute([$id]);
+        try { $pdo->prepare("DELETE FROM cliente_contactos WHERE cliente_id = ?")->execute([$id]); } catch (Exception $e) {}
         $pdo->prepare("DELETE FROM clientes WHERE id = ?")->execute([$id]);
         jsonResponse(['success' => true, 'message' => 'Cliente eliminado']);
         break;
